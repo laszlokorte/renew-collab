@@ -16,6 +16,13 @@ defmodule RenewCollabWeb.ElementController do
     document = Renew.get_document!(document_id)
 
     with {:ok, %Element{} = element} <- Renew.create_element(document, element_params) do
+      RenewCollabWeb.Endpoint.broadcast!(
+        "document:#{document_id}",
+        "element:new",
+        Map.take(element, [:id, :z_index, :position_x, :position_y])
+        |> Map.put("href", url(~p"/api/documents/#{document_id}/elements/#{element}"))
+      )
+
       conn
       |> put_status(:created)
       |> put_resp_header("location", ~p"/api/documents/#{document.id}/elements/#{element}")

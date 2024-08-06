@@ -30,6 +30,7 @@ defmodule RenewCollabWeb.DocumentJSON do
     %{
       # id: document.id,
       href: url(~p"/api/documents/#{document}"),
+      channel: "document:#{document.id}",
       name: document.name,
       kind: document.kind,
       elements:
