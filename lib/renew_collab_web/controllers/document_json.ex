@@ -32,10 +32,12 @@ defmodule RenewCollabWeb.DocumentJSON do
       href: url(~p"/api/documents/#{document}"),
       name: document.name,
       kind: document.kind,
-      elements: %{
-        href: url(~p"/api/documents/#{document}/elements"),
-        items: document.elements |> Enum.map(&element_data(document, &1))
-      }
+      elements:
+        case document.elements do
+          %Ecto.Association.NotLoaded{} -> %{}
+          _ -> %{items: document.elements |> Enum.map(&element_data(document, &1))}
+        end
+        |> Map.put(:href, url(~p"/api/documents/#{document}/elements"))
     }
   end
 

@@ -53,7 +53,7 @@ defmodule RenewCollab.Renew do
 
   """
   def create_document(attrs \\ %{}) do
-    %Document{}
+    %Document{elements: []}
     |> Document.changeset(attrs)
     |> Repo.insert()
   end
