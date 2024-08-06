@@ -21,15 +21,18 @@ if System.get_env("PHX_SERVER") do
 end
 
 if config_env() == :prod do
-  database_path =
-    System.get_env("DATABASE_PATH") ||
+  database_password =
+    System.get_env("DATABASE_PASSWORD") ||
       raise """
-      environment variable DATABASE_PATH is missing.
-      For example: /etc/renew_collab/renew_collab.db
+      environment variable DATABASE_PASSWORD is missing.
       """
 
   config :renew_collab, RenewCollab.Repo,
-    database: database_path,
+    hostname: "localhost",
+    username: "laszlo7",
+    database: "laszlo7_renew_collab",
+    password: database_password,
+    protocol: :tcp,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "5")
 
   # The secret key base is used to sign/encrypt cookies and other secrets.
