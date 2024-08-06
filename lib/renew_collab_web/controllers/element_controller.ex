@@ -18,7 +18,7 @@ defmodule RenewCollabWeb.ElementController do
     with {:ok, %Element{} = element} <- Renew.create_element(document, element_params) do
       conn
       |> put_status(:created)
-      |> put_resp_header("location", ~p"/api/element/#{element}")
+      |> put_resp_header("location", ~p"/api/#{document.id}/element/#{element}")
       |> render(:show, element: element)
     end
   end
@@ -33,7 +33,7 @@ defmodule RenewCollabWeb.ElementController do
     document = Renew.get_document!(document_id)
     element = Renew.get_element!(document, id)
 
-    with {:ok, %Element{} = element} <- Renew.update_element(element_params) do
+    with {:ok, %Element{} = element} <- Renew.update_element(element, element_params) do
       render(conn, :show, element: element)
     end
   end
