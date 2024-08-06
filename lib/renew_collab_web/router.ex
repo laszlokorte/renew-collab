@@ -5,8 +5,17 @@ defmodule RenewCollabWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :authenticated do
+    plug RenewCollabWeb.Plug.Authenticate
+  end
+
   scope "/api", RenewCollabWeb do
     pipe_through :api
+    get "/auth/login", SessionController, :new
+  end
+
+  scope "/api", RenewCollabWeb do
+    pipe_through [:api, :authenticated]
 
     resources "/documents", DocumentController, except: [:new, :edit] do
       resources "/elements", ElementController, except: [:new, :edit]

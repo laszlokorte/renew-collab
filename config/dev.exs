@@ -2,6 +2,7 @@ import Config
 
 # Configure your database
 config :renew_collab, RenewCollab.Repo,
+  adapter: Ecto.Adapters.SQLite3,
   database: Path.expand("../renew_collab_dev.db", __DIR__),
   pool_size: 5,
   stacktrace: true,

@@ -28,6 +28,7 @@ if config_env() == :prod do
       """
 
   config :renew_collab, RenewCollab.Repo,
+    adapter: Ecto.Adapters.MyXQL,
     hostname: "localhost",
     username: "laszlo7",
     database: "laszlo7_renew_collab",
