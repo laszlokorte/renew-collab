@@ -27,6 +27,8 @@ if config_env() == :prod do
       environment variable DATABASE_PASSWORD is missing.
       """
 
+  config :renew_collab, :app_password, System.get_env("APP_PASSWORD")
+
   config :renew_collab, RenewCollab.Repo,
     adapter: Ecto.Adapters.MyXQL,
     hostname: "localhost",

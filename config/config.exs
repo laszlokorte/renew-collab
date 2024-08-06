@@ -30,7 +30,6 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-
 config :exqlite, make_force_build: false
 
 # Import environment specific config. This must remain at the bottom

@@ -1,5 +1,7 @@
 import Config
 
+config :renew_collab, :app_password, "test"
+
 # Configure your database
 config :renew_collab, RenewCollab.Repo,
   adapter: Ecto.Adapters.SQLite3,

@@ -7,7 +7,7 @@ defmodule RenewCollab.Renew.Document do
   schema "document" do
     field :name, :string
     field :kind, :string
-    has_many :elements, RenewCollab.Renew.Element
+    has_many :elements, RenewCollab.Renew.Element, on_delete: :delete_all
 
     timestamps(type: :utc_datetime)
   end
