@@ -8,7 +8,7 @@ defmodule RenewCollabWeb.SessionController do
     account = RenewCollab.Auth.get_account_by_email(email)
 
     if account && verify_pass(password, account.password) do
-      render(conn, :show, token: RenewCollabWeb.Token.sign(%{user_id: 42}))
+      render(conn, :show, token: RenewCollabWeb.Token.sign(%{user_id: account.id}))
     else
       conn |> put_status(:unauthorized) |> render(:show, %{:error => "Authentication failed"})
     end
