@@ -29,3 +29,4 @@ renew_collab-*.tar
 *.db
 *.db-*
 
+deploy.sh
