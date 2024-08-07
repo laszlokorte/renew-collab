@@ -7,7 +7,13 @@ defmodule RenewCollabWeb.DocumentJSON do
   Renders a list of document.
   """
   def index(%{documents: documents}) do
-    %{data: for(document <- documents, do: list_data(document))}
+    %{
+      data: %{
+        href: url(~p"/api/documents"),
+        channel: "documents",
+        items: for(document <- documents, do: list_data(document))
+      }
+    }
   end
 
   @doc """
