@@ -37,7 +37,7 @@ defmodule RenewCollab.Auth do
   """
   def get_account!(id), do: Repo.get!(Account, id)
 
-  def get_account_by_email(email), do: Repo.get(Account, email: email)
+  def get_account_by_email(email), do: Repo.get_by(Account, email: email)
 
   @doc """
   Creates a account.

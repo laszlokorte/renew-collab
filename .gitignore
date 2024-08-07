@@ -30,3 +30,6 @@ renew_collab-*.tar
 *.db-*
 
 deploy.sh
+dev.sh
+env.sh
+mkpass.sh
