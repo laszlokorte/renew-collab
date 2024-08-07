@@ -19,7 +19,7 @@ defmodule RenewCollabWeb.Endpoint do
 
   socket "/collaboration", RenewCollabWeb.CollabSocket,
     websocket: [check_origin: false],
-    longpoll: false
+    longpoll: false 
 
   # Serve at "/" the static files from "priv/static" directory.
   #
