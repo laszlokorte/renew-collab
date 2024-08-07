@@ -1,6 +1,6 @@
 defmodule RenewCollabWeb.SessionController do
   use RenewCollabWeb, :controller
-  import Bcrypt.Base, only: [verify_pass: 2]
+  import Bcrypt, only: [verify_pass: 2]
 
   action_fallback RenewCollabWeb.FallbackController
 
