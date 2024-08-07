@@ -7,7 +7,7 @@ defmodule RenewCollab.Repo.Migrations.CreateElement do
       add :z_index, :integer
       add :position_x, :float
       add :position_y, :float
-      add :document_id, references(:document, on_delete: :nothing, type: :binary_id)
+      add :document_id, references(:document, on_delete: :delete_all, type: :binary_id)
 
       timestamps(type: :utc_datetime)
     end
