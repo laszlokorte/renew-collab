@@ -8,7 +8,6 @@ defmodule RenewCollab.Repo.Migrations.CreateElementStyle do
       add :background_color, :string
       add :border_color, :string
       add :border_width, :string
-      add :border_width, :string
       add :element_id, references(:element, on_delete: :delete_all, type: :binary_id)
 
       timestamps(type: :utc_datetime)

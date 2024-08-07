@@ -9,7 +9,6 @@ defmodule RenewCollab.Repo.Migrations.CreateElementTextStyle do
       add :font_family, :string
       add :bold, :boolean, default: false, null: false
       add :italic, :boolean, default: false, null: false
-      add :italic, :boolean, default: false, null: false
       add :underline, :boolean, default: false, null: false
       add :text_color, :string
       add :element_text_id, references(:element_text, on_delete: :delete_all, type: :binary_id)
