@@ -1,16 +1,16 @@
-defmodule RenewCollab.RenewNesting do
+defmodule RenewCollab.RenewHierarchy do
 	import Ecto.Query, only: [from: 2, union: 2]
 
-	def repair_parenthood do
-		invalid = find_invalids()
-		missing = find_missing()
-		
-		ids_to_delete = invalid |> Enum.map(fn	%{id: id} -> id end)
-		rows_to_insert = missing |> Enum.map(&Map.take(&1, [:document_id, :ancestor_id, :descendant_id, :depth]))
+	alias RenewCollab.Hierarchy.ElementParenthood
 
+	def repair_parenthood do
 		RenewCollab.Repo.transaction(fn _ -> 
-			RenewCollab.Repo.delete_all(from p in RenewCollab.Renew.ElementParenthood, where: p.id in ^ids_to_delete)
-			RenewCollab.Repo.insert_all(RenewCollab.Renew.ElementParenthood, rows_to_insert)
+			ids_to_delete = Enum.map(find_invalids(), &(&1.id))
+			RenewCollab.Repo.delete_all(from p in ElementParenthood, where: p.id in ^ids_to_delete)
+
+			attributes = [:document_id, :ancestor_id, :descendant_id, :depth]
+			rows_to_insert = Enum.map(find_missing(), &Map.take(&1, attributes))
+			RenewCollab.Repo.insert_all(ElementParenthood, rows_to_insert)
 		end)
 	end
 
@@ -62,12 +62,20 @@ defmodule RenewCollab.RenewNesting do
 		        id: a.id
 		      }
 
+
+		symmetrics = from a in "element_parenthood",
+		    where: {a.descendant_id, a.ancestor_id} == {parent_as(:parent_query).ancestor_id, parent_as(:parent_query).descendant_id},
+			select: %{
+		        id: a.id
+		      }
+
 		 query = from p in "element_parenthood", 
 		  as: :parent_query,
 	      where:
 	        (p.depth == 0 and p.descendant_id != p.ancestor_id) or
 	        (p.depth != 0 and p.descendant_id == p.ancestor_id) or
-	        (p.depth > 1 and not exists(transitives)),
+	        (p.depth > 1 and not exists(transitives)) or
+	        (p.depth > 0 and exists(symmetrics)),
 	      select: %{
 	        id: p.id
 	      }

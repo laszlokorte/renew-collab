@@ -1,4 +1,4 @@
-defmodule RenewCollab.Renew.ElementConnectionStyle do
+defmodule RenewCollab.Style.ElementConnectionStyle do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -13,7 +13,7 @@ defmodule RenewCollab.Renew.ElementConnectionStyle do
     field :source_tip, :string
     field :target_tip, :string
     field :smoothness, :string
-    belongs_to :element_connection, RenewCollab.Renew.ElementConnection
+    belongs_to :element_connection, RenewCollab.Connection.ElementConnection
 
     timestamps(type: :utc_datetime)
   end

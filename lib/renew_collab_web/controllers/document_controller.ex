@@ -2,7 +2,7 @@ defmodule RenewCollabWeb.DocumentController do
   use RenewCollabWeb, :controller
 
   alias RenewCollab.Renew
-  alias RenewCollab.Renew.Document
+  alias RenewCollab.Document.Document
 
   action_fallback RenewCollabWeb.FallbackController
 

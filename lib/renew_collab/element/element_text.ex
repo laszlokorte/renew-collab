@@ -1,4 +1,4 @@
-defmodule RenewCollab.Renew.ElementText do
+defmodule RenewCollab.Element.ElementText do
   use Ecto.Schema
   import Ecto.Changeset
 

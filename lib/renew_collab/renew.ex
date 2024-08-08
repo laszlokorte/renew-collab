@@ -6,7 +6,8 @@ defmodule RenewCollab.Renew do
   import Ecto.Query, warn: false
   alias RenewCollab.Repo
 
-  alias RenewCollab.Renew.Document
+  alias RenewCollab.Document.Document
+  alias RenewCollab.Element.Element
 
   @doc """
   Returns the list of document.
@@ -105,7 +106,7 @@ defmodule RenewCollab.Renew do
     Document.changeset(document, attrs)
   end
 
-  alias RenewCollab.Renew.Element
+  alias RenewCollab.Element.Element
 
   @doc """
   Returns the list of element.
@@ -202,7 +203,7 @@ defmodule RenewCollab.Renew do
     Element.changeset(element, attrs)
   end
 
-  alias RenewCollab.Renew.ElementParenthood
+  alias RenewCollab.Hierarchy.ElementParenthood
 
   @doc """
   Returns the list of element_parenthood.
@@ -298,7 +299,7 @@ defmodule RenewCollab.Renew do
     ElementParenthood.changeset(element_parenthood, attrs)
   end
 
-  alias RenewCollab.Renew.ElementBox
+  alias RenewCollab.Element.ElementBox
 
   @doc """
   Returns the list of element_box.
@@ -394,7 +395,7 @@ defmodule RenewCollab.Renew do
     ElementBox.changeset(element_box, attrs)
   end
 
-  alias RenewCollab.Renew.ElementText
+  alias RenewCollab.Element.ElementText
 
   @doc """
   Returns the list of element_text.
@@ -490,7 +491,7 @@ defmodule RenewCollab.Renew do
     ElementText.changeset(element_text, attrs)
   end
 
-  alias RenewCollab.Renew.ElementConnection
+  alias RenewCollab.Connection.ElementConnection
 
   @doc """
   Returns the list of element_connection.
@@ -586,7 +587,7 @@ defmodule RenewCollab.Renew do
     ElementConnection.changeset(element_connection, attrs)
   end
 
-  alias RenewCollab.Renew.ElementSocket
+  alias RenewCollab.Element.ElementSocket
 
   @doc """
   Returns the list of element_socket.
@@ -682,7 +683,7 @@ defmodule RenewCollab.Renew do
     ElementSocket.changeset(element_socket, attrs)
   end
 
-  alias RenewCollab.Renew.ElementConnectionWaypoint
+  alias RenewCollab.Connection.ElementConnectionWaypoint
 
   @doc """
   Returns the list of element_connection_waypoint.
@@ -778,7 +779,7 @@ defmodule RenewCollab.Renew do
     ElementConnectionWaypoint.changeset(element_connection_waypoint, attrs)
   end
 
-  alias RenewCollab.Renew.ElementConnectionSourceBond
+  alias RenewCollab.Connection.ElementConnectionSourceBond
 
   @doc """
   Returns the list of element_connection_source_bond.
@@ -874,7 +875,7 @@ defmodule RenewCollab.Renew do
     ElementConnectionSourceBond.changeset(element_connection_source_bond, attrs)
   end
 
-  alias RenewCollab.Renew.ElementConnectionTargetBond
+  alias RenewCollab.Connection.ElementConnectionTargetBond
 
   @doc """
   Returns the list of element_connection_target_bond.
@@ -970,7 +971,7 @@ defmodule RenewCollab.Renew do
     ElementConnectionTargetBond.changeset(element_connection_target_bond, attrs)
   end
 
-  alias RenewCollab.Renew.ElementStyle
+  alias RenewCollab.Style.ElementStyle
 
   @doc """
   Returns the list of element_style.
@@ -1066,7 +1067,7 @@ defmodule RenewCollab.Renew do
     ElementStyle.changeset(element_style, attrs)
   end
 
-  alias RenewCollab.Renew.ElementConnectionStyle
+  alias RenewCollab.Style.ElementConnectionStyle
 
   @doc """
   Returns the list of element_connection_style.
@@ -1162,7 +1163,7 @@ defmodule RenewCollab.Renew do
     ElementConnectionStyle.changeset(element_connection_style, attrs)
   end
 
-  alias RenewCollab.Renew.ElementTextStyle
+  alias RenewCollab.Style.ElementTextStyle
 
   @doc """
   Returns the list of element_text_style.

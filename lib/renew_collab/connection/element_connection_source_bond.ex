@@ -1,4 +1,4 @@
-defmodule RenewCollab.Renew.ElementConnectionSourceBond do
+defmodule RenewCollab.Connection.ElementConnectionSourceBond do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -6,8 +6,8 @@ defmodule RenewCollab.Renew.ElementConnectionSourceBond do
   @foreign_key_type :binary_id
   schema "element_connection_source_bond" do
 
-    belongs_to :element_connection, RenewCollab.Renew.ElementConnection
-    belongs_to :source_socket, RenewCollab.Renew.ElementSocket
+    belongs_to :element_connection, RenewCollab.Connection.ElementConnection
+    belongs_to :source_socket, RenewCollab.Connection.ElementSocket
 
     timestamps(type: :utc_datetime)
   end

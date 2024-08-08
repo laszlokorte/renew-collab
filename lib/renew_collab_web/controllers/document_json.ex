@@ -1,6 +1,6 @@
 defmodule RenewCollabWeb.DocumentJSON do
-  alias RenewCollab.Renew.Document
-  alias RenewCollab.Renew.Element
+  alias RenewCollab.Document.Document
+  alias RenewCollab.Element.Element
   use RenewCollabWeb, :verified_routes
 
   @doc """

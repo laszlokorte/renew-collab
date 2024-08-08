@@ -1,4 +1,4 @@
-defmodule RenewCollab.Renew.ElementStyle do
+defmodule RenewCollab.Style.ElementStyle do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -9,7 +9,7 @@ defmodule RenewCollab.Renew.ElementStyle do
     field :background_color, :string
     field :border_color, :string
     field :border_width, :string
-    belongs_to :element, RenewCollab.Renew.Element
+    belongs_to :element, RenewCollab.Element.Element
 
     timestamps(type: :utc_datetime)
   end

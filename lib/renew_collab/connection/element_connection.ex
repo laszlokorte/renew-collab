@@ -1,4 +1,4 @@
-defmodule RenewCollab.Renew.ElementConnection do
+defmodule RenewCollab.Connection.ElementConnection do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -9,11 +9,11 @@ defmodule RenewCollab.Renew.ElementConnection do
     field :source_y, :float
     field :target_x, :float
     field :target_y, :float
-    belongs_to :element, RenewCollab.Renew.Element
-    has_one :source_bond, RenewCollab.Renew.ElementConnectionSourceBond
-    has_one :target_bond, RenewCollab.Renew.ElementConnectionTargetBond
-    has_one :style, RenewCollab.Renew.ElementConnectionStyle
-    has_many :waypoints, RenewCollab.Renew.ElementConnectionWaypoint
+    belongs_to :element, RenewCollab.Element.Element
+    has_one :source_bond, RenewCollab.Connection.ElementConnectionSourceBond
+    has_one :target_bond, RenewCollab.Connection.ElementConnectionTargetBond
+    has_one :style, RenewCollab.Style.ElementConnectionStyle
+    has_many :waypoints, RenewCollab.Connection.ElementConnectionWaypoint
 
     timestamps(type: :utc_datetime)
   end

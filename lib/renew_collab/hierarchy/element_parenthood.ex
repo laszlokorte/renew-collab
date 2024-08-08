@@ -1,4 +1,4 @@
-defmodule RenewCollab.Renew.ElementParenthood do
+defmodule RenewCollab.Hierarchy.ElementParenthood do
   use Ecto.Schema
   import Ecto.Changeset
 

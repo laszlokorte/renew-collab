@@ -1,4 +1,4 @@
-defmodule RenewCollab.Renew.ElementTextStyle do
+defmodule RenewCollab.Style.ElementTextStyle do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -12,7 +12,7 @@ defmodule RenewCollab.Renew.ElementTextStyle do
     field :font_family, :string
     field :bold, :boolean, default: false
     field :text_color, :string
-    belongs_to :element_text, RenewCollab.Renew.ElementText
+    belongs_to :element_text, RenewCollab.Element.ElementText
 
     timestamps(type: :utc_datetime)
   end

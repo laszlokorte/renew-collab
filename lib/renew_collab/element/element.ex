@@ -1,4 +1,4 @@
-defmodule RenewCollab.Renew.Element do
+defmodule RenewCollab.Element.Element do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -8,12 +8,12 @@ defmodule RenewCollab.Renew.Element do
     field :z_index, :integer
     field :position_x, :float
     field :position_y, :float
-    belongs_to :document, RenewCollab.Renew.Document
-    has_one :box, RenewCollab.Renew.ElementBox
-    has_one :text, RenewCollab.Renew.ElementText
-    has_one :connection, RenewCollab.Renew.ElementConnection
-    has_one :style, RenewCollab.Renew.ElementStyle
-    has_many :sockets, RenewCollab.Renew.ElementSocket
+    belongs_to :document, RenewCollab.Document.Document
+    has_one :box, RenewCollab.Element.ElementBox
+    has_one :text, RenewCollab.Element.ElementText
+    has_one :connection, RenewCollab.Connection.ElementConnection
+    has_one :style, RenewCollab.Style.ElementStyle
+    has_many :sockets, RenewCollab.Connection.ElementSocket
 
     timestamps(type: :utc_datetime)
   end

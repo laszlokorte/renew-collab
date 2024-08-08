@@ -1,4 +1,4 @@
-defmodule RenewCollab.Renew.ElementConnectionWaypoint do
+defmodule RenewCollab.Connection.ElementConnectionWaypoint do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -8,7 +8,7 @@ defmodule RenewCollab.Renew.ElementConnectionWaypoint do
     field :sort, :integer
     field :position_x, :float
     field :position_y, :float
-    belongs_to :element_connection, RenewCollab.Renew.ElementConnection
+    belongs_to :element_connection, RenewCollab.Connection.ElementConnection
 
     timestamps(type: :utc_datetime)
   end
