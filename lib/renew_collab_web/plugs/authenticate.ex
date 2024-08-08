@@ -10,9 +10,9 @@ defmodule RenewCollabWeb.Plug.Authenticate do
     with {:ok, token} <- fetch_token(conn),
          {:ok, data} <- RenewCollabWeb.Token.verify(token) do
       conn
-      |> assign(:current_user, data.user_id)
+      |> assign(:current_account, data.account_id)
     else
-      _error ->
+      _ ->
         conn
         |> put_status(:unauthorized)
         |> Phoenix.Controller.json(%{"error" => "Not authorized"})

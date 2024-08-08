@@ -6,16 +6,15 @@ defmodule RenewCollab.Renew.ElementParenthood do
   @foreign_key_type :binary_id
   schema "element_parenthood" do
     field :depth, :integer
+    field :document_id, :binary_id
     field :ancestor_id, :binary_id
     field :descendant_id, :binary_id
-
-    timestamps(type: :utc_datetime)
   end
 
   @doc false
   def changeset(element_parenthood, attrs) do
     element_parenthood
-    |> cast(attrs, [:depth])
-    |> validate_required([:depth])
+    |> cast(attrs, [:depth, :ancestor_id, :descendant_id, :document_id])
+    |> validate_required([:depth, :ancestor_id, :descendant_id, :document_id])
   end
 end

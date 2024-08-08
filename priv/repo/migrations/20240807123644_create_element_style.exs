@@ -3,12 +3,12 @@ defmodule RenewCollab.Repo.Migrations.CreateElementStyle do
 
   def change do
     create table(:element_style, primary_key: false) do
-      add :id, :binary_id, primary_key: true
+      add :id, :binary_id, primary_key: true, null: false
       add :opacity, :float
       add :background_color, :string
       add :border_color, :string
       add :border_width, :string
-      add :element_id, references(:element, on_delete: :delete_all, type: :binary_id)
+      add :element_id, references(:element, on_delete: :delete_all, type: :binary_id), null: false
 
       timestamps(type: :utc_datetime)
     end

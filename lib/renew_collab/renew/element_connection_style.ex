@@ -13,7 +13,7 @@ defmodule RenewCollab.Renew.ElementConnectionStyle do
     field :source_tip, :string
     field :target_tip, :string
     field :smoothness, :string
-    field :element_connection_id, :binary_id
+    belongs_to :element_connection, RenewCollab.Renew.ElementConnection
 
     timestamps(type: :utc_datetime)
   end

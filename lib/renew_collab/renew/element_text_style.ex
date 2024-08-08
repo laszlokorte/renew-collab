@@ -12,7 +12,7 @@ defmodule RenewCollab.Renew.ElementTextStyle do
     field :font_family, :string
     field :bold, :boolean, default: false
     field :text_color, :string
-    field :element_text_id, :binary_id
+    belongs_to :element_text, RenewCollab.Renew.ElementText
 
     timestamps(type: :utc_datetime)
   end

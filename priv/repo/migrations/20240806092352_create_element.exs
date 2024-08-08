@@ -3,11 +3,11 @@ defmodule RenewCollab.Repo.Migrations.CreateElement do
 
   def change do
     create table(:element, primary_key: false) do
-      add :id, :binary_id, primary_key: true
-      add :z_index, :integer
-      add :position_x, :float
-      add :position_y, :float
-      add :document_id, references(:document, on_delete: :delete_all, type: :binary_id)
+      add :id, :binary_id, primary_key: true, null: false
+      add :z_index, :integer, null: false
+      add :position_x, :float, null: false
+      add :position_y, :float, null: false
+      add :document_id, references(:document, on_delete: :delete_all, type: :binary_id), null: false
 
       timestamps(type: :utc_datetime)
     end

@@ -9,7 +9,11 @@ defmodule RenewCollab.Renew.ElementConnection do
     field :source_y, :float
     field :target_x, :float
     field :target_y, :float
-    field :element_id, :binary_id
+    belongs_to :element, RenewCollab.Renew.Element
+    has_one :source_bond, RenewCollab.Renew.ElementConnectionSourceBond
+    has_one :target_bond, RenewCollab.Renew.ElementConnectionTargetBond
+    has_one :style, RenewCollab.Renew.ElementConnectionStyle
+    has_many :waypoints, RenewCollab.Renew.ElementConnectionWaypoint
 
     timestamps(type: :utc_datetime)
   end
@@ -18,6 +22,10 @@ defmodule RenewCollab.Renew.ElementConnection do
   def changeset(element_connection, attrs) do
     element_connection
     |> cast(attrs, [:source_x, :source_y, :target_x, :target_y])
+    |> cast_assoc(:source_bond)
+    |> cast_assoc(:target_bond)
+    |> cast_assoc(:style)
+    |> cast_assoc(:waypoints)
     |> validate_required([:source_x, :source_y, :target_x, :target_y])
     |> unique_constraint(:element_id)
   end

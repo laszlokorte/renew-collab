@@ -7,7 +7,7 @@ defmodule RenewCollab.Renew.ElementBox do
   schema "element_box" do
     field :width, :float
     field :height, :float
-    field :element_id, :binary_id
+    belongs_to :element, RenewCollab.Renew.Element
 
     timestamps(type: :utc_datetime)
   end

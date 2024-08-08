@@ -3,10 +3,10 @@ defmodule RenewCollab.Repo.Migrations.CreateElementBox do
 
   def change do
     create table(:element_box, primary_key: false) do
-      add :id, :binary_id, primary_key: true
-      add :width, :float
-      add :height, :float
-      add :element_id, references(:element, on_delete: :delete_all, type: :binary_id)
+      add :id, :binary_id, primary_key: true, null: false
+      add :width, :float, null: false
+      add :height, :float, null: false
+      add :element_id, references(:element, on_delete: :delete_all, type: :binary_id), null: false
 
       timestamps(type: :utc_datetime)
     end

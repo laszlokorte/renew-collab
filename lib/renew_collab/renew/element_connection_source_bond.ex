@@ -6,8 +6,8 @@ defmodule RenewCollab.Renew.ElementConnectionSourceBond do
   @foreign_key_type :binary_id
   schema "element_connection_source_bond" do
 
-    field :element_connection_id, :binary_id
-    field :source_socket_id, :binary_id
+    belongs_to :element_connection, RenewCollab.Renew.ElementConnection
+    belongs_to :source_socket, RenewCollab.Renew.ElementSocket
 
     timestamps(type: :utc_datetime)
   end

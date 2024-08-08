@@ -3,7 +3,7 @@ defmodule RenewCollab.Repo.Migrations.CreateElementConnectionStyle do
 
   def change do
     create table(:element_connection_style, primary_key: false) do
-      add :id, :binary_id, primary_key: true
+      add :id, :binary_id, primary_key: true, null: false
       add :stroke_width, :string
       add :stroke_color, :string
       add :stroke_joint, :string
@@ -12,7 +12,7 @@ defmodule RenewCollab.Repo.Migrations.CreateElementConnectionStyle do
       add :source_tip, :string
       add :target_tip, :string
       add :smoothness, :string
-      add :element_connection_id, references(:element_connection, on_delete: :delete_all, type: :binary_id)
+      add :element_connection_id, references(:element_connection, on_delete: :delete_all, type: :binary_id), null: false
 
       timestamps(type: :utc_datetime)
     end

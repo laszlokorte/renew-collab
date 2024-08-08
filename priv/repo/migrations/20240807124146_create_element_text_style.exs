@@ -3,7 +3,7 @@ defmodule RenewCollab.Repo.Migrations.CreateElementTextStyle do
 
   def change do
     create table(:element_text_style, primary_key: false) do
-      add :id, :binary_id, primary_key: true
+      add :id, :binary_id, primary_key: true, null: false
       add :alignment, :string
       add :font_size, :float
       add :font_family, :string
@@ -11,7 +11,7 @@ defmodule RenewCollab.Repo.Migrations.CreateElementTextStyle do
       add :italic, :boolean, default: false, null: false
       add :underline, :boolean, default: false, null: false
       add :text_color, :string
-      add :element_text_id, references(:element_text, on_delete: :delete_all, type: :binary_id)
+      add :element_text_id, references(:element_text, on_delete: :delete_all, type: :binary_id), null: false
 
       timestamps(type: :utc_datetime)
     end

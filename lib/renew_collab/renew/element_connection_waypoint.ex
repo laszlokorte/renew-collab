@@ -8,7 +8,7 @@ defmodule RenewCollab.Renew.ElementConnectionWaypoint do
     field :sort, :integer
     field :position_x, :float
     field :position_y, :float
-    field :element_connection_id, :binary_id
+    belongs_to :element_connection, RenewCollab.Renew.ElementConnection
 
     timestamps(type: :utc_datetime)
   end

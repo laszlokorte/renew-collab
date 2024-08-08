@@ -9,7 +9,7 @@ defmodule RenewCollab.Renew.ElementStyle do
     field :background_color, :string
     field :border_color, :string
     field :border_width, :string
-    field :element_id, :binary_id
+    belongs_to :element, RenewCollab.Renew.Element
 
     timestamps(type: :utc_datetime)
   end

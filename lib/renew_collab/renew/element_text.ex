@@ -6,7 +6,8 @@ defmodule RenewCollab.Renew.ElementText do
   @foreign_key_type :binary_id
   schema "element_text" do
     field :body, :string
-    field :element_id, :binary_id
+    belongs_to :element, RenewCollab.Renew.Element
+    has_many :style, RenewCollab.Renew.ElementTextStyle
 
     timestamps(type: :utc_datetime)
   end
@@ -15,6 +16,7 @@ defmodule RenewCollab.Renew.ElementText do
   def changeset(element_text, attrs) do
     element_text
     |> cast(attrs, [:body])
+    |> cast_assoc(:style)
     |> validate_required([:body])
     |> unique_constraint(:element_id)
   end

@@ -7,7 +7,7 @@ defmodule RenewCollab.Renew.ElementSocket do
   schema "element_socket" do
     field :name, :string
     field :kind, :string
-    field :element_id, :binary_id
+    belongs_to :element, RenewCollab.Renew.Element
 
     timestamps(type: :utc_datetime)
   end
