@@ -13,7 +13,7 @@ defmodule RenewCollab.Element.Element do
     has_one :text, RenewCollab.Element.ElementText
     has_one :connection, RenewCollab.Connection.ElementConnection
     has_one :style, RenewCollab.Style.ElementStyle
-    has_many :sockets, RenewCollab.Connection.ElementSocket
+    has_many :sockets, RenewCollab.Element.ElementSocket
 
     timestamps(type: :utc_datetime)
   end

@@ -151,7 +151,7 @@ defmodule RenewCollab.Renew do
 
   """
   def create_element(%Document{} = document, attrs \\ %{}) do
-    %Element{document: document}
+    %Element{document_id: document.id}
     |> Element.changeset(attrs)
     |> Repo.insert()
   end

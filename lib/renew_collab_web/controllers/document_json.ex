@@ -51,7 +51,6 @@ defmodule RenewCollabWeb.DocumentJSON do
   defp element_data(%Document{} = document, %Element{} = element) do
     %{
       # id: element.id,
-      href: url(~p"/api/documents/#{document.id}/elements/#{element.id}"),
       z_index: element.z_index,
       position_x: element.position_x,
       position_y: element.position_y
