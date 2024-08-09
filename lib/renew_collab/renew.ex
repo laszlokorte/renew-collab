@@ -8,6 +8,7 @@ defmodule RenewCollab.Renew do
 
   alias RenewCollab.Document.Document
   alias RenewCollab.Element.Element
+  alias RenewCollab.Hierarchy.ElementParenthood
 
   @doc """
   Returns the list of document.
@@ -151,9 +152,26 @@ defmodule RenewCollab.Renew do
 
   """
   def create_element(%Document{} = document, attrs \\ %{}) do
-    %Element{document_id: document.id}
-    |> Element.changeset(attrs)
-    |> Repo.insert()
+    {:ok, %{insert_element: element}} =
+      Ecto.Multi.new()
+      |> Ecto.Multi.insert(
+        :insert_element,
+        Element.changeset(%Element{document_id: document.id}, attrs)
+      )
+      |> Ecto.Multi.insert(
+        :insert_parenthood,
+        fn %{insert_element: new_element} ->
+          ElementParenthood.changeset(%ElementParenthood{}, %{
+            depth: 0,
+            document_id: new_element.document_id,
+            ancestor_id: new_element.id,
+            descendant_id: new_element.id
+          })
+        end
+      )
+      |> Repo.transaction()
+
+    {:ok, element}
   end
 
   @doc """
@@ -744,7 +762,10 @@ defmodule RenewCollab.Renew do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_element_connection_waypoint(%ElementConnectionWaypoint{} = element_connection_waypoint, attrs) do
+  def update_element_connection_waypoint(
+        %ElementConnectionWaypoint{} = element_connection_waypoint,
+        attrs
+      ) do
     element_connection_waypoint
     |> ElementConnectionWaypoint.changeset(attrs)
     |> Repo.update()
@@ -762,7 +783,9 @@ defmodule RenewCollab.Renew do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_element_connection_waypoint(%ElementConnectionWaypoint{} = element_connection_waypoint) do
+  def delete_element_connection_waypoint(
+        %ElementConnectionWaypoint{} = element_connection_waypoint
+      ) do
     Repo.delete(element_connection_waypoint)
   end
 
@@ -775,7 +798,10 @@ defmodule RenewCollab.Renew do
       %Ecto.Changeset{data: %ElementConnectionWaypoint{}}
 
   """
-  def change_element_connection_waypoint(%ElementConnectionWaypoint{} = element_connection_waypoint, attrs \\ %{}) do
+  def change_element_connection_waypoint(
+        %ElementConnectionWaypoint{} = element_connection_waypoint,
+        attrs \\ %{}
+      ) do
     ElementConnectionWaypoint.changeset(element_connection_waypoint, attrs)
   end
 
@@ -840,7 +866,10 @@ defmodule RenewCollab.Renew do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_element_connection_source_bond(%ElementConnectionSourceBond{} = element_connection_source_bond, attrs) do
+  def update_element_connection_source_bond(
+        %ElementConnectionSourceBond{} = element_connection_source_bond,
+        attrs
+      ) do
     element_connection_source_bond
     |> ElementConnectionSourceBond.changeset(attrs)
     |> Repo.update()
@@ -858,7 +887,9 @@ defmodule RenewCollab.Renew do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_element_connection_source_bond(%ElementConnectionSourceBond{} = element_connection_source_bond) do
+  def delete_element_connection_source_bond(
+        %ElementConnectionSourceBond{} = element_connection_source_bond
+      ) do
     Repo.delete(element_connection_source_bond)
   end
 
@@ -871,7 +902,10 @@ defmodule RenewCollab.Renew do
       %Ecto.Changeset{data: %ElementConnectionSourceBond{}}
 
   """
-  def change_element_connection_source_bond(%ElementConnectionSourceBond{} = element_connection_source_bond, attrs \\ %{}) do
+  def change_element_connection_source_bond(
+        %ElementConnectionSourceBond{} = element_connection_source_bond,
+        attrs \\ %{}
+      ) do
     ElementConnectionSourceBond.changeset(element_connection_source_bond, attrs)
   end
 
@@ -936,7 +970,10 @@ defmodule RenewCollab.Renew do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_element_connection_target_bond(%ElementConnectionTargetBond{} = element_connection_target_bond, attrs) do
+  def update_element_connection_target_bond(
+        %ElementConnectionTargetBond{} = element_connection_target_bond,
+        attrs
+      ) do
     element_connection_target_bond
     |> ElementConnectionTargetBond.changeset(attrs)
     |> Repo.update()
@@ -954,7 +991,9 @@ defmodule RenewCollab.Renew do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_element_connection_target_bond(%ElementConnectionTargetBond{} = element_connection_target_bond) do
+  def delete_element_connection_target_bond(
+        %ElementConnectionTargetBond{} = element_connection_target_bond
+      ) do
     Repo.delete(element_connection_target_bond)
   end
 
@@ -967,7 +1006,10 @@ defmodule RenewCollab.Renew do
       %Ecto.Changeset{data: %ElementConnectionTargetBond{}}
 
   """
-  def change_element_connection_target_bond(%ElementConnectionTargetBond{} = element_connection_target_bond, attrs \\ %{}) do
+  def change_element_connection_target_bond(
+        %ElementConnectionTargetBond{} = element_connection_target_bond,
+        attrs \\ %{}
+      ) do
     ElementConnectionTargetBond.changeset(element_connection_target_bond, attrs)
   end
 
@@ -1159,7 +1201,10 @@ defmodule RenewCollab.Renew do
       %Ecto.Changeset{data: %ElementConnectionStyle{}}
 
   """
-  def change_element_connection_style(%ElementConnectionStyle{} = element_connection_style, attrs \\ %{}) do
+  def change_element_connection_style(
+        %ElementConnectionStyle{} = element_connection_style,
+        attrs \\ %{}
+      ) do
     ElementConnectionStyle.changeset(element_connection_style, attrs)
   end
 
