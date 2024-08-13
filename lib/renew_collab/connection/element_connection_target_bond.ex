@@ -5,9 +5,8 @@ defmodule RenewCollab.Connection.ElementConnectionTargetBond do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "element_connection_target_bond" do
-
     belongs_to :element_connection, RenewCollab.Connection.ElementConnection
-    belongs_to :target_socket, RenewCollab.Connection.ElementSocket
+    belongs_to :target_socket, RenewCollab.Element.ElementSocket
 
     timestamps(type: :utc_datetime)
   end
