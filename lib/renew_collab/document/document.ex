@@ -16,6 +16,7 @@ defmodule RenewCollab.Document.Document do
   def changeset(document, attrs) do
     document
     |> cast(attrs, [:name, :kind])
+    |> cast_assoc(:elements)
     |> validate_required([:name, :kind])
   end
 end

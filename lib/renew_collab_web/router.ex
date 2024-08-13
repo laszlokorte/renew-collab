@@ -17,6 +17,10 @@ defmodule RenewCollabWeb.Router do
   scope "/api", RenewCollabWeb do
     pipe_through [:api, :authenticated]
 
+    scope "/documents" do
+      post "import", DocumentController, :import
+    end
+
     resources "/documents", DocumentController, except: [:new, :edit] do
       resources "/elements", ElementController, except: [:new, :edit]
     end

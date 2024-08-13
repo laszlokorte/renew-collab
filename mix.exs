@@ -44,7 +44,8 @@ defmodule RenewCollab.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
       {:corsica, "~> 2.0"},
-      {:bcrypt_elixir, "~> 3.0"}
+      {:bcrypt_elixir, "~> 3.0"},
+      {:renewex, "~> 0.3.0"}
     ]
   end
 

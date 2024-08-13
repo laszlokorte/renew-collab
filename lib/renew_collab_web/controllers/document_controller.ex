@@ -3,6 +3,7 @@ defmodule RenewCollabWeb.DocumentController do
 
   alias RenewCollab.Renew
   alias RenewCollab.Document.Document
+  alias RenewCollab.Element.Element
 
   action_fallback RenewCollabWeb.FallbackController
 
@@ -52,6 +53,47 @@ defmodule RenewCollabWeb.DocumentController do
       )
 
       send_resp(conn, :no_content, "")
+    end
+  end
+
+  def import(conn, %{
+        "renew_file" => %Plug.Upload{
+          path: path,
+          content_type: content_type,
+          filename: filename
+        }
+      }) do
+    with {:ok, content} <- File.read(path),
+         {:ok, true} <- check_utf8_binary?(content),
+         {:ok, document, refs} <- Renewex.parse_string(content),
+         %Renewex.Storable{class_name: class_name, fields: %{figures: figures}} <- document do
+      figs = figures |> Enum.map(&Enum.at(refs, elem(&1, 1))) |> Enum.to_list()
+
+      elements =
+        for %Renewex.Storable{fields: %{fOriginX: fOriginX, fOriginY: fOriginY}} <- figs do
+          %{"position_x" => fOriginX, "position_y" => fOriginY, "z_index" => 0}
+        end
+
+      document =
+        create(conn, %{
+          "document" => %{"name" => filename, "kind" => class_name, "elements" => elements}
+        })
+
+      document
+    else
+      e ->
+        conn
+        |> put_status(:bad_request)
+        |> Phoenix.Controller.json(%{"error" => "Not a valid renew file"})
+        |> halt()
+    end
+  end
+
+  defp check_utf8_binary?(binary) do
+    if :unicode.characters_to_binary(binary, :utf8, :utf8) == binary do
+      {:ok, true}
+    else
+      {:ok, false}
     end
   end
 end
