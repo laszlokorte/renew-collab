@@ -22,4 +22,12 @@ defmodule RenewCollab.Auth do
     end
   end
 
+  def create_account(email, password) do
+    %RenewCollab.Auth.Account{}
+    |> RenewCollab.Auth.Account.changeset(%{
+      "email" => email,
+      "password" => password
+    })
+    |> RenewCollab.Repo.insert()
+  end
 end
