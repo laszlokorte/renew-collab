@@ -10,10 +10,16 @@ defmodule RenewCollab.Connection.ElementConnection do
     field :target_x, :float
     field :target_y, :float
     belongs_to :element, RenewCollab.Element.Element
-    has_one :source_bond, RenewCollab.Connection.ElementConnectionSourceBond
-    has_one :target_bond, RenewCollab.Connection.ElementConnectionTargetBond
-    has_one :style, RenewCollab.Style.ElementConnectionStyle
-    has_many :waypoints, RenewCollab.Connection.ElementConnectionWaypoint
+
+    has_one :source_bond, RenewCollab.Connection.ElementConnectionSourceBond,
+      on_delete: :delete_all
+
+    has_one :target_bond, RenewCollab.Connection.ElementConnectionTargetBond,
+      on_delete: :delete_all
+
+    has_one :style, RenewCollab.Style.ElementConnectionStyle, on_delete: :delete_all
+
+    has_many :waypoints, RenewCollab.Connection.ElementConnectionWaypoint, on_delete: :delete_all
 
     timestamps(type: :utc_datetime)
   end

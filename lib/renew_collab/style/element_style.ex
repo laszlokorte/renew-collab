@@ -18,7 +18,7 @@ defmodule RenewCollab.Style.ElementStyle do
   def changeset(element_style, attrs) do
     element_style
     |> cast(attrs, [:opacity, :background_color, :border_color, :border_width, :border_width])
-    |> validate_required([:opacity, :background_color, :border_color, :border_width, :border_width])
+    # |> validate_required([:opacity, :background_color, :border_color, :border_width, :border_width])
     |> unique_constraint(:element_id)
   end
 end

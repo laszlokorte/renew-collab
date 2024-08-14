@@ -53,6 +53,7 @@ defmodule RenewCollabWeb.DocumentJSON do
   defp element_data(%Document{} = document, %Element{} = element) do
     %{
       # id: element.id,
+      id: element.id,
       z_index: element.z_index,
       position_x: element.position_x,
       position_y: element.position_y,
@@ -65,7 +66,28 @@ defmodule RenewCollabWeb.DocumentJSON do
             nil
 
           v ->
-            %{"body" => v.body}
+            %{
+              "body" => v.body,
+              "style" =>
+                case v.style do
+                  nil ->
+                    nil
+
+                  %Ecto.Association.NotLoaded{} ->
+                    nil
+
+                  v ->
+                    %{
+                      "italic" => v.italic,
+                      "underline" => v.underline,
+                      "alignment" => v.alignment,
+                      "font_size" => v.font_size,
+                      "font_family" => v.font_family,
+                      "bold" => v.bold,
+                      "text_color" => v.text_color
+                    }
+                end
+            }
         end,
       box:
         case element.box do
@@ -99,9 +121,6 @@ defmodule RenewCollabWeb.DocumentJSON do
                     |> Enum.map(fn
                       %ElementConnectionWaypoint{position_x: x, position_y: y} ->
                         %{"x" => x, "y" => y}
-
-                      e ->
-                        dbg(e)
                     end)
 
                   nil ->
@@ -114,8 +133,27 @@ defmodule RenewCollabWeb.DocumentJSON do
                     []
 
                   e ->
-                    dbg(e)
                     []
+                end,
+              "style" =>
+                case v.style do
+                  nil ->
+                    nil
+
+                  %Ecto.Association.NotLoaded{} ->
+                    nil
+
+                  v ->
+                    %{
+                      "stroke_width" => v.stroke_width,
+                      "stroke_color" => v.stroke_color,
+                      "stroke_joint" => v.stroke_joint,
+                      "stroke_cap" => v.stroke_cap,
+                      "stroke_dash_array" => v.stroke_dash_array,
+                      "source_tip" => v.source_tip,
+                      "target_tip" => v.target_tip,
+                      "smoothness" => v.smoothness
+                    }
                 end
             }
         end,
@@ -128,7 +166,12 @@ defmodule RenewCollabWeb.DocumentJSON do
             nil
 
           v ->
-            v
+            %{
+              "opacity" => v.opacity,
+              "background_color" => v.background_color,
+              "border_color" => v.border_color,
+              "border_width" => v.border_width
+            }
         end,
       sockets:
         case element.sockets do

@@ -7,7 +7,7 @@ defmodule RenewCollab.Element.ElementText do
   schema "element_text" do
     field :body, :string
     belongs_to :element, RenewCollab.Renew.Element
-    has_many :style, RenewCollab.Style.ElementTextStyle
+    has_one :style, RenewCollab.Style.ElementTextStyle, on_delete: :delete_all
 
     timestamps(type: :utc_datetime)
   end

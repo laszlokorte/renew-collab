@@ -21,8 +21,17 @@ defmodule RenewCollab.Style.ElementConnectionStyle do
   @doc false
   def changeset(element_connection_style, attrs) do
     element_connection_style
-    |> cast(attrs, [:stroke_width, :stroke_color, :stroke_joint, :stroke_cap, :stroke_dash_array, :source_tip, :target_tip, :smoothness])
-    |> validate_required([:stroke_width, :stroke_color, :stroke_joint, :stroke_cap, :stroke_dash_array, :source_tip, :target_tip, :smoothness])
+    |> cast(attrs, [
+      :stroke_width,
+      :stroke_color,
+      :stroke_joint,
+      :stroke_cap,
+      :stroke_dash_array,
+      :source_tip,
+      :target_tip,
+      :smoothness
+    ])
+    # |> validate_required([:stroke_width, :stroke_color, :stroke_joint, :stroke_cap, :stroke_dash_array, :source_tip, :target_tip, :smoothness])
     |> unique_constraint(:element_connection_id)
   end
 end

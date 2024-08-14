@@ -9,11 +9,11 @@ defmodule RenewCollab.Element.Element do
     field :position_x, :float
     field :position_y, :float
     belongs_to :document, RenewCollab.Document.Document
-    has_one :box, RenewCollab.Element.ElementBox
-    has_one :text, RenewCollab.Element.ElementText
-    has_one :connection, RenewCollab.Connection.ElementConnection
-    has_one :style, RenewCollab.Style.ElementStyle
-    has_many :sockets, RenewCollab.Element.ElementSocket
+    has_one :box, RenewCollab.Element.ElementBox, on_delete: :delete_all
+    has_one :text, RenewCollab.Element.ElementText, on_delete: :delete_all
+    has_one :connection, RenewCollab.Connection.ElementConnection, on_delete: :delete_all
+    has_one :style, RenewCollab.Style.ElementStyle, on_delete: :delete_all
+    has_many :sockets, RenewCollab.Element.ElementSocket, on_delete: :delete_all
 
     timestamps(type: :utc_datetime)
   end

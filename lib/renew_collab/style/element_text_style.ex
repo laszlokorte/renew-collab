@@ -20,8 +20,16 @@ defmodule RenewCollab.Style.ElementTextStyle do
   @doc false
   def changeset(element_text_style, attrs) do
     element_text_style
-    |> cast(attrs, [:alignment, :font_size, :font_family, :bold, :italic, :italic, :underline, :text_color])
-    |> validate_required([:alignment, :font_size, :font_family, :bold, :italic, :italic, :underline, :text_color])
+    |> cast(attrs, [:alignment, :font_size, :font_family, :bold, :italic, :underline, :text_color])
+    |> validate_required([
+      :alignment,
+      :font_size,
+      :font_family,
+      :bold,
+      :italic,
+      :underline,
+      :text_color
+    ])
     |> unique_constraint(:element_text_id)
   end
 end

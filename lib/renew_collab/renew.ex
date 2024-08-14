@@ -8,6 +8,7 @@ defmodule RenewCollab.Renew do
 
   alias RenewCollab.Document.Document
   alias RenewCollab.Element.Element
+  alias RenewCollab.Connection.ElementConnectionWaypoint
   alias RenewCollab.Hierarchy.ElementParenthood
 
   @doc """
@@ -43,7 +44,20 @@ defmodule RenewCollab.Renew do
     do:
       Repo.get!(Document, id)
       |> Repo.preload(
-        elements: [box: [], text: [], connection: [:waypoints], style: [], sockets: []]
+        elements:
+          from(e in Element,
+            order_by: [asc: :z_index],
+            preload: [
+              box: [],
+              text: [style: []],
+              connection: [
+                waypoints: ^from(w in ElementConnectionWaypoint, order_by: [asc: :sort]),
+                style: []
+              ],
+              style: [],
+              sockets: []
+            ]
+          )
       )
 
   @doc """
