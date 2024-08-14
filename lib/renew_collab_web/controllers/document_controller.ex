@@ -70,9 +70,56 @@ defmodule RenewCollabWeb.DocumentController do
       figs = figures |> Enum.map(&Enum.at(refs, elem(&1, 1))) |> Enum.to_list()
 
       elements =
-        for %Renewex.Storable{fields: %{fOriginX: fOriginX, fOriginY: fOriginY}} <- figs do
-          %{"position_x" => fOriginX, "position_y" => fOriginY, "z_index" => 0}
-        end
+        Enum.concat([
+          for %Renewex.Storable{fields: %{x: x, y: y, w: w, h: h}} <- figs do
+            %{
+              "position_x" => x,
+              "position_y" => y,
+              "z_index" => 0,
+              "box" => %{"width" => w, "height" => h}
+            }
+          end,
+          for %Renewex.Storable{fields: %{text: body, fOriginX: x, fOriginY: y}} <- figs do
+            %{
+              "position_x" => x,
+              "position_y" => y,
+              "z_index" => 0,
+              "text" => %{"body" => body}
+            }
+          end,
+          for %Renewex.Storable{fields: %{points: [_, _ | _] = points}} <- figs do
+            start_point = hd(points)
+            end_point = List.last(points)
+            start_x = start_point[:x]
+            start_y = start_point[:y]
+            end_x = end_point[:x]
+            end_y = end_point[:y]
+
+            %{
+              "position_x" => (start_x + end_x) / 2,
+              "position_y" => (start_y + end_y) / 2,
+              "z_index" => 0,
+              "connection" => %{
+                "source_x" => start_x,
+                "source_y" => start_y,
+                "target_x" => end_x,
+                "target_y" => end_y,
+                "waypoints" =>
+                  points
+                  |> Enum.drop(1)
+                  |> Enum.drop(-1)
+                  |> Enum.with_index()
+                  |> Enum.map(fn {p, index} ->
+                    %{
+                      "sort" => index,
+                      "position_x" => p[:x],
+                      "position_y" => p[:y]
+                    }
+                  end)
+              }
+            }
+          end
+        ])
 
       document =
         create(conn, %{

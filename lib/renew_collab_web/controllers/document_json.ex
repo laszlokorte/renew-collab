@@ -1,6 +1,8 @@
 defmodule RenewCollabWeb.DocumentJSON do
   alias RenewCollab.Document.Document
   alias RenewCollab.Element.Element
+  alias RenewCollab.Connection.ElementConnectionWaypoint
+
   use RenewCollabWeb, :verified_routes
 
   @doc """
@@ -53,7 +55,87 @@ defmodule RenewCollabWeb.DocumentJSON do
       # id: element.id,
       z_index: element.z_index,
       position_x: element.position_x,
-      position_y: element.position_y
+      position_y: element.position_y,
+      text:
+        case element.text do
+          nil ->
+            nil
+
+          %Ecto.Association.NotLoaded{} ->
+            nil
+
+          v ->
+            %{"body" => v.body}
+        end,
+      box:
+        case element.box do
+          nil ->
+            nil
+
+          %Ecto.Association.NotLoaded{} ->
+            nil
+
+          v ->
+            %{"width" => v.width, "height" => v.height}
+        end,
+      connection:
+        case element.connection do
+          nil ->
+            nil
+
+          %Ecto.Association.NotLoaded{} ->
+            nil
+
+          v ->
+            %{
+              "source_x" => v.source_x,
+              "source_y" => v.source_y,
+              "target_x" => v.target_x,
+              "target_y" => v.target_y,
+              "waypoints" =>
+                case v.waypoints do
+                  [_ | _] = w ->
+                    w
+                    |> Enum.map(fn
+                      %ElementConnectionWaypoint{position_x: x, position_y: y} ->
+                        %{"x" => x, "y" => y}
+
+                      e ->
+                        dbg(e)
+                    end)
+
+                  nil ->
+                    []
+
+                  %Ecto.Association.NotLoaded{} ->
+                    []
+
+                  [] ->
+                    []
+
+                  e ->
+                    dbg(e)
+                    []
+                end
+            }
+        end,
+      style:
+        case element.style do
+          nil ->
+            nil
+
+          %Ecto.Association.NotLoaded{} ->
+            nil
+
+          v ->
+            v
+        end,
+      sockets:
+        case element.sockets do
+          nil -> nil
+          %Ecto.Association.NotLoaded{} -> nil
+          v -> v
+        end
     }
   end
 end

@@ -40,7 +40,11 @@ defmodule RenewCollab.Renew do
   def get_document!(id), do: Repo.get!(Document, id)
 
   def get_document_with_elements!(id),
-    do: Repo.get!(Document, id) |> Repo.preload(:elements)
+    do:
+      Repo.get!(Document, id)
+      |> Repo.preload(
+        elements: [box: [], text: [], connection: [:waypoints], style: [], sockets: []]
+      )
 
   @doc """
   Creates a document.
