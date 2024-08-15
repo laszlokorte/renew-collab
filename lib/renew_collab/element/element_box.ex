@@ -7,6 +7,7 @@ defmodule RenewCollab.Element.ElementBox do
   schema "element_box" do
     field :width, :float
     field :height, :float
+    field :shape, :string
     belongs_to :element, RenewCollab.Renew.Element
 
     timestamps(type: :utc_datetime)
@@ -15,7 +16,7 @@ defmodule RenewCollab.Element.ElementBox do
   @doc false
   def changeset(element_box, attrs) do
     element_box
-    |> cast(attrs, [:width, :height])
+    |> cast(attrs, [:width, :height, :shape])
     |> validate_required([:width, :height])
     |> unique_constraint(:element_id)
   end

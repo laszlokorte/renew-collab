@@ -54,6 +54,7 @@ defmodule RenewCollabWeb.DocumentJSON do
     %{
       # id: element.id,
       id: element.id,
+      semantic_tag: element.semantic_tag,
       z_index: element.z_index,
       position_x: element.position_x,
       position_y: element.position_y,
@@ -98,7 +99,7 @@ defmodule RenewCollabWeb.DocumentJSON do
             nil
 
           v ->
-            %{"width" => v.width, "height" => v.height}
+            %{"width" => v.width, "height" => v.height, "shape" => v.shape}
         end,
       connection:
         case element.connection do
