@@ -196,10 +196,10 @@ defmodule RenewCollabWeb.DocumentController do
                 "style" => %{
                   "underline" => false,
                   "alignment" => convert_alignment(Map.get(attrs, "TextAlignment", "left")),
-                  "font_size" => Map.get(attrs, :fCurrentFontSize, 12),
-                  "font_family" => Map.get(attrs, :fCurrentFontName, "sans-serif"),
-                  "bold" => Map.get(attrs, :fCurrentFontStyle, 0) == 1,
-                  "italic" => Map.get(attrs, :fCurrentFontStyle, 0) == 2,
+                  "font_size" => Map.get(fields, :fCurrentFontSize, 12),
+                  "font_family" => Map.get(fields, :fCurrentFontName, "sans-serif"),
+                  "bold" => Map.get(fields, :fCurrentFontStyle, 0) == 1,
+                  "italic" => Map.get(fields, :fCurrentFontStyle, 0) == 2,
                   "text_color" => convert_color(Map.get(attrs, "TextColor", "black"))
                 }
               }
