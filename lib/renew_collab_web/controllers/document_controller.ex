@@ -58,6 +58,7 @@ defmodule RenewCollabWeb.DocumentController do
 
   defp convert_color(m) when is_binary(m), do: m
   defp convert_color({:rgba, 255, 199, 158, 255}), do: nil
+  defp convert_color({:rgb, 255, 199, 158}), do: nil
   defp convert_color({:rgba, r, g, b, a}), do: "rgba(#{r},#{g},#{b},#{a})"
   defp convert_color({:rgb, r, g, b}), do: "rgb(#{r},#{g},#{b})"
 

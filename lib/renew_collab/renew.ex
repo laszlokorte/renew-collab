@@ -21,7 +21,7 @@ defmodule RenewCollab.Renew do
 
   """
   def list_documents do
-    Repo.all(Document)
+    Repo.all(Document, order_by: [asc: :inserted_at])
   end
 
   @doc """
