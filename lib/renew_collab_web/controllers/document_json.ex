@@ -44,13 +44,13 @@ defmodule RenewCollabWeb.DocumentJSON do
       elements:
         case document.elements do
           %Ecto.Association.NotLoaded{} -> %{}
-          _ -> %{items: document.elements |> Enum.map(&element_data(document, &1))}
+          _ -> %{items: document.elements |> Enum.map(&element_data(&1))}
         end
         |> Map.put(:href, url(~p"/api/documents/#{document}/elements"))
     }
   end
 
-  defp element_data(%Document{} = document, %Element{} = element) do
+  def element_data(%Element{} = element) do
     %{
       # id: element.id,
       id: element.id,
