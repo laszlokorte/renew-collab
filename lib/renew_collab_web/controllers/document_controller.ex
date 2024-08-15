@@ -66,6 +66,10 @@ defmodule RenewCollabWeb.DocumentController do
   defp convert_alignment("right"), do: :right
   defp convert_alignment(_), do: :left
 
+  defp convert_font("SansSerif"), do: "sans-serif"
+  defp convert_font("Serif"), do: "serif"
+  defp convert_font(other), do: other
+
   defp convert_shape(grammar, class_name, fields) do
     cond do
       Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.contrib.TriangleFigure") ->
@@ -197,7 +201,7 @@ defmodule RenewCollabWeb.DocumentController do
                   "underline" => false,
                   "alignment" => convert_alignment(Map.get(attrs, "TextAlignment", "left")),
                   "font_size" => Map.get(fields, :fCurrentFontSize, 12),
-                  "font_family" => Map.get(fields, :fCurrentFontName, "sans-serif"),
+                  "font_family" => convert_font(Map.get(fields, :fCurrentFontName, "sans-serif")),
                   "bold" => Map.get(fields, :fCurrentFontStyle, 0) == 1,
                   "italic" => Map.get(fields, :fCurrentFontStyle, 0) == 2,
                   "text_color" => convert_color(Map.get(attrs, "TextColor", "black"))
