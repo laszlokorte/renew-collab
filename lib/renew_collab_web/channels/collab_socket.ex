@@ -8,7 +8,8 @@ defmodule RenewCollabWeb.CollabSocket do
   @impl true
   def connect(%{"token" => token}, socket, _connect_info) do
     with {:ok, data} <- RenewCollabWeb.Token.verify(token) do
-      {:ok, assign(socket, :current_account, data.account_id)}
+      {:ok,
+       assign(socket, :current_account, %{account_id: data.account_id, username: data.email})}
     else
       _error ->
         {:error, "Invalid Token"}

@@ -1,6 +1,8 @@
 defmodule RenewCollabWeb.DocumentChannel do
   use RenewCollabWeb, :channel
 
+  alias RenewCollabWeb.Presence
+
   alias RenewCollab.Renew
   alias RenewCollab.Document.Document
   alias RenewCollab.Element.Element
@@ -12,6 +14,7 @@ defmodule RenewCollabWeb.DocumentChannel do
   @impl true
   def join("document:" <> documet_id, payload, socket) do
     if authorized?(documet_id, payload) do
+      send(self(), :after_join)
       {:ok, assign(socket, :document_id, documet_id)}
     else
       {:error, %{reason: "unauthorized"}}
@@ -62,8 +65,6 @@ defmodule RenewCollabWeb.DocumentChannel do
                  |> Enum.drop(-1)
                  |> Enum.with_index()
                  |> Enum.map(fn {p, index} ->
-                   dbg(p)
-
                    %{
                      "sort" => index,
                      "position_x" => Map.get(p, "x"),
@@ -73,11 +74,14 @@ defmodule RenewCollabWeb.DocumentChannel do
              }
            }) do
       broadcast!(socket, "element:new", RenewCollabWeb.DocumentJSON.element_data(element))
-    else
-      err -> dbg(err)
-    end
 
-    {:noreply, socket}
+      {:reply, {:ok, %{id: element.id}}, socket}
+    else
+      err ->
+        dbg(err)
+
+        {:noreply, socket}
+    end
   end
 
   @impl true
@@ -87,6 +91,18 @@ defmodule RenewCollabWeb.DocumentChannel do
     # {:reply, {:ok, payload}, socket}
   end
 
+  def handle_info(:after_join, socket) do
+    {:ok, _} =
+      Presence.track(socket, socket.assigns.current_account.account_id, %{
+        online_at: inspect(System.system_time(:second)),
+        username: socket.assigns.current_account.username,
+        color: make_color(socket.assigns.current_account.account_id)
+      })
+
+    push(socket, "presence_state", Presence.list(socket))
+    {:noreply, socket}
+  end
+
   # Add authorization logic here as required.
   defp authorized?(documet_id, _payload) do
     with %RenewCollab.Document.Document{} <- RenewCollab.Renew.get_document!(documet_id) do
@@ -94,5 +110,10 @@ defmodule RenewCollabWeb.DocumentChannel do
     else
       _ -> false
     end
+  end
+
+  defp make_color(account_id) do
+    hue = to_charlist(account_id) |> Enum.sum() |> rem(360)
+    "hsl(#{hue}, 70%, 40%)"
   end
 end

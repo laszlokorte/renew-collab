@@ -11,14 +11,14 @@ defmodule RenewCollab.Application do
       RenewCollabWeb.Telemetry,
       RenewCollab.Repo,
       {Ecto.Migrator,
-        repos: Application.fetch_env!(:renew_collab, :ecto_repos),
-        skip: skip_migrations?()},
+       repos: Application.fetch_env!(:renew_collab, :ecto_repos), skip: skip_migrations?()},
       {DNSCluster, query: Application.get_env(:renew_collab, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: RenewCollab.PubSub},
       # Start a worker by calling: RenewCollab.Worker.start_link(arg)
       # {RenewCollab.Worker, arg},
       # Start to serve requests, typically the last entry
-      RenewCollabWeb.Endpoint
+      RenewCollabWeb.Endpoint,
+      RenewCollabWeb.Presence
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
