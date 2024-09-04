@@ -37,7 +37,7 @@ defmodule RenewCollab.Renew do
           )
       )
 
-  def create_document(attrs \\ %{}, parenthoods) do
+  def create_document(attrs \\ %{}, parenthoods \\ []) do
     with {:ok, transaction} <-
            Ecto.Multi.new()
            |> Ecto.Multi.insert(
