@@ -107,7 +107,7 @@ defmodule RenewCollabWeb.DocumentJSON do
               "shape" => v.shape
             }
         end,
-      connection:
+      edge:
         case element.edge do
           nil ->
             nil

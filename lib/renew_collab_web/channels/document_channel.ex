@@ -83,12 +83,13 @@ defmodule RenewCollabWeb.DocumentChannel do
   end
 
   @impl true
-  def handle_in(_, payload, socket) do
+  def handle_in(_, _payload, socket) do
     {:noreply, socket}
     # {:noreply, socket}
     # {:reply, {:ok, payload}, socket}
   end
 
+  @impl true
   def handle_info(:after_join, socket) do
     {:ok, _} =
       Presence.track(socket, socket.assigns.current_account.account_id, %{

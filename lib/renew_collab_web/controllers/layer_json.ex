@@ -25,9 +25,7 @@ defmodule RenewCollabWeb.LayerJSON do
         href: url(~p"/api/documents/#{element.document_id}")
       },
       href: url(~p"/api/documents/#{element.document_id}/elements/#{element}"),
-      z_index: element.z_index,
-      position_x: element.position_x,
-      position_y: element.position_y
+      z_index: element.z_index
     }
   end
 
@@ -35,9 +33,7 @@ defmodule RenewCollabWeb.LayerJSON do
     %{
       # id: element.id,
       href: url(~p"/api/documents/#{element.document_id}/elements/#{element}"),
-      z_index: element.z_index,
-      position_x: element.position_x,
-      position_y: element.position_y
+      z_index: element.z_index
     }
   end
 end

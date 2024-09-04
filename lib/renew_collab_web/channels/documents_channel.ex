@@ -11,7 +11,7 @@ defmodule RenewCollabWeb.DocumentsChannel do
   end
 
   @impl true
-  def handle_in(_, payload, socket) do
+  def handle_in(_, _payload, socket) do
     {:noreply, socket}
   end
 

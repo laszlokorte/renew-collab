@@ -22,7 +22,7 @@ defmodule RenewCollabWeb.Router do
     end
 
     resources "/documents", DocumentController, except: [:new, :edit] do
-      resources "/elements", ElementController, except: [:new, :edit]
+      resources "/elements", ElementController, only: [:index, :create, :show]
     end
   end
 

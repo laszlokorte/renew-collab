@@ -7,9 +7,8 @@ defmodule RenewCollabWeb.ElementController do
   action_fallback RenewCollabWeb.FallbackController
 
   def index(conn, %{"document_id" => document_id}) do
-    document = Renew.get_document!(document_id)
-    elements = Renew.list_elements(document)
-    render(conn, :index, elements: elements)
+    document = Renew.get_document_with_elements!(document_id)
+    render(conn, :index, elements: document.elements)
   end
 
   def create(conn, %{"document_id" => document_id, "element" => element_params}) do
@@ -34,23 +33,5 @@ defmodule RenewCollabWeb.ElementController do
     document = Renew.get_document!(document_id)
     element = Renew.get_element!(document, id)
     render(conn, :show, element: element)
-  end
-
-  def update(conn, %{"document_id" => document_id, "id" => id, "element" => element_params}) do
-    document = Renew.get_document!(document_id)
-    element = Renew.get_element!(document, id)
-
-    with {:ok, %Layer{} = element} <- Renew.update_element(element, element_params) do
-      render(conn, :show, element: element)
-    end
-  end
-
-  def delete(conn, %{"document_id" => document_id, "id" => id}) do
-    document = Renew.get_document!(document_id)
-    element = Renew.get_element!(document, id)
-
-    with {:ok, %Layer{}} <- Renew.delete_element(element) do
-      send_resp(conn, :no_content, "")
-    end
   end
 end

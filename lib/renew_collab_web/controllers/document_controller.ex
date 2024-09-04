@@ -3,7 +3,6 @@ defmodule RenewCollabWeb.DocumentController do
 
   alias RenewCollab.Renew
   alias RenewCollab.Document.Document
-  alias RenewCollab.Element.Element
 
   action_fallback RenewCollabWeb.FallbackController
 
@@ -89,7 +88,7 @@ defmodule RenewCollabWeb.DocumentController do
   def import(conn, %{
         "renew_file" => %Plug.Upload{
           path: path,
-          content_type: content_type,
+          content_type: _content_type,
           filename: filename
         }
       }) do
@@ -115,7 +114,7 @@ defmodule RenewCollabWeb.DocumentController do
       # BSplineSegments
       # BSplineDegree
       # ArcScale
-      elements =
+      layers =
         Enum.concat([
           for {%Renewex.Storable{
                  class_name: class_name,
@@ -144,10 +143,10 @@ defmodule RenewCollabWeb.DocumentController do
 
             %{
               "semantic_tag" => class_name,
-              "position_x" => x,
-              "position_y" => y,
               "z_index" => z_index,
               "box" => %{
+                "position_x" => x,
+                "position_y" => y,
                 "width" => w,
                 "height" => h,
                 "shape" => convert_shape(parser.grammar, class_name, fields)
@@ -184,11 +183,11 @@ defmodule RenewCollabWeb.DocumentController do
 
             %{
               "semantic_tag" => class_name,
-              "position_x" => x,
-              "position_y" => y,
               "z_index" => z_index,
               "style" => style,
               "text" => %{
+                "position_x" => x,
+                "position_y" => y,
                 "body" => body,
                 "style" => %{
                   "underline" => false,
@@ -253,11 +252,9 @@ defmodule RenewCollabWeb.DocumentController do
 
             %{
               "semantic_tag" => class_name,
-              "position_x" => (start_x + end_x) / 2,
-              "position_y" => (start_y + end_y) / 2,
               "z_index" => z_index,
               "style" => style,
-              "connection" => %{
+              "edge" => %{
                 "source_x" => start_x,
                 "source_y" => start_y,
                 "target_x" => end_x,
@@ -282,12 +279,12 @@ defmodule RenewCollabWeb.DocumentController do
 
       document =
         create(conn, %{
-          "document" => %{"name" => filename, "kind" => class_name, "elements" => elements}
+          "document" => %{"name" => filename, "kind" => class_name, "layers" => layers}
         })
 
       document
     else
-      e ->
+      _e ->
         conn
         |> put_status(:bad_request)
         |> Phoenix.Controller.json(%{"error" => "Not a valid renew file"})
