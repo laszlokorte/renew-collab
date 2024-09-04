@@ -7,6 +7,7 @@ defmodule RenewCollab.Hierarchy.Layer do
   schema "layer" do
     field :z_index, :integer
     field :semantic_tag, :string
+    field :hidden, :boolean, default: false
     belongs_to :document, RenewCollab.Document.Document
     has_one :box, RenewCollab.Element.Box, on_delete: :delete_all
     has_one :text, RenewCollab.Element.Text, on_delete: :delete_all
@@ -20,7 +21,7 @@ defmodule RenewCollab.Hierarchy.Layer do
   @doc false
   def changeset(layer, attrs) do
     layer
-    |> cast(attrs, [:id, :z_index, :semantic_tag])
+    |> cast(attrs, [:id, :z_index, :semantic_tag, :hidden])
     |> cast_assoc(:box)
     |> cast_assoc(:text)
     |> cast_assoc(:edge)

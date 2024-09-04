@@ -8,6 +8,7 @@ defmodule RenewCollab.Repo.Migrations.CreateElementEdge do
       add :source_y, :float, null: false
       add :target_x, :float, null: false
       add :target_y, :float, null: false
+      add :cyclic, :boolean, null: false, default: false
       add :layer_id, references(:layer, on_delete: :delete_all, type: :binary_id), null: false
 
       timestamps(type: :utc_datetime)

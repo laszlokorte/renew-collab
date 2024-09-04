@@ -77,12 +77,4 @@ defmodule RenewCollabWeb.DocumentController do
         |> halt()
     end
   end
-
-  defp check_utf8_binary?(binary) do
-    if :unicode.characters_to_binary(binary, :utf8, :utf8) == binary do
-      {:ok, true}
-    else
-      {:ok, false}
-    end
-  end
 end

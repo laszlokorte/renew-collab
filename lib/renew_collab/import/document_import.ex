@@ -45,15 +45,16 @@ defmodule RenewCollab.Import.DocumentImport do
                   attrs ->
                     %{
                       "opacity" => Map.get(attrs, "Opacity", 1),
-                      "background_color" => convert_color(Map.get(attrs, "FillColor", "green")),
+                      "background_color" => convert_color(Map.get(attrs, "FillColor", "#70DB93")),
                       "border_color" => convert_color(Map.get(attrs, "FrameColor", "black")),
-                      "border_width" => Map.get(attrs, "LineWidth", "1")
+                      "border_width" => convert_border_width(Map.get(attrs, "LineWidth", 1))
                     }
                 end
 
               %{
                 "semantic_tag" => class_name,
                 "z_index" => z_index,
+                "hidden" => convert_visibility_to_hidden(Map.get(attrs, "Visibility")),
                 "id" => uuid,
                 "box" => %{
                   "position_x" => x,
@@ -84,15 +85,16 @@ defmodule RenewCollab.Import.DocumentImport do
                   attrs ->
                     %{
                       "opacity" => Map.get(attrs, "Opacity", 1),
-                      "background_color" => convert_color(Map.get(attrs, "FillColor", "green")),
+                      "background_color" => convert_color(Map.get(attrs, "FillColor", "#70DB93")),
                       "border_color" => convert_color(Map.get(attrs, "FrameColor", "black")),
-                      "border_width" => Map.get(attrs, "LineWidth", "1")
+                      "border_width" => convert_border_width(Map.get(attrs, "LineWidth", 1))
                     }
                 end
 
               %{
                 "semantic_tag" => class_name,
                 "z_index" => z_index,
+                "hidden" => convert_visibility_to_hidden(Map.get(attrs, "Visibility")),
                 "id" => uuid,
                 "style" => style,
                 "text" => %{
@@ -100,7 +102,8 @@ defmodule RenewCollab.Import.DocumentImport do
                   "position_y" => y,
                   "body" => body,
                   "style" => %{
-                    "underline" => false,
+                    "underline" =>
+                      convert_font_style(Map.get(fields, :fCurrentFontStyle, 0), :underlined),
                     "alignment" => convert_alignment(Map.get(attrs, "TextAlignment", 0)),
                     "font_size" => Map.get(fields, :fCurrentFontSize, 12),
                     "font_family" =>
@@ -138,7 +141,10 @@ defmodule RenewCollab.Import.DocumentImport do
 
                   attrs ->
                     %{
-                      "opacity" => Map.get(attrs, "Opacity", 1)
+                      "opacity" => Map.get(attrs, "Opacity", 1),
+                      "background_color" => convert_color(Map.get(attrs, "FillColor", "#70DB93")),
+                      "border_color" => convert_color(Map.get(attrs, "FrameColor", "black")),
+                      "border_width" => convert_border_width(Map.get(attrs, "LineWidth", 1))
                     }
                 end
 
@@ -149,7 +155,7 @@ defmodule RenewCollab.Import.DocumentImport do
 
                   attrs ->
                     %{
-                      "stroke_width" => Map.get(attrs, "LineWidth", "1"),
+                      "stroke_width" => convert_border_width(Map.get(attrs, "LineWidth", 1)),
                       "stroke_color" => convert_color(Map.get(attrs, "FrameColor", "black")),
                       "stroke_joint" => "round",
                       "stroke_cap" => "round",
@@ -169,6 +175,7 @@ defmodule RenewCollab.Import.DocumentImport do
               %{
                 "semantic_tag" => class_name,
                 "z_index" => z_index,
+                "hidden" => convert_visibility_to_hidden(Map.get(attrs, "Visibility")),
                 "id" => uuid,
                 "style" => style,
                 "edge" => %{
@@ -176,6 +183,7 @@ defmodule RenewCollab.Import.DocumentImport do
                   "source_y" => start_y,
                   "target_x" => end_x,
                   "target_y" => end_y,
+                  "cyclic" => convert_line_cyclicity(parser.grammar, class_name),
                   "waypoints" =>
                     points
                     |> Enum.drop(1)
@@ -210,7 +218,13 @@ defmodule RenewCollab.Import.DocumentImport do
   defp convert_color(m) when is_binary(m), do: m
   defp convert_color({:rgba, 255, 199, 158, 255}), do: "transparent"
   defp convert_color({:rgb, 255, 199, 158}), do: "transparent"
-  defp convert_color({:rgba, r, g, b, a}), do: "rgba(#{r},#{g},#{b},#{a})"
+
+  defp convert_color({:rgba, r, g, b, a}) when is_integer(a),
+    do: "rgba(#{r},#{g},#{b},#{a / 250.0})"
+
+  defp convert_color({:rgba, r, g, b, a}) when is_float(a) and a <= 1.0,
+    do: "rgba(#{r},#{g},#{b},#{a})"
+
   defp convert_color({:rgb, r, g, b}), do: "rgb(#{r},#{g},#{b})"
 
   defp convert_alignment(0), do: :left
@@ -218,18 +232,21 @@ defmodule RenewCollab.Import.DocumentImport do
   defp convert_alignment(2), do: :right
   defp convert_alignment(_), do: :left
 
-  defp convert_font_style(1, :bold), do: true
-  defp convert_font_style(2, :italic), do: true
-  defp convert_font_style(_, :bold), do: false
-  defp convert_font_style(_, :italic), do: false
+  defp convert_font_style(bitmask, :underlined), do: Bitwise.band(bitmask, 4) == 4
+  defp convert_font_style(bitmask, :bold), do: Bitwise.band(bitmask, 1) == 1
+  defp convert_font_style(bitmask, :italic), do: Bitwise.band(bitmask, 2) == 2
 
   defp convert_font("SansSerif"), do: "sans-serif"
   defp convert_font("Serif"), do: "serif"
   defp convert_font(other), do: other
 
   defp convert_line_style(gap) when is_integer(gap), do: Integer.to_string(gap)
-  defp convert_line_style(nil), do: nil
   defp convert_line_style(dasharray) when is_binary(dasharray), do: dasharray
+  defp convert_line_style(nil), do: nil
+
+  defp convert_border_width(width) when is_integer(width), do: Integer.to_string(width)
+  defp convert_border_width(width) when is_binary(width), do: width
+  defp convert_border_width(nil), do: nil
 
   defp convert_line_decoration(nil), do: nil
 
@@ -245,9 +262,17 @@ defmodule RenewCollab.Import.DocumentImport do
     "#{class_name}(#{angle}:#{outer_radius}:#{inner_radius}:#{filled})"
   end
 
+  defp convert_visibility_to_hidden(visible) when is_boolean(visible), do: not visible
+  defp convert_visibility_to_hidden(nil), do: false
+  defp convert_visibility_to_hidden(_), do: false
+
   defp resolve_ref(refs, {:ref, r}), do: Enum.at(refs, r)
   defp resolve_ref(_, nil), do: nil
   defp resolve_ref(_, noref), do: noref
+
+  defp convert_line_cyclicity(grammar, class_name) do
+    Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.contrib.PolygonFigure")
+  end
 
   defp convert_shape(grammar, class_name, fields) do
     cond do
@@ -259,6 +284,9 @@ defmodule RenewCollab.Import.DocumentImport do
 
       Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.figures.EllipseFigure") ->
         "ellipse"
+
+      Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.figures.PieFigure") ->
+        "pie:#{Map.get(fields, :start_angle)}:#{Map.get(fields, :end_angle)}"
 
       Renewex.Hierarchy.is_subtype_of(
         grammar,

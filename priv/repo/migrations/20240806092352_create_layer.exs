@@ -5,6 +5,7 @@ defmodule RenewCollab.Repo.Migrations.CreateLayer do
     create table(:layer, primary_key: false) do
       add :id, :binary_id, primary_key: true, null: false
       add :z_index, :integer, null: false
+      add :hidden, :boolean, null: false, default: false
 
       add :semantic_tag, :string
 

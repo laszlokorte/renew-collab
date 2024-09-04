@@ -56,6 +56,7 @@ defmodule RenewCollabWeb.DocumentJSON do
       id: element.id,
       semantic_tag: element.semantic_tag,
       z_index: element.z_index,
+      hidden: element.hidden,
       text:
         case element.text do
           nil ->
@@ -121,6 +122,7 @@ defmodule RenewCollabWeb.DocumentJSON do
               "source_y" => v.source_y,
               "target_x" => v.target_x,
               "target_y" => v.target_y,
+              "cyclic" => v.cyclic,
               "waypoints" =>
                 case v.waypoints do
                   [_ | _] = w ->

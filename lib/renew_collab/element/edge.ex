@@ -9,6 +9,7 @@ defmodule RenewCollab.Element.Edge do
     field :source_y, :float
     field :target_x, :float
     field :target_y, :float
+    field :cyclic, :boolean, default: false
     belongs_to :layer, RenewCollab.Hierarchy.Layer
 
     has_one :source_bond, RenewCollab.Connection.SourceBond, on_delete: :delete_all
@@ -25,7 +26,7 @@ defmodule RenewCollab.Element.Edge do
   @doc false
   def changeset(element_edge, attrs) do
     element_edge
-    |> cast(attrs, [:source_x, :source_y, :target_x, :target_y])
+    |> cast(attrs, [:source_x, :source_y, :target_x, :target_y, :cyclic])
     |> cast_assoc(:source_bond)
     |> cast_assoc(:target_bond)
     |> cast_assoc(:style)

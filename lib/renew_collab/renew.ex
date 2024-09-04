@@ -60,6 +60,8 @@ defmodule RenewCollab.Renew do
            )
            |> Repo.transaction() do
       {:ok, Map.get(transaction, :insert_document)}
+    else
+      e -> dbg(e)
     end
   end
 
