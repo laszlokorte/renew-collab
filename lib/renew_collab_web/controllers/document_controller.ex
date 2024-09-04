@@ -33,14 +33,6 @@ defmodule RenewCollabWeb.DocumentController do
     render(conn, :show, document: document)
   end
 
-  def update(conn, %{"id" => id, "document" => document_params}) do
-    document = Renew.get_document!(id)
-
-    with {:ok, %Document{} = document} <- Renew.update_document(document, document_params) do
-      render(conn, :show, document: document)
-    end
-  end
-
   def delete(conn, %{"id" => id}) do
     document = Renew.get_document!(id)
 

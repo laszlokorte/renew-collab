@@ -7,7 +7,7 @@ defmodule RenewCollab.Document.Document do
   schema "document" do
     field :name, :string
     field :kind, :string
-    has_many :elements, RenewCollab.Element.Element, on_delete: :delete_all
+    has_many :layers, RenewCollab.Hierarchy.Layer, on_delete: :delete_all
 
     timestamps(type: :utc_datetime)
   end
@@ -16,7 +16,7 @@ defmodule RenewCollab.Document.Document do
   def changeset(document, attrs) do
     document
     |> cast(attrs, [:name, :kind])
-    |> cast_assoc(:elements)
+    |> cast_assoc(:layers)
     |> validate_required([:name, :kind])
   end
 end

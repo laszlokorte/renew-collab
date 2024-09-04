@@ -1,13 +1,15 @@
-defmodule RenewCollab.Element.ElementText do
+defmodule RenewCollab.Element.Text do
   use Ecto.Schema
   import Ecto.Changeset
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "element_text" do
+    field :position_x, :float
+    field :position_y, :float
     field :body, :string
-    belongs_to :element, RenewCollab.Renew.Element
-    has_one :style, RenewCollab.Style.ElementTextStyle, on_delete: :delete_all
+    belongs_to :layer, RenewCollab.Hierarchy.Layer
+    has_one :style, RenewCollab.Style.TextStyle, on_delete: :delete_all
 
     timestamps(type: :utc_datetime)
   end
@@ -15,9 +17,9 @@ defmodule RenewCollab.Element.ElementText do
   @doc false
   def changeset(element_text, attrs) do
     element_text
-    |> cast(attrs, [:body])
+    |> cast(attrs, [:position_x, :position_y, :body])
     |> cast_assoc(:style)
-    |> validate_required([:body])
+    |> validate_required([:position_x, :position_y, :body])
     |> unique_constraint(:element_id)
   end
 end

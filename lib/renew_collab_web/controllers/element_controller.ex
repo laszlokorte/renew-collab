@@ -2,7 +2,7 @@ defmodule RenewCollabWeb.ElementController do
   use RenewCollabWeb, :controller
 
   alias RenewCollab.Renew
-  alias RenewCollab.Element.Element
+  alias RenewCollab.Hierarchy.Layer
 
   action_fallback RenewCollabWeb.FallbackController
 
@@ -15,7 +15,7 @@ defmodule RenewCollabWeb.ElementController do
   def create(conn, %{"document_id" => document_id, "element" => element_params}) do
     document = Renew.get_document!(document_id)
 
-    with {:ok, %Element{} = element} <- Renew.create_element(document, element_params) do
+    with {:ok, %Layer{} = element} <- Renew.create_element(document, element_params) do
       RenewCollabWeb.Endpoint.broadcast!(
         "document:#{document_id}",
         "element:new",
@@ -40,7 +40,7 @@ defmodule RenewCollabWeb.ElementController do
     document = Renew.get_document!(document_id)
     element = Renew.get_element!(document, id)
 
-    with {:ok, %Element{} = element} <- Renew.update_element(element, element_params) do
+    with {:ok, %Layer{} = element} <- Renew.update_element(element, element_params) do
       render(conn, :show, element: element)
     end
   end
@@ -49,7 +49,7 @@ defmodule RenewCollabWeb.ElementController do
     document = Renew.get_document!(document_id)
     element = Renew.get_element!(document, id)
 
-    with {:ok, %Element{}} <- Renew.delete_element(element) do
+    with {:ok, %Layer{}} <- Renew.delete_element(element) do
       send_resp(conn, :no_content, "")
     end
   end

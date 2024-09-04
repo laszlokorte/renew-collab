@@ -5,7 +5,7 @@ defmodule RenewCollabWeb.DocumentChannel do
 
   alias RenewCollab.Renew
   alias RenewCollab.Document.Document
-  alias RenewCollab.Element.Element
+  alias RenewCollab.Hierarchy.Layer
 
   use Phoenix.VerifiedRoutes,
     router: RenewCollabWeb.Router,
@@ -29,12 +29,12 @@ defmodule RenewCollabWeb.DocumentChannel do
 
   @impl true
   def handle_in("create_element", %{"element" => element_params}, socket) do
-    with {:ok, %Element{} = element} <-
+    with {:ok, %Layer{} = layer} <-
            Renew.create_element(%Document{id: socket.assigns.document_id}, element_params) do
       broadcast!(
         socket,
         "element:new",
-        Map.take(element, [:id, :z_index, :position_x, :position_y])
+        Map.take(layer, [:id, :z_index, :position_x, :position_y])
       )
     else
       err -> dbg(err)
@@ -49,12 +49,10 @@ defmodule RenewCollabWeb.DocumentChannel do
         %{"element" => %{"z_index" => z_index, "points" => [first_point | _] = points}},
         socket
       ) do
-    with {:ok, %Element{} = element} <-
+    with {:ok, %Layer{} = element} <-
            Renew.create_element(%Document{id: socket.assigns.document_id}, %{
              "z_index" => z_index,
-             "position_x" => Map.get(first_point, "x"),
-             "position_y" => Map.get(first_point, "y"),
-             "connection" => %{
+             "edge" => %{
                "source_x" => Map.get(first_point, "x"),
                "source_y" => Map.get(first_point, "y"),
                "target_x" => Map.get(List.last(points), "x"),

@@ -11,11 +11,13 @@ defmodule RenewCollab.Repo.Migrations.CreateElementTextStyle do
       add :italic, :boolean, default: false, null: false
       add :underline, :boolean, default: false, null: false
       add :text_color, :string
-      add :element_text_id, references(:element_text, on_delete: :delete_all, type: :binary_id), null: false
+
+      add :text_id, references(:element_text, on_delete: :delete_all, type: :binary_id),
+        null: false
 
       timestamps(type: :utc_datetime)
     end
 
-    create unique_index(:element_text_style, [:element_text_id])
+    create unique_index(:element_text_style, [:text_id])
   end
 end

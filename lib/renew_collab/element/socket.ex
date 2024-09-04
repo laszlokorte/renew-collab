@@ -1,4 +1,4 @@
-defmodule RenewCollab.Element.ElementSocket do
+defmodule RenewCollab.Element.Socket do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -7,7 +7,7 @@ defmodule RenewCollab.Element.ElementSocket do
   schema "element_socket" do
     field :name, :string
     field :kind, :string
-    belongs_to :element, RenewCollab.Renew.Element
+    belongs_to :layer, RenewCollab.Hierarchy.Layer
 
     timestamps(type: :utc_datetime)
   end

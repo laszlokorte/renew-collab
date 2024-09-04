@@ -1,10 +1,10 @@
-defmodule RenewCollab.Style.ElementConnectionStyle do
+defmodule RenewCollab.Style.EdgeStyle do
   use Ecto.Schema
   import Ecto.Changeset
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
-  schema "element_connection_style" do
+  schema "element_edge_style" do
     field :stroke_width, :string
     field :stroke_color, :string
     field :stroke_joint, :string
@@ -13,14 +13,14 @@ defmodule RenewCollab.Style.ElementConnectionStyle do
     field :source_tip, :string
     field :target_tip, :string
     field :smoothness, :string
-    belongs_to :element_connection, RenewCollab.Connection.ElementConnection
+    belongs_to :edge, RenewCollab.Element.Edge
 
     timestamps(type: :utc_datetime)
   end
 
   @doc false
-  def changeset(element_connection_style, attrs) do
-    element_connection_style
+  def changeset(element_edge_style, attrs) do
+    element_edge_style
     |> cast(attrs, [
       :stroke_width,
       :stroke_color,

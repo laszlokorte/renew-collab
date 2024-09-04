@@ -1,7 +1,7 @@
 defmodule RenewCollabWeb.DocumentJSON do
   alias RenewCollab.Document.Document
-  alias RenewCollab.Element.Element
-  alias RenewCollab.Connection.ElementConnectionWaypoint
+  alias RenewCollab.Hierarchy.Layer
+  alias RenewCollab.Connection.Waypoint
 
   use RenewCollabWeb, :verified_routes
 
@@ -42,22 +42,20 @@ defmodule RenewCollabWeb.DocumentJSON do
       name: document.name,
       kind: document.kind,
       elements:
-        case document.elements do
+        case document.layers do
           %Ecto.Association.NotLoaded{} -> %{}
-          _ -> %{items: document.elements |> Enum.map(&element_data(&1))}
+          _ -> %{items: document.layers |> Enum.map(&element_data(&1))}
         end
         |> Map.put(:href, url(~p"/api/documents/#{document}/elements"))
     }
   end
 
-  def element_data(%Element{} = element) do
+  def element_data(%Layer{} = element) do
     %{
       # id: element.id,
       id: element.id,
       semantic_tag: element.semantic_tag,
       z_index: element.z_index,
-      position_x: element.position_x,
-      position_y: element.position_y,
       text:
         case element.text do
           nil ->
@@ -68,6 +66,8 @@ defmodule RenewCollabWeb.DocumentJSON do
 
           v ->
             %{
+              "position_x" => v.position_x,
+              "position_y" => v.position_y,
               "body" => v.body,
               "style" =>
                 case v.style do
@@ -99,10 +99,16 @@ defmodule RenewCollabWeb.DocumentJSON do
             nil
 
           v ->
-            %{"width" => v.width, "height" => v.height, "shape" => v.shape}
+            %{
+              "position_x" => v.position_x,
+              "position_y" => v.position_y,
+              "width" => v.width,
+              "height" => v.height,
+              "shape" => v.shape
+            }
         end,
       connection:
-        case element.connection do
+        case element.edge do
           nil ->
             nil
 
@@ -120,7 +126,7 @@ defmodule RenewCollabWeb.DocumentJSON do
                   [_ | _] = w ->
                     w
                     |> Enum.map(fn
-                      %ElementConnectionWaypoint{position_x: x, position_y: y} ->
+                      %Waypoint{position_x: x, position_y: y} ->
                         %{"x" => x, "y" => y}
                     end)
 
@@ -133,7 +139,7 @@ defmodule RenewCollabWeb.DocumentJSON do
                   [] ->
                     []
 
-                  e ->
+                  _ ->
                     []
                 end,
               "style" =>

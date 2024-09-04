@@ -1,22 +1,22 @@
-defmodule RenewCollab.Style.ElementStyle do
+defmodule RenewCollab.Style.LayerStyle do
   use Ecto.Schema
   import Ecto.Changeset
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
-  schema "element_style" do
+  schema "layer_style" do
     field :opacity, :float
     field :background_color, :string
     field :border_color, :string
     field :border_width, :string
-    belongs_to :element, RenewCollab.Element.Element
+    belongs_to :layer, RenewCollab.Hierarchy.Layer
 
     timestamps(type: :utc_datetime)
   end
 
   @doc false
-  def changeset(element_style, attrs) do
-    element_style
+  def changeset(layer_style, attrs) do
+    layer_style
     |> cast(attrs, [:opacity, :background_color, :border_color, :border_width, :border_width])
     # |> validate_required([:opacity, :background_color, :border_color, :border_width, :border_width])
     |> unique_constraint(:element_id)

@@ -1,5 +1,5 @@
-defmodule RenewCollabWeb.ElementJSON do
-  alias RenewCollab.Element.Element
+defmodule RenewCollabWeb.LayerJSON do
+  alias RenewCollab.Hierarchy.Layer
   use RenewCollabWeb, :verified_routes
 
   @doc """
@@ -18,7 +18,7 @@ defmodule RenewCollabWeb.ElementJSON do
     %{data: detail_data(element)}
   end
 
-  defp detail_data(%Element{} = element) do
+  defp detail_data(%Layer{} = element) do
     %{
       # id: element.id,
       document: %{
@@ -31,7 +31,7 @@ defmodule RenewCollabWeb.ElementJSON do
     }
   end
 
-  defp list_data(%Element{} = element) do
+  defp list_data(%Layer{} = element) do
     %{
       # id: element.id,
       href: url(~p"/api/documents/#{element.document_id}/elements/#{element}"),
