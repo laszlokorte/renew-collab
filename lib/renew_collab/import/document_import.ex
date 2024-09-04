@@ -153,7 +153,7 @@ defmodule RenewCollab.Import.DocumentImport do
                       "stroke_color" => convert_color(Map.get(attrs, "FrameColor", "black")),
                       "stroke_joint" => "round",
                       "stroke_cap" => "round",
-                      "stroke_dash_array" => "",
+                      "stroke_dash_array" => convert_line_style(Map.get(attrs, "LineStyle")),
                       "source_tip" => "",
                       "target_tip" => "",
                       "smoothness" => ""
@@ -221,10 +221,17 @@ defmodule RenewCollab.Import.DocumentImport do
   defp convert_font("Serif"), do: "serif"
   defp convert_font(other), do: other
 
+  defp convert_line_style(gap) when is_integer(gap), do: Integer.to_string(gap)
+  defp convert_line_style(nil), do: nil
+  defp convert_line_style(dasharray) when is_binary(dasharray), do: dasharray
+
   defp convert_shape(grammar, class_name, fields) do
     cond do
       Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.contrib.TriangleFigure") ->
         "triangle:#{Map.get(fields, :rotation)}"
+
+      Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.contrib.DiamondFigure") ->
+        "diamond"
 
       Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.figures.EllipseFigure") ->
         "ellipse"
@@ -234,7 +241,7 @@ defmodule RenewCollab.Import.DocumentImport do
         class_name,
         "CH.ifa.draw.figures.RoundRectangleFigure"
       ) ->
-        "roundrect"
+        "roundrect:#{Map.get(fields, :arc_width, 0)}:#{Map.get(fields, :arc_height, 0)}"
 
       Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.figures.RectangleFigure") ->
         "rect"
