@@ -1,7 +1,7 @@
 defmodule RenewCollab.Import.DocumentImport do
   def import(name, content) do
     with {:ok, true} <- check_utf8_binary?(content),
-         {:ok, root, refs} <- Renewex.parse_string(content),
+         {:ok, %Renewex.Document{root: root, refs: refs}} <- Renewex.parse_document(content),
          parser <- Renewex.Parser.detect_document_version(Renewex.Tokenizer.scan(content)),
          %Renewex.Storable{class_name: class_name, fields: %{figures: figures}} <- root do
       refs_with_ids = Enum.map(refs, fn s -> {s, generate_layer_id()} end) |> Enum.to_list()
@@ -154,8 +154,14 @@ defmodule RenewCollab.Import.DocumentImport do
                       "stroke_joint" => "round",
                       "stroke_cap" => "round",
                       "stroke_dash_array" => convert_line_style(Map.get(attrs, "LineStyle")),
-                      "source_tip" => "",
-                      "target_tip" => "",
+                      "source_tip" =>
+                        convert_line_decoration(
+                          resolve_ref(refs, Map.get(fields, :start_decoration))
+                        ),
+                      "target_tip" =>
+                        convert_line_decoration(
+                          resolve_ref(refs, Map.get(fields, :end_decoration))
+                        ),
                       "smoothness" => ""
                     }
                 end
@@ -224,6 +230,24 @@ defmodule RenewCollab.Import.DocumentImport do
   defp convert_line_style(gap) when is_integer(gap), do: Integer.to_string(gap)
   defp convert_line_style(nil), do: nil
   defp convert_line_style(dasharray) when is_binary(dasharray), do: dasharray
+
+  defp convert_line_decoration(nil), do: nil
+
+  defp convert_line_decoration(%Renewex.Storable{
+         class_name: class_name,
+         fields: %{
+           angle: angle,
+           outer_radius: outer_radius,
+           inner_radius: inner_radius,
+           filled: filled
+         }
+       }) do
+    "#{class_name}(#{angle}:#{outer_radius}:#{inner_radius}:#{filled})"
+  end
+
+  defp resolve_ref(refs, {:ref, r}), do: Enum.at(refs, r)
+  defp resolve_ref(_, nil), do: nil
+  defp resolve_ref(_, noref), do: noref
 
   defp convert_shape(grammar, class_name, fields) do
     cond do
