@@ -56,13 +56,19 @@ defmodule RenewCollabWeb.DocumentController do
         }
       }) do
     with {:ok, content} <- File.read(path),
-         {:ok, document_params} <- DocumentImport.import(filename, content) do
-      document =
-        create(conn, %{
-          "document" => document_params
-        })
+         {:ok, document_params, hierarchy} <- DocumentImport.import(filename, content),
+         {:ok, %Document{} = document} <- Renew.create_document(document_params, hierarchy) do
+      RenewCollabWeb.Endpoint.broadcast!(
+        "documents",
+        "document:new",
+        Map.take(document, [:name, :kind, :id])
+        |> Map.put("href", url(~p"/api/documents/#{document}"))
+      )
 
-      document
+      conn
+      |> put_status(:created)
+      |> put_resp_header("location", ~p"/api/documents/#{document}")
+      |> render(:show, document: document)
     else
       _e ->
         conn

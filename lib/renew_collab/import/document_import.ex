@@ -4,9 +4,10 @@ defmodule RenewCollab.Import.DocumentImport do
          {:ok, root, refs} <- Renewex.parse_string(content),
          parser <- Renewex.Parser.detect_document_version(Renewex.Tokenizer.scan(content)),
          %Renewex.Storable{class_name: class_name, fields: %{figures: figures}} <- root do
-      refs_with_ids = Enum.map(refs, fn s -> {s, generate_layer_id()} end)
+      refs_with_ids = Enum.map(refs, fn s -> {s, generate_layer_id()} end) |> Enum.to_list()
 
       figs = Enum.flat_map(figures, fn fig -> collect_nested_figures(fig, refs_with_ids) end)
+      hierarchy = Enum.flat_map(figures, fn fig -> collect_hierarchy(fig, refs_with_ids) end)
 
       # FrameColor
       # FillColor
@@ -23,168 +24,180 @@ defmodule RenewCollab.Import.DocumentImport do
       # BSplineDegree
       # ArcScale
       layers =
-        Enum.concat([
-          for {{%Renewex.Storable{
-                  class_name: class_name,
-                  fields: %{x: x, y: y, w: w, h: h} = fields
-                }, uuid}, z_index} <- figs do
-            attrs =
-              with %Renewex.Storable{fields: f} <- Map.get(fields, :attributes) do
-                f.attributes |> Enum.into(%{}, fn {key, _type, value} -> {key, value} end)
-              else
-                _ -> nil
-              end
+        for layer <- figs do
+          case layer do
+            {{%Renewex.Storable{
+                class_name: class_name,
+                fields: %{x: x, y: y, w: w, h: h} = fields
+              }, uuid}, z_index} ->
+              attrs =
+                with %Renewex.Storable{fields: f} <- Map.get(fields, :attributes) do
+                  f.attributes |> Enum.into(%{}, fn {key, _type, value} -> {key, value} end)
+                else
+                  _ -> nil
+                end
 
-            style =
-              case attrs do
-                nil ->
-                  nil
+              style =
+                case attrs do
+                  nil ->
+                    nil
 
-                attrs ->
-                  %{
-                    "opacity" => Map.get(attrs, "Opacity", 1),
-                    "background_color" => convert_color(Map.get(attrs, "FillColor", "green")),
-                    "border_color" => convert_color(Map.get(attrs, "FrameColor", "black")),
-                    "border_width" => Map.get(attrs, "LineWidth", "1")
+                  attrs ->
+                    %{
+                      "opacity" => Map.get(attrs, "Opacity", 1),
+                      "background_color" => convert_color(Map.get(attrs, "FillColor", "green")),
+                      "border_color" => convert_color(Map.get(attrs, "FrameColor", "black")),
+                      "border_width" => Map.get(attrs, "LineWidth", "1")
+                    }
+                end
+
+              %{
+                "semantic_tag" => class_name,
+                "z_index" => z_index,
+                "id" => uuid,
+                "box" => %{
+                  "position_x" => x,
+                  "position_y" => y,
+                  "width" => w,
+                  "height" => h,
+                  "shape" => convert_shape(parser.grammar, class_name, fields)
+                },
+                "style" => style
+              }
+
+            {{%Renewex.Storable{
+                class_name: class_name,
+                fields: %{text: body, fOriginX: x, fOriginY: y} = fields
+              }, uuid}, z_index} ->
+              attrs =
+                with %Renewex.Storable{fields: f} <- Map.get(fields, :attributes) do
+                  f.attributes |> Enum.into(%{}, fn {key, _type, value} -> {key, value} end)
+                else
+                  _ -> nil
+                end
+
+              style =
+                case attrs do
+                  nil ->
+                    nil
+
+                  attrs ->
+                    %{
+                      "opacity" => Map.get(attrs, "Opacity", 1),
+                      "background_color" => convert_color(Map.get(attrs, "FillColor", "green")),
+                      "border_color" => convert_color(Map.get(attrs, "FrameColor", "black")),
+                      "border_width" => Map.get(attrs, "LineWidth", "1")
+                    }
+                end
+
+              %{
+                "semantic_tag" => class_name,
+                "z_index" => z_index,
+                "id" => uuid,
+                "style" => style,
+                "text" => %{
+                  "position_x" => x,
+                  "position_y" => y,
+                  "body" => body,
+                  "style" => %{
+                    "underline" => false,
+                    "alignment" => convert_alignment(Map.get(attrs, "TextAlignment", 0)),
+                    "font_size" => Map.get(fields, :fCurrentFontSize, 12),
+                    "font_family" =>
+                      convert_font(Map.get(fields, :fCurrentFontName, "sans-serif")),
+                    "bold" => convert_font_style(Map.get(fields, :fCurrentFontStyle, 0), :bold),
+                    "italic" =>
+                      convert_font_style(Map.get(fields, :fCurrentFontStyle, 0), :italic),
+                    "text_color" => convert_color(Map.get(attrs, "TextColor", "black"))
                   }
-              end
-
-            %{
-              "semantic_tag" => class_name,
-              "z_index" => z_index,
-              "id" => uuid,
-              "box" => %{
-                "position_x" => x,
-                "position_y" => y,
-                "width" => w,
-                "height" => h,
-                "shape" => convert_shape(parser.grammar, class_name, fields)
-              },
-              "style" => style
-            }
-          end,
-          for {{%Renewex.Storable{
-                  class_name: class_name,
-                  fields: %{text: body, fOriginX: x, fOriginY: y} = fields
-                }, uuid}, z_index} <- figs do
-            attrs =
-              with %Renewex.Storable{fields: f} <- Map.get(fields, :attributes) do
-                f.attributes |> Enum.into(%{}, fn {key, _type, value} -> {key, value} end)
-              else
-                _ -> nil
-              end
-
-            style =
-              case attrs do
-                nil ->
-                  nil
-
-                attrs ->
-                  %{
-                    "opacity" => Map.get(attrs, "Opacity", 1),
-                    "background_color" => convert_color(Map.get(attrs, "FillColor", "green")),
-                    "border_color" => convert_color(Map.get(attrs, "FrameColor", "black")),
-                    "border_width" => Map.get(attrs, "LineWidth", "1")
-                  }
-              end
-
-            %{
-              "semantic_tag" => class_name,
-              "z_index" => z_index,
-              "id" => uuid,
-              "style" => style,
-              "text" => %{
-                "position_x" => x,
-                "position_y" => y,
-                "body" => body,
-                "style" => %{
-                  "underline" => false,
-                  "alignment" => convert_alignment(Map.get(attrs, "TextAlignment", 0)),
-                  "font_size" => Map.get(fields, :fCurrentFontSize, 12),
-                  "font_family" => convert_font(Map.get(fields, :fCurrentFontName, "sans-serif")),
-                  "bold" => convert_font_style(Map.get(fields, :fCurrentFontStyle, 0), :bold),
-                  "italic" => convert_font_style(Map.get(fields, :fCurrentFontStyle, 0), :italic),
-                  "text_color" => convert_color(Map.get(attrs, "TextColor", "black"))
                 }
               }
-            }
-          end,
-          for {{%Renewex.Storable{
-                  class_name: class_name,
-                  fields: %{points: [_, _ | _] = points} = fields
-                }, uuid}, z_index} <- figs do
-            start_point = hd(points)
-            end_point = List.last(points)
-            start_x = start_point[:x]
-            start_y = start_point[:y]
-            end_x = end_point[:x]
-            end_y = end_point[:y]
 
-            attrs =
-              with %Renewex.Storable{fields: f} <- Map.get(fields, :attributes) do
-                f.attributes |> Enum.into(%{}, fn {key, _type, value} -> {key, value} end)
-              else
-                _ -> nil
-              end
+            {{%Renewex.Storable{
+                class_name: class_name,
+                fields: %{points: [_, _ | _] = points} = fields
+              }, uuid}, z_index} ->
+              start_point = hd(points)
+              end_point = List.last(points)
+              start_x = start_point[:x]
+              start_y = start_point[:y]
+              end_x = end_point[:x]
+              end_y = end_point[:y]
 
-            style =
-              case attrs do
-                nil ->
-                  nil
+              attrs =
+                with %Renewex.Storable{fields: f} <- Map.get(fields, :attributes) do
+                  f.attributes |> Enum.into(%{}, fn {key, _type, value} -> {key, value} end)
+                else
+                  _ -> nil
+                end
 
-                attrs ->
-                  %{
-                    "opacity" => Map.get(attrs, "Opacity", 1)
-                  }
-              end
+              style =
+                case attrs do
+                  nil ->
+                    nil
 
-            line_style =
-              case attrs do
-                nil ->
-                  nil
-
-                attrs ->
-                  %{
-                    "stroke_width" => Map.get(attrs, "LineWidth", "1"),
-                    "stroke_color" => convert_color(Map.get(attrs, "FrameColor", "black")),
-                    "stroke_joint" => "round",
-                    "stroke_cap" => "round",
-                    "stroke_dash_array" => "",
-                    "source_tip" => "",
-                    "target_tip" => "",
-                    "smoothness" => ""
-                  }
-              end
-
-            %{
-              "semantic_tag" => class_name,
-              "z_index" => z_index,
-              "id" => uuid,
-              "style" => style,
-              "edge" => %{
-                "source_x" => start_x,
-                "source_y" => start_y,
-                "target_x" => end_x,
-                "target_y" => end_y,
-                "waypoints" =>
-                  points
-                  |> Enum.drop(1)
-                  |> Enum.drop(-1)
-                  |> Enum.with_index()
-                  |> Enum.map(fn {p, index} ->
+                  attrs ->
                     %{
-                      "sort" => index,
-                      "position_x" => p[:x],
-                      "position_y" => p[:y]
+                      "opacity" => Map.get(attrs, "Opacity", 1)
                     }
-                  end),
-                "style" => line_style
-              }
-            }
-          end
-        ])
+                end
 
-      {:ok, %{"name" => name, "kind" => class_name, "layers" => layers}}
+              line_style =
+                case attrs do
+                  nil ->
+                    nil
+
+                  attrs ->
+                    %{
+                      "stroke_width" => Map.get(attrs, "LineWidth", "1"),
+                      "stroke_color" => convert_color(Map.get(attrs, "FrameColor", "black")),
+                      "stroke_joint" => "round",
+                      "stroke_cap" => "round",
+                      "stroke_dash_array" => "",
+                      "source_tip" => "",
+                      "target_tip" => "",
+                      "smoothness" => ""
+                    }
+                end
+
+              %{
+                "semantic_tag" => class_name,
+                "z_index" => z_index,
+                "id" => uuid,
+                "style" => style,
+                "edge" => %{
+                  "source_x" => start_x,
+                  "source_y" => start_y,
+                  "target_x" => end_x,
+                  "target_y" => end_y,
+                  "waypoints" =>
+                    points
+                    |> Enum.drop(1)
+                    |> Enum.drop(-1)
+                    |> Enum.with_index()
+                    |> Enum.map(fn {p, index} ->
+                      %{
+                        "sort" => index,
+                        "position_x" => p[:x],
+                        "position_y" => p[:y]
+                      }
+                    end),
+                  "style" => line_style
+                }
+              }
+
+            {{%Renewex.Storable{
+                class_name: class_name
+              }, uuid}, z_index} ->
+              %{
+                "semantic_tag" => class_name,
+                "z_index" => z_index,
+                "id" => uuid
+              }
+          end
+        end
+
+      {:ok, %{"name" => name, "kind" => class_name, "layers" => layers}, hierarchy}
     end
   end
 
@@ -250,6 +263,41 @@ defmodule RenewCollab.Import.DocumentImport do
         [el]
         |> Enum.to_list()
         |> Enum.with_index()
+
+      _ ->
+        []
+    end
+  end
+
+  defp collect_hierarchy({:ref, r}, refs_with_ids, ancestors \\ []) do
+    case Enum.at(refs_with_ids, r) do
+      {%Renewex.Storable{class_name: class_name, fields: %{figures: figures}}, own_id} = el ->
+        figures
+        |> Enum.flat_map(fn fig ->
+          collect_hierarchy(
+            fig,
+            refs_with_ids,
+            [
+              {own_id, 0}
+              | Enum.map(ancestors, fn
+                  {parent_id, distance} -> {parent_id, distance + 1}
+                end)
+            ]
+          )
+        end)
+        |> Enum.concat([{own_id, own_id, 0}])
+        |> Enum.concat(
+          Enum.map(ancestors, fn
+            {parent_id, distance} -> {parent_id, own_id, distance + 1}
+          end)
+        )
+        |> Enum.to_list()
+
+      {%Renewex.Storable{}, child_id} = el ->
+        Enum.map(ancestors, fn
+          {parent_id, distance} -> {parent_id, child_id, distance + 1}
+        end)
+        |> Enum.concat([{child_id, child_id, 0}])
 
       _ ->
         []

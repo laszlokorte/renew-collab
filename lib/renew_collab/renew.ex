@@ -37,10 +37,30 @@ defmodule RenewCollab.Renew do
           )
       )
 
-  def create_document(attrs \\ %{}) do
-    %Document{layers: []}
-    |> Document.changeset(attrs)
-    |> Repo.insert()
+  def create_document(attrs \\ %{}, parenthoods) do
+    with {:ok, transaction} <-
+           Ecto.Multi.new()
+           |> Ecto.Multi.insert(
+             :insert_document,
+             %Document{} |> Document.changeset(attrs)
+           )
+           |> Ecto.Multi.insert_all(
+             :insert_parenthoods,
+             LayerParenthood,
+             fn %{insert_document: new_document} ->
+               Enum.map(parenthoods, fn {ancestor_id, descendant_id, depth} ->
+                 %{
+                   depth: depth,
+                   ancestor_id: ancestor_id,
+                   descendant_id: descendant_id,
+                   document_id: new_document.id
+                 }
+               end)
+             end
+           )
+           |> Repo.transaction() do
+      {:ok, Map.get(transaction, :insert_document)}
+    end
   end
 
   def delete_document(%Document{} = document) do
