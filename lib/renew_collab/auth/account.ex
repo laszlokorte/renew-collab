@@ -16,7 +16,8 @@ defmodule RenewCollab.Auth.Account do
     account
     |> cast(attrs, [:email, :password])
     |> validate_required([:email, :password])
-    |> prepare_changes(fn changeset -> 
+    |> unique_constraint(:email)
+    |> prepare_changes(fn changeset ->
       update_change(changeset, :password, &Bcrypt.hash_pwd_salt(&1))
     end)
   end
