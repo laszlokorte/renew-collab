@@ -6,7 +6,7 @@ defmodule RenewCollab.Repo.Migrations.CreateEdgeStyle do
       add :id, :binary_id, primary_key: true, null: false
       add :stroke_width, :string
       add :stroke_color, :string
-      add :stroke_joint, :string
+      add :stroke_join, :string
       add :stroke_cap, :string
       add :stroke_dash_array, :string
       add :source_tip, :string

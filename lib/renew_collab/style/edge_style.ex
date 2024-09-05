@@ -5,9 +5,9 @@ defmodule RenewCollab.Style.EdgeStyle do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "element_edge_style" do
-    field :stroke_width, :string
-    field :stroke_color, :string
-    field :stroke_joint, :string
+    field :stroke_width, :string, default: "1"
+    field :stroke_color, :string, default: "black"
+    field :stroke_join, :string
     field :stroke_cap, :string
     field :stroke_dash_array, :string
     field :source_tip, :string
@@ -24,14 +24,14 @@ defmodule RenewCollab.Style.EdgeStyle do
     |> cast(attrs, [
       :stroke_width,
       :stroke_color,
-      :stroke_joint,
+      :stroke_join,
       :stroke_cap,
       :stroke_dash_array,
       :source_tip,
       :target_tip,
       :smoothness
     ])
-    # |> validate_required([:stroke_width, :stroke_color, :stroke_joint, :stroke_cap, :stroke_dash_array, :source_tip, :target_tip, :smoothness])
+    # |> validate_required([:stroke_width, :stroke_color, :stroke_join, :stroke_cap, :stroke_dash_array, :source_tip, :target_tip, :smoothness])
     |> unique_constraint(:element_connection_id)
   end
 end

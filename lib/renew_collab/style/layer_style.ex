@@ -9,6 +9,7 @@ defmodule RenewCollab.Style.LayerStyle do
     field :background_color, :string
     field :border_color, :string
     field :border_width, :string
+    field :border_dash_array, :string
     belongs_to :layer, RenewCollab.Hierarchy.Layer
 
     timestamps(type: :utc_datetime)
@@ -17,7 +18,14 @@ defmodule RenewCollab.Style.LayerStyle do
   @doc false
   def changeset(layer_style, attrs) do
     layer_style
-    |> cast(attrs, [:opacity, :background_color, :border_color, :border_width, :border_width])
+    |> cast(attrs, [
+      :opacity,
+      :background_color,
+      :border_color,
+      :border_width,
+      :border_width,
+      :border_dash_array
+    ])
     # |> validate_required([:opacity, :background_color, :border_color, :border_width, :border_width])
     |> unique_constraint(:element_id)
   end

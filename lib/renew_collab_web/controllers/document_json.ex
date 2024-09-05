@@ -156,7 +156,7 @@ defmodule RenewCollabWeb.DocumentJSON do
                     %{
                       "stroke_width" => v.stroke_width,
                       "stroke_color" => v.stroke_color,
-                      "stroke_joint" => v.stroke_joint,
+                      "stroke_join" => v.stroke_join,
                       "stroke_cap" => v.stroke_cap,
                       "stroke_dash_array" => v.stroke_dash_array,
                       "source_tip" => v.source_tip,
@@ -179,7 +179,8 @@ defmodule RenewCollabWeb.DocumentJSON do
               "opacity" => v.opacity,
               "background_color" => v.background_color,
               "border_color" => v.border_color,
-              "border_width" => v.border_width
+              "border_width" => v.border_width,
+              "border_dash_array" => v.border_dash_array
             }
         end,
       sockets:

@@ -45,7 +45,7 @@ defmodule RenewCollab.MixProject do
       {:bandit, "~> 1.5"},
       {:corsica, "~> 2.0"},
       {:bcrypt_elixir, "~> 3.0"},
-      {:renewex, "~> 0.11.0"}
+      {:renewex, "~> 0.12.0"}
     ]
   end
 

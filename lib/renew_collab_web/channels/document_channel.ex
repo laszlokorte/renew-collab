@@ -68,7 +68,11 @@ defmodule RenewCollabWeb.DocumentChannel do
                      "position_x" => Map.get(p, "x"),
                      "position_y" => Map.get(p, "y")
                    }
-                 end)
+                 end),
+               "style" => %{
+                 "stroke_color" => make_color(socket.assigns.current_account.account_id),
+                 "stroke_width" => "5"
+               }
              }
            }) do
       broadcast!(socket, "element:new", RenewCollabWeb.DocumentJSON.element_data(element))

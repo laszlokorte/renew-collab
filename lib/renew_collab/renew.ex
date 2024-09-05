@@ -48,15 +48,19 @@ defmodule RenewCollab.Renew do
              :insert_parenthoods,
              LayerParenthood,
              fn %{insert_document: new_document} ->
-               Enum.map(parenthoods, fn {ancestor_id, descendant_id, depth} ->
-                 %{
-                   depth: depth,
-                   ancestor_id: ancestor_id,
-                   descendant_id: descendant_id,
-                   document_id: new_document.id
-                 }
-               end)
-             end
+               Enum.map(
+                 parenthoods,
+                 fn {ancestor_id, descendant_id, depth} ->
+                   %{
+                     depth: depth,
+                     ancestor_id: ancestor_id,
+                     descendant_id: descendant_id,
+                     document_id: new_document.id
+                   }
+                 end
+               )
+             end,
+             on_conflict: {:replace, [:depth, :ancestor_id, :descendant_id]}
            )
            |> Repo.transaction() do
       {:ok, Map.get(transaction, :insert_document)}

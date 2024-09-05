@@ -11,6 +11,11 @@ defmodule RenewCollab.Import.DocumentImport do
         |> Enum.with_index()
         |> Enum.flat_map(fn {fig, i} -> collect_nested_figures(fig, i, refs_with_ids) end)
 
+      unique_figs =
+        figs
+        |> Enum.group_by(fn {{_, uid}, _} -> uid end)
+        |> Enum.map(fn {uid, [first | _]} -> first end)
+
       hierarchy = Enum.flat_map(figures, fn fig -> collect_hierarchy(fig, refs_with_ids) end)
 
       # FrameColor
@@ -28,7 +33,7 @@ defmodule RenewCollab.Import.DocumentImport do
       # BSplineDegree
       # ArcScale
       layers =
-        for layer <- figs do
+        for layer <- unique_figs do
           case layer do
             {{%Renewex.Storable{
                 class_name: class_name,
@@ -91,7 +96,8 @@ defmodule RenewCollab.Import.DocumentImport do
                       "opacity" => Map.get(attrs, "Opacity", 1),
                       "background_color" => convert_color(Map.get(attrs, "FillColor", "#70DB93")),
                       "border_color" => convert_color(Map.get(attrs, "FrameColor", "black")),
-                      "border_width" => convert_border_width(Map.get(attrs, "LineWidth", 1))
+                      "border_width" => convert_border_width(Map.get(attrs, "LineWidth", 1)),
+                      "border_dash_array" => convert_line_style(Map.get(attrs, "LineStyle"))
                     }
                 end
 
@@ -161,8 +167,8 @@ defmodule RenewCollab.Import.DocumentImport do
                     %{
                       "stroke_width" => convert_border_width(Map.get(attrs, "LineWidth", 1)),
                       "stroke_color" => convert_color(Map.get(attrs, "FrameColor", "black")),
-                      "stroke_joint" => "round",
-                      "stroke_cap" => "round",
+                      "stroke_join" => "rect",
+                      "stroke_cap" => "rect",
                       "stroke_dash_array" => convert_line_style(Map.get(attrs, "LineStyle")),
                       "source_tip" =>
                         convert_line_decoration(
@@ -265,6 +271,14 @@ defmodule RenewCollab.Import.DocumentImport do
        }) do
     "#{class_name}(#{angle}:#{outer_radius}:#{inner_radius}:#{filled})"
   end
+
+  defp convert_line_decoration(%Renewex.Storable{
+         class_name: "de.renew.gui.CircleDecoration" = class_name
+       }) do
+    "#{class_name}"
+  end
+
+  defp convert_line_decoration(other), do: dbg(other)
 
   defp convert_visibility_to_hidden(visible) when is_boolean(visible), do: not visible
   defp convert_visibility_to_hidden(nil), do: false
