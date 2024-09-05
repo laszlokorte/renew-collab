@@ -8,6 +8,7 @@ defmodule RenewCollab.Repo.Migrations.CreateLayerStyle do
       add :background_color, :string
       add :border_color, :string
       add :border_width, :string
+      add :border_dash_array, :string
       add :layer_id, references(:layer, on_delete: :delete_all, type: :binary_id), null: false
 
       timestamps(type: :utc_datetime)
