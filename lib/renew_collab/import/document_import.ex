@@ -6,7 +6,11 @@ defmodule RenewCollab.Import.DocumentImport do
          %Renewex.Storable{class_name: class_name, fields: %{figures: figures}} <- root do
       refs_with_ids = Enum.map(refs, fn s -> {s, generate_layer_id()} end) |> Enum.to_list()
 
-      figs = Enum.flat_map(figures, fn fig -> collect_nested_figures(fig, refs_with_ids) end)
+      figs =
+        figures
+        |> Enum.with_index()
+        |> Enum.flat_map(fn {fig, i} -> collect_nested_figures(fig, i, refs_with_ids) end)
+
       hierarchy = Enum.flat_map(figures, fn fig -> collect_hierarchy(fig, refs_with_ids) end)
 
       # FrameColor
@@ -303,25 +307,24 @@ defmodule RenewCollab.Import.DocumentImport do
     end
   end
 
-  defp collect_nested_figures({:ref, r}, refs_with_ids) do
+  defp collect_nested_figures({:ref, r}, index, refs_with_ids) do
     case Enum.at(refs_with_ids, r) do
       {%Renewex.Storable{class_name: class_name, fields: %{figures: figures}}, _} = el ->
         figures
-        |> Enum.flat_map(fn fig ->
-          collect_nested_figures(fig, refs_with_ids)
+        |> Enum.with_index()
+        |> Enum.flat_map(fn {fig, i} ->
+          collect_nested_figures(fig, i, refs_with_ids)
         end)
         |> then(
           &Enum.concat(
-            Enum.with_index([el]),
+            [{el, index}],
             &1
           )
         )
         |> Enum.to_list()
 
       {%Renewex.Storable{}, _} = el ->
-        [el]
-        |> Enum.to_list()
-        |> Enum.with_index()
+        [{el, index}]
 
       _ ->
         []
