@@ -5,7 +5,7 @@ defmodule RenewCollab.Connection.SourceBond do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "element_connection_source_bond" do
-    belongs_to :element_edge, RenewCollab.Element.Edge
+    belongs_to :edge, RenewCollab.Element.Edge
     belongs_to :source_socket, RenewCollab.Element.Socket
 
     timestamps(type: :utc_datetime)
