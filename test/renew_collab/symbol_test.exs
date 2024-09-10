@@ -89,7 +89,12 @@ defmodule RenewCollab.SymbolTest do
 
     test "update_path/2 with valid data updates the path" do
       path = path_fixture()
-      update_attrs = %{sort: 43, fill_color: "some updated fill_color", stroke_color: "some updated stroke_color"}
+
+      update_attrs = %{
+        sort: 43,
+        fill_color: "some updated fill_color",
+        stroke_color: "some updated stroke_color"
+      }
 
       assert {:ok, %Path{} = path} = Symbol.update_path(path, update_attrs)
       assert path.sort == 43
@@ -120,7 +125,22 @@ defmodule RenewCollab.SymbolTest do
 
     import RenewCollab.SymbolFixtures
 
-    @invalid_attrs %{sort: nil, relative: nil, x_value: nil, x_unit: nil, x_offset_operation: nil, x_offset_value_static: nil, x_offset_dynamic_value: nil, x_offset_dynamic_unit: nil, y_value: nil, y_unit: nil, y_offset_operation: nil, y_offset_value_static: nil, y_offset_dynamic_value: nil, y_offset_dynamic_unit: nil}
+    @invalid_attrs %{
+      sort: nil,
+      relative: nil,
+      x_value: nil,
+      x_unit: nil,
+      x_offset_operation: nil,
+      x_offset_value_static: nil,
+      x_offset_dynamic_value: nil,
+      x_offset_dynamic_unit: nil,
+      y_value: nil,
+      y_unit: nil,
+      y_offset_operation: nil,
+      y_offset_value_static: nil,
+      y_offset_dynamic_value: nil,
+      y_offset_dynamic_unit: nil
+    }
 
     test "list_shape_path_segment/0 returns all shape_path_segment" do
       path_segment = path_segment_fixture()
@@ -133,7 +153,22 @@ defmodule RenewCollab.SymbolTest do
     end
 
     test "create_path_segment/1 with valid data creates a path_segment" do
-      valid_attrs = %{sort: 42, relative: true, x_value: 120.5, x_unit: :width, x_offset_operation: :sum, x_offset_value_static: 120.5, x_offset_dynamic_value: 120.5, x_offset_dynamic_unit: :width, y_value: 120.5, y_unit: :width, y_offset_operation: :sum, y_offset_value_static: 120.5, y_offset_dynamic_value: 120.5, y_offset_dynamic_unit: :width}
+      valid_attrs = %{
+        sort: 42,
+        relative: true,
+        x_value: 120.5,
+        x_unit: :width,
+        x_offset_operation: :sum,
+        x_offset_value_static: 120.5,
+        x_offset_dynamic_value: 120.5,
+        x_offset_dynamic_unit: :width,
+        y_value: 120.5,
+        y_unit: :width,
+        y_offset_operation: :sum,
+        y_offset_value_static: 120.5,
+        y_offset_dynamic_value: 120.5,
+        y_offset_dynamic_unit: :width
+      }
 
       assert {:ok, %PathSegment{} = path_segment} = Symbol.create_path_segment(valid_attrs)
       assert path_segment.sort == 42
@@ -158,9 +193,27 @@ defmodule RenewCollab.SymbolTest do
 
     test "update_path_segment/2 with valid data updates the path_segment" do
       path_segment = path_segment_fixture()
-      update_attrs = %{sort: 43, relative: false, x_value: 456.7, x_unit: :height, x_offset_operation: :min, x_offset_value_static: 456.7, x_offset_dynamic_value: 456.7, x_offset_dynamic_unit: :height, y_value: 456.7, y_unit: :height, y_offset_operation: :min, y_offset_value_static: 456.7, y_offset_dynamic_value: 456.7, y_offset_dynamic_unit: :height}
 
-      assert {:ok, %PathSegment{} = path_segment} = Symbol.update_path_segment(path_segment, update_attrs)
+      update_attrs = %{
+        sort: 43,
+        relative: false,
+        x_value: 456.7,
+        x_unit: :height,
+        x_offset_operation: :min,
+        x_offset_value_static: 456.7,
+        x_offset_dynamic_value: 456.7,
+        x_offset_dynamic_unit: :height,
+        y_value: 456.7,
+        y_unit: :height,
+        y_offset_operation: :min,
+        y_offset_value_static: 456.7,
+        y_offset_dynamic_value: 456.7,
+        y_offset_dynamic_unit: :height
+      }
+
+      assert {:ok, %PathSegment{} = path_segment} =
+               Symbol.update_path_segment(path_segment, update_attrs)
+
       assert path_segment.sort == 43
       assert path_segment.relative == false
       assert path_segment.x_value == 456.7
@@ -179,7 +232,10 @@ defmodule RenewCollab.SymbolTest do
 
     test "update_path_segment/2 with invalid data returns error changeset" do
       path_segment = path_segment_fixture()
-      assert {:error, %Ecto.Changeset{}} = Symbol.update_path_segment(path_segment, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Symbol.update_path_segment(path_segment, @invalid_attrs)
+
       assert path_segment == Symbol.get_path_segment!(path_segment.id)
     end
 
@@ -256,7 +312,14 @@ defmodule RenewCollab.SymbolTest do
 
     import RenewCollab.SymbolFixtures
 
-    @invalid_attrs %{y_value: nil, y_unit: nil, y_offset_operation: nil, y_offset_value_static: nil, y_offset_dynamic_value: nil, y_offset_dynamic_unit: nil}
+    @invalid_attrs %{
+      y_value: nil,
+      y_unit: nil,
+      y_offset_operation: nil,
+      y_offset_value_static: nil,
+      y_offset_dynamic_value: nil,
+      y_offset_dynamic_unit: nil
+    }
 
     test "list_shape_path_step_vertical/0 returns all shape_path_step_vertical" do
       path_step_vertical = path_step_vertical_fixture()
@@ -269,9 +332,18 @@ defmodule RenewCollab.SymbolTest do
     end
 
     test "create_path_step_vertical/1 with valid data creates a path_step_vertical" do
-      valid_attrs = %{y_value: 120.5, y_unit: :width, y_offset_operation: :sum, y_offset_value_static: 120.5, y_offset_dynamic_value: 120.5, y_offset_dynamic_unit: :width}
+      valid_attrs = %{
+        y_value: 120.5,
+        y_unit: :width,
+        y_offset_operation: :sum,
+        y_offset_value_static: 120.5,
+        y_offset_dynamic_value: 120.5,
+        y_offset_dynamic_unit: :width
+      }
 
-      assert {:ok, %PathStepVertical{} = path_step_vertical} = Symbol.create_path_step_vertical(valid_attrs)
+      assert {:ok, %PathStepVertical{} = path_step_vertical} =
+               Symbol.create_path_step_vertical(valid_attrs)
+
       assert path_step_vertical.y_value == 120.5
       assert path_step_vertical.y_unit == :width
       assert path_step_vertical.y_offset_operation == :sum
@@ -286,9 +358,19 @@ defmodule RenewCollab.SymbolTest do
 
     test "update_path_step_vertical/2 with valid data updates the path_step_vertical" do
       path_step_vertical = path_step_vertical_fixture()
-      update_attrs = %{y_value: 456.7, y_unit: :height, y_offset_operation: :min, y_offset_value_static: 456.7, y_offset_dynamic_value: 456.7, y_offset_dynamic_unit: :height}
 
-      assert {:ok, %PathStepVertical{} = path_step_vertical} = Symbol.update_path_step_vertical(path_step_vertical, update_attrs)
+      update_attrs = %{
+        y_value: 456.7,
+        y_unit: :height,
+        y_offset_operation: :min,
+        y_offset_value_static: 456.7,
+        y_offset_dynamic_value: 456.7,
+        y_offset_dynamic_unit: :height
+      }
+
+      assert {:ok, %PathStepVertical{} = path_step_vertical} =
+               Symbol.update_path_step_vertical(path_step_vertical, update_attrs)
+
       assert path_step_vertical.y_value == 456.7
       assert path_step_vertical.y_unit == :height
       assert path_step_vertical.y_offset_operation == :min
@@ -299,14 +381,20 @@ defmodule RenewCollab.SymbolTest do
 
     test "update_path_step_vertical/2 with invalid data returns error changeset" do
       path_step_vertical = path_step_vertical_fixture()
-      assert {:error, %Ecto.Changeset{}} = Symbol.update_path_step_vertical(path_step_vertical, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Symbol.update_path_step_vertical(path_step_vertical, @invalid_attrs)
+
       assert path_step_vertical == Symbol.get_path_step_vertical!(path_step_vertical.id)
     end
 
     test "delete_path_step_vertical/1 deletes the path_step_vertical" do
       path_step_vertical = path_step_vertical_fixture()
       assert {:ok, %PathStepVertical{}} = Symbol.delete_path_step_vertical(path_step_vertical)
-      assert_raise Ecto.NoResultsError, fn -> Symbol.get_path_step_vertical!(path_step_vertical.id) end
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Symbol.get_path_step_vertical!(path_step_vertical.id)
+      end
     end
 
     test "change_path_step_vertical/1 returns a path_step_vertical changeset" do
@@ -320,7 +408,14 @@ defmodule RenewCollab.SymbolTest do
 
     import RenewCollab.SymbolFixtures
 
-    @invalid_attrs %{x_value: nil, x_unit: nil, x_offset_operation: nil, x_offset_value_static: nil, x_offset_dynamic_value: nil, x_offset_dynamic_unit: nil}
+    @invalid_attrs %{
+      x_value: nil,
+      x_unit: nil,
+      x_offset_operation: nil,
+      x_offset_value_static: nil,
+      x_offset_dynamic_value: nil,
+      x_offset_dynamic_unit: nil
+    }
 
     test "list_shape_path_step_horizontal/0 returns all shape_path_step_horizontal" do
       path_step_horizontal = path_step_horizontal_fixture()
@@ -333,9 +428,18 @@ defmodule RenewCollab.SymbolTest do
     end
 
     test "create_path_step_horizontal/1 with valid data creates a path_step_horizontal" do
-      valid_attrs = %{x_value: 120.5, x_unit: :width, x_offset_operation: :sum, x_offset_value_static: 120.5, x_offset_dynamic_value: 120.5, x_offset_dynamic_unit: :width}
+      valid_attrs = %{
+        x_value: 120.5,
+        x_unit: :width,
+        x_offset_operation: :sum,
+        x_offset_value_static: 120.5,
+        x_offset_dynamic_value: 120.5,
+        x_offset_dynamic_unit: :width
+      }
 
-      assert {:ok, %PathStepHorizontal{} = path_step_horizontal} = Symbol.create_path_step_horizontal(valid_attrs)
+      assert {:ok, %PathStepHorizontal{} = path_step_horizontal} =
+               Symbol.create_path_step_horizontal(valid_attrs)
+
       assert path_step_horizontal.x_value == 120.5
       assert path_step_horizontal.x_unit == :width
       assert path_step_horizontal.x_offset_operation == :sum
@@ -350,9 +454,19 @@ defmodule RenewCollab.SymbolTest do
 
     test "update_path_step_horizontal/2 with valid data updates the path_step_horizontal" do
       path_step_horizontal = path_step_horizontal_fixture()
-      update_attrs = %{x_value: 456.7, x_unit: :height, x_offset_operation: :min, x_offset_value_static: 456.7, x_offset_dynamic_value: 456.7, x_offset_dynamic_unit: :height}
 
-      assert {:ok, %PathStepHorizontal{} = path_step_horizontal} = Symbol.update_path_step_horizontal(path_step_horizontal, update_attrs)
+      update_attrs = %{
+        x_value: 456.7,
+        x_unit: :height,
+        x_offset_operation: :min,
+        x_offset_value_static: 456.7,
+        x_offset_dynamic_value: 456.7,
+        x_offset_dynamic_unit: :height
+      }
+
+      assert {:ok, %PathStepHorizontal{} = path_step_horizontal} =
+               Symbol.update_path_step_horizontal(path_step_horizontal, update_attrs)
+
       assert path_step_horizontal.x_value == 456.7
       assert path_step_horizontal.x_unit == :height
       assert path_step_horizontal.x_offset_operation == :min
@@ -363,14 +477,22 @@ defmodule RenewCollab.SymbolTest do
 
     test "update_path_step_horizontal/2 with invalid data returns error changeset" do
       path_step_horizontal = path_step_horizontal_fixture()
-      assert {:error, %Ecto.Changeset{}} = Symbol.update_path_step_horizontal(path_step_horizontal, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Symbol.update_path_step_horizontal(path_step_horizontal, @invalid_attrs)
+
       assert path_step_horizontal == Symbol.get_path_step_horizontal!(path_step_horizontal.id)
     end
 
     test "delete_path_step_horizontal/1 deletes the path_step_horizontal" do
       path_step_horizontal = path_step_horizontal_fixture()
-      assert {:ok, %PathStepHorizontal{}} = Symbol.delete_path_step_horizontal(path_step_horizontal)
-      assert_raise Ecto.NoResultsError, fn -> Symbol.get_path_step_horizontal!(path_step_horizontal.id) end
+
+      assert {:ok, %PathStepHorizontal{}} =
+               Symbol.delete_path_step_horizontal(path_step_horizontal)
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Symbol.get_path_step_horizontal!(path_step_horizontal.id)
+      end
     end
 
     test "change_path_step_horizontal/1 returns a path_step_horizontal changeset" do
@@ -384,7 +506,23 @@ defmodule RenewCollab.SymbolTest do
 
     import RenewCollab.SymbolFixtures
 
-    @invalid_attrs %{angle: nil, sweep: nil, large: nil, rx_value: nil, rx_unit: nil, rx_offset_operation: nil, rx_offset_value_static: nil, rx_offset_dynamic_value: nil, rx_offset_dynamic_unit: nil, ry_value: nil, ry_unit: nil, ry_offset_operation: nil, ry_offset_value_static: nil, ry_offset_dynamic_value: nil, ry_offset_dynamic_unit: nil}
+    @invalid_attrs %{
+      angle: nil,
+      sweep: nil,
+      large: nil,
+      rx_value: nil,
+      rx_unit: nil,
+      rx_offset_operation: nil,
+      rx_offset_value_static: nil,
+      rx_offset_dynamic_value: nil,
+      rx_offset_dynamic_unit: nil,
+      ry_value: nil,
+      ry_unit: nil,
+      ry_offset_operation: nil,
+      ry_offset_value_static: nil,
+      ry_offset_dynamic_value: nil,
+      ry_offset_dynamic_unit: nil
+    }
 
     test "list_shape_path_step_arc/0 returns all shape_path_step_arc" do
       path_step_arc = path_step_arc_fixture()
@@ -397,7 +535,23 @@ defmodule RenewCollab.SymbolTest do
     end
 
     test "create_path_step_arc/1 with valid data creates a path_step_arc" do
-      valid_attrs = %{angle: 120.5, sweep: true, large: true, rx_value: 120.5, rx_unit: :width, rx_offset_operation: :sum, rx_offset_value_static: 120.5, rx_offset_dynamic_value: 120.5, rx_offset_dynamic_unit: :width, ry_value: 120.5, ry_unit: :width, ry_offset_operation: :sum, ry_offset_value_static: 120.5, ry_offset_dynamic_value: 120.5, ry_offset_dynamic_unit: :width}
+      valid_attrs = %{
+        angle: 120.5,
+        sweep: true,
+        large: true,
+        rx_value: 120.5,
+        rx_unit: :width,
+        rx_offset_operation: :sum,
+        rx_offset_value_static: 120.5,
+        rx_offset_dynamic_value: 120.5,
+        rx_offset_dynamic_unit: :width,
+        ry_value: 120.5,
+        ry_unit: :width,
+        ry_offset_operation: :sum,
+        ry_offset_value_static: 120.5,
+        ry_offset_dynamic_value: 120.5,
+        ry_offset_dynamic_unit: :width
+      }
 
       assert {:ok, %PathStepArc{} = path_step_arc} = Symbol.create_path_step_arc(valid_attrs)
       assert path_step_arc.angle == 120.5
@@ -423,9 +577,28 @@ defmodule RenewCollab.SymbolTest do
 
     test "update_path_step_arc/2 with valid data updates the path_step_arc" do
       path_step_arc = path_step_arc_fixture()
-      update_attrs = %{angle: 456.7, sweep: false, large: false, rx_value: 456.7, rx_unit: :height, rx_offset_operation: :min, rx_offset_value_static: 456.7, rx_offset_dynamic_value: 456.7, rx_offset_dynamic_unit: :height, ry_value: 456.7, ry_unit: :height, ry_offset_operation: :min, ry_offset_value_static: 456.7, ry_offset_dynamic_value: 456.7, ry_offset_dynamic_unit: :height}
 
-      assert {:ok, %PathStepArc{} = path_step_arc} = Symbol.update_path_step_arc(path_step_arc, update_attrs)
+      update_attrs = %{
+        angle: 456.7,
+        sweep: false,
+        large: false,
+        rx_value: 456.7,
+        rx_unit: :height,
+        rx_offset_operation: :min,
+        rx_offset_value_static: 456.7,
+        rx_offset_dynamic_value: 456.7,
+        rx_offset_dynamic_unit: :height,
+        ry_value: 456.7,
+        ry_unit: :height,
+        ry_offset_operation: :min,
+        ry_offset_value_static: 456.7,
+        ry_offset_dynamic_value: 456.7,
+        ry_offset_dynamic_unit: :height
+      }
+
+      assert {:ok, %PathStepArc{} = path_step_arc} =
+               Symbol.update_path_step_arc(path_step_arc, update_attrs)
+
       assert path_step_arc.angle == 456.7
       assert path_step_arc.sweep == false
       assert path_step_arc.large == false
@@ -445,7 +618,10 @@ defmodule RenewCollab.SymbolTest do
 
     test "update_path_step_arc/2 with invalid data returns error changeset" do
       path_step_arc = path_step_arc_fixture()
-      assert {:error, %Ecto.Changeset{}} = Symbol.update_path_step_arc(path_step_arc, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Symbol.update_path_step_arc(path_step_arc, @invalid_attrs)
+
       assert path_step_arc == Symbol.get_path_step_arc!(path_step_arc.id)
     end
 

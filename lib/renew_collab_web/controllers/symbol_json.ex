@@ -63,15 +63,13 @@ defmodule RenewCollabWeb.SymbolJSON do
 
   defp horizontal_data(ortho) do
     %{
-      "x" => %{
-        "value" => ortho.x_value,
-        "unit" => ortho.x_unit,
-        "offset" => %{
-          "operation" => ortho.x_offset_operation,
-          "value_static" => ortho.x_offset_value_static,
-          "dynamic_value" => ortho.x_offset_dynamic_value,
-          "dynamic_unit" => ortho.x_offset_dynamic_unit
-        }
+      "value" => ortho.x_value,
+      "unit" => ortho.x_unit,
+      "offset" => %{
+        "operation" => ortho.x_offset_operation,
+        "value_static" => ortho.x_offset_value_static,
+        "dynamic_value" => ortho.x_offset_dynamic_value,
+        "dynamic_unit" => ortho.x_offset_dynamic_unit
       }
     }
   end
@@ -82,15 +80,13 @@ defmodule RenewCollabWeb.SymbolJSON do
 
   defp vertical_data(ortho) do
     %{
-      "y" => %{
-        "value" => ortho.y_value,
-        "unit" => ortho.y_unit,
-        "offset" => %{
-          "operation" => ortho.y_offset_operation,
-          "value_static" => ortho.y_offset_value_static,
-          "dynamic_value" => ortho.y_offset_dynamic_value,
-          "dynamic_unit" => ortho.y_offset_dynamic_unit
-        }
+      "value" => ortho.y_value,
+      "unit" => ortho.y_unit,
+      "offset" => %{
+        "operation" => ortho.y_offset_operation,
+        "value_static" => ortho.y_offset_value_static,
+        "dynamic_value" => ortho.y_offset_dynamic_value,
+        "dynamic_unit" => ortho.y_offset_dynamic_unit
       }
     }
   end
@@ -101,7 +97,7 @@ defmodule RenewCollabWeb.SymbolJSON do
 
   defp arc_data(arc) do
     %{
-      "r" => %{
+      "rx" => %{
         "value" => arc.rx_value,
         "unit" => arc.rx_unit,
         "offset" => %{

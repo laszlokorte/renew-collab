@@ -137,7 +137,9 @@ defmodule RenewCollab.RenewTest do
     test "create_element_parenthood/1 with valid data creates a element_parenthood" do
       valid_attrs = %{depth: 42}
 
-      assert {:ok, %ElementParenthood{} = element_parenthood} = Renew.create_element_parenthood(valid_attrs)
+      assert {:ok, %ElementParenthood{} = element_parenthood} =
+               Renew.create_element_parenthood(valid_attrs)
+
       assert element_parenthood.depth == 42
     end
 
@@ -149,20 +151,28 @@ defmodule RenewCollab.RenewTest do
       element_parenthood = element_parenthood_fixture()
       update_attrs = %{depth: 43}
 
-      assert {:ok, %ElementParenthood{} = element_parenthood} = Renew.update_element_parenthood(element_parenthood, update_attrs)
+      assert {:ok, %ElementParenthood{} = element_parenthood} =
+               Renew.update_element_parenthood(element_parenthood, update_attrs)
+
       assert element_parenthood.depth == 43
     end
 
     test "update_element_parenthood/2 with invalid data returns error changeset" do
       element_parenthood = element_parenthood_fixture()
-      assert {:error, %Ecto.Changeset{}} = Renew.update_element_parenthood(element_parenthood, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Renew.update_element_parenthood(element_parenthood, @invalid_attrs)
+
       assert element_parenthood == Renew.get_element_parenthood!(element_parenthood.id)
     end
 
     test "delete_element_parenthood/1 deletes the element_parenthood" do
       element_parenthood = element_parenthood_fixture()
       assert {:ok, %ElementParenthood{}} = Renew.delete_element_parenthood(element_parenthood)
-      assert_raise Ecto.NoResultsError, fn -> Renew.get_element_parenthood!(element_parenthood.id) end
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Renew.get_element_parenthood!(element_parenthood.id)
+      end
     end
 
     test "change_element_parenthood/1 returns a element_parenthood changeset" do
@@ -204,7 +214,9 @@ defmodule RenewCollab.RenewTest do
       element_box = element_box_fixture()
       update_attrs = %{width: 456.7, height: 456.7}
 
-      assert {:ok, %ElementBox{} = element_box} = Renew.update_element_box(element_box, update_attrs)
+      assert {:ok, %ElementBox{} = element_box} =
+               Renew.update_element_box(element_box, update_attrs)
+
       assert element_box.width == 456.7
       assert element_box.height == 456.7
     end
@@ -259,7 +271,9 @@ defmodule RenewCollab.RenewTest do
       element_text = element_text_fixture()
       update_attrs = %{body: "some updated body"}
 
-      assert {:ok, %ElementText{} = element_text} = Renew.update_element_text(element_text, update_attrs)
+      assert {:ok, %ElementText{} = element_text} =
+               Renew.update_element_text(element_text, update_attrs)
+
       assert element_text.body == "some updated body"
     end
 
@@ -301,7 +315,9 @@ defmodule RenewCollab.RenewTest do
     test "create_element_connection/1 with valid data creates a element_connection" do
       valid_attrs = %{source_x: 120.5, source_y: 120.5, target_x: 120.5, target_y: 120.5}
 
-      assert {:ok, %ElementConnection{} = element_connection} = Renew.create_element_connection(valid_attrs)
+      assert {:ok, %ElementConnection{} = element_connection} =
+               Renew.create_element_connection(valid_attrs)
+
       assert element_connection.source_x == 120.5
       assert element_connection.source_y == 120.5
       assert element_connection.target_x == 120.5
@@ -316,7 +332,9 @@ defmodule RenewCollab.RenewTest do
       element_connection = element_connection_fixture()
       update_attrs = %{source_x: 456.7, source_y: 456.7, target_x: 456.7, target_y: 456.7}
 
-      assert {:ok, %ElementConnection{} = element_connection} = Renew.update_element_connection(element_connection, update_attrs)
+      assert {:ok, %ElementConnection{} = element_connection} =
+               Renew.update_element_connection(element_connection, update_attrs)
+
       assert element_connection.source_x == 456.7
       assert element_connection.source_y == 456.7
       assert element_connection.target_x == 456.7
@@ -325,14 +343,20 @@ defmodule RenewCollab.RenewTest do
 
     test "update_element_connection/2 with invalid data returns error changeset" do
       element_connection = element_connection_fixture()
-      assert {:error, %Ecto.Changeset{}} = Renew.update_element_connection(element_connection, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Renew.update_element_connection(element_connection, @invalid_attrs)
+
       assert element_connection == Renew.get_element_connection!(element_connection.id)
     end
 
     test "delete_element_connection/1 deletes the element_connection" do
       element_connection = element_connection_fixture()
       assert {:ok, %ElementConnection{}} = Renew.delete_element_connection(element_connection)
-      assert_raise Ecto.NoResultsError, fn -> Renew.get_element_connection!(element_connection.id) end
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Renew.get_element_connection!(element_connection.id)
+      end
     end
 
     test "change_element_connection/1 returns a element_connection changeset" do
@@ -374,14 +398,19 @@ defmodule RenewCollab.RenewTest do
       element_socket = element_socket_fixture()
       update_attrs = %{name: "some updated name", kind: "some updated kind"}
 
-      assert {:ok, %ElementSocket{} = element_socket} = Renew.update_element_socket(element_socket, update_attrs)
+      assert {:ok, %ElementSocket{} = element_socket} =
+               Renew.update_element_socket(element_socket, update_attrs)
+
       assert element_socket.name == "some updated name"
       assert element_socket.kind == "some updated kind"
     end
 
     test "update_element_socket/2 with invalid data returns error changeset" do
       element_socket = element_socket_fixture()
-      assert {:error, %Ecto.Changeset{}} = Renew.update_element_socket(element_socket, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Renew.update_element_socket(element_socket, @invalid_attrs)
+
       assert element_socket == Renew.get_element_socket!(element_socket.id)
     end
 
@@ -411,27 +440,34 @@ defmodule RenewCollab.RenewTest do
 
     test "get_element_connection_waypoint!/1 returns the element_connection_waypoint with given id" do
       element_connection_waypoint = element_connection_waypoint_fixture()
-      assert Renew.get_element_connection_waypoint!(element_connection_waypoint.id) == element_connection_waypoint
+
+      assert Renew.get_element_connection_waypoint!(element_connection_waypoint.id) ==
+               element_connection_waypoint
     end
 
     test "create_element_connection_waypoint/1 with valid data creates a element_connection_waypoint" do
       valid_attrs = %{sort: 42, position_x: 120.5, position_y: 120.5}
 
-      assert {:ok, %ElementConnectionWaypoint{} = element_connection_waypoint} = Renew.create_element_connection_waypoint(valid_attrs)
+      assert {:ok, %ElementConnectionWaypoint{} = element_connection_waypoint} =
+               Renew.create_element_connection_waypoint(valid_attrs)
+
       assert element_connection_waypoint.sort == 42
       assert element_connection_waypoint.position_x == 120.5
       assert element_connection_waypoint.position_y == 120.5
     end
 
     test "create_element_connection_waypoint/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Renew.create_element_connection_waypoint(@invalid_attrs)
+      assert {:error, %Ecto.Changeset{}} =
+               Renew.create_element_connection_waypoint(@invalid_attrs)
     end
 
     test "update_element_connection_waypoint/2 with valid data updates the element_connection_waypoint" do
       element_connection_waypoint = element_connection_waypoint_fixture()
       update_attrs = %{sort: 43, position_x: 456.7, position_y: 456.7}
 
-      assert {:ok, %ElementConnectionWaypoint{} = element_connection_waypoint} = Renew.update_element_connection_waypoint(element_connection_waypoint, update_attrs)
+      assert {:ok, %ElementConnectionWaypoint{} = element_connection_waypoint} =
+               Renew.update_element_connection_waypoint(element_connection_waypoint, update_attrs)
+
       assert element_connection_waypoint.sort == 43
       assert element_connection_waypoint.position_x == 456.7
       assert element_connection_waypoint.position_y == 456.7
@@ -439,19 +475,33 @@ defmodule RenewCollab.RenewTest do
 
     test "update_element_connection_waypoint/2 with invalid data returns error changeset" do
       element_connection_waypoint = element_connection_waypoint_fixture()
-      assert {:error, %Ecto.Changeset{}} = Renew.update_element_connection_waypoint(element_connection_waypoint, @invalid_attrs)
-      assert element_connection_waypoint == Renew.get_element_connection_waypoint!(element_connection_waypoint.id)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Renew.update_element_connection_waypoint(
+                 element_connection_waypoint,
+                 @invalid_attrs
+               )
+
+      assert element_connection_waypoint ==
+               Renew.get_element_connection_waypoint!(element_connection_waypoint.id)
     end
 
     test "delete_element_connection_waypoint/1 deletes the element_connection_waypoint" do
       element_connection_waypoint = element_connection_waypoint_fixture()
-      assert {:ok, %ElementConnectionWaypoint{}} = Renew.delete_element_connection_waypoint(element_connection_waypoint)
-      assert_raise Ecto.NoResultsError, fn -> Renew.get_element_connection_waypoint!(element_connection_waypoint.id) end
+
+      assert {:ok, %ElementConnectionWaypoint{}} =
+               Renew.delete_element_connection_waypoint(element_connection_waypoint)
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Renew.get_element_connection_waypoint!(element_connection_waypoint.id)
+      end
     end
 
     test "change_element_connection_waypoint/1 returns a element_connection_waypoint changeset" do
       element_connection_waypoint = element_connection_waypoint_fixture()
-      assert %Ecto.Changeset{} = Renew.change_element_connection_waypoint(element_connection_waypoint)
+
+      assert %Ecto.Changeset{} =
+               Renew.change_element_connection_waypoint(element_connection_waypoint)
     end
   end
 
@@ -469,41 +519,63 @@ defmodule RenewCollab.RenewTest do
 
     test "get_element_connection_source_bond!/1 returns the element_connection_source_bond with given id" do
       element_connection_source_bond = element_connection_source_bond_fixture()
-      assert Renew.get_element_connection_source_bond!(element_connection_source_bond.id) == element_connection_source_bond
+
+      assert Renew.get_element_connection_source_bond!(element_connection_source_bond.id) ==
+               element_connection_source_bond
     end
 
     test "create_element_connection_source_bond/1 with valid data creates a element_connection_source_bond" do
       valid_attrs = %{}
 
-      assert {:ok, %ElementConnectionSourceBond{} = element_connection_source_bond} = Renew.create_element_connection_source_bond(valid_attrs)
+      assert {:ok, %ElementConnectionSourceBond{} = element_connection_source_bond} =
+               Renew.create_element_connection_source_bond(valid_attrs)
     end
 
     test "create_element_connection_source_bond/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Renew.create_element_connection_source_bond(@invalid_attrs)
+      assert {:error, %Ecto.Changeset{}} =
+               Renew.create_element_connection_source_bond(@invalid_attrs)
     end
 
     test "update_element_connection_source_bond/2 with valid data updates the element_connection_source_bond" do
       element_connection_source_bond = element_connection_source_bond_fixture()
       update_attrs = %{}
 
-      assert {:ok, %ElementConnectionSourceBond{} = element_connection_source_bond} = Renew.update_element_connection_source_bond(element_connection_source_bond, update_attrs)
+      assert {:ok, %ElementConnectionSourceBond{} = element_connection_source_bond} =
+               Renew.update_element_connection_source_bond(
+                 element_connection_source_bond,
+                 update_attrs
+               )
     end
 
     test "update_element_connection_source_bond/2 with invalid data returns error changeset" do
       element_connection_source_bond = element_connection_source_bond_fixture()
-      assert {:error, %Ecto.Changeset{}} = Renew.update_element_connection_source_bond(element_connection_source_bond, @invalid_attrs)
-      assert element_connection_source_bond == Renew.get_element_connection_source_bond!(element_connection_source_bond.id)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Renew.update_element_connection_source_bond(
+                 element_connection_source_bond,
+                 @invalid_attrs
+               )
+
+      assert element_connection_source_bond ==
+               Renew.get_element_connection_source_bond!(element_connection_source_bond.id)
     end
 
     test "delete_element_connection_source_bond/1 deletes the element_connection_source_bond" do
       element_connection_source_bond = element_connection_source_bond_fixture()
-      assert {:ok, %ElementConnectionSourceBond{}} = Renew.delete_element_connection_source_bond(element_connection_source_bond)
-      assert_raise Ecto.NoResultsError, fn -> Renew.get_element_connection_source_bond!(element_connection_source_bond.id) end
+
+      assert {:ok, %ElementConnectionSourceBond{}} =
+               Renew.delete_element_connection_source_bond(element_connection_source_bond)
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Renew.get_element_connection_source_bond!(element_connection_source_bond.id)
+      end
     end
 
     test "change_element_connection_source_bond/1 returns a element_connection_source_bond changeset" do
       element_connection_source_bond = element_connection_source_bond_fixture()
-      assert %Ecto.Changeset{} = Renew.change_element_connection_source_bond(element_connection_source_bond)
+
+      assert %Ecto.Changeset{} =
+               Renew.change_element_connection_source_bond(element_connection_source_bond)
     end
   end
 
@@ -521,41 +593,63 @@ defmodule RenewCollab.RenewTest do
 
     test "get_element_connection_target_bond!/1 returns the element_connection_target_bond with given id" do
       element_connection_target_bond = element_connection_target_bond_fixture()
-      assert Renew.get_element_connection_target_bond!(element_connection_target_bond.id) == element_connection_target_bond
+
+      assert Renew.get_element_connection_target_bond!(element_connection_target_bond.id) ==
+               element_connection_target_bond
     end
 
     test "create_element_connection_target_bond/1 with valid data creates a element_connection_target_bond" do
       valid_attrs = %{}
 
-      assert {:ok, %ElementConnectionTargetBond{} = element_connection_target_bond} = Renew.create_element_connection_target_bond(valid_attrs)
+      assert {:ok, %ElementConnectionTargetBond{} = element_connection_target_bond} =
+               Renew.create_element_connection_target_bond(valid_attrs)
     end
 
     test "create_element_connection_target_bond/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Renew.create_element_connection_target_bond(@invalid_attrs)
+      assert {:error, %Ecto.Changeset{}} =
+               Renew.create_element_connection_target_bond(@invalid_attrs)
     end
 
     test "update_element_connection_target_bond/2 with valid data updates the element_connection_target_bond" do
       element_connection_target_bond = element_connection_target_bond_fixture()
       update_attrs = %{}
 
-      assert {:ok, %ElementConnectionTargetBond{} = element_connection_target_bond} = Renew.update_element_connection_target_bond(element_connection_target_bond, update_attrs)
+      assert {:ok, %ElementConnectionTargetBond{} = element_connection_target_bond} =
+               Renew.update_element_connection_target_bond(
+                 element_connection_target_bond,
+                 update_attrs
+               )
     end
 
     test "update_element_connection_target_bond/2 with invalid data returns error changeset" do
       element_connection_target_bond = element_connection_target_bond_fixture()
-      assert {:error, %Ecto.Changeset{}} = Renew.update_element_connection_target_bond(element_connection_target_bond, @invalid_attrs)
-      assert element_connection_target_bond == Renew.get_element_connection_target_bond!(element_connection_target_bond.id)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Renew.update_element_connection_target_bond(
+                 element_connection_target_bond,
+                 @invalid_attrs
+               )
+
+      assert element_connection_target_bond ==
+               Renew.get_element_connection_target_bond!(element_connection_target_bond.id)
     end
 
     test "delete_element_connection_target_bond/1 deletes the element_connection_target_bond" do
       element_connection_target_bond = element_connection_target_bond_fixture()
-      assert {:ok, %ElementConnectionTargetBond{}} = Renew.delete_element_connection_target_bond(element_connection_target_bond)
-      assert_raise Ecto.NoResultsError, fn -> Renew.get_element_connection_target_bond!(element_connection_target_bond.id) end
+
+      assert {:ok, %ElementConnectionTargetBond{}} =
+               Renew.delete_element_connection_target_bond(element_connection_target_bond)
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Renew.get_element_connection_target_bond!(element_connection_target_bond.id)
+      end
     end
 
     test "change_element_connection_target_bond/1 returns a element_connection_target_bond changeset" do
       element_connection_target_bond = element_connection_target_bond_fixture()
-      assert %Ecto.Changeset{} = Renew.change_element_connection_target_bond(element_connection_target_bond)
+
+      assert %Ecto.Changeset{} =
+               Renew.change_element_connection_target_bond(element_connection_target_bond)
     end
   end
 
@@ -577,7 +671,12 @@ defmodule RenewCollab.RenewTest do
     end
 
     test "create_element_style/1 with valid data creates a element_style" do
-      valid_attrs = %{opacity: 120.5, background_color: "some background_color", border_color: "some border_color", border_width: "some border_width"}
+      valid_attrs = %{
+        opacity: 120.5,
+        background_color: "some background_color",
+        border_color: "some border_color",
+        border_width: "some border_width"
+      }
 
       assert {:ok, %ElementStyle{} = element_style} = Renew.create_element_style(valid_attrs)
       assert element_style.opacity == 120.5
@@ -592,9 +691,17 @@ defmodule RenewCollab.RenewTest do
 
     test "update_element_style/2 with valid data updates the element_style" do
       element_style = element_style_fixture()
-      update_attrs = %{opacity: 456.7, background_color: "some updated background_color", border_color: "some updated border_color", border_width: "some updated border_width"}
 
-      assert {:ok, %ElementStyle{} = element_style} = Renew.update_element_style(element_style, update_attrs)
+      update_attrs = %{
+        opacity: 456.7,
+        background_color: "some updated background_color",
+        border_color: "some updated border_color",
+        border_width: "some updated border_width"
+      }
+
+      assert {:ok, %ElementStyle{} = element_style} =
+               Renew.update_element_style(element_style, update_attrs)
+
       assert element_style.opacity == 456.7
       assert element_style.background_color == "some updated background_color"
       assert element_style.border_color == "some updated border_color"
@@ -603,7 +710,10 @@ defmodule RenewCollab.RenewTest do
 
     test "update_element_style/2 with invalid data returns error changeset" do
       element_style = element_style_fixture()
-      assert {:error, %Ecto.Changeset{}} = Renew.update_element_style(element_style, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Renew.update_element_style(element_style, @invalid_attrs)
+
       assert element_style == Renew.get_element_style!(element_style.id)
     end
 
@@ -624,7 +734,16 @@ defmodule RenewCollab.RenewTest do
 
     import RenewCollab.RenewFixtures
 
-    @invalid_attrs %{stroke_width: nil, stroke_color: nil, stroke_joint: nil, stroke_cap: nil, stroke_dash_array: nil, source_tip: nil, target_tip: nil, smoothness: nil}
+    @invalid_attrs %{
+      stroke_width: nil,
+      stroke_color: nil,
+      stroke_joint: nil,
+      stroke_cap: nil,
+      stroke_dash_array: nil,
+      source_tip: nil,
+      target_tip: nil,
+      smoothness: nil
+    }
 
     test "list_element_connection_style/0 returns all element_connection_style" do
       element_connection_style = element_connection_style_fixture()
@@ -633,13 +752,26 @@ defmodule RenewCollab.RenewTest do
 
     test "get_element_connection_style!/1 returns the element_connection_style with given id" do
       element_connection_style = element_connection_style_fixture()
-      assert Renew.get_element_connection_style!(element_connection_style.id) == element_connection_style
+
+      assert Renew.get_element_connection_style!(element_connection_style.id) ==
+               element_connection_style
     end
 
     test "create_element_connection_style/1 with valid data creates a element_connection_style" do
-      valid_attrs = %{stroke_width: "some stroke_width", stroke_color: "some stroke_color", stroke_joint: "some stroke_joint", stroke_cap: "some stroke_cap", stroke_dash_array: "some stroke_dash_array", source_tip: "some source_tip", target_tip: "some target_tip", smoothness: "some smoothness"}
+      valid_attrs = %{
+        stroke_width: "some stroke_width",
+        stroke_color: "some stroke_color",
+        stroke_joint: "some stroke_joint",
+        stroke_cap: "some stroke_cap",
+        stroke_dash_array: "some stroke_dash_array",
+        source_tip: "some source_tip",
+        target_tip: "some target_tip",
+        smoothness: "some smoothness"
+      }
 
-      assert {:ok, %ElementConnectionStyle{} = element_connection_style} = Renew.create_element_connection_style(valid_attrs)
+      assert {:ok, %ElementConnectionStyle{} = element_connection_style} =
+               Renew.create_element_connection_style(valid_attrs)
+
       assert element_connection_style.stroke_width == "some stroke_width"
       assert element_connection_style.stroke_color == "some stroke_color"
       assert element_connection_style.stroke_joint == "some stroke_joint"
@@ -656,9 +788,21 @@ defmodule RenewCollab.RenewTest do
 
     test "update_element_connection_style/2 with valid data updates the element_connection_style" do
       element_connection_style = element_connection_style_fixture()
-      update_attrs = %{stroke_width: "some updated stroke_width", stroke_color: "some updated stroke_color", stroke_joint: "some updated stroke_joint", stroke_cap: "some updated stroke_cap", stroke_dash_array: "some updated stroke_dash_array", source_tip: "some updated source_tip", target_tip: "some updated target_tip", smoothness: "some updated smoothness"}
 
-      assert {:ok, %ElementConnectionStyle{} = element_connection_style} = Renew.update_element_connection_style(element_connection_style, update_attrs)
+      update_attrs = %{
+        stroke_width: "some updated stroke_width",
+        stroke_color: "some updated stroke_color",
+        stroke_joint: "some updated stroke_joint",
+        stroke_cap: "some updated stroke_cap",
+        stroke_dash_array: "some updated stroke_dash_array",
+        source_tip: "some updated source_tip",
+        target_tip: "some updated target_tip",
+        smoothness: "some updated smoothness"
+      }
+
+      assert {:ok, %ElementConnectionStyle{} = element_connection_style} =
+               Renew.update_element_connection_style(element_connection_style, update_attrs)
+
       assert element_connection_style.stroke_width == "some updated stroke_width"
       assert element_connection_style.stroke_color == "some updated stroke_color"
       assert element_connection_style.stroke_joint == "some updated stroke_joint"
@@ -671,14 +815,23 @@ defmodule RenewCollab.RenewTest do
 
     test "update_element_connection_style/2 with invalid data returns error changeset" do
       element_connection_style = element_connection_style_fixture()
-      assert {:error, %Ecto.Changeset{}} = Renew.update_element_connection_style(element_connection_style, @invalid_attrs)
-      assert element_connection_style == Renew.get_element_connection_style!(element_connection_style.id)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Renew.update_element_connection_style(element_connection_style, @invalid_attrs)
+
+      assert element_connection_style ==
+               Renew.get_element_connection_style!(element_connection_style.id)
     end
 
     test "delete_element_connection_style/1 deletes the element_connection_style" do
       element_connection_style = element_connection_style_fixture()
-      assert {:ok, %ElementConnectionStyle{}} = Renew.delete_element_connection_style(element_connection_style)
-      assert_raise Ecto.NoResultsError, fn -> Renew.get_element_connection_style!(element_connection_style.id) end
+
+      assert {:ok, %ElementConnectionStyle{}} =
+               Renew.delete_element_connection_style(element_connection_style)
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Renew.get_element_connection_style!(element_connection_style.id)
+      end
     end
 
     test "change_element_connection_style/1 returns a element_connection_style changeset" do
@@ -692,7 +845,15 @@ defmodule RenewCollab.RenewTest do
 
     import RenewCollab.RenewFixtures
 
-    @invalid_attrs %{italic: nil, underline: nil, alignment: nil, font_size: nil, font_family: nil, bold: nil, text_color: nil}
+    @invalid_attrs %{
+      italic: nil,
+      underline: nil,
+      alignment: nil,
+      font_size: nil,
+      font_family: nil,
+      bold: nil,
+      text_color: nil
+    }
 
     test "list_element_text_style/0 returns all element_text_style" do
       element_text_style = element_text_style_fixture()
@@ -705,9 +866,19 @@ defmodule RenewCollab.RenewTest do
     end
 
     test "create_element_text_style/1 with valid data creates a element_text_style" do
-      valid_attrs = %{italic: true, underline: true, alignment: :left, font_size: 120.5, font_family: "some font_family", bold: true, text_color: "some text_color"}
+      valid_attrs = %{
+        italic: true,
+        underline: true,
+        alignment: :left,
+        font_size: 120.5,
+        font_family: "some font_family",
+        bold: true,
+        text_color: "some text_color"
+      }
 
-      assert {:ok, %ElementTextStyle{} = element_text_style} = Renew.create_element_text_style(valid_attrs)
+      assert {:ok, %ElementTextStyle{} = element_text_style} =
+               Renew.create_element_text_style(valid_attrs)
+
       assert element_text_style.italic == true
       assert element_text_style.underline == true
       assert element_text_style.alignment == :left
@@ -723,9 +894,20 @@ defmodule RenewCollab.RenewTest do
 
     test "update_element_text_style/2 with valid data updates the element_text_style" do
       element_text_style = element_text_style_fixture()
-      update_attrs = %{italic: false, underline: false, alignment: :center, font_size: 456.7, font_family: "some updated font_family", bold: false, text_color: "some updated text_color"}
 
-      assert {:ok, %ElementTextStyle{} = element_text_style} = Renew.update_element_text_style(element_text_style, update_attrs)
+      update_attrs = %{
+        italic: false,
+        underline: false,
+        alignment: :center,
+        font_size: 456.7,
+        font_family: "some updated font_family",
+        bold: false,
+        text_color: "some updated text_color"
+      }
+
+      assert {:ok, %ElementTextStyle{} = element_text_style} =
+               Renew.update_element_text_style(element_text_style, update_attrs)
+
       assert element_text_style.italic == false
       assert element_text_style.underline == false
       assert element_text_style.alignment == :center
@@ -737,14 +919,20 @@ defmodule RenewCollab.RenewTest do
 
     test "update_element_text_style/2 with invalid data returns error changeset" do
       element_text_style = element_text_style_fixture()
-      assert {:error, %Ecto.Changeset{}} = Renew.update_element_text_style(element_text_style, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Renew.update_element_text_style(element_text_style, @invalid_attrs)
+
       assert element_text_style == Renew.get_element_text_style!(element_text_style.id)
     end
 
     test "delete_element_text_style/1 deletes the element_text_style" do
       element_text_style = element_text_style_fixture()
       assert {:ok, %ElementTextStyle{}} = Renew.delete_element_text_style(element_text_style)
-      assert_raise Ecto.NoResultsError, fn -> Renew.get_element_text_style!(element_text_style.id) end
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Renew.get_element_text_style!(element_text_style.id)
+      end
     end
 
     test "change_element_text_style/1 returns a element_text_style changeset" do

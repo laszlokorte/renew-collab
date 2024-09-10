@@ -26,57 +26,10 @@ defmodule RenewCollab.Symbol do
   def list_shapes do
     Repo.delete_all(Shape)
 
-    %Shape{}
-    |> Shape.changeset(%{
-      "name" => "rectangle",
-      "paths" => [
-        %{
-          "fill_color" => "white",
-          "stroke_color" => "black",
-          "sort" => 0,
-          "segments" => [
-            %{
-              "sort" => 0,
-              "relative" => false,
-              "x_value" => 0,
-              "y_value" => 0,
-              "steps" => [
-                %{
-                  "sort" => 0,
-                  "relative" => false,
-                  "horizontal" => %{
-                    "x_value" => 1,
-                    "y_value" => 0
-                  }
-                },
-                %{
-                  "sort" => 1,
-                  "relative" => false,
-                  "horizontal" => %{
-                    "x_value" => 1,
-                    "y_value" => 1
-                  }
-                },
-                %{
-                  "sort" => 2,
-                  "relative" => false,
-                  "horizontal" => %{
-                    "x_value" => 0,
-                    "y_value" => 1
-                  }
-                },
-                %{
-                  "sort" => 1,
-                  "relative" => false
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    })
-    |> Repo.insert()
-    |> dbg
+    RenewCollab.Symbol.PredefinedSymbols.all()
+    |> Enum.each(fn shape ->
+      %Shape{} |> Shape.changeset(shape) |> Repo.insert() |> dbg()
+    end)
 
     Repo.all(Shape)
     |> Repo.preload(

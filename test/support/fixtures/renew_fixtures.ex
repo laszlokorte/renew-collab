@@ -132,9 +132,7 @@ defmodule RenewCollab.RenewFixtures do
   def element_connection_source_bond_fixture(attrs \\ %{}) do
     {:ok, element_connection_source_bond} =
       attrs
-      |> Enum.into(%{
-
-      })
+      |> Enum.into(%{})
       |> RenewCollab.Renew.create_element_connection_source_bond()
 
     element_connection_source_bond
@@ -146,9 +144,7 @@ defmodule RenewCollab.RenewFixtures do
   def element_connection_target_bond_fixture(attrs \\ %{}) do
     {:ok, element_connection_target_bond} =
       attrs
-      |> Enum.into(%{
-
-      })
+      |> Enum.into(%{})
       |> RenewCollab.Renew.create_element_connection_target_bond()
 
     element_connection_target_bond

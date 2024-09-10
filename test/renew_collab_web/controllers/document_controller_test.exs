@@ -49,7 +49,10 @@ defmodule RenewCollabWeb.DocumentControllerTest do
   describe "update document" do
     setup [:create_document]
 
-    test "renders document when data is valid", %{conn: conn, document: %Document{id: id} = document} do
+    test "renders document when data is valid", %{
+      conn: conn,
+      document: %Document{id: id} = document
+    } do
       conn = put(conn, ~p"/api/document/#{document}", document: @update_attrs)
       assert %{"id" => ^id} = json_response(conn, 200)["data"]
 
