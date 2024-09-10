@@ -7,7 +7,7 @@ defmodule RenewCollab.Repo.Migrations.CreateShapePathStepHorizontal do
 
       add :x_value, :float, null: false
       add :x_unit, :string, null: "width"
-      add :x_offset_operation, :string, null: false, default: "add"
+      add :x_offset_operation, :string, null: false, default: "sum"
       add :x_offset_value_static, :float, null: false, default: 0
       add :x_offset_dynamic_value, :float, null: false, default: 0
       add :x_offset_dynamic_unit, :string, default: "min"

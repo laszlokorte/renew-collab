@@ -92,7 +92,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -105,7 +105,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -118,7 +118,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -10
@@ -135,7 +135,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => -10
@@ -145,7 +145,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 },
                 "y" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => -10
@@ -247,7 +247,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -260,7 +260,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -273,7 +273,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -286,7 +286,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -299,7 +299,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -312,7 +312,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -325,7 +325,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -338,7 +338,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -351,7 +351,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -364,7 +364,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -377,7 +377,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -390,7 +390,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -407,7 +407,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -417,7 +417,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 },
                 "y" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -790,7 +790,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     "large" => false,
                     "rx" => %{
                       "offset" => %{
-                        "op" => "add",
+                        "op" => "sum",
                         "rel_unit" => "minsize",
                         "rel_value" => 0,
                         "static" => 10
@@ -800,7 +800,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     },
                     "ry" => %{
                       "offset" => %{
-                        "op" => "add",
+                        "op" => "sum",
                         "rel_unit" => "minsize",
                         "rel_value" => 0,
                         "static" => 10
@@ -813,7 +813,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 20
@@ -828,7 +828,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     "large" => false,
                     "rx" => %{
                       "offset" => %{
-                        "op" => "add",
+                        "op" => "sum",
                         "rel_unit" => "minsize",
                         "rel_value" => 0,
                         "static" => 10
@@ -838,7 +838,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     },
                     "ry" => %{
                       "offset" => %{
-                        "op" => "add",
+                        "op" => "sum",
                         "rel_unit" => "minsize",
                         "rel_value" => 0,
                         "static" => 10
@@ -851,7 +851,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -20
@@ -865,7 +865,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => -10
@@ -875,7 +875,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 },
                 "y" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -2678,7 +2678,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       ]
     },
     %{
-      "name" => "triangle-sw",
+      "name" => "triangle-se",
       "paths" => [
         %{
           "fill_color" => "white",
@@ -3195,7 +3195,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -3205,30 +3205,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 10
-                    },
-                    "unit" => "height",
-                    "value" => 0.5
-                  }
-                },
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => -10
-                    },
-                    "unit" => "height",
-                    "value" => -0.5
-                  },
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -3241,7 +3218,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -10
@@ -3251,7 +3228,30 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 10
+                    },
+                    "unit" => "height",
+                    "value" => 0.5
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => -10
+                    },
+                    "unit" => "height",
+                    "value" => -0.5
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -10
@@ -3268,7 +3268,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -3278,7 +3278,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 },
                 "y" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => -10
@@ -3410,7 +3410,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -3420,7 +3420,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -10
@@ -3433,7 +3433,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -3443,7 +3443,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -3456,7 +3456,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -10
@@ -3466,7 +3466,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -3483,7 +3483,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => -10
@@ -3493,7 +3493,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 },
                 "y" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -5232,7 +5232,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 20
@@ -5242,30 +5242,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 20
-                    },
-                    "unit" => "height",
-                    "value" => 0
-                  }
-                },
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => -20
-                    },
-                    "unit" => "width",
-                    "value" => 0
-                  },
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 20
@@ -5278,7 +5255,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -20
@@ -5288,7 +5265,30 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 20
+                    },
+                    "unit" => "height",
+                    "value" => 0
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => -20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -20
@@ -5305,7 +5305,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -5315,7 +5315,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 },
                 "y" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => -20
@@ -5602,7 +5602,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 20
@@ -5612,30 +5612,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 20
-                    },
-                    "unit" => "height",
-                    "value" => 0
-                  }
-                },
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => -20
-                    },
-                    "unit" => "width",
-                    "value" => 0
-                  },
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 20
@@ -5648,7 +5625,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -20
@@ -5658,7 +5635,30 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 20
+                    },
+                    "unit" => "height",
+                    "value" => 0
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => -20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -20
@@ -5675,7 +5675,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -5685,7 +5685,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 },
                 "y" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => -20
@@ -5972,7 +5972,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -5982,30 +5982,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 10
-                    },
-                    "unit" => "height",
-                    "value" => 0
-                  }
-                },
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => -10
-                    },
-                    "unit" => "width",
-                    "value" => 0
-                  },
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -6018,7 +5995,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -10
@@ -6028,105 +6005,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => -10
-                    },
-                    "unit" => "height",
-                    "value" => 0
-                  }
-                },
-                %{
-                  "relative" => false
-                },
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => -10
-                    },
-                    "unit" => "width",
-                    "value" => 0
-                  },
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => -10
-                    },
-                    "unit" => "height",
-                    "value" => 0
-                  }
-                },
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 10
-                    },
-                    "unit" => "width",
-                    "value" => 0
-                  },
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => -10
-                    },
-                    "unit" => "height",
-                    "value" => 0
-                  }
-                },
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 10
-                    },
-                    "unit" => "width",
-                    "value" => 0
-                  },
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 10
-                    },
-                    "unit" => "height",
-                    "value" => 0
-                  }
-                },
-                %{
-                  "relative" => false
-                },
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => -10
-                    },
-                    "unit" => "width",
-                    "value" => 0
-                  },
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -6139,7 +6018,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -10
@@ -6149,30 +6028,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => -10
-                    },
-                    "unit" => "height",
-                    "value" => 0
-                  }
-                },
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 10
-                    },
-                    "unit" => "width",
-                    "value" => 0
-                  },
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -10
@@ -6188,17 +6044,17 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
-                      "static" => 10
+                      "static" => -10
                     },
                     "unit" => "width",
                     "value" => 0
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -10
@@ -6211,7 +6067,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -6221,7 +6077,56 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => -10
+                    },
+                    "unit" => "height",
+                    "value" => 0
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 10
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 10
+                    },
+                    "unit" => "height",
+                    "value" => 0
+                  }
+                },
+                %{
+                  "relative" => false
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => -10
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -6234,7 +6139,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -10
@@ -6244,7 +6149,102 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => -10
+                    },
+                    "unit" => "height",
+                    "value" => 0
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 10
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => -10
+                    },
+                    "unit" => "height",
+                    "value" => 0
+                  }
+                },
+                %{
+                  "relative" => false
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 10
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => -10
+                    },
+                    "unit" => "height",
+                    "value" => 0
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 10
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 10
+                    },
+                    "unit" => "height",
+                    "value" => 0
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => -10
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -6261,7 +6261,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -6271,7 +6271,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 },
                 "y" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -6662,7 +6662,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -6672,7 +6672,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 },
                 "y" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -6854,7 +6854,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 20
@@ -6864,30 +6864,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 20
-                    },
-                    "unit" => "height",
-                    "value" => 0
-                  }
-                },
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => -20
-                    },
-                    "unit" => "width",
-                    "value" => 0
-                  },
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 20
@@ -6900,7 +6877,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -20
@@ -6910,7 +6887,30 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 20
+                    },
+                    "unit" => "height",
+                    "value" => 0
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => -20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -20
@@ -6927,7 +6927,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -6937,7 +6937,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 },
                 "y" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => -20
@@ -7224,7 +7224,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 20
@@ -7234,30 +7234,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 20
-                    },
-                    "unit" => "height",
-                    "value" => 0
-                  }
-                },
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => -20
-                    },
-                    "unit" => "width",
-                    "value" => 0
-                  },
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 20
@@ -7270,7 +7247,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -20
@@ -7280,7 +7257,30 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 20
+                    },
+                    "unit" => "height",
+                    "value" => 0
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => -20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -20
@@ -7297,7 +7297,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -7307,7 +7307,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 },
                 "y" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => -20
@@ -7594,7 +7594,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -7604,30 +7604,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 10
-                    },
-                    "unit" => "height",
-                    "value" => 0
-                  }
-                },
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => -10
-                    },
-                    "unit" => "width",
-                    "value" => 0
-                  },
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -7640,7 +7617,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -10
@@ -7650,105 +7627,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => -10
-                    },
-                    "unit" => "height",
-                    "value" => 0
-                  }
-                },
-                %{
-                  "relative" => false
-                },
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => -10
-                    },
-                    "unit" => "width",
-                    "value" => 0
-                  },
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => -10
-                    },
-                    "unit" => "height",
-                    "value" => 0
-                  }
-                },
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 10
-                    },
-                    "unit" => "width",
-                    "value" => 0
-                  },
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => -10
-                    },
-                    "unit" => "height",
-                    "value" => 0
-                  }
-                },
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 10
-                    },
-                    "unit" => "width",
-                    "value" => 0
-                  },
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 10
-                    },
-                    "unit" => "height",
-                    "value" => 0
-                  }
-                },
-                %{
-                  "relative" => false
-                },
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => -10
-                    },
-                    "unit" => "width",
-                    "value" => 0
-                  },
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -7761,7 +7640,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -10
@@ -7771,30 +7650,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => -10
-                    },
-                    "unit" => "height",
-                    "value" => 0
-                  }
-                },
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "add",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 10
-                    },
-                    "unit" => "width",
-                    "value" => 0
-                  },
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -10
@@ -7810,17 +7666,17 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
-                      "static" => 10
+                      "static" => -10
                     },
                     "unit" => "width",
                     "value" => 0
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -10
@@ -7833,7 +7689,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -7843,7 +7699,56 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => -10
+                    },
+                    "unit" => "height",
+                    "value" => 0
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 10
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 10
+                    },
+                    "unit" => "height",
+                    "value" => 0
+                  }
+                },
+                %{
+                  "relative" => false
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => -10
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -7856,7 +7761,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -10
@@ -7866,7 +7771,102 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => -10
+                    },
+                    "unit" => "height",
+                    "value" => 0
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 10
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => -10
+                    },
+                    "unit" => "height",
+                    "value" => 0
+                  }
+                },
+                %{
+                  "relative" => false
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 10
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => -10
+                    },
+                    "unit" => "height",
+                    "value" => 0
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 10
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 10
+                    },
+                    "unit" => "height",
+                    "value" => 0
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => -10
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -7883,7 +7883,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -7893,7 +7893,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 },
                 "y" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -8284,7 +8284,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -8294,7 +8294,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 },
                 "y" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -8344,7 +8344,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => -0.5,
                       "static" => 0
@@ -8380,7 +8380,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0.5,
                       "static" => 0
@@ -8416,7 +8416,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0.5,
                       "static" => 0
@@ -8456,7 +8456,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => -0.5,
                     "static" => 0
@@ -8495,7 +8495,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     "large" => true,
                     "rx" => %{
                       "offset" => %{
-                        "op" => "add",
+                        "op" => "sum",
                         "rel_unit" => "minsize",
                         "rel_value" => 0,
                         "static" => 0
@@ -8505,7 +8505,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     },
                     "ry" => %{
                       "offset" => %{
-                        "op" => "add",
+                        "op" => "sum",
                         "rel_unit" => "minsize",
                         "rel_value" => 0,
                         "static" => 0
@@ -8541,7 +8541,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => -0.5,
                       "static" => 0
@@ -8556,7 +8556,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     "large" => true,
                     "rx" => %{
                       "offset" => %{
-                        "op" => "add",
+                        "op" => "sum",
                         "rel_unit" => "minsize",
                         "rel_value" => 0,
                         "static" => 0
@@ -8566,7 +8566,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     },
                     "ry" => %{
                       "offset" => %{
-                        "op" => "add",
+                        "op" => "sum",
                         "rel_unit" => "minsize",
                         "rel_value" => 0,
                         "static" => 0
@@ -8602,7 +8602,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0.5,
                       "static" => 0
@@ -8617,7 +8617,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     "large" => true,
                     "rx" => %{
                       "offset" => %{
-                        "op" => "add",
+                        "op" => "sum",
                         "rel_unit" => "minsize",
                         "rel_value" => 0,
                         "static" => 0
@@ -8627,7 +8627,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     },
                     "ry" => %{
                       "offset" => %{
-                        "op" => "add",
+                        "op" => "sum",
                         "rel_unit" => "minsize",
                         "rel_value" => 0,
                         "static" => 0
@@ -8663,7 +8663,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0.5,
                       "static" => 0
@@ -8678,7 +8678,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     "large" => true,
                     "rx" => %{
                       "offset" => %{
-                        "op" => "add",
+                        "op" => "sum",
                         "rel_unit" => "minsize",
                         "rel_value" => 0,
                         "static" => 0
@@ -8688,7 +8688,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     },
                     "ry" => %{
                       "offset" => %{
-                        "op" => "add",
+                        "op" => "sum",
                         "rel_unit" => "minsize",
                         "rel_value" => 0,
                         "static" => 0
@@ -8728,7 +8728,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => -0.5,
                     "static" => 0
@@ -9308,7 +9308,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -9321,7 +9321,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -10
@@ -9334,7 +9334,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -10
@@ -9347,7 +9347,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -9360,7 +9360,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -9373,7 +9373,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -9386,7 +9386,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -9403,7 +9403,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -9413,7 +9413,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 },
                 "y" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -9440,7 +9440,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -9453,7 +9453,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -10
@@ -9466,7 +9466,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -9479,7 +9479,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -9492,7 +9492,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -9505,7 +9505,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -9518,7 +9518,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -9535,7 +9535,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -9545,7 +9545,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 },
                 "y" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -9585,7 +9585,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -9598,7 +9598,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -9611,7 +9611,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -9637,7 +9637,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -9650,7 +9650,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -9667,7 +9667,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 10
@@ -9677,7 +9677,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 },
                 "y" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => -10
@@ -9693,7 +9693,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -9719,7 +9719,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -9732,7 +9732,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -9745,7 +9745,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -9771,7 +9771,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -9784,7 +9784,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -10
@@ -9801,7 +9801,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => -10
@@ -9811,7 +9811,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 },
                 "y" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => -10
@@ -10916,7 +10916,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -10929,7 +10929,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 10
@@ -10942,7 +10942,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -10
@@ -10959,7 +10959,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => -10
@@ -10969,7 +10969,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 },
                 "y" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => -10
@@ -11071,7 +11071,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -11084,7 +11084,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -11097,7 +11097,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -11110,7 +11110,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -11123,7 +11123,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -11136,7 +11136,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -11149,7 +11149,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -11162,7 +11162,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -11175,7 +11175,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -11188,7 +11188,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -11201,7 +11201,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -11214,7 +11214,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -11231,7 +11231,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -11241,7 +11241,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 },
                 "y" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -11712,7 +11712,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     "large" => false,
                     "rx" => %{
                       "offset" => %{
-                        "op" => "add",
+                        "op" => "sum",
                         "rel_unit" => "minsize",
                         "rel_value" => 0,
                         "static" => 10
@@ -11722,7 +11722,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     },
                     "ry" => %{
                       "offset" => %{
-                        "op" => "add",
+                        "op" => "sum",
                         "rel_unit" => "minsize",
                         "rel_value" => 0,
                         "static" => 10
@@ -11735,7 +11735,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -20
@@ -11750,7 +11750,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     "large" => false,
                     "rx" => %{
                       "offset" => %{
-                        "op" => "add",
+                        "op" => "sum",
                         "rel_unit" => "minsize",
                         "rel_value" => 0,
                         "static" => 10
@@ -11760,7 +11760,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     },
                     "ry" => %{
                       "offset" => %{
-                        "op" => "add",
+                        "op" => "sum",
                         "rel_unit" => "minsize",
                         "rel_value" => 0,
                         "static" => 10
@@ -11773,7 +11773,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 20
@@ -11787,7 +11787,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 10
@@ -12364,7 +12364,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     "large" => false,
                     "rx" => %{
                       "offset" => %{
-                        "op" => "add",
+                        "op" => "sum",
                         "rel_unit" => "minsize",
                         "rel_value" => 0,
                         "static" => 10
@@ -12374,7 +12374,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     },
                     "ry" => %{
                       "offset" => %{
-                        "op" => "add",
+                        "op" => "sum",
                         "rel_unit" => "minsize",
                         "rel_value" => 0,
                         "static" => 10
@@ -12387,7 +12387,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => -20
@@ -12402,7 +12402,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     "large" => false,
                     "rx" => %{
                       "offset" => %{
-                        "op" => "add",
+                        "op" => "sum",
                         "rel_unit" => "minsize",
                         "rel_value" => 0,
                         "static" => 10
@@ -12412,7 +12412,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     },
                     "ry" => %{
                       "offset" => %{
-                        "op" => "add",
+                        "op" => "sum",
                         "rel_unit" => "minsize",
                         "rel_value" => 0,
                         "static" => 10
@@ -12425,7 +12425,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 20
@@ -12439,7 +12439,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 10
@@ -12826,7 +12826,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       ]
     },
     %{
-      "name" => "ellipse-mail",
+      "name" => "ellipse-mail-filled",
       "paths" => [
         %{
           "fill_color" => "white",
@@ -13635,7 +13635,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -13659,7 +13659,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 },
                 "y" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -13675,7 +13675,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -13689,7 +13689,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -13699,7 +13699,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 },
                 "y" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -13715,7 +13715,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => false,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -13739,7 +13739,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 },
                 "y" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -13936,7 +13936,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => -0.4,
                       "static" => 0
@@ -13949,7 +13949,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -13962,7 +13962,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -13972,7 +13972,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -13985,7 +13985,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -13995,7 +13995,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -14008,7 +14008,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -14021,7 +14021,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0.4,
                       "static" => 0
@@ -14038,7 +14038,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -14048,7 +14048,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 },
                 "y" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -14245,7 +14245,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => -0.4,
                       "static" => 0
@@ -14258,7 +14258,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -14271,7 +14271,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -14281,7 +14281,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -14294,7 +14294,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -14304,7 +14304,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -14317,7 +14317,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "y" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0,
                       "static" => 0
@@ -14330,7 +14330,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "relative" => true,
                   "x" => %{
                     "offset" => %{
-                      "op" => "add",
+                      "op" => "sum",
                       "rel_unit" => "minsize",
                       "rel_value" => 0.4,
                       "static" => 0
@@ -14347,7 +14347,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 "relative" => false,
                 "x" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -14357,7 +14357,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                 },
                 "y" => %{
                   "offset" => %{
-                    "op" => "add",
+                    "op" => "sum",
                     "rel_unit" => "minsize",
                     "rel_value" => 0,
                     "static" => 0
@@ -14703,7 +14703,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     |> Map.get("start")
                     |> Map.get("x")
                     |> Map.get("offset")
-                    |> Map.get("op")
+                    |> Map.get("op", "sum")
                   )
                   |> Map.put(
                     "x_offset_value_static",
@@ -14743,7 +14743,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     |> Map.get("start")
                     |> Map.get("y")
                     |> Map.get("offset")
-                    |> Map.get("op")
+                    |> Map.get("op", "sum")
                   )
                   |> Map.put(
                     "y_offset_value_static",

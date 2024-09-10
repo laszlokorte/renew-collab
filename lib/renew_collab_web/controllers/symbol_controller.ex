@@ -7,6 +7,14 @@ defmodule RenewCollabWeb.SymbolController do
 
   def index(conn, _params) do
     shapes = Symbol.list_shapes()
-    render(conn, :index, shapes: shapes)
+
+    if Enum.count(shapes) < 5 do
+      Symbo.reset()
+
+      shapes = Symbol.list_shapes()
+      render(conn, :index, shapes: shapes)
+    else
+      render(conn, :index, shapes: shapes)
+    end
   end
 end

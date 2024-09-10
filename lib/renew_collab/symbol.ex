@@ -24,16 +24,6 @@ defmodule RenewCollab.Symbol do
 
   """
   def list_shapes do
-
-    if Repo.aggregate(Shape, :count) < 5 do
-      Repo.delete_all(Shape) 
-      
-      RenewCollab.Symbol.PredefinedSymbols.all()
-      |> Enum.each(fn shape ->
-        %Shape{} |> Shape.changeset(shape) |> Repo.insert() |> dbg()
-      end)
-    end
-
     Repo.all(Shape)
     |> Repo.preload(
       paths:
@@ -58,5 +48,15 @@ defmodule RenewCollab.Symbol do
           ]
         )
     )
+  end
+
+  def reset do
+    Repo.delete_all(Shape)
+
+    RenewCollab.Symbol.PredefinedSymbols.all()
+    |> Enum.reduce(Ecto.Multi.new(), fn shape, multi ->
+      multi |> Ecto.Multi.insert(Map.get(shape, "name"), %Shape{} |> Shape.changeset(shape))
+    end)
+    |> Repo.transaction()
   end
 end
