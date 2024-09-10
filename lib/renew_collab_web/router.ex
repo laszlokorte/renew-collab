@@ -26,6 +26,11 @@ defmodule RenewCollabWeb.Router do
     end
   end
 
+  scope "/api", RenewCollabWeb do
+    pipe_through :api
+    resources "/symbols", SymbolController, only: [:index]
+  end
+
   # Enable LiveDashboard in development
   if Application.compile_env(:renew_collab, :dev_routes) do
     # If you want to use the LiveDashboard in production, you should put
