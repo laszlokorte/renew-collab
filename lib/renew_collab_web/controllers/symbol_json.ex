@@ -3,12 +3,12 @@ defmodule RenewCollabWeb.SymbolJSON do
 
   def index(%{shapes: shapes}) do
     %{
-      shapes: Enum.map(shapes, &{&1.name, shape_data(&1)}) |> Map.new()
+      shapes: Enum.map(shapes, &shape_data/1)
     }
   end
 
   defp shape_data(shape) do
-    %{paths: Enum.map(shape.paths, &path_data/1)}
+    %{name: shape.name, paths: Enum.map(shape.paths, &path_data/1)}
   end
 
   defp path_data(path) do
@@ -116,7 +116,10 @@ defmodule RenewCollabWeb.SymbolJSON do
           "dynamic_value" => arc.ry_offset_dynamic_value,
           "dynamic_unit" => arc.ry_offset_dynamic_unit
         }
-      }
+      },
+      "large" => arc.large,
+      "sweep" => arc.sweep,
+      "angle" => arc.angle
     }
   end
 end

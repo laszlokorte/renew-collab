@@ -14684,7 +14684,10 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               |> Enum.map(fn
                 {segment, segment_index} ->
                   Map.new()
-                  |> Map.put("relative", Map.get(segment, "relative", false))
+                  |> Map.put(
+                    "relative",
+                    segment |> Map.get("start") |> Map.get("relative", false)
+                  )
                   |> Map.put("sort", segment_index)
                   |> Map.put(
                     "x_value",
@@ -14774,6 +14777,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                       {step, step_index} ->
                         Map.new()
                         |> Map.put("sort", step_index)
+                        |> Map.put("relative", Map.get(step, "relative", false))
                         |> then(fn
                           step_map ->
                             case Map.get(step, "y") do

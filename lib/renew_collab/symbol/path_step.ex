@@ -6,7 +6,7 @@ defmodule RenewCollab.Symbol.PathStep do
   @foreign_key_type :binary_id
   schema "shape_path_step" do
     field :sort, :integer
-    field :relative, :boolean, default: false
+    field :relative, :boolean
     belongs_to :path_segment, RenewCollab.Symbol.PathSegment
     has_one :arc, RenewCollab.Symbol.PathStepArc, on_delete: :delete_all
     has_one :vertical, RenewCollab.Symbol.PathStepVertical, on_delete: :delete_all

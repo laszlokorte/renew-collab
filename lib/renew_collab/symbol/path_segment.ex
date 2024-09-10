@@ -6,7 +6,7 @@ defmodule RenewCollab.Symbol.PathSegment do
   @foreign_key_type :binary_id
   schema "shape_path_segment" do
     field :sort, :integer
-    field :relative, :boolean, default: false
+    field :relative, :boolean
     field :x_value, :float, default: 0.0
     field :x_unit, Ecto.Enum, values: [:width, :height, :minsize, :maxsize], default: :width
     field :x_offset_operation, Ecto.Enum, values: [:sum, :min, :max], default: :sum
