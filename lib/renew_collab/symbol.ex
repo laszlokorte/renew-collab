@@ -164,11 +164,178 @@ defmodule RenewCollab.Symbol do
     }
   end
 
-  defp build_step(box, startPos, {x, y}, step) do
-    {"", {x, y}}
+  defp build_step(box, start_pos, {current_x, current_y}, step) do
+    # const relative = !!step.relative;
+    # const vertical = !!step.vertical;
+    # const horizontal = !!step.horizontal;
+    # const diagonal = vertical && horizontal;
+    # const arc = !!step.arc;
+
+    cond do
+      step.arc ->
+        {"", {current_x, current_y}}
+
+        cond do
+          step.vertical != nil and step.horizontal != nil -> {"", {current_x, current_y}}
+          step.vertical != nil -> {"", {current_x, current_y}}
+          step.horizontal != nil -> {"", {current_x, current_y}}
+        end
+
+      step.vertical != nil and step.horizontal != nil ->
+        {"", {current_x, current_y}}
+
+      step.vertical != nil ->
+        y = build_coord(box, :x, step.relative, extract_coord(:y, step.vertical))
+        {"", {current_x, current_y}}
+
+      step.horizontal != nil ->
+        x = build_coord(box, :x, step.relative, extract_coord(:x, step.horizontal))
+        {"", {current_x, current_y}}
+
+      true ->
+        {if(step.relative, do: "z", else: "Z"), start_pos}
+    end
+
+    # if (arc) {
+    #   const rx = buildCoord(box, "x", true, step.arc.rx);
+    #   const ry = buildCoord(box, "y", true, step.arc.ry);
+    #   const params =
+    #     rx +
+    #     "," +
+    #     ry +
+    #     "," +
+    #     (step.arc.angle ? 1 : 0) +
+    #     "," +
+    #     (step.arc.sweep ? 1 : 0) +
+    #     "," +
+    #     (step.arc.large ? 1 : 0);
+
+    #   if (diagonal) {
+    #     const x = buildCoord(box, "x", step.relative, step.horizontal);
+    #     const y = buildCoord(box, "y", step.relative, step.vertical);
+
+    #     return {
+    #       string: (relative ? "a" : "A") + params + "," + x + "," + y,
+    #       pos: relative
+    #         ? { x: currentX + x, y: currentY + y }
+    #         : { x, y },
+    #     };
+    #   } else if (vertical) {
+    #     const y = buildCoord(box, "y", step.relative, step.vertical);
+    #     return {
+    #       string:
+    #         (relative ? "a" : "A") +
+    #         params +
+    #         "," +
+    #         (relative ? 0 : currentX) +
+    #         "," +
+    #         y,
+    #       pos: relative
+    #         ? { x: currentX, y: currentY + y }
+    #         : { x: currentX, y },
+    #     };
+    #   } else if (horizontal) {
+    #     const x = buildCoord(box, "x", step.relative, step.horizontal);
+    #     return {
+    #       string:
+    #         (relative ? "a" : "A") +
+    #         params +
+    #         "," +
+    #         x +
+    #         "," +
+    #         (relative ? 0 : currentY),
+    #       pos: relative
+    #         ? { x: currentX + x, y: currentY }
+    #         : { x, y: currentY },
+    #     };
+    #   } else {
+    #     return {
+    #       string:
+    #         (relative ? "a" : "A") +
+    #         params +
+    #         "," +
+    #         (relative ? 0 : currentX) +
+    #         "," +
+    #         (relative ? 0 : currentY),
+    #       pos: relative
+    #         ? { x: currentX + x, y: currentY + y }
+    #         : { x: currentX, y: currentY },
+    #     };
+    #   }
+    # } else {
+    #   if (diagonal) {
+    #     const x = buildCoord(box, "x", step.relative, step.horizontal);
+    #     const y = buildCoord(box, "y", step.relative, step.vertical);
+    #     return {
+    #       string: (relative ? "l" : "L") + x + "," + y,
+    #       pos: relative
+    #         ? { x: currentX + x, y: currentY + y }
+    #         : { x, y },
+    #     };
+    #   } else if (vertical) {
+    #     const y = buildCoord(box, "y", step.relative, step.vertical);
+    #     return {
+    #       string: (relative ? "v" : "V") + y,
+    #       pos: relative
+    #         ? { x: currentX, y: currentY + y }
+    #         : { x: currentX, y },
+    #     };
+    #   } else if (horizontal) {
+    #     const x = buildCoord(box, "x", step.relative, step.horizontal);
+    #     return {
+    #       string: (relative ? "h" : "H") + x,
+    #       pos: relative
+    #         ? { x: currentX + x, y: currentY }
+    #         : { x, y: currentY },
+    #     };
+    #   } else {
+    #     return {
+    #       string: relative ? "z" : "Z",
+    #       pos: startPos,
+    #     };
+    #   }
+    # }
+
+    {"", {current_x, current_y}}
   end
 
-  defp build_coord(box, axis, relative, pos) do
-    0
+  defp build_coord(box, axis, relative, coord) do
+    # const units = {
+    #   maxsize: Math.max(box.width, box.height),
+    #   minsize: Math.min(box.width, box.height),
+    #   width: box.width,
+    #   height: box.height,
+    # };
+
+    # const ops = {
+    #   max: (a, b) => Math.max(a, b),
+    #   min: (a, b) => Math.min(a, b),
+    #   sum: (a, b) => a + b,
+    # };
+
+    origin = box_axis(axis, box)
+    base = coord.value * unit(coord.unit, box)
+
+    offset =
+      op(
+        coord.offset.operation,
+        coord.offset.value_static,
+        unit(coord.offset.dynamic_unit, box) * coord.offset.dynamic_value
+      )
+
+    if(relative, do: base, else: base + origin) + offset
+    # return (relative ? base : base + origin) + offset;
   end
+
+  def box_axis(:x, box), do: box.position_x
+  def box_axis(:y, box), do: box.position_y
+
+  def unit(:maxsize, box), do: max(box.width, box.height)
+  def unit(:minsize, box), do: min(box.width, box.height)
+  def unit(:width, box), do: box.width
+  def unit(:height, box), do: box.height
+
+  def op(:max, a, b), do: max(a, b)
+  def op(:min, a, b), do: min(a, b)
+  def op(:sum, a, b), do: a + b
 end
