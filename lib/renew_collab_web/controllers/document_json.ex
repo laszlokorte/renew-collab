@@ -25,6 +25,13 @@ defmodule RenewCollabWeb.DocumentJSON do
     %{data: detail_data(document)}
   end
 
+  @doc """
+  Renders a single document.
+  """
+  def import(%{document: document}) do
+    %{data: list_data(document)}
+  end
+
   defp list_data(%Document{} = document) do
     %{
       # id: document.id,
@@ -105,7 +112,12 @@ defmodule RenewCollabWeb.DocumentJSON do
               "position_y" => v.position_y,
               "width" => v.width,
               "height" => v.height,
-              "shape" => v.shape
+              "shape_attributes" => v.symbol_shape_attributes,
+              "shape" =>
+                case v.symbol_shape do
+                  nil -> nil
+                  symbol -> symbol.name
+                end
             }
         end,
       edge:

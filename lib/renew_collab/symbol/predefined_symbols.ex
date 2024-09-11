@@ -4,7 +4,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "rect",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -76,7 +76,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -84,7 +84,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "rect-double",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -156,10 +156,10 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -231,7 +231,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -239,7 +239,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "rect-double-proportional",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -428,10 +428,10 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -503,7 +503,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -511,7 +511,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "rect-double-in",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -583,10 +583,10 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -658,7 +658,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -666,7 +666,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "ellipse",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -772,7 +772,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -780,7 +780,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "ellipse-double",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -886,10 +886,10 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -995,7 +995,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -1003,7 +1003,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "ellipse-double-in",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -1109,10 +1109,10 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -1218,7 +1218,147 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
+        }
+      ]
+    },
+    %{
+      "name" => "pie",
+      "paths" => [
+        %{
+          "fill_color" => "inherit",
+          "segments" => [
+            %{
+              "steps" => [
+                %{
+                  "arc" => %{
+                    "angle" => 0,
+                    "large" => false,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "width",
+                      "value" => 0.5
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "height",
+                      "value" => 0.5
+                    },
+                    "sweep" => false
+                  },
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => 1
+                  }
+                },
+                %{
+                  "arc" => %{
+                    "angle" => 0,
+                    "large" => false,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "width",
+                      "value" => 0.5
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "height",
+                      "value" => 0.5
+                    },
+                    "sweep" => false
+                  },
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => -0.5
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => -0.5
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 0.5
+                  }
+                },
+                %{
+                  "relative" => true
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "width",
+                  "value" => 0
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0.5
+                }
+              }
+            }
+          ],
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -1226,7 +1366,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "bar-horizontal",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -1298,7 +1438,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -1306,7 +1446,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "bar-vertical",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -1378,7 +1518,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -1386,7 +1526,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "diamond",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -1488,7 +1628,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -1496,7 +1636,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "triangle-right",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -1575,7 +1715,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -1583,7 +1723,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "triangle-half-center-right",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -1662,7 +1802,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -1670,7 +1810,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "triangle-half-right",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -1749,7 +1889,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -1757,7 +1897,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "triangle-left",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -1826,7 +1966,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -1834,7 +1974,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "triangle-half-center-left",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -1903,7 +2043,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -1911,7 +2051,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "triangle-half-left",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -1980,7 +2120,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -1988,7 +2128,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "triangle-up",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -2057,7 +2197,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -2065,7 +2205,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "triangle-half-center-up",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -2134,7 +2274,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -2142,7 +2282,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "triangle-half-up",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -2211,7 +2351,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -2219,7 +2359,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "triangle-down",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -2288,7 +2428,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -2296,7 +2436,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "triangle-half-center-down",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -2365,7 +2505,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -2373,7 +2513,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "triangle-half-down",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -2442,7 +2582,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -2450,7 +2590,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "triangle-sw",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -2519,7 +2659,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -2527,7 +2667,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "triangle-ne",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -2596,7 +2736,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -2604,7 +2744,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "triangle-nw",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -2673,7 +2813,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -2681,7 +2821,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "triangle-se",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -2750,7 +2890,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -2758,7 +2898,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "diamond-double-rel",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -2959,7 +3099,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -2967,7 +3107,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "diamond-full-height",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -3069,7 +3209,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -3077,7 +3217,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "diamond-full-width",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -3179,7 +3319,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -3187,7 +3327,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "diamond-full-height-double",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -3289,10 +3429,10 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -3394,7 +3534,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -3402,7 +3542,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "diamond-full-width-double",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -3504,10 +3644,10 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -3609,7 +3749,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -3617,7 +3757,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "rect-clipped",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -3781,7 +3921,292 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
+        }
+      ]
+    },
+    %{
+      "name" => "rect-round",
+      "paths" => [
+        %{
+          "fill_color" => "inherit",
+          "segments" => [
+            %{
+              "steps" => [
+                %{
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "max",
+                      "rel_unit" => "minsize",
+                      "rel_value" => -0.5,
+                      "static" => -20
+                    },
+                    "unit" => "width",
+                    "value" => 1
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0.5,
+                      "static" => 20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0.5,
+                      "static" => 20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "arc" => %{
+                    "angle" => 0,
+                    "sweep" => false,
+                    "large" => true,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => 0
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => 0
+                    }
+                  }
+                },
+                %{
+                  "relative" => false,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "max",
+                      "rel_unit" => "minsize",
+                      "rel_value" => -0.5,
+                      "static" => -20
+                    },
+                    "unit" => "height",
+                    "value" => 1
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "max",
+                      "rel_unit" => "minsize",
+                      "rel_value" => -0.5,
+                      "static" => -20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0.5,
+                      "static" => 20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "arc" => %{
+                    "angle" => 0,
+                    "sweep" => false,
+                    "large" => true,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => 0
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => 0
+                    }
+                  }
+                },
+                %{
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0.5,
+                      "static" => 20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "max",
+                      "rel_unit" => "minsize",
+                      "rel_value" => -0.5,
+                      "static" => -20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "max",
+                      "rel_unit" => "minsize",
+                      "rel_value" => -0.5,
+                      "static" => -20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "arc" => %{
+                    "angle" => 0,
+                    "sweep" => false,
+                    "large" => true,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => 0
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => 0
+                    }
+                  }
+                },
+                %{
+                  "relative" => false,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0.5,
+                      "static" => 20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  }
+                },
+                %{
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0.5,
+                      "static" => 20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 0
+                  },
+                  "arc" => %{
+                    "angle" => 0,
+                    "sweep" => false,
+                    "large" => true,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => 0
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => 0
+                    }
+                  }
+                },
+                %{
+                  "relative" => false
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0.5,
+                    "static" => 20
+                  },
+                  "unit" => "width",
+                  "value" => 0
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0
+                }
+              }
+            }
+          ],
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -3789,7 +4214,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "octagon",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -3943,7 +4368,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -3951,7 +4376,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "octagon-proper",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -4128,7 +4553,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -4136,7 +4561,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "octagon-square",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [],
@@ -4339,7 +4764,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -4347,7 +4772,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "rect-clipped-paper",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -4465,7 +4890,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -4473,7 +4898,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "rect-clipped-paper-proportional",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -4578,7 +5003,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -4586,7 +5011,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "rect-fold-paper",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -4704,10 +5129,10 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -4766,7 +5191,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -4949,7 +5374,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "rect-handle",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -5061,7 +5486,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -5069,7 +5494,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "bar-horizontal-black",
       "paths" => [
         %{
-          "fill_color" => "black",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -5141,7 +5566,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -5149,7 +5574,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "bar-horizontal-black-diamond",
       "paths" => [
         %{
-          "fill_color" => "black",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -5221,7 +5646,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
           "fill_color" => "white",
@@ -5334,7 +5759,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "bar-horizontal-black-diamond-fit",
       "paths" => [
         %{
-          "fill_color" => "black",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -5406,7 +5831,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
           "fill_color" => "white",
@@ -5519,7 +5944,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "bar-horizontal-black-diamond-black",
       "paths" => [
         %{
-          "fill_color" => "black",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -5591,7 +6016,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
           "fill_color" => "black",
@@ -5696,7 +6121,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         }
       ]
     },
@@ -5704,7 +6129,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "bar-horizontal-black-diamond-black-fit",
       "paths" => [
         %{
-          "fill_color" => "black",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -5776,7 +6201,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
           "fill_color" => "black",
@@ -5881,7 +6306,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         }
       ]
     },
@@ -5889,7 +6314,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "bar-horizontal-black-diamond-quad",
       "paths" => [
         %{
-          "fill_color" => "black",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -5961,7 +6386,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
           "fill_color" => "white",
@@ -6290,7 +6715,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "bar-horizontal-black-diamond-quad-fit",
       "paths" => [
         %{
-          "fill_color" => "black",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -6362,7 +6787,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
           "fill_color" => "white",
@@ -6691,7 +7116,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "bar-vertical-black",
       "paths" => [
         %{
-          "fill_color" => "black",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -6763,7 +7188,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -6771,7 +7196,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "bar-vertical-black-diamond",
       "paths" => [
         %{
-          "fill_color" => "black",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -6843,7 +7268,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
           "fill_color" => "white",
@@ -6956,7 +7381,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "bar-vertical-black-diamond-fit",
       "paths" => [
         %{
-          "fill_color" => "black",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -7028,7 +7453,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
           "fill_color" => "white",
@@ -7141,7 +7566,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "bar-vertical-black-diamond-black",
       "paths" => [
         %{
-          "fill_color" => "black",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -7213,7 +7638,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
           "fill_color" => "black",
@@ -7318,7 +7743,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         }
       ]
     },
@@ -7326,7 +7751,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "bar-vertical-black-diamond-black-fit",
       "paths" => [
         %{
-          "fill_color" => "black",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -7398,7 +7823,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
           "fill_color" => "black",
@@ -7503,7 +7928,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         }
       ]
     },
@@ -7511,7 +7936,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "bar-vertical-black-diamond-quad",
       "paths" => [
         %{
-          "fill_color" => "black",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -7583,7 +8008,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
           "fill_color" => "white",
@@ -7912,7 +8337,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "bar-vertical-black-diamond-quad-fit",
       "paths" => [
         %{
-          "fill_color" => "black",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -7984,7 +8409,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
           "fill_color" => "white",
@@ -8313,7 +8738,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "hexagon",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -8477,7 +8902,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -8485,7 +8910,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "pill",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -8749,7 +9174,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -8881,7 +9306,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         }
       ]
     },
@@ -9013,7 +9438,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         }
       ]
     },
@@ -9292,7 +9717,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         }
       ]
     },
@@ -9424,7 +9849,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         }
       ]
     },
@@ -9556,7 +9981,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         }
       ]
     },
@@ -9822,7 +10247,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         }
       ]
     },
@@ -9830,7 +10255,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "diamond-plus",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -9932,7 +10357,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
           "fill_color" => "black",
@@ -10150,7 +10575,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         }
       ]
     },
@@ -10158,7 +10583,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "diamond-plus-big",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -10260,7 +10685,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
           "fill_color" => "black",
@@ -10452,7 +10877,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         }
       ]
     },
@@ -10460,7 +10885,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "diamond-X",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -10562,7 +10987,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
           "fill_color" => "black",
@@ -10900,7 +11325,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         }
       ]
     },
@@ -10980,10 +11405,10 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         },
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -11055,7 +11480,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         }
       ]
     },
@@ -11252,10 +11677,10 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         },
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -11327,7 +11752,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         }
       ]
     },
@@ -11407,10 +11832,10 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         },
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -11482,7 +11907,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         }
       ]
     },
@@ -11490,7 +11915,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "ellipse-double-black",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -11596,7 +12021,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         },
         %{
           "fill_color" => "black",
@@ -11808,7 +12233,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         }
       ]
     },
@@ -11816,7 +12241,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "ellipse-double-in-black",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -11922,7 +12347,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         },
         %{
           "fill_color" => "black",
@@ -12134,7 +12559,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         }
       ]
     },
@@ -12142,7 +12567,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "ellipse-triple-black",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -12248,7 +12673,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         },
         %{
           "fill_color" => "black",
@@ -12460,7 +12885,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
           "fill_color" => "black",
@@ -12569,7 +12994,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -12577,7 +13002,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "ellipse-mail",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -12683,7 +13108,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
           "fill_color" => "white",
@@ -12700,7 +13125,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                       "static" => 0
                     },
                     "unit" => "minsize",
-                    "value" => 0.3
+                    "value" => -0.3
                   },
                   "y" => %{
                     "offset" => %{
@@ -12723,7 +13148,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                       "static" => 0
                     },
                     "unit" => "minsize",
-                    "value" => -0.6
+                    "value" => 0.6
                   }
                 },
                 %{
@@ -12794,6 +13219,29 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     "unit" => "minsize",
                     "value" => -0.4
                   }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.3
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.2
+                  }
                 }
               ],
               "start" => %{
@@ -12829,7 +13277,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "ellipse-mail-filled",
       "paths" => [
         %{
-          "fill_color" => "white",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -12935,7 +13383,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         },
         %{
           "fill_color" => "black",
@@ -13106,7 +13554,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         }
       ]
     },
@@ -13449,7 +13897,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -13565,7 +14013,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
           "stroke_color" => "black"
         },
         %{
-          "fill_color" => "white",
+          "fill_color" => "none",
           "segments" => [
             %{
               "steps" => [
@@ -13627,7 +14075,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
           "stroke_color" => "black"
         },
         %{
-          "fill_color" => "white",
+          "fill_color" => "none",
           "segments" => [
             %{
               "steps" => [
@@ -14368,7 +14816,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "none"
         }
       ]
     },
@@ -14376,7 +14824,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "double-arrow",
       "paths" => [
         %{
-          "fill_color" => "black",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -14527,7 +14975,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
     },
@@ -14535,7 +14983,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
       "name" => "cone-arrow",
       "paths" => [
         %{
-          "fill_color" => "black",
+          "fill_color" => "inherit",
           "segments" => [
             %{
               "steps" => [
@@ -14662,14 +15110,3214 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
               }
             }
           ],
-          "stroke_color" => "black"
+          "stroke_color" => "inherit"
         }
       ]
-    }
+    },
+    %{
+      "name" => "cylinder",
+      "paths" => [
+        %{
+          "fill_color" => "inherit",
+          "segments" => [
+            %{
+              "steps" => [
+                %{
+                  "arc" => %{
+                    "angle" => 0,
+                    "large" => true,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "width",
+                      "value" => 0.5
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "height",
+                      "value" => 0.2
+                    },
+                    "sweep" => false
+                  },
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => 1
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 0.6
+                  }
+                },
+                %{
+                  "arc" => %{
+                    "angle" => 0,
+                    "large" => true,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "width",
+                      "value" => 0.5
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "height",
+                      "value" => 0.2
+                    },
+                    "sweep" => false
+                  },
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  }
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "width",
+                  "value" => 0
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0.2
+                }
+              }
+            }
+          ],
+          "stroke_color" => "inherit"
+        },
+        %{
+          "fill_color" => "none",
+          "segments" => [
+            %{
+              "steps" => [
+                %{
+                  "arc" => %{
+                    "angle" => 0,
+                    "large" => false,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "width",
+                      "value" => 0.5
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "height",
+                      "value" => 0.2
+                    },
+                    "sweep" => false
+                  },
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => 1
+                  }
+                },
+
+                %{"relative" => false},
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "width",
+                  "value" => 0
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0.2
+                }
+              }
+            },
+          ],
+          "stroke_color" => "inherit"
+        }
+      ]
+    },
+    %{
+      "name" => "database",
+      "paths" => [
+        %{
+          "fill_color" => "white",
+          "segments" => [
+            %{
+              "steps" => [
+                %{
+                  "arc" => %{
+                    "angle" => 0,
+                    "large" => true,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "width",
+                      "value" => 0.5
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "height",
+                      "value" => 0.2
+                    },
+                    "sweep" => false
+                  },
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => 1
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 0.6
+                  }
+                },
+                %{
+                  "arc" => %{
+                    "angle" => 0,
+                    "large" => true,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "width",
+                      "value" => 0.5
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "height",
+                      "value" => 0.2
+                    },
+                    "sweep" => false
+                  },
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  }
+                },
+                %{"relative" => false},
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "width",
+                  "value" => 0
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0.2
+                }
+              }
+            }
+          ],
+          "stroke_color" => "inherit"
+        },
+        %{
+          "fill_color" => "none",
+          "segments" => [
+            %{
+              "steps" => [
+                %{
+                  "arc" => %{
+                    "angle" => 0,
+                    "large" => false,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "width",
+                      "value" => 0.5
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "height",
+                      "value" => 0.2
+                    },
+                    "sweep" => false
+                  },
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => 1
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 0.1
+                  }
+                },
+                %{
+                  "arc" => %{
+                    "angle" => 0,
+                    "large" => true,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "width",
+                      "value" => 0.5
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "height",
+                      "value" => 0.2
+                    },
+                    "sweep" => false
+                  },
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => -1
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 0.1
+                  }
+                },
+                %{
+                  "arc" => %{
+                    "angle" => 0,
+                    "large" => false,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "width",
+                      "value" => 0.5
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "height",
+                      "value" => 0.2
+                    },
+                    "sweep" => false
+                  },
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => 1
+                  }
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "width",
+                  "value" => 0
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0.2
+                }
+              }
+            }
+          ],
+          "stroke_color" => "inherit"
+        }
+      ]
+    },
+    %{
+      "name" => "bpmn-activity",
+      "paths" => [
+        %{
+          "fill_color" => "inherit",
+          "segments" => [
+            %{
+              "steps" => [
+                %{
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "max",
+                      "rel_unit" => "minsize",
+                      "rel_value" => -0.5,
+                      "static" => -20
+                    },
+                    "unit" => "width",
+                    "value" => 1
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0.5,
+                      "static" => 20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0.5,
+                      "static" => 20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "arc" => %{
+                    "angle" => 0,
+                    "sweep" => false,
+                    "large" => true,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => 0
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => 0
+                    }
+                  }
+                },
+                %{
+                  "relative" => false,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "max",
+                      "rel_unit" => "minsize",
+                      "rel_value" => -0.5,
+                      "static" => -20
+                    },
+                    "unit" => "height",
+                    "value" => 1
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "max",
+                      "rel_unit" => "minsize",
+                      "rel_value" => -0.5,
+                      "static" => -20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0.5,
+                      "static" => 20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "arc" => %{
+                    "angle" => 0,
+                    "sweep" => false,
+                    "large" => true,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => 0
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => 0
+                    }
+                  }
+                },
+                %{
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0.5,
+                      "static" => 20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "max",
+                      "rel_unit" => "minsize",
+                      "rel_value" => -0.5,
+                      "static" => -20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "max",
+                      "rel_unit" => "minsize",
+                      "rel_value" => -0.5,
+                      "static" => -20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "arc" => %{
+                    "angle" => 0,
+                    "sweep" => false,
+                    "large" => true,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => 0
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => 0
+                    }
+                  }
+                },
+                %{
+                  "relative" => false,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0.5,
+                      "static" => 20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  }
+                },
+                %{
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0.5,
+                      "static" => 20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 0
+                  },
+                  "arc" => %{
+                    "angle" => 0,
+                    "sweep" => false,
+                    "large" => true,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => 0
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => 0
+                    }
+                  }
+                },
+                %{
+                  "relative" => false
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0.5,
+                    "static" => 20
+                  },
+                  "unit" => "width",
+                  "value" => 0
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0
+                }
+              }
+            }
+          ],
+          "stroke_color" => "inherit"
+        }
+      ]
+    },
+    %{
+      "name" => "bpmn-activity-exchange",
+      "paths" => [
+        %{
+          "fill_color" => "inherit",
+          "segments" => [
+            %{
+              "steps" => [
+                %{
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "max",
+                      "rel_unit" => "minsize",
+                      "rel_value" => -0.5,
+                      "static" => -20
+                    },
+                    "unit" => "width",
+                    "value" => 1
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0.5,
+                      "static" => 20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0.5,
+                      "static" => 20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "arc" => %{
+                    "angle" => 0,
+                    "sweep" => false,
+                    "large" => true,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => 0
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => 0
+                    }
+                  }
+                },
+                %{
+                  "relative" => false,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "max",
+                      "rel_unit" => "minsize",
+                      "rel_value" => -0.5,
+                      "static" => -20
+                    },
+                    "unit" => "height",
+                    "value" => 1
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "max",
+                      "rel_unit" => "minsize",
+                      "rel_value" => -0.5,
+                      "static" => -20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0.5,
+                      "static" => 20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "arc" => %{
+                    "angle" => 0,
+                    "sweep" => false,
+                    "large" => true,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => 0
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => 0
+                    }
+                  }
+                },
+                %{
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0.5,
+                      "static" => 20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "max",
+                      "rel_unit" => "minsize",
+                      "rel_value" => -0.5,
+                      "static" => -20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "max",
+                      "rel_unit" => "minsize",
+                      "rel_value" => -0.5,
+                      "static" => -20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "arc" => %{
+                    "angle" => 0,
+                    "sweep" => false,
+                    "large" => true,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => 0
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => 0
+                    }
+                  }
+                },
+                %{
+                  "relative" => false,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0.5,
+                      "static" => 20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  }
+                },
+                %{
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0.5,
+                      "static" => 20
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 0
+                  },
+                  "arc" => %{
+                    "angle" => 0,
+                    "sweep" => false,
+                    "large" => true,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => 0
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => 0
+                    }
+                  }
+                },
+                %{
+                  "relative" => false
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0.5,
+                    "static" => 20
+                  },
+                  "unit" => "width",
+                  "value" => 0
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0
+                }
+              }
+            }
+          ],
+          "stroke_color" => "inherit"
+        }
+      ]
+    },
+    %{
+      "name" => "bpmn-gateway",
+      "paths" => [
+        %{
+          "fill_color" => "inherit",
+          "segments" => [
+            %{
+              "steps" => [
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => 0.5
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 0.5
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => -0.5
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 0.5
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => -0.5
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => -0.5
+                  }
+                },
+                %{
+                  "relative" => false
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "width",
+                  "value" => 0.5
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0
+                }
+              }
+            }
+          ],
+          "stroke_color" => "inherit"
+        }
+      ]
+    },
+    %{
+      "name" => "bpmn-gateway-xor",
+      "paths" => [
+        %{
+          "fill_color" => "inherit",
+          "segments" => [
+            %{
+              "steps" => [
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => 0.5
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 0.5
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => -0.5
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 0.5
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => -0.5
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => -0.5
+                  }
+                },
+                %{
+                  "relative" => false
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "width",
+                  "value" => 0.5
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0
+                }
+              }
+            }
+          ],
+          "stroke_color" => "inherit"
+        },
+        %{
+          "fill_color" => "black",
+          "segments" => [
+            %{
+              "steps" => [],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "width",
+                  "value" => 0.5
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0.5
+                }
+              }
+            },
+            %{
+              "steps" => [
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.05
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.2
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.2
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.1
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.2
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.2
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.1
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.2
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.2
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.1
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.2
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.2
+                  }
+                },
+                %{
+                  "relative" => false
+                }
+              ],
+              "start" => %{
+                "relative" => true,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "width",
+                  "value" => 0
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "minsize",
+                  "value" => -0.25
+                }
+              }
+            }
+          ],
+          "stroke_color" => "none"
+        }
+      ]
+    },
+    %{
+      "name" => "bpmn-gateway-and",
+      "paths" => [
+        %{
+          "fill_color" => "inherit",
+          "segments" => [
+            %{
+              "steps" => [
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => 0.5
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 0.5
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => -0.5
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 0.5
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => -0.5
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => -0.5
+                  }
+                },
+                %{
+                  "relative" => false
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "width",
+                  "value" => 0.5
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0
+                }
+              }
+            }
+          ],
+          "stroke_color" => "inherit"
+        },
+        %{
+          "fill_color" => "black",
+          "segments" => [
+            %{
+              "steps" => [],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "width",
+                  "value" => 0.5
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0.5
+                }
+              }
+            },
+            %{
+              "steps" => [
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.05
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.05
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.17
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.17
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.17
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.17
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.05
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.05
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.17
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.17
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.17
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.17
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.05
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.05
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.17
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.17
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.17
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.17
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.05
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.05
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.17
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.17
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.17
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.17
+                  }
+                },
+                %{
+                  "relative" => false
+                }
+              ],
+              "start" => %{
+                "relative" => true,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "minsize",
+                  "value" => 0.17
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "minsize",
+                  "value" => -0.22
+                }
+              }
+            }
+          ],
+          "stroke_color" => "none"
+        }
+      ]
+    },
+    %{
+      "name" => "bpmn-pool",
+      "paths" => [
+        %{
+          "fill_color" => "inherit",
+          "segments" => [
+            %{
+              "steps" => [
+                %{
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => 1
+                  }
+                },
+                %{
+                  "relative" => false,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 1
+                  }
+                },
+                %{
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  }
+                },
+                %{
+                  "relative" => false
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "width",
+                  "value" => 0
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0
+                }
+              }
+            },
+            %{
+              "steps" => [
+                %{
+                  "relative" => false,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 1
+                  }
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "width",
+                    "rel_value" => 1,
+                    "static" => 20
+                  },
+                  "unit" => "width",
+                  "value" => 0
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0
+                }
+              }
+            }
+          ],
+          "stroke_color" => "inherit"
+        }
+      ]
+    },
   ]
+
+  def generate_bpmn_symbols() do
+    for pos <- ["start", "interm", "end"],
+        type <- ["standard", "message", "terminate"],
+        throwing <- [true, false]
+        # , 
+        # (type == "message" or not throwing) and 
+        # (pos != "start" or not throwing) and 
+        # (pos != "end" or throwing or type != "message") and 
+        # (type != "terminate" or pos == "end")
+         do
+      name =
+        "bpmn-#{pos}-#{type}" |> then(&if throwing, do: "#{&1}-throwing", else: &1)
+
+      %{
+        "name" => name,
+        "paths" => case pos do
+          "start" ->  [
+        %{
+          "fill_color" => "inherit",
+          "segments" => [
+            %{
+              "steps" => [
+                %{
+                  "arc" => %{
+                    "angle" => 0,
+                    "large" => false,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "width",
+                      "value" => 0.5
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "height",
+                      "value" => 0.5
+                    },
+                    "sweep" => false
+                  },
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => 1
+                  }
+                },
+                %{
+                  "arc" => %{
+                    "angle" => 0,
+                    "large" => false,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "width",
+                      "value" => 0.5
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "height",
+                      "value" => 0.5
+                    },
+                    "sweep" => false
+                  },
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => -1
+                  }
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "width",
+                  "value" => 0
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0.5
+                }
+              }
+            }
+          ],
+          "stroke_color" => "inherit"
+        }
+      ]
+          "interm" -> [
+          %{
+            "fill_color" => "inherit",
+            "segments" => [
+              %{
+                "steps" => [
+                  %{
+                    "arc" => %{
+                      "angle" => 0,
+                      "large" => false,
+                      "rx" => %{
+                        "offset" => %{
+                          "op" => "min",
+                          "rel_unit" => "minsize",
+                          "rel_value" => 0,
+                          "static" => 0
+                        },
+                        "unit" => "width",
+                        "value" => 0.5
+                      },
+                      "ry" => %{
+                        "offset" => %{
+                          "op" => "min",
+                          "rel_unit" => "minsize",
+                          "rel_value" => 0,
+                          "static" => 0
+                        },
+                        "unit" => "height",
+                        "value" => 0.5
+                      },
+                      "sweep" => false
+                    },
+                    "relative" => true,
+                    "x" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "width",
+                      "value" => 1
+                    }
+                  },
+                  %{
+                    "arc" => %{
+                      "angle" => 0,
+                      "large" => false,
+                      "rx" => %{
+                        "offset" => %{
+                          "op" => "min",
+                          "rel_unit" => "minsize",
+                          "rel_value" => 0,
+                          "static" => 0
+                        },
+                        "unit" => "width",
+                        "value" => 0.5
+                      },
+                      "ry" => %{
+                        "offset" => %{
+                          "op" => "min",
+                          "rel_unit" => "minsize",
+                          "rel_value" => 0,
+                          "static" => 0
+                        },
+                        "unit" => "height",
+                        "value" => 0.5
+                      },
+                      "sweep" => false
+                    },
+                    "relative" => true,
+                    "x" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "width",
+                      "value" => -1
+                    }
+                  }
+                ],
+                "start" => %{
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 0.5
+                  }
+                }
+              }
+            ],
+            "stroke_color" => "inherit"
+          },
+          %{
+            "fill_color" => "inherit",
+            "segments" => [
+              %{
+                "steps" => [
+                  %{
+                    "arc" => %{
+                      "angle" => 0,
+                      "large" => false,
+                      "rx" => %{
+                        "offset" => %{
+                          "op" => "max",
+                          "rel_unit" => "width",
+                          "rel_value" => -0.25,
+                          "static" => -10
+                        },
+                        "unit" => "width",
+                        "value" => 0.5
+                      },
+                      "ry" => %{
+                        "offset" => %{
+                          "op" => "max",
+                          "rel_unit" => "height",
+                          "rel_value" => -0.25,
+                          "static" => -10
+                        },
+                        "unit" => "height",
+                        "value" => 0.5
+                      },
+                      "sweep" => false
+                    },
+                    "relative" => true,
+                    "x" => %{
+                      "offset" => %{
+                        "op" => "max",
+                        "rel_unit" => "width",
+                        "rel_value" => -0.5,
+                        "static" => -20
+                      },
+                      "unit" => "width",
+                      "value" => 1
+                    }
+                  },
+                  %{
+                    "arc" => %{
+                      "angle" => 0,
+                      "large" => false,
+                      "rx" => %{
+                        "offset" => %{
+                          "op" => "max",
+                          "rel_unit" => "width",
+                          "rel_value" => -0.25,
+                          "static" => -10
+                        },
+                        "unit" => "width",
+                        "value" => 0.5
+                      },
+                      "ry" => %{
+                        "offset" => %{
+                          "op" => "max",
+                          "rel_unit" => "height",
+                          "rel_value" => -0.25,
+                          "static" => -10
+                        },
+                        "unit" => "height",
+                        "value" => 0.5
+                      },
+                      "sweep" => false
+                    },
+                    "relative" => true,
+                    "x" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "width",
+                        "rel_value" => 0.5,
+                        "static" => 20
+                      },
+                      "unit" => "width",
+                      "value" => -1
+                    }
+                  }
+                ],
+                "start" => %{
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "width",
+                      "rel_value" => 0.25,
+                      "static" => 10
+                    },
+                    "unit" => "width",
+                    "value" => 0
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 0.5
+                  }
+                }
+              }
+            ],
+            "stroke_color" => "inherit"
+          }
+        ]
+        "end" -> [%{
+          "fill_color" => "inherit",
+          "segments" => [
+            %{
+              "steps" => [
+                %{
+                  "arc" => %{
+                    "angle" => 0,
+                    "large" => false,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "width",
+                      "value" => 0.5
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "height",
+                      "value" => 0.5
+                    },
+                    "sweep" => false
+                  },
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => 1
+                  }
+                },
+                %{
+                  "arc" => %{
+                    "angle" => 0,
+                    "large" => false,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "width",
+                      "value" => 0.5
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "height",
+                      "value" => 0.5
+                    },
+                    "sweep" => false
+                  },
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => -1
+                  }
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "width",
+                  "value" => 0
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0.5
+                }
+              }
+            }
+          ],
+          "stroke_color" => "none"
+        },
+        %{
+          "fill_color" => "black",
+          "segments" => [
+            %{
+              "steps" => [
+                %{
+                  "arc" => %{
+                    "angle" => 0,
+                    "large" => false,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "width",
+                      "value" => 0.5
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "height",
+                      "value" => 0.5
+                    },
+                    "sweep" => false
+                  },
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => 1
+                  }
+                },
+                %{
+                  "arc" => %{
+                    "angle" => 0,
+                    "large" => false,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "width",
+                      "value" => 0.5
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "min",
+                        "rel_unit" => "minsize",
+                        "rel_value" => 0,
+                        "static" => 0
+                      },
+                      "unit" => "height",
+                      "value" => 0.5
+                    },
+                    "sweep" => false
+                  },
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => -1
+                  }
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "width",
+                  "value" => 0
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0.5
+                }
+              }
+            },
+            %{
+              "steps" => [
+                %{
+                  "arc" => %{
+                    "angle" => 0,
+                    "large" => false,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "max",
+                        "rel_unit" => "width",
+                        "rel_value" => -0.25,
+                        "static" => -10
+                      },
+                      "unit" => "width",
+                      "value" => 0.5
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "max",
+                        "rel_unit" => "height",
+                        "rel_value" => -0.25,
+                        "static" => -10
+                      },
+                      "unit" => "height",
+                      "value" => 0.5
+                    },
+                    "sweep" => false
+                  },
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "width",
+                      "rel_value" => 0.5,
+                      "static" => 20
+                    },
+                    "unit" => "width",
+                    "value" => -1
+                  }
+                },
+                %{
+                  "arc" => %{
+                    "angle" => 0,
+                    "large" => false,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "max",
+                        "rel_unit" => "width",
+                        "rel_value" => -0.25,
+                        "static" => -10
+                      },
+                      "unit" => "width",
+                      "value" => 0.5
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "max",
+                        "rel_unit" => "height",
+                        "rel_value" => -0.25,
+                        "static" => -10
+                      },
+                      "unit" => "height",
+                      "value" => 0.5
+                    },
+                    "sweep" => false
+                  },
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "max",
+                      "rel_unit" => "width",
+                      "rel_value" => -0.5,
+                      "static" => -20
+                    },
+                    "unit" => "width",
+                    "value" => 1
+                  }
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "max",
+                    "rel_unit" => "width",
+                    "rel_value" => -0.25,
+                    "static" => -10
+                  },
+                  "unit" => "width",
+                  "value" => 1
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0.5
+                }
+              }
+            }
+          ],
+          "stroke_color" => "none"
+        }
+      ]
+      end |> Enum.concat(
+        case type do
+          "standard" -> []
+          "message" -> if(throwing, do: [
+          %{
+          "fill_color" => "black",
+          "segments" => [
+            %{
+              "steps" => [
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.3
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "max",
+                      "rel_unit" => "minsize",
+                      "rel_value" => -0.1,
+                      "static" => -6
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.2
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0.1,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.4
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.6
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.2
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0.1,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.2
+                  }
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "width",
+                  "value" => 0.5
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0.1,
+                    "static" => 6
+                  },
+                  "unit" => "height",
+                  "value" => 0.5
+                }
+              }
+            },
+            %{
+              "steps" => [
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.3
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.2
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.6
+                  }
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "width",
+                  "value" => 0.5
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0.5
+                }
+              }
+            }
+          ],
+          "stroke_color" => "none"
+        }], else: [
+          %{
+          "fill_color" => "white",
+          "segments" => [
+            %{
+              "steps" => [
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.3
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.2
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.6
+                  }
+                },
+                %{
+                  "relative" => true
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "width",
+                  "value" => 0.5
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0.5
+                }
+              }
+            },
+            %{
+              "steps" => [
+                %{
+                  "relative" => true,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.4
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.6
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => -0.4
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.3
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "minsize",
+                    "value" => 0.2
+                  }
+                }
+              ],
+              "start" => %{
+                "relative" => true,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "minsize",
+                  "value" => 0.3
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "minsize",
+                  "value" => -0.2
+                }
+              }
+            }
+          ],
+          "stroke_color" => "black"
+        }])       
+        "terminate" ->  [
+        %{
+          "fill_color" => "black",
+          "segments" => [
+            %{
+              "steps" => [
+                %{
+                  "arc" => %{
+                    "angle" => 0,
+                    "large" => false,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "max",
+                        "rel_unit" => "minsize",
+                        "rel_value" => -0.1,
+                        "static" => -10
+                      },
+                      "unit" => "width",
+                      "value" => 0.3
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "max",
+                        "rel_unit" => "minsize",
+                        "rel_value" => -0.1,
+                        "static" => -10
+                      },
+                      "unit" => "height",
+                      "value" => 0.3
+                    },
+                    "sweep" => false
+                  },
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "max",
+                      "rel_unit" => "minsize",
+                      "rel_value" => -0.2,
+                      "static" => -20
+                    },
+                    "unit" => "width",
+                    "value" => 0.6
+                  }
+                },
+                %{
+                  "arc" => %{
+                    "angle" => 0,
+                    "large" => false,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "max",
+                        "rel_unit" => "minsize",
+                        "rel_value" => -0.1,
+                        "static" => -10
+                      },
+                      "unit" => "width",
+                      "value" => 0.3
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "max",
+                        "rel_unit" => "minsize",
+                        "rel_value" => -0.1,
+                        "static" => -10
+                      },
+                      "unit" => "height",
+                      "value" => 0.3
+                    },
+                    "sweep" => false
+                  },
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0.2,
+                      "static" => 20
+                    },
+                    "unit" => "width",
+                    "value" => -0.6
+                  }
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0.1,
+                    "static" => 10
+                  },
+                  "unit" => "width",
+                  "value" => 0.2
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0.5
+                }
+              }
+            }
+          ],
+          "stroke_color" => "none"
+        }
+      ]
+        end
+      )
+      }
+    end
+  end
 
   def all do
     @symbols
+    |> Enum.concat(generate_bpmn_symbols())
     |> Enum.map(fn shape ->
       shape
       |> Map.update("paths", [], fn paths ->

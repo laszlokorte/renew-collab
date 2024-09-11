@@ -25,7 +25,9 @@ defmodule RenewCollab.Renew do
           from(e in Layer,
             order_by: [asc: :z_index],
             preload: [
-              box: [],
+              box: [
+                symbol_shape: []
+              ],
               text: [style: []],
               edge: [
                 waypoints: ^from(w in Waypoint, order_by: [asc: :sort]),
@@ -99,7 +101,9 @@ defmodule RenewCollab.Renew do
   def get_element!(document, id) do
     Repo.get_by(Layer, id: id, document: document)
     |> Repo.preload(
-      box: [],
+      box: [
+        symbol_shape: []
+      ],
       text: [style: []],
       edge: [
         waypoints: from(w in Waypoint, order_by: [asc: :sort]),

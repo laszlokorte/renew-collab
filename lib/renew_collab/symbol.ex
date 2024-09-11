@@ -50,6 +50,12 @@ defmodule RenewCollab.Symbol do
     )
   end
 
+  def ids_by_name do
+    from(p in Shape, select: {p.name, p.id})
+    |> Repo.all()
+    |> Map.new()
+  end
+
   def reset do
     Repo.delete_all(Shape)
 

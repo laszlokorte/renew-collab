@@ -1,5 +1,7 @@
 defmodule RenewCollab.Import.DocumentImport do
   def import(name, content) do
+    symbol_ids = RenewCollab.Symbol.ids_by_name()
+
     with {:ok, true} <- check_utf8_binary?(content),
          {:ok, %Renewex.Document{root: root, refs: refs}} <- Renewex.parse_document(content),
          parser <- Renewex.Parser.detect_document_version(Renewex.Tokenizer.scan(content)),
@@ -60,6 +62,9 @@ defmodule RenewCollab.Import.DocumentImport do
                     }
                 end
 
+              {shape_name, shape_attributes} =
+                convert_shape(parser.grammar, class_name, fields, attrs)
+
               %{
                 "semantic_tag" => class_name,
                 "z_index" => z_index,
@@ -70,7 +75,8 @@ defmodule RenewCollab.Import.DocumentImport do
                   "position_y" => y,
                   "width" => w,
                   "height" => h,
-                  "shape" => convert_shape(parser.grammar, class_name, fields)
+                  "symbol_shape_attributes" => shape_attributes,
+                  "symbol_shape_id" => Map.get(symbol_ids, shape_name)
                 },
                 "style" => style
               }
@@ -292,32 +298,141 @@ defmodule RenewCollab.Import.DocumentImport do
     Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.contrib.PolygonFigure")
   end
 
-  defp convert_shape(grammar, class_name, fields) do
+  defp convert_shape(grammar, class_name, fields, attrs) do
     cond do
+      Renewex.Hierarchy.is_subtype_of(
+        grammar,
+        class_name,
+        "de.renew.bpmn.figures.DataStoreFigure"
+      ) ->
+        {"database", nil}
+
+      Renewex.Hierarchy.is_subtype_of(grammar, class_name, "de.renew.bpmn.figures.DataFigure") ->
+        {case Map.get(fields, :type) do
+           0 -> "rect-fold-paper-proportional"
+           1 -> "rect-fold-paper-proportional-arrow-right"
+           2 -> "rect-fold-paper-proportional-arrow-right-black"
+           3 -> "rect-fold-paper-proportional-striped"
+         end, nil}
+
+      Renewex.Hierarchy.is_subtype_of(grammar, class_name, "de.renew.bpmn.figures.ActivityFigure") ->
+        {case Map.get(fields, :type) do
+           0 -> "bpmn-activity"
+           1 -> "bpmn-activity-exchange"
+         end,
+         %{
+           "rx" => 5,
+           "ry" => 5
+         }}
+
+      Renewex.Hierarchy.is_subtype_of(grammar, class_name, "de.renew.bpmn.figures.GatewayFigure") ->
+        {case Map.get(fields, :type) do
+           0 -> "bpmn-gateway"
+           1 -> "bpmn-gateway-xor"
+           2 -> "bpmn-gateway-and"
+         end, nil}
+
+      Renewex.Hierarchy.is_subtype_of(grammar, class_name, "de.renew.bpmn.figures.EventFigure") ->
+        {case {Map.get(fields, :position), Map.get(fields, :type), Map.get(fields, :throwing)} do
+           {0, 0, false} -> "bpmn-start-standard"
+           {0, 0, true} -> "bpmn-start-standard-throwing"
+           {0, 1, false} -> "bpmn-start-message"
+           {0, 1, true} -> "bpmn-start-message-throwing"
+           {0, 2, false} -> "bpmn-start-terminate"
+           {0, 2, true} -> "bpmn-start-terminate-throwing"
+           {1, 0, false} -> "bpmn-interm-standard"
+           {1, 0, true} -> "bpmn-interm-standard-throwing"
+           {1, 1, false} -> "bpmn-interm-message"
+           {1, 1, true} -> "bpmn-interm-message-throwing"
+           {1, 2, false} -> "bpmn-interm-terminate"
+           {1, 2, true} -> "bpmn-interm-terminate-throwing"
+           {2, 0, false} -> "bpmn-end-standard"
+           {2, 0, true} -> "bpmn-end-standard-throwing"
+           {2, 1, false} -> "bpmn-end-message"
+           {2, 1, true} -> "bpmn-end-message-throwing"
+           {2, 2, false} -> "bpmn-end-terminate"
+           {2, 2, true} -> "bpmn-end-terminate-throwing"
+         end, nil}
+
+      Renewex.Hierarchy.is_subtype_of(grammar, class_name, "de.renew.bpmn.figures.PoolFigure") ->
+        {"bpmn-pool", nil}
+
+      Renewex.Hierarchy.is_subtype_of(
+        grammar,
+        class_name,
+        "de.renew.diagram.RoleDescriptorFigure"
+      ) ->
+        {"rect", nil}
+
+      Renewex.Hierarchy.is_subtype_of(grammar, class_name, "de.renew.diagram.VJoinFigure") ->
+        # fields.decoration.class_name == de.renew.diagram.XORDecoration
+        # fields.decoration.class_name == de.renew.diagram.ANDDecoration
+        {"bar-horizontal-black-diamond-quad", nil}
+
+      Renewex.Hierarchy.is_subtype_of(grammar, class_name, "de.renew.diagram.VSplitFigure") ->
+        {"bar-horizontal-black-diamond-quad", nil}
+
+      Renewex.Hierarchy.is_subtype_of(
+        grammar,
+        class_name,
+        "de.renew.interfacenets.datatypes.InterfaceBoxFigure"
+      ) ->
+        {"bracket-both-outer", nil}
+
+      Renewex.Hierarchy.is_subtype_of(
+        grammar,
+        class_name,
+        "de.renew.interfacenets.datatypes.InterfaceFigure"
+      ) ->
+        {if Map.get(attrs, "RightInterface") do
+           "bracket-right-outer"
+         else
+           "bracket-left-outer"
+         end, nil}
+
       Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.contrib.TriangleFigure") ->
-        "triangle:#{Map.get(fields, :rotation)}"
+        {case Map.get(fields, :rotation) do
+           0 -> "triangle-up"
+           1 -> "triangle-ne"
+           2 -> "triangle-right"
+           3 -> "triangle-se"
+           4 -> "triangle-down"
+           5 -> "triangle-sw"
+           6 -> "triangle-left"
+           7 -> "triangle-nw"
+         end, nil}
 
       Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.contrib.DiamondFigure") ->
-        "diamond"
+        {"diamond", nil}
 
       Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.figures.EllipseFigure") ->
-        "ellipse"
+        {"ellipse", nil}
 
       Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.figures.PieFigure") ->
-        "pie:#{Map.get(fields, :start_angle)}:#{Map.get(fields, :end_angle)}"
+        # "pie:#{Map.get(fields, :start_angle)}:#{Map.get(fields, :end_angle)}"
+        {"pie",
+         %{
+           "start_angle" => Map.get(fields, :start_angle),
+           "end_angle" => Map.get(fields, :end_angle)
+         }}
 
       Renewex.Hierarchy.is_subtype_of(
         grammar,
         class_name,
         "CH.ifa.draw.figures.RoundRectangleFigure"
       ) ->
-        "roundrect:#{Map.get(fields, :arc_width, 0)}:#{Map.get(fields, :arc_height, 0)}"
+        # "roundrect:#{Map.get(fields, :arc_width, 0)}:#{Map.get(fields, :arc_height, 0)}"
+        {"rect-round",
+         %{
+           "rx" => Map.get(fields, :arc_width, 0),
+           "ry" => Map.get(fields, :arc_height, 0)
+         }}
 
       Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.figures.RectangleFigure") ->
-        "rect"
+        {"rect", nil}
 
       true ->
-        nil
+        {dbg(class_name), nil}
     end
   end
 

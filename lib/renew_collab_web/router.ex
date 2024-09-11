@@ -12,6 +12,8 @@ defmodule RenewCollabWeb.Router do
   scope "/api", RenewCollabWeb do
     pipe_through :api
     post "/auth/login", SessionController, :new
+    resources "/symbols", SymbolController, only: [:index]
+    get "/install", InstallController, :reset
   end
 
   scope "/api", RenewCollabWeb do
@@ -24,11 +26,6 @@ defmodule RenewCollabWeb.Router do
     resources "/documents", DocumentController, except: [:new, :edit] do
       resources "/elements", ElementController, only: [:index, :create, :show]
     end
-  end
-
-  scope "/api", RenewCollabWeb do
-    pipe_through :api
-    resources "/symbols", SymbolController, only: [:index]
   end
 
   # Enable LiveDashboard in development
