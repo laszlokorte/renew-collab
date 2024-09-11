@@ -24,7 +24,14 @@ config :renew_collab, RenewCollabWeb.Endpoint,
   code_reloader: true,
   debug_errors: true,
   secret_key_base: "T9rh3fGUvXs/CrmQv6Us79G7Ho4Ct/BQkIpia64YDmhq6eT0FkgL/qlCvOv5UxVc",
-  watchers: []
+  watchers: [],
+  live_reload: [
+    patterns: [
+      ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
+      ~r"priv/gettext/.*(po)$",
+      ~r"lib/renew_collab_web/(controllers|live|components)/.*(ex|heex)$"
+    ]
+  ]
 
 # ## SSL Support
 #

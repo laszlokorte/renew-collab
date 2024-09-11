@@ -65,4 +65,110 @@ defmodule RenewCollab.Symbol do
     end)
     |> Repo.transaction()
   end
+
+  def build_symbol_path(
+        %RenewCollab.Element.Box{
+          position_x: x,
+          position_y: y,
+          width: width,
+          height: height
+        } = box,
+        %RenewCollab.Symbol.Path{
+          segments: segments
+        }
+      ) do
+    segments
+    |> Enum.map(fn segment ->
+      start =
+        {start_x, start_y} = {
+          build_coord(box, :x, segment.relative, extract_coord(:x, segment)),
+          build_coord(box, :y, segment.relative, extract_coord(:y, segment))
+        }
+
+      {path_string, _end_pos} =
+        segment.steps
+        |> Enum.reduce(
+          {
+            "#{if(segment.relative, do: "m", else: "M")} #{start_x} #{start_x}",
+            start
+          },
+          fn step, {current_string, current_pos} ->
+            {next_string, next_pos} =
+              build_step(
+                box,
+                start,
+                current_pos,
+                step
+              )
+
+            {[current_string, next_string], next_pos}
+          end
+        )
+
+      path_string
+    end)
+    |> Enum.join(" ")
+
+    "M #{x} #{y} h #{width} v #{height} h #{-width} v #{-height} z"
+  end
+
+  defp extract_coord(:x, obj) do
+    %{
+      value: obj.x_value,
+      unit: obj.x_unit,
+      offset: %{
+        operation: obj.x_offset_operation,
+        value_static: obj.x_offset_value_static,
+        dynamic_value: obj.x_offset_dynamic_value,
+        dynamic_unit: obj.x_offset_dynamic_unit
+      }
+    }
+  end
+
+  defp extract_coord(:y, obj) do
+    %{
+      value: obj.y_value,
+      unit: obj.y_unit,
+      offset: %{
+        operation: obj.y_offset_operation,
+        value_static: obj.y_offset_value_static,
+        dynamic_value: obj.y_offset_dynamic_value,
+        dynamic_unit: obj.y_offset_dynamic_unit
+      }
+    }
+  end
+
+  defp extract_coord(:rx, obj) do
+    %{
+      value: obj.rx_value,
+      unit: obj.rx_unit,
+      offset: %{
+        operation: obj.rx_offset_operation,
+        value_static: obj.rx_offset_value_static,
+        dynamic_value: obj.rx_offset_dynamic_value,
+        dynamic_unit: obj.rx_offset_dynamic_unit
+      }
+    }
+  end
+
+  defp extract_coord(:ry, obj) do
+    %{
+      value: obj.ry_value,
+      unit: obj.ry_unit,
+      offset: %{
+        operation: obj.ry_offset_operation,
+        value_static: obj.ry_offset_value_static,
+        dynamic_value: obj.ry_offset_dynamic_value,
+        dynamic_unit: obj.ry_offset_dynamic_unit
+      }
+    }
+  end
+
+  defp build_step(box, startPos, {x, y}, step) do
+    {"", {x, y}}
+  end
+
+  defp build_coord(box, axis, relative, pos) do
+    0
+  end
 end

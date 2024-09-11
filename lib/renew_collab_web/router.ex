@@ -1,6 +1,15 @@
 defmodule RenewCollabWeb.Router do
   use RenewCollabWeb, :router
 
+  pipeline :browser do
+    plug :accepts, ["html"]
+    plug :fetch_session
+    plug :fetch_live_flash
+    plug :put_root_layout, html: {RenewCollabWeb.Layouts, :root}
+    plug :protect_from_forgery
+    plug :put_secure_browser_headers
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -26,6 +35,13 @@ defmodule RenewCollabWeb.Router do
     resources "/documents", DocumentController, except: [:new, :edit] do
       resources "/elements", ElementController, only: [:index, :create, :show]
     end
+  end
+
+  scope "/live", RenewCollabWeb do
+    pipe_through :browser
+
+    live "/document/:id", LiveDocument
+    live "/documents", LiveDocuments
   end
 
   # Enable LiveDashboard in development

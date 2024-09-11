@@ -13,9 +13,9 @@ defmodule RenewCollabWeb.Endpoint do
 
   plug RenewCollabWeb.Plug.CORS
 
-  # socket "/live", Phoenix.LiveView.Socket,
-  #   websocket: [connect_info: [session: @session_options]],
-  #   longpoll: [connect_info: [session: @session_options]]
+  socket "/live", Phoenix.LiveView.Socket,
+    websocket: [connect_info: [session: @session_options]],
+    longpoll: [connect_info: [session: @session_options]]
 
   socket "/collaboration", RenewCollabWeb.CollabSocket,
     websocket: [check_origin: false],
@@ -34,6 +34,8 @@ defmodule RenewCollabWeb.Endpoint do
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
   if code_reloading? do
+    socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
+    plug Phoenix.LiveReloader
     plug Phoenix.CodeReloader
     plug Phoenix.Ecto.CheckRepoStatus, otp_app: :renew_collab
   end
