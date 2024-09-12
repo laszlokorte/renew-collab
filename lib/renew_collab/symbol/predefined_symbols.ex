@@ -15282,8 +15282,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     "value" => 1
                   }
                 },
-
-                %{"relative" => false},
+                %{"relative" => false}
               ],
               "start" => %{
                 "relative" => false,
@@ -15308,7 +15307,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   "value" => 0.2
                 }
               }
-            },
+            }
           ],
           "stroke_color" => "inherit"
         }
@@ -15411,7 +15410,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     "value" => 0
                   }
                 },
-                %{"relative" => false},
+                %{"relative" => false}
               ],
               "start" => %{
                 "relative" => false,
@@ -17190,1127 +17189,1144 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
           "stroke_color" => "inherit"
         }
       ]
-    },
+    }
   ]
 
   def generate_bpmn_symbols() do
+    # , 
+    # (type == "message" or not throwing) and 
+    # (pos != "start" or not throwing) and 
+    # (pos != "end" or throwing or type != "message") and 
+    # (type != "terminate" or pos == "end")
     for pos <- ["start", "interm", "end"],
         type <- ["standard", "message", "terminate"],
-        throwing <- [true, false]
-        # , 
-        # (type == "message" or not throwing) and 
-        # (pos != "start" or not throwing) and 
-        # (pos != "end" or throwing or type != "message") and 
-        # (type != "terminate" or pos == "end")
-         do
+        throwing <- [true, false] do
       name =
         "bpmn-#{pos}-#{type}" |> then(&if throwing, do: "#{&1}-throwing", else: &1)
 
       %{
         "name" => name,
-        "paths" => case pos do
-          "start" ->  [
-        %{
-          "fill_color" => "inherit",
-          "segments" => [
-            %{
-              "steps" => [
+        "paths" =>
+          case pos do
+            "start" ->
+              [
                 %{
-                  "arc" => %{
-                    "angle" => 0,
-                    "large" => false,
-                    "rx" => %{
-                      "offset" => %{
-                        "op" => "min",
-                        "rel_unit" => "minsize",
-                        "rel_value" => 0,
-                        "static" => 0
-                      },
-                      "unit" => "width",
-                      "value" => 0.5
-                    },
-                    "ry" => %{
-                      "offset" => %{
-                        "op" => "min",
-                        "rel_unit" => "minsize",
-                        "rel_value" => 0,
-                        "static" => 0
-                      },
-                      "unit" => "height",
-                      "value" => 0.5
-                    },
-                    "sweep" => false
-                  },
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 0
-                    },
-                    "unit" => "width",
-                    "value" => 1
-                  }
-                },
-                %{
-                  "arc" => %{
-                    "angle" => 0,
-                    "large" => false,
-                    "rx" => %{
-                      "offset" => %{
-                        "op" => "min",
-                        "rel_unit" => "minsize",
-                        "rel_value" => 0,
-                        "static" => 0
-                      },
-                      "unit" => "width",
-                      "value" => 0.5
-                    },
-                    "ry" => %{
-                      "offset" => %{
-                        "op" => "min",
-                        "rel_unit" => "minsize",
-                        "rel_value" => 0,
-                        "static" => 0
-                      },
-                      "unit" => "height",
-                      "value" => 0.5
-                    },
-                    "sweep" => false
-                  },
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 0
-                    },
-                    "unit" => "width",
-                    "value" => -1
-                  }
-                }
-              ],
-              "start" => %{
-                "relative" => false,
-                "x" => %{
-                  "offset" => %{
-                    "op" => "min",
-                    "rel_unit" => "minsize",
-                    "rel_value" => 0,
-                    "static" => 0
-                  },
-                  "unit" => "width",
-                  "value" => 0
-                },
-                "y" => %{
-                  "offset" => %{
-                    "op" => "min",
-                    "rel_unit" => "minsize",
-                    "rel_value" => 0,
-                    "static" => 0
-                  },
-                  "unit" => "height",
-                  "value" => 0.5
-                }
-              }
-            }
-          ],
-          "stroke_color" => "inherit"
-        }
-      ]
-          "interm" -> [
-          %{
-            "fill_color" => "inherit",
-            "segments" => [
-              %{
-                "steps" => [
-                  %{
-                    "arc" => %{
-                      "angle" => 0,
-                      "large" => false,
-                      "rx" => %{
-                        "offset" => %{
-                          "op" => "min",
-                          "rel_unit" => "minsize",
-                          "rel_value" => 0,
-                          "static" => 0
+                  "fill_color" => "inherit",
+                  "segments" => [
+                    %{
+                      "steps" => [
+                        %{
+                          "arc" => %{
+                            "angle" => 0,
+                            "large" => false,
+                            "rx" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0,
+                                "static" => 0
+                              },
+                              "unit" => "width",
+                              "value" => 0.5
+                            },
+                            "ry" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0,
+                                "static" => 0
+                              },
+                              "unit" => "height",
+                              "value" => 0.5
+                            },
+                            "sweep" => false
+                          },
+                          "relative" => true,
+                          "x" => %{
+                            "offset" => %{
+                              "op" => "min",
+                              "rel_unit" => "minsize",
+                              "rel_value" => 0,
+                              "static" => 0
+                            },
+                            "unit" => "width",
+                            "value" => 1
+                          }
                         },
-                        "unit" => "width",
-                        "value" => 0.5
-                      },
-                      "ry" => %{
-                        "offset" => %{
-                          "op" => "min",
-                          "rel_unit" => "minsize",
-                          "rel_value" => 0,
-                          "static" => 0
+                        %{
+                          "arc" => %{
+                            "angle" => 0,
+                            "large" => false,
+                            "rx" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0,
+                                "static" => 0
+                              },
+                              "unit" => "width",
+                              "value" => 0.5
+                            },
+                            "ry" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0,
+                                "static" => 0
+                              },
+                              "unit" => "height",
+                              "value" => 0.5
+                            },
+                            "sweep" => false
+                          },
+                          "relative" => true,
+                          "x" => %{
+                            "offset" => %{
+                              "op" => "min",
+                              "rel_unit" => "minsize",
+                              "rel_value" => 0,
+                              "static" => 0
+                            },
+                            "unit" => "width",
+                            "value" => -1
+                          }
+                        }
+                      ],
+                      "start" => %{
+                        "relative" => false,
+                        "x" => %{
+                          "offset" => %{
+                            "op" => "min",
+                            "rel_unit" => "minsize",
+                            "rel_value" => 0,
+                            "static" => 0
+                          },
+                          "unit" => "width",
+                          "value" => 0
                         },
-                        "unit" => "height",
-                        "value" => 0.5
-                      },
-                      "sweep" => false
-                    },
-                    "relative" => true,
-                    "x" => %{
-                      "offset" => %{
-                        "op" => "min",
-                        "rel_unit" => "minsize",
-                        "rel_value" => 0,
-                        "static" => 0
-                      },
-                      "unit" => "width",
-                      "value" => 1
+                        "y" => %{
+                          "offset" => %{
+                            "op" => "min",
+                            "rel_unit" => "minsize",
+                            "rel_value" => 0,
+                            "static" => 0
+                          },
+                          "unit" => "height",
+                          "value" => 0.5
+                        }
+                      }
                     }
-                  },
-                  %{
-                    "arc" => %{
-                      "angle" => 0,
-                      "large" => false,
-                      "rx" => %{
-                        "offset" => %{
-                          "op" => "min",
-                          "rel_unit" => "minsize",
-                          "rel_value" => 0,
-                          "static" => 0
+                  ],
+                  "stroke_color" => "inherit"
+                }
+              ]
+
+            "interm" ->
+              [
+                %{
+                  "fill_color" => "inherit",
+                  "segments" => [
+                    %{
+                      "steps" => [
+                        %{
+                          "arc" => %{
+                            "angle" => 0,
+                            "large" => false,
+                            "rx" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0,
+                                "static" => 0
+                              },
+                              "unit" => "width",
+                              "value" => 0.5
+                            },
+                            "ry" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0,
+                                "static" => 0
+                              },
+                              "unit" => "height",
+                              "value" => 0.5
+                            },
+                            "sweep" => false
+                          },
+                          "relative" => true,
+                          "x" => %{
+                            "offset" => %{
+                              "op" => "min",
+                              "rel_unit" => "minsize",
+                              "rel_value" => 0,
+                              "static" => 0
+                            },
+                            "unit" => "width",
+                            "value" => 1
+                          }
                         },
-                        "unit" => "width",
-                        "value" => 0.5
-                      },
-                      "ry" => %{
-                        "offset" => %{
-                          "op" => "min",
-                          "rel_unit" => "minsize",
-                          "rel_value" => 0,
-                          "static" => 0
+                        %{
+                          "arc" => %{
+                            "angle" => 0,
+                            "large" => false,
+                            "rx" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0,
+                                "static" => 0
+                              },
+                              "unit" => "width",
+                              "value" => 0.5
+                            },
+                            "ry" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0,
+                                "static" => 0
+                              },
+                              "unit" => "height",
+                              "value" => 0.5
+                            },
+                            "sweep" => false
+                          },
+                          "relative" => true,
+                          "x" => %{
+                            "offset" => %{
+                              "op" => "min",
+                              "rel_unit" => "minsize",
+                              "rel_value" => 0,
+                              "static" => 0
+                            },
+                            "unit" => "width",
+                            "value" => -1
+                          }
+                        }
+                      ],
+                      "start" => %{
+                        "relative" => false,
+                        "x" => %{
+                          "offset" => %{
+                            "op" => "min",
+                            "rel_unit" => "minsize",
+                            "rel_value" => 0,
+                            "static" => 0
+                          },
+                          "unit" => "width",
+                          "value" => 0
                         },
-                        "unit" => "height",
-                        "value" => 0.5
-                      },
-                      "sweep" => false
-                    },
-                    "relative" => true,
-                    "x" => %{
-                      "offset" => %{
-                        "op" => "min",
-                        "rel_unit" => "minsize",
-                        "rel_value" => 0,
-                        "static" => 0
-                      },
-                      "unit" => "width",
-                      "value" => -1
+                        "y" => %{
+                          "offset" => %{
+                            "op" => "min",
+                            "rel_unit" => "minsize",
+                            "rel_value" => 0,
+                            "static" => 0
+                          },
+                          "unit" => "height",
+                          "value" => 0.5
+                        }
+                      }
                     }
-                  }
-                ],
-                "start" => %{
-                  "relative" => false,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 0
-                    },
-                    "unit" => "width",
-                    "value" => 0
-                  },
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 0
-                    },
-                    "unit" => "height",
-                    "value" => 0.5
-                  }
-                }
-              }
-            ],
-            "stroke_color" => "inherit"
-          },
-          %{
-            "fill_color" => "inherit",
-            "segments" => [
-              %{
-                "steps" => [
-                  %{
-                    "arc" => %{
-                      "angle" => 0,
-                      "large" => false,
-                      "rx" => %{
-                        "offset" => %{
-                          "op" => "max",
-                          "rel_unit" => "width",
-                          "rel_value" => -0.25,
-                          "static" => -10
+                  ],
+                  "stroke_color" => "inherit"
+                },
+                %{
+                  "fill_color" => "inherit",
+                  "segments" => [
+                    %{
+                      "steps" => [
+                        %{
+                          "arc" => %{
+                            "angle" => 0,
+                            "large" => false,
+                            "rx" => %{
+                              "offset" => %{
+                                "op" => "max",
+                                "rel_unit" => "width",
+                                "rel_value" => -0.25,
+                                "static" => -10
+                              },
+                              "unit" => "width",
+                              "value" => 0.5
+                            },
+                            "ry" => %{
+                              "offset" => %{
+                                "op" => "max",
+                                "rel_unit" => "height",
+                                "rel_value" => -0.25,
+                                "static" => -10
+                              },
+                              "unit" => "height",
+                              "value" => 0.5
+                            },
+                            "sweep" => false
+                          },
+                          "relative" => true,
+                          "x" => %{
+                            "offset" => %{
+                              "op" => "max",
+                              "rel_unit" => "width",
+                              "rel_value" => -0.5,
+                              "static" => -20
+                            },
+                            "unit" => "width",
+                            "value" => 1
+                          }
                         },
-                        "unit" => "width",
-                        "value" => 0.5
-                      },
-                      "ry" => %{
-                        "offset" => %{
-                          "op" => "max",
-                          "rel_unit" => "height",
-                          "rel_value" => -0.25,
-                          "static" => -10
+                        %{
+                          "arc" => %{
+                            "angle" => 0,
+                            "large" => false,
+                            "rx" => %{
+                              "offset" => %{
+                                "op" => "max",
+                                "rel_unit" => "width",
+                                "rel_value" => -0.25,
+                                "static" => -10
+                              },
+                              "unit" => "width",
+                              "value" => 0.5
+                            },
+                            "ry" => %{
+                              "offset" => %{
+                                "op" => "max",
+                                "rel_unit" => "height",
+                                "rel_value" => -0.25,
+                                "static" => -10
+                              },
+                              "unit" => "height",
+                              "value" => 0.5
+                            },
+                            "sweep" => false
+                          },
+                          "relative" => true,
+                          "x" => %{
+                            "offset" => %{
+                              "op" => "min",
+                              "rel_unit" => "width",
+                              "rel_value" => 0.5,
+                              "static" => 20
+                            },
+                            "unit" => "width",
+                            "value" => -1
+                          }
+                        }
+                      ],
+                      "start" => %{
+                        "relative" => false,
+                        "x" => %{
+                          "offset" => %{
+                            "op" => "min",
+                            "rel_unit" => "width",
+                            "rel_value" => 0.25,
+                            "static" => 10
+                          },
+                          "unit" => "width",
+                          "value" => 0
                         },
-                        "unit" => "height",
-                        "value" => 0.5
-                      },
-                      "sweep" => false
-                    },
-                    "relative" => true,
-                    "x" => %{
-                      "offset" => %{
-                        "op" => "max",
-                        "rel_unit" => "width",
-                        "rel_value" => -0.5,
-                        "static" => -20
-                      },
-                      "unit" => "width",
-                      "value" => 1
+                        "y" => %{
+                          "offset" => %{
+                            "op" => "min",
+                            "rel_unit" => "minsize",
+                            "rel_value" => 0,
+                            "static" => 0
+                          },
+                          "unit" => "height",
+                          "value" => 0.5
+                        }
+                      }
                     }
-                  },
-                  %{
-                    "arc" => %{
-                      "angle" => 0,
-                      "large" => false,
-                      "rx" => %{
-                        "offset" => %{
-                          "op" => "max",
-                          "rel_unit" => "width",
-                          "rel_value" => -0.25,
-                          "static" => -10
+                  ],
+                  "stroke_color" => "inherit"
+                }
+              ]
+
+            "end" ->
+              [
+                %{
+                  "fill_color" => "inherit",
+                  "segments" => [
+                    %{
+                      "steps" => [
+                        %{
+                          "arc" => %{
+                            "angle" => 0,
+                            "large" => false,
+                            "rx" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0,
+                                "static" => 0
+                              },
+                              "unit" => "width",
+                              "value" => 0.5
+                            },
+                            "ry" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0,
+                                "static" => 0
+                              },
+                              "unit" => "height",
+                              "value" => 0.5
+                            },
+                            "sweep" => false
+                          },
+                          "relative" => true,
+                          "x" => %{
+                            "offset" => %{
+                              "op" => "min",
+                              "rel_unit" => "minsize",
+                              "rel_value" => 0,
+                              "static" => 0
+                            },
+                            "unit" => "width",
+                            "value" => 1
+                          }
                         },
-                        "unit" => "width",
-                        "value" => 0.5
-                      },
-                      "ry" => %{
-                        "offset" => %{
-                          "op" => "max",
-                          "rel_unit" => "height",
-                          "rel_value" => -0.25,
-                          "static" => -10
+                        %{
+                          "arc" => %{
+                            "angle" => 0,
+                            "large" => false,
+                            "rx" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0,
+                                "static" => 0
+                              },
+                              "unit" => "width",
+                              "value" => 0.5
+                            },
+                            "ry" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0,
+                                "static" => 0
+                              },
+                              "unit" => "height",
+                              "value" => 0.5
+                            },
+                            "sweep" => false
+                          },
+                          "relative" => true,
+                          "x" => %{
+                            "offset" => %{
+                              "op" => "min",
+                              "rel_unit" => "minsize",
+                              "rel_value" => 0,
+                              "static" => 0
+                            },
+                            "unit" => "width",
+                            "value" => -1
+                          }
+                        }
+                      ],
+                      "start" => %{
+                        "relative" => false,
+                        "x" => %{
+                          "offset" => %{
+                            "op" => "min",
+                            "rel_unit" => "minsize",
+                            "rel_value" => 0,
+                            "static" => 0
+                          },
+                          "unit" => "width",
+                          "value" => 0
                         },
-                        "unit" => "height",
-                        "value" => 0.5
-                      },
-                      "sweep" => false
-                    },
-                    "relative" => true,
-                    "x" => %{
-                      "offset" => %{
-                        "op" => "min",
-                        "rel_unit" => "width",
-                        "rel_value" => 0.5,
-                        "static" => 20
-                      },
-                      "unit" => "width",
-                      "value" => -1
+                        "y" => %{
+                          "offset" => %{
+                            "op" => "min",
+                            "rel_unit" => "minsize",
+                            "rel_value" => 0,
+                            "static" => 0
+                          },
+                          "unit" => "height",
+                          "value" => 0.5
+                        }
+                      }
                     }
-                  }
-                ],
-                "start" => %{
-                  "relative" => false,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "width",
-                      "rel_value" => 0.25,
-                      "static" => 10
+                  ],
+                  "stroke_color" => "none"
+                },
+                %{
+                  "fill_color" => "black",
+                  "segments" => [
+                    %{
+                      "steps" => [
+                        %{
+                          "arc" => %{
+                            "angle" => 0,
+                            "large" => false,
+                            "rx" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0,
+                                "static" => 0
+                              },
+                              "unit" => "width",
+                              "value" => 0.5
+                            },
+                            "ry" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0,
+                                "static" => 0
+                              },
+                              "unit" => "height",
+                              "value" => 0.5
+                            },
+                            "sweep" => false
+                          },
+                          "relative" => true,
+                          "x" => %{
+                            "offset" => %{
+                              "op" => "min",
+                              "rel_unit" => "minsize",
+                              "rel_value" => 0,
+                              "static" => 0
+                            },
+                            "unit" => "width",
+                            "value" => 1
+                          }
+                        },
+                        %{
+                          "arc" => %{
+                            "angle" => 0,
+                            "large" => false,
+                            "rx" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0,
+                                "static" => 0
+                              },
+                              "unit" => "width",
+                              "value" => 0.5
+                            },
+                            "ry" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0,
+                                "static" => 0
+                              },
+                              "unit" => "height",
+                              "value" => 0.5
+                            },
+                            "sweep" => false
+                          },
+                          "relative" => true,
+                          "x" => %{
+                            "offset" => %{
+                              "op" => "min",
+                              "rel_unit" => "minsize",
+                              "rel_value" => 0,
+                              "static" => 0
+                            },
+                            "unit" => "width",
+                            "value" => -1
+                          }
+                        }
+                      ],
+                      "start" => %{
+                        "relative" => false,
+                        "x" => %{
+                          "offset" => %{
+                            "op" => "min",
+                            "rel_unit" => "minsize",
+                            "rel_value" => 0,
+                            "static" => 0
+                          },
+                          "unit" => "width",
+                          "value" => 0
+                        },
+                        "y" => %{
+                          "offset" => %{
+                            "op" => "min",
+                            "rel_unit" => "minsize",
+                            "rel_value" => 0,
+                            "static" => 0
+                          },
+                          "unit" => "height",
+                          "value" => 0.5
+                        }
+                      }
                     },
-                    "unit" => "width",
-                    "value" => 0
-                  },
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 0
-                    },
-                    "unit" => "height",
-                    "value" => 0.5
-                  }
+                    %{
+                      "steps" => [
+                        %{
+                          "arc" => %{
+                            "angle" => 0,
+                            "large" => false,
+                            "rx" => %{
+                              "offset" => %{
+                                "op" => "max",
+                                "rel_unit" => "width",
+                                "rel_value" => -0.25,
+                                "static" => -10
+                              },
+                              "unit" => "width",
+                              "value" => 0.5
+                            },
+                            "ry" => %{
+                              "offset" => %{
+                                "op" => "max",
+                                "rel_unit" => "height",
+                                "rel_value" => -0.25,
+                                "static" => -10
+                              },
+                              "unit" => "height",
+                              "value" => 0.5
+                            },
+                            "sweep" => false
+                          },
+                          "relative" => true,
+                          "x" => %{
+                            "offset" => %{
+                              "op" => "min",
+                              "rel_unit" => "width",
+                              "rel_value" => 0.5,
+                              "static" => 20
+                            },
+                            "unit" => "width",
+                            "value" => -1
+                          }
+                        },
+                        %{
+                          "arc" => %{
+                            "angle" => 0,
+                            "large" => false,
+                            "rx" => %{
+                              "offset" => %{
+                                "op" => "max",
+                                "rel_unit" => "width",
+                                "rel_value" => -0.25,
+                                "static" => -10
+                              },
+                              "unit" => "width",
+                              "value" => 0.5
+                            },
+                            "ry" => %{
+                              "offset" => %{
+                                "op" => "max",
+                                "rel_unit" => "height",
+                                "rel_value" => -0.25,
+                                "static" => -10
+                              },
+                              "unit" => "height",
+                              "value" => 0.5
+                            },
+                            "sweep" => false
+                          },
+                          "relative" => true,
+                          "x" => %{
+                            "offset" => %{
+                              "op" => "max",
+                              "rel_unit" => "width",
+                              "rel_value" => -0.5,
+                              "static" => -20
+                            },
+                            "unit" => "width",
+                            "value" => 1
+                          }
+                        }
+                      ],
+                      "start" => %{
+                        "relative" => false,
+                        "x" => %{
+                          "offset" => %{
+                            "op" => "max",
+                            "rel_unit" => "width",
+                            "rel_value" => -0.25,
+                            "static" => -10
+                          },
+                          "unit" => "width",
+                          "value" => 1
+                        },
+                        "y" => %{
+                          "offset" => %{
+                            "op" => "min",
+                            "rel_unit" => "minsize",
+                            "rel_value" => 0,
+                            "static" => 0
+                          },
+                          "unit" => "height",
+                          "value" => 0.5
+                        }
+                      }
+                    }
+                  ],
+                  "stroke_color" => "none"
                 }
-              }
-            ],
-            "stroke_color" => "inherit"
-          }
-        ]
-        "end" -> [%{
-          "fill_color" => "inherit",
-          "segments" => [
-            %{
-              "steps" => [
-                %{
-                  "arc" => %{
-                    "angle" => 0,
-                    "large" => false,
-                    "rx" => %{
-                      "offset" => %{
-                        "op" => "min",
-                        "rel_unit" => "minsize",
-                        "rel_value" => 0,
-                        "static" => 0
-                      },
-                      "unit" => "width",
-                      "value" => 0.5
-                    },
-                    "ry" => %{
-                      "offset" => %{
-                        "op" => "min",
-                        "rel_unit" => "minsize",
-                        "rel_value" => 0,
-                        "static" => 0
-                      },
-                      "unit" => "height",
-                      "value" => 0.5
-                    },
-                    "sweep" => false
-                  },
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 0
-                    },
-                    "unit" => "width",
-                    "value" => 1
+              ]
+          end
+          |> Enum.concat(
+            case type do
+              "standard" ->
+                []
+
+              "message" ->
+                if(throwing,
+                  do: [
+                    %{
+                      "fill_color" => "black",
+                      "segments" => [
+                        %{
+                          "steps" => [
+                            %{
+                              "relative" => true,
+                              "x" => %{
+                                "offset" => %{
+                                  "op" => "min",
+                                  "rel_unit" => "minsize",
+                                  "rel_value" => 0,
+                                  "static" => 0
+                                },
+                                "unit" => "minsize",
+                                "value" => 0.3
+                              },
+                              "y" => %{
+                                "offset" => %{
+                                  "op" => "max",
+                                  "rel_unit" => "minsize",
+                                  "rel_value" => -0.1,
+                                  "static" => -6
+                                },
+                                "unit" => "minsize",
+                                "value" => -0.2
+                              }
+                            },
+                            %{
+                              "relative" => true,
+                              "y" => %{
+                                "offset" => %{
+                                  "op" => "min",
+                                  "rel_unit" => "minsize",
+                                  "rel_value" => 0.1,
+                                  "static" => 0
+                                },
+                                "unit" => "minsize",
+                                "value" => 0.4
+                              }
+                            },
+                            %{
+                              "relative" => true,
+                              "x" => %{
+                                "offset" => %{
+                                  "op" => "min",
+                                  "rel_unit" => "minsize",
+                                  "rel_value" => 0,
+                                  "static" => 0
+                                },
+                                "unit" => "minsize",
+                                "value" => -0.6
+                              }
+                            },
+                            %{
+                              "relative" => true,
+                              "y" => %{
+                                "offset" => %{
+                                  "op" => "min",
+                                  "rel_unit" => "minsize",
+                                  "rel_value" => 0,
+                                  "static" => 0
+                                },
+                                "unit" => "minsize",
+                                "value" => -0.2
+                              }
+                            },
+                            %{
+                              "relative" => true,
+                              "y" => %{
+                                "offset" => %{
+                                  "op" => "min",
+                                  "rel_unit" => "minsize",
+                                  "rel_value" => 0.1,
+                                  "static" => 0
+                                },
+                                "unit" => "minsize",
+                                "value" => -0.2
+                              }
+                            }
+                          ],
+                          "start" => %{
+                            "relative" => false,
+                            "x" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0,
+                                "static" => 0
+                              },
+                              "unit" => "width",
+                              "value" => 0.5
+                            },
+                            "y" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0.1,
+                                "static" => 6
+                              },
+                              "unit" => "height",
+                              "value" => 0.5
+                            }
+                          }
+                        },
+                        %{
+                          "steps" => [
+                            %{
+                              "relative" => true,
+                              "x" => %{
+                                "offset" => %{
+                                  "op" => "min",
+                                  "rel_unit" => "minsize",
+                                  "rel_value" => 0,
+                                  "static" => 0
+                                },
+                                "unit" => "minsize",
+                                "value" => 0.3
+                              },
+                              "y" => %{
+                                "offset" => %{
+                                  "op" => "min",
+                                  "rel_unit" => "minsize",
+                                  "rel_value" => 0,
+                                  "static" => 0
+                                },
+                                "unit" => "minsize",
+                                "value" => -0.2
+                              }
+                            },
+                            %{
+                              "relative" => true,
+                              "x" => %{
+                                "offset" => %{
+                                  "op" => "min",
+                                  "rel_unit" => "minsize",
+                                  "rel_value" => 0,
+                                  "static" => 0
+                                },
+                                "unit" => "minsize",
+                                "value" => -0.6
+                              }
+                            }
+                          ],
+                          "start" => %{
+                            "relative" => false,
+                            "x" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0,
+                                "static" => 0
+                              },
+                              "unit" => "width",
+                              "value" => 0.5
+                            },
+                            "y" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0,
+                                "static" => 0
+                              },
+                              "unit" => "height",
+                              "value" => 0.5
+                            }
+                          }
+                        }
+                      ],
+                      "stroke_color" => "none"
+                    }
+                  ],
+                  else: [
+                    %{
+                      "fill_color" => "white",
+                      "segments" => [
+                        %{
+                          "steps" => [
+                            %{
+                              "relative" => true,
+                              "x" => %{
+                                "offset" => %{
+                                  "op" => "min",
+                                  "rel_unit" => "minsize",
+                                  "rel_value" => 0,
+                                  "static" => 0
+                                },
+                                "unit" => "minsize",
+                                "value" => -0.3
+                              },
+                              "y" => %{
+                                "offset" => %{
+                                  "op" => "min",
+                                  "rel_unit" => "minsize",
+                                  "rel_value" => 0,
+                                  "static" => 0
+                                },
+                                "unit" => "minsize",
+                                "value" => -0.2
+                              }
+                            },
+                            %{
+                              "relative" => true,
+                              "x" => %{
+                                "offset" => %{
+                                  "op" => "min",
+                                  "rel_unit" => "minsize",
+                                  "rel_value" => 0,
+                                  "static" => 0
+                                },
+                                "unit" => "minsize",
+                                "value" => 0.6
+                              }
+                            },
+                            %{
+                              "relative" => true
+                            }
+                          ],
+                          "start" => %{
+                            "relative" => false,
+                            "x" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0,
+                                "static" => 0
+                              },
+                              "unit" => "width",
+                              "value" => 0.5
+                            },
+                            "y" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0,
+                                "static" => 0
+                              },
+                              "unit" => "height",
+                              "value" => 0.5
+                            }
+                          }
+                        },
+                        %{
+                          "steps" => [
+                            %{
+                              "relative" => true,
+                              "y" => %{
+                                "offset" => %{
+                                  "op" => "min",
+                                  "rel_unit" => "minsize",
+                                  "rel_value" => 0,
+                                  "static" => 0
+                                },
+                                "unit" => "minsize",
+                                "value" => 0.4
+                              }
+                            },
+                            %{
+                              "relative" => true,
+                              "x" => %{
+                                "offset" => %{
+                                  "op" => "min",
+                                  "rel_unit" => "minsize",
+                                  "rel_value" => 0,
+                                  "static" => 0
+                                },
+                                "unit" => "minsize",
+                                "value" => -0.6
+                              }
+                            },
+                            %{
+                              "relative" => true,
+                              "y" => %{
+                                "offset" => %{
+                                  "op" => "min",
+                                  "rel_unit" => "minsize",
+                                  "rel_value" => 0,
+                                  "static" => 0
+                                },
+                                "unit" => "minsize",
+                                "value" => -0.4
+                              }
+                            },
+                            %{
+                              "relative" => true,
+                              "x" => %{
+                                "offset" => %{
+                                  "op" => "min",
+                                  "rel_unit" => "minsize",
+                                  "rel_value" => 0,
+                                  "static" => 0
+                                },
+                                "unit" => "minsize",
+                                "value" => 0.3
+                              },
+                              "y" => %{
+                                "offset" => %{
+                                  "op" => "min",
+                                  "rel_unit" => "minsize",
+                                  "rel_value" => 0,
+                                  "static" => 0
+                                },
+                                "unit" => "minsize",
+                                "value" => 0.2
+                              }
+                            }
+                          ],
+                          "start" => %{
+                            "relative" => true,
+                            "x" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0,
+                                "static" => 0
+                              },
+                              "unit" => "minsize",
+                              "value" => 0.3
+                            },
+                            "y" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0,
+                                "static" => 0
+                              },
+                              "unit" => "minsize",
+                              "value" => -0.2
+                            }
+                          }
+                        }
+                      ],
+                      "stroke_color" => "black"
+                    }
+                  ]
+                )
+
+              "terminate" ->
+                [
+                  %{
+                    "fill_color" => "black",
+                    "segments" => [
+                      %{
+                        "steps" => [
+                          %{
+                            "arc" => %{
+                              "angle" => 0,
+                              "large" => false,
+                              "rx" => %{
+                                "offset" => %{
+                                  "op" => "max",
+                                  "rel_unit" => "minsize",
+                                  "rel_value" => -0.1,
+                                  "static" => -10
+                                },
+                                "unit" => "width",
+                                "value" => 0.3
+                              },
+                              "ry" => %{
+                                "offset" => %{
+                                  "op" => "max",
+                                  "rel_unit" => "minsize",
+                                  "rel_value" => -0.1,
+                                  "static" => -10
+                                },
+                                "unit" => "height",
+                                "value" => 0.3
+                              },
+                              "sweep" => false
+                            },
+                            "relative" => true,
+                            "x" => %{
+                              "offset" => %{
+                                "op" => "max",
+                                "rel_unit" => "minsize",
+                                "rel_value" => -0.2,
+                                "static" => -20
+                              },
+                              "unit" => "width",
+                              "value" => 0.6
+                            }
+                          },
+                          %{
+                            "arc" => %{
+                              "angle" => 0,
+                              "large" => false,
+                              "rx" => %{
+                                "offset" => %{
+                                  "op" => "max",
+                                  "rel_unit" => "minsize",
+                                  "rel_value" => -0.1,
+                                  "static" => -10
+                                },
+                                "unit" => "width",
+                                "value" => 0.3
+                              },
+                              "ry" => %{
+                                "offset" => %{
+                                  "op" => "max",
+                                  "rel_unit" => "minsize",
+                                  "rel_value" => -0.1,
+                                  "static" => -10
+                                },
+                                "unit" => "height",
+                                "value" => 0.3
+                              },
+                              "sweep" => false
+                            },
+                            "relative" => true,
+                            "x" => %{
+                              "offset" => %{
+                                "op" => "min",
+                                "rel_unit" => "minsize",
+                                "rel_value" => 0.2,
+                                "static" => 20
+                              },
+                              "unit" => "width",
+                              "value" => -0.6
+                            }
+                          }
+                        ],
+                        "start" => %{
+                          "relative" => false,
+                          "x" => %{
+                            "offset" => %{
+                              "op" => "min",
+                              "rel_unit" => "minsize",
+                              "rel_value" => 0.1,
+                              "static" => 10
+                            },
+                            "unit" => "width",
+                            "value" => 0.2
+                          },
+                          "y" => %{
+                            "offset" => %{
+                              "op" => "min",
+                              "rel_unit" => "minsize",
+                              "rel_value" => 0,
+                              "static" => 0
+                            },
+                            "unit" => "height",
+                            "value" => 0.5
+                          }
+                        }
+                      }
+                    ],
+                    "stroke_color" => "none"
                   }
-                },
-                %{
-                  "arc" => %{
-                    "angle" => 0,
-                    "large" => false,
-                    "rx" => %{
-                      "offset" => %{
-                        "op" => "min",
-                        "rel_unit" => "minsize",
-                        "rel_value" => 0,
-                        "static" => 0
-                      },
-                      "unit" => "width",
-                      "value" => 0.5
-                    },
-                    "ry" => %{
-                      "offset" => %{
-                        "op" => "min",
-                        "rel_unit" => "minsize",
-                        "rel_value" => 0,
-                        "static" => 0
-                      },
-                      "unit" => "height",
-                      "value" => 0.5
-                    },
-                    "sweep" => false
-                  },
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 0
-                    },
-                    "unit" => "width",
-                    "value" => -1
-                  }
-                }
-              ],
-              "start" => %{
-                "relative" => false,
-                "x" => %{
-                  "offset" => %{
-                    "op" => "min",
-                    "rel_unit" => "minsize",
-                    "rel_value" => 0,
-                    "static" => 0
-                  },
-                  "unit" => "width",
-                  "value" => 0
-                },
-                "y" => %{
-                  "offset" => %{
-                    "op" => "min",
-                    "rel_unit" => "minsize",
-                    "rel_value" => 0,
-                    "static" => 0
-                  },
-                  "unit" => "height",
-                  "value" => 0.5
-                }
-              }
-            }
-          ],
-          "stroke_color" => "none"
-        },
-        %{
-          "fill_color" => "black",
-          "segments" => [
-            %{
-              "steps" => [
-                %{
-                  "arc" => %{
-                    "angle" => 0,
-                    "large" => false,
-                    "rx" => %{
-                      "offset" => %{
-                        "op" => "min",
-                        "rel_unit" => "minsize",
-                        "rel_value" => 0,
-                        "static" => 0
-                      },
-                      "unit" => "width",
-                      "value" => 0.5
-                    },
-                    "ry" => %{
-                      "offset" => %{
-                        "op" => "min",
-                        "rel_unit" => "minsize",
-                        "rel_value" => 0,
-                        "static" => 0
-                      },
-                      "unit" => "height",
-                      "value" => 0.5
-                    },
-                    "sweep" => false
-                  },
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 0
-                    },
-                    "unit" => "width",
-                    "value" => 1
-                  }
-                },
-                %{
-                  "arc" => %{
-                    "angle" => 0,
-                    "large" => false,
-                    "rx" => %{
-                      "offset" => %{
-                        "op" => "min",
-                        "rel_unit" => "minsize",
-                        "rel_value" => 0,
-                        "static" => 0
-                      },
-                      "unit" => "width",
-                      "value" => 0.5
-                    },
-                    "ry" => %{
-                      "offset" => %{
-                        "op" => "min",
-                        "rel_unit" => "minsize",
-                        "rel_value" => 0,
-                        "static" => 0
-                      },
-                      "unit" => "height",
-                      "value" => 0.5
-                    },
-                    "sweep" => false
-                  },
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 0
-                    },
-                    "unit" => "width",
-                    "value" => -1
-                  }
-                }
-              ],
-              "start" => %{
-                "relative" => false,
-                "x" => %{
-                  "offset" => %{
-                    "op" => "min",
-                    "rel_unit" => "minsize",
-                    "rel_value" => 0,
-                    "static" => 0
-                  },
-                  "unit" => "width",
-                  "value" => 0
-                },
-                "y" => %{
-                  "offset" => %{
-                    "op" => "min",
-                    "rel_unit" => "minsize",
-                    "rel_value" => 0,
-                    "static" => 0
-                  },
-                  "unit" => "height",
-                  "value" => 0.5
-                }
-              }
-            },
-            %{
-              "steps" => [
-                %{
-                  "arc" => %{
-                    "angle" => 0,
-                    "large" => false,
-                    "rx" => %{
-                      "offset" => %{
-                        "op" => "max",
-                        "rel_unit" => "width",
-                        "rel_value" => -0.25,
-                        "static" => -10
-                      },
-                      "unit" => "width",
-                      "value" => 0.5
-                    },
-                    "ry" => %{
-                      "offset" => %{
-                        "op" => "max",
-                        "rel_unit" => "height",
-                        "rel_value" => -0.25,
-                        "static" => -10
-                      },
-                      "unit" => "height",
-                      "value" => 0.5
-                    },
-                    "sweep" => false
-                  },
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "width",
-                      "rel_value" => 0.5,
-                      "static" => 20
-                    },
-                    "unit" => "width",
-                    "value" => -1
-                  }
-                },
-                %{
-                  "arc" => %{
-                    "angle" => 0,
-                    "large" => false,
-                    "rx" => %{
-                      "offset" => %{
-                        "op" => "max",
-                        "rel_unit" => "width",
-                        "rel_value" => -0.25,
-                        "static" => -10
-                      },
-                      "unit" => "width",
-                      "value" => 0.5
-                    },
-                    "ry" => %{
-                      "offset" => %{
-                        "op" => "max",
-                        "rel_unit" => "height",
-                        "rel_value" => -0.25,
-                        "static" => -10
-                      },
-                      "unit" => "height",
-                      "value" => 0.5
-                    },
-                    "sweep" => false
-                  },
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "max",
-                      "rel_unit" => "width",
-                      "rel_value" => -0.5,
-                      "static" => -20
-                    },
-                    "unit" => "width",
-                    "value" => 1
-                  }
-                }
-              ],
-              "start" => %{
-                "relative" => false,
-                "x" => %{
-                  "offset" => %{
-                    "op" => "max",
-                    "rel_unit" => "width",
-                    "rel_value" => -0.25,
-                    "static" => -10
-                  },
-                  "unit" => "width",
-                  "value" => 1
-                },
-                "y" => %{
-                  "offset" => %{
-                    "op" => "min",
-                    "rel_unit" => "minsize",
-                    "rel_value" => 0,
-                    "static" => 0
-                  },
-                  "unit" => "height",
-                  "value" => 0.5
-                }
-              }
-            }
-          ],
-          "stroke_color" => "none"
-        }
-      ]
-      end |> Enum.concat(
-        case type do
-          "standard" -> []
-          "message" -> if(throwing, do: [
-          %{
-          "fill_color" => "black",
-          "segments" => [
-            %{
-              "steps" => [
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 0
-                    },
-                    "unit" => "minsize",
-                    "value" => 0.3
-                  },
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "max",
-                      "rel_unit" => "minsize",
-                      "rel_value" => -0.1,
-                      "static" => -6
-                    },
-                    "unit" => "minsize",
-                    "value" => -0.2
-                  }
-                },
-                %{
-                  "relative" => true,
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0.1,
-                      "static" => 0
-                    },
-                    "unit" => "minsize",
-                    "value" => 0.4
-                  }
-                },
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 0
-                    },
-                    "unit" => "minsize",
-                    "value" => -0.6
-                  }
-                },
-                %{
-                  "relative" => true,
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 0
-                    },
-                    "unit" => "minsize",
-                    "value" => -0.2
-                  }
-                },
-                %{
-                  "relative" => true,
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0.1,
-                      "static" => 0
-                    },
-                    "unit" => "minsize",
-                    "value" => -0.2
-                  }
-                }
-              ],
-              "start" => %{
-                "relative" => false,
-                "x" => %{
-                  "offset" => %{
-                    "op" => "min",
-                    "rel_unit" => "minsize",
-                    "rel_value" => 0,
-                    "static" => 0
-                  },
-                  "unit" => "width",
-                  "value" => 0.5
-                },
-                "y" => %{
-                  "offset" => %{
-                    "op" => "min",
-                    "rel_unit" => "minsize",
-                    "rel_value" => 0.1,
-                    "static" => 6
-                  },
-                  "unit" => "height",
-                  "value" => 0.5
-                }
-              }
-            },
-            %{
-              "steps" => [
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 0
-                    },
-                    "unit" => "minsize",
-                    "value" => 0.3
-                  },
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 0
-                    },
-                    "unit" => "minsize",
-                    "value" => -0.2
-                  }
-                },
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 0
-                    },
-                    "unit" => "minsize",
-                    "value" => -0.6
-                  }
-                }
-              ],
-              "start" => %{
-                "relative" => false,
-                "x" => %{
-                  "offset" => %{
-                    "op" => "min",
-                    "rel_unit" => "minsize",
-                    "rel_value" => 0,
-                    "static" => 0
-                  },
-                  "unit" => "width",
-                  "value" => 0.5
-                },
-                "y" => %{
-                  "offset" => %{
-                    "op" => "min",
-                    "rel_unit" => "minsize",
-                    "rel_value" => 0,
-                    "static" => 0
-                  },
-                  "unit" => "height",
-                  "value" => 0.5
-                }
-              }
-            }
-          ],
-          "stroke_color" => "none"
-        }], else: [
-          %{
-          "fill_color" => "white",
-          "segments" => [
-            %{
-              "steps" => [
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 0
-                    },
-                    "unit" => "minsize",
-                    "value" => -0.3
-                  },
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 0
-                    },
-                    "unit" => "minsize",
-                    "value" => -0.2
-                  }
-                },
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 0
-                    },
-                    "unit" => "minsize",
-                    "value" => 0.6
-                  }
-                },
-                %{
-                  "relative" => true
-                }
-              ],
-              "start" => %{
-                "relative" => false,
-                "x" => %{
-                  "offset" => %{
-                    "op" => "min",
-                    "rel_unit" => "minsize",
-                    "rel_value" => 0,
-                    "static" => 0
-                  },
-                  "unit" => "width",
-                  "value" => 0.5
-                },
-                "y" => %{
-                  "offset" => %{
-                    "op" => "min",
-                    "rel_unit" => "minsize",
-                    "rel_value" => 0,
-                    "static" => 0
-                  },
-                  "unit" => "height",
-                  "value" => 0.5
-                }
-              }
-            },
-            %{
-              "steps" => [
-                %{
-                  "relative" => true,
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 0
-                    },
-                    "unit" => "minsize",
-                    "value" => 0.4
-                  }
-                },
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 0
-                    },
-                    "unit" => "minsize",
-                    "value" => -0.6
-                  }
-                },
-                %{
-                  "relative" => true,
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 0
-                    },
-                    "unit" => "minsize",
-                    "value" => -0.4
-                  }
-                },
-                %{
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 0
-                    },
-                    "unit" => "minsize",
-                    "value" => 0.3
-                  },
-                  "y" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0,
-                      "static" => 0
-                    },
-                    "unit" => "minsize",
-                    "value" => 0.2
-                  }
-                }
-              ],
-              "start" => %{
-                "relative" => true,
-                "x" => %{
-                  "offset" => %{
-                    "op" => "min",
-                    "rel_unit" => "minsize",
-                    "rel_value" => 0,
-                    "static" => 0
-                  },
-                  "unit" => "minsize",
-                  "value" => 0.3
-                },
-                "y" => %{
-                  "offset" => %{
-                    "op" => "min",
-                    "rel_unit" => "minsize",
-                    "rel_value" => 0,
-                    "static" => 0
-                  },
-                  "unit" => "minsize",
-                  "value" => -0.2
-                }
-              }
-            }
-          ],
-          "stroke_color" => "black"
-        }])       
-        "terminate" ->  [
-        %{
-          "fill_color" => "black",
-          "segments" => [
-            %{
-              "steps" => [
-                %{
-                  "arc" => %{
-                    "angle" => 0,
-                    "large" => false,
-                    "rx" => %{
-                      "offset" => %{
-                        "op" => "max",
-                        "rel_unit" => "minsize",
-                        "rel_value" => -0.1,
-                        "static" => -10
-                      },
-                      "unit" => "width",
-                      "value" => 0.3
-                    },
-                    "ry" => %{
-                      "offset" => %{
-                        "op" => "max",
-                        "rel_unit" => "minsize",
-                        "rel_value" => -0.1,
-                        "static" => -10
-                      },
-                      "unit" => "height",
-                      "value" => 0.3
-                    },
-                    "sweep" => false
-                  },
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "max",
-                      "rel_unit" => "minsize",
-                      "rel_value" => -0.2,
-                      "static" => -20
-                    },
-                    "unit" => "width",
-                    "value" => 0.6
-                  }
-                },
-                %{
-                  "arc" => %{
-                    "angle" => 0,
-                    "large" => false,
-                    "rx" => %{
-                      "offset" => %{
-                        "op" => "max",
-                        "rel_unit" => "minsize",
-                        "rel_value" => -0.1,
-                        "static" => -10
-                      },
-                      "unit" => "width",
-                      "value" => 0.3
-                    },
-                    "ry" => %{
-                      "offset" => %{
-                        "op" => "max",
-                        "rel_unit" => "minsize",
-                        "rel_value" => -0.1,
-                        "static" => -10
-                      },
-                      "unit" => "height",
-                      "value" => 0.3
-                    },
-                    "sweep" => false
-                  },
-                  "relative" => true,
-                  "x" => %{
-                    "offset" => %{
-                      "op" => "min",
-                      "rel_unit" => "minsize",
-                      "rel_value" => 0.2,
-                      "static" => 20
-                    },
-                    "unit" => "width",
-                    "value" => -0.6
-                  }
-                }
-              ],
-              "start" => %{
-                "relative" => false,
-                "x" => %{
-                  "offset" => %{
-                    "op" => "min",
-                    "rel_unit" => "minsize",
-                    "rel_value" => 0.1,
-                    "static" => 10
-                  },
-                  "unit" => "width",
-                  "value" => 0.2
-                },
-                "y" => %{
-                  "offset" => %{
-                    "op" => "min",
-                    "rel_unit" => "minsize",
-                    "rel_value" => 0,
-                    "static" => 0
-                  },
-                  "unit" => "height",
-                  "value" => 0.5
-                }
-              }
-            }
-          ],
-          "stroke_color" => "none"
-        }
-      ]
-        end
-      )
+                ]
+            end
+          )
       }
     end
   end

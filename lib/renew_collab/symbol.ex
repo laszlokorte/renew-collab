@@ -67,7 +67,7 @@ defmodule RenewCollab.Symbol do
   end
 
   def build_symbol_path(
-        %RenewCollab.Element.Box{
+        %{
           position_x: x,
           position_y: y,
           width: width,
@@ -81,15 +81,15 @@ defmodule RenewCollab.Symbol do
     |> Enum.map(fn segment ->
       start =
         {start_x, start_y} = {
-          build_coord(box, :x, segment.relative, extract_coord(:x, segment)),
-          build_coord(box, :y, segment.relative, extract_coord(:y, segment))
+          build_coord(box, :x, segment.relative, unify_coord(:x, segment)),
+          build_coord(box, :y, segment.relative, unify_coord(:y, segment))
         }
 
       {path_string, _end_pos} =
         segment.steps
         |> Enum.reduce(
           {
-            "#{if(segment.relative, do: "m", else: "M")} #{start_x} #{start_x}",
+            "#{svg_command(:move, segment.relative)} #{start_x} #{start_y}",
             start
           },
           fn step, {current_string, current_pos} ->
@@ -105,14 +105,12 @@ defmodule RenewCollab.Symbol do
           end
         )
 
-      path_string
+      :erlang.iolist_to_binary(path_string)
     end)
     |> Enum.join(" ")
-
-    "M #{x} #{y} h #{width} v #{height} h #{-width} v #{-height} z"
   end
 
-  defp extract_coord(:x, obj) do
+  defp unify_coord(:x, obj) do
     %{
       value: obj.x_value,
       unit: obj.x_unit,
@@ -125,7 +123,7 @@ defmodule RenewCollab.Symbol do
     }
   end
 
-  defp extract_coord(:y, obj) do
+  defp unify_coord(:y, obj) do
     %{
       value: obj.y_value,
       unit: obj.y_unit,
@@ -138,7 +136,7 @@ defmodule RenewCollab.Symbol do
     }
   end
 
-  defp extract_coord(:rx, obj) do
+  defp unify_coord(:rx, obj) do
     %{
       value: obj.rx_value,
       unit: obj.rx_unit,
@@ -151,7 +149,7 @@ defmodule RenewCollab.Symbol do
     }
   end
 
-  defp extract_coord(:ry, obj) do
+  defp unify_coord(:ry, obj) do
     %{
       value: obj.ry_value,
       unit: obj.ry_unit,
@@ -164,7 +162,7 @@ defmodule RenewCollab.Symbol do
     }
   end
 
-  defp build_step(box, start_pos, {current_x, current_y}, step) do
+  defp build_step(box, start_pos, {current_x, current_y} = current_pos, step) do
     # const relative = !!step.relative;
     # const vertical = !!step.vertical;
     # const horizontal = !!step.horizontal;
@@ -173,131 +171,96 @@ defmodule RenewCollab.Symbol do
 
     cond do
       step.arc ->
-        {"", {current_x, current_y}}
+        rx = build_coord(box, :x, true, unify_coord(:rx, step.arc))
+        ry = build_coord(box, :y, true, unify_coord(:ry, step.arc))
 
-        cond do
-          step.vertical != nil and step.horizontal != nil -> {"", {current_x, current_y}}
-          step.vertical != nil -> {"", {current_x, current_y}}
-          step.horizontal != nil -> {"", {current_x, current_y}}
-        end
+        angle = step.arc.angle
+        large = step.arc.large
+        sweep = step.arc.sweep
+
+        {x, y} =
+          cond do
+            step.vertical != nil and step.horizontal != nil ->
+              x = build_coord(box, :x, step.relative, unify_coord(:x, step.horizontal))
+              y = build_coord(box, :y, step.relative, unify_coord(:y, step.vertical))
+
+              {x, y}
+
+            step.vertical != nil ->
+              x = if(step.relative, do: 0, else: current_x)
+              y = build_coord(box, :y, step.relative, unify_coord(:y, step.vertical))
+
+              {x, y}
+
+            step.horizontal != nil ->
+              x = build_coord(box, :x, step.relative, unify_coord(:x, step.horizontal))
+              y = if(step.relative, do: 0, else: current_y)
+
+              {x, y}
+
+            true ->
+              x = if(step.relative, do: 0, else: current_x)
+              y = if(step.relative, do: 0, else: current_y)
+
+              {x, y}
+          end
+
+        {"#{svg_command(:arc, step.relative)} #{rx} #{ry} #{if(angle, do: 1, else: 0)} #{if(sweep, do: 1, else: 0)} #{if(large, do: 1, else: 0)}  #{x} #{y}",
+         svg_move(step.relative, current_pos, {x, y})}
 
       step.vertical != nil and step.horizontal != nil ->
-        {"", {current_x, current_y}}
+        x = build_coord(box, :x, step.relative, unify_coord(:x, step.horizontal))
+        y = build_coord(box, :y, step.relative, unify_coord(:y, step.vertical))
+
+        {"#{svg_command(:diagonal, step.relative)} #{x} #{y}",
+         svg_move(step.relative, current_pos, {x, y})}
 
       step.vertical != nil ->
-        y = build_coord(box, :x, step.relative, extract_coord(:y, step.vertical))
-        {"", {current_x, current_y}}
+        y = build_coord(box, :y, step.relative, unify_coord(:y, step.vertical))
+
+        {"#{svg_command(:vertical, step.relative)} #{y}",
+         svg_move(step.relative, current_pos, {nil, y})}
 
       step.horizontal != nil ->
-        x = build_coord(box, :x, step.relative, extract_coord(:x, step.horizontal))
-        {"", {current_x, current_y}}
+        x = build_coord(box, :x, step.relative, unify_coord(:x, step.horizontal))
+
+        {"#{svg_command(:horizontal, step.relative)} #{x}",
+         svg_move(step.relative, current_pos, {x, nil})}
 
       true ->
-        {if(step.relative, do: "z", else: "Z"), start_pos}
+        {svg_command(:close, step.relative), start_pos}
     end
-
-    # if (arc) {
-    #   const rx = buildCoord(box, "x", true, step.arc.rx);
-    #   const ry = buildCoord(box, "y", true, step.arc.ry);
-    #   const params =
-    #     rx +
-    #     "," +
-    #     ry +
-    #     "," +
-    #     (step.arc.angle ? 1 : 0) +
-    #     "," +
-    #     (step.arc.sweep ? 1 : 0) +
-    #     "," +
-    #     (step.arc.large ? 1 : 0);
-
-    #   if (diagonal) {
-    #     const x = buildCoord(box, "x", step.relative, step.horizontal);
-    #     const y = buildCoord(box, "y", step.relative, step.vertical);
-
-    #     return {
-    #       string: (relative ? "a" : "A") + params + "," + x + "," + y,
-    #       pos: relative
-    #         ? { x: currentX + x, y: currentY + y }
-    #         : { x, y },
-    #     };
-    #   } else if (vertical) {
-    #     const y = buildCoord(box, "y", step.relative, step.vertical);
-    #     return {
-    #       string:
-    #         (relative ? "a" : "A") +
-    #         params +
-    #         "," +
-    #         (relative ? 0 : currentX) +
-    #         "," +
-    #         y,
-    #       pos: relative
-    #         ? { x: currentX, y: currentY + y }
-    #         : { x: currentX, y },
-    #     };
-    #   } else if (horizontal) {
-    #     const x = buildCoord(box, "x", step.relative, step.horizontal);
-    #     return {
-    #       string:
-    #         (relative ? "a" : "A") +
-    #         params +
-    #         "," +
-    #         x +
-    #         "," +
-    #         (relative ? 0 : currentY),
-    #       pos: relative
-    #         ? { x: currentX + x, y: currentY }
-    #         : { x, y: currentY },
-    #     };
-    #   } else {
-    #     return {
-    #       string:
-    #         (relative ? "a" : "A") +
-    #         params +
-    #         "," +
-    #         (relative ? 0 : currentX) +
-    #         "," +
-    #         (relative ? 0 : currentY),
-    #       pos: relative
-    #         ? { x: currentX + x, y: currentY + y }
-    #         : { x: currentX, y: currentY },
-    #     };
-    #   }
-    # } else {
-    #   if (diagonal) {
-    #     const x = buildCoord(box, "x", step.relative, step.horizontal);
-    #     const y = buildCoord(box, "y", step.relative, step.vertical);
-    #     return {
-    #       string: (relative ? "l" : "L") + x + "," + y,
-    #       pos: relative
-    #         ? { x: currentX + x, y: currentY + y }
-    #         : { x, y },
-    #     };
-    #   } else if (vertical) {
-    #     const y = buildCoord(box, "y", step.relative, step.vertical);
-    #     return {
-    #       string: (relative ? "v" : "V") + y,
-    #       pos: relative
-    #         ? { x: currentX, y: currentY + y }
-    #         : { x: currentX, y },
-    #     };
-    #   } else if (horizontal) {
-    #     const x = buildCoord(box, "x", step.relative, step.horizontal);
-    #     return {
-    #       string: (relative ? "h" : "H") + x,
-    #       pos: relative
-    #         ? { x: currentX + x, y: currentY }
-    #         : { x, y: currentY },
-    #     };
-    #   } else {
-    #     return {
-    #       string: relative ? "z" : "Z",
-    #       pos: startPos,
-    #     };
-    #   }
-    # }
-
-    {"", {current_x, current_y}}
   end
+
+  defp svg_command(:close, true), do: "z"
+  defp svg_command(:close, false), do: "Z"
+  defp svg_command(:vertical, true), do: "v"
+  defp svg_command(:vertical, false), do: "V"
+  defp svg_command(:horizontal, true), do: "h"
+  defp svg_command(:horizontal, false), do: "H"
+  defp svg_command(:diagonal, true), do: "l"
+  defp svg_command(:diagonal, false), do: "L"
+  defp svg_command(:move, true), do: "m"
+  defp svg_command(:move, false), do: "M"
+  defp svg_command(:arc, true), do: "a"
+  defp svg_command(:arc, false), do: "A"
+
+  defp svg_move(true, {old_x, old_y}, {nil, arg_y}) when not is_nil(arg_y),
+    do: {old_x, old_y + arg_y}
+
+  defp svg_move(true, {old_x, old_y}, {arg_x, nil}) when not is_nil(arg_x),
+    do: {old_x + arg_x, old_y}
+
+  defp svg_move(true, {old_x, old_y}, {arg_x, arg_y})
+       when not is_nil(arg_x) and not is_nil(arg_y),
+       do: {old_x + arg_x, old_y + arg_y}
+
+  defp svg_move(false, {old_x, old_y}, {nil, arg_y}) when not is_nil(arg_y), do: {old_x, arg_y}
+  defp svg_move(false, {old_x, old_y}, {arg_x, nil}) when not is_nil(arg_x), do: {arg_x, old_y}
+
+  defp svg_move(false, {old_x, old_y}, {arg_x, arg_y})
+       when not is_nil(arg_x) and not is_nil(arg_y),
+       do: {arg_x, arg_y}
 
   defp build_coord(box, axis, relative, coord) do
     # const units = {
@@ -337,5 +300,5 @@ defmodule RenewCollab.Symbol do
 
   def op(:max, a, b), do: max(a, b)
   def op(:min, a, b), do: min(a, b)
-  def op(:sum, a, b), do: a + b
+  def op(:sum, a, b) when is_float(a) and is_float(b), do: a + b
 end
