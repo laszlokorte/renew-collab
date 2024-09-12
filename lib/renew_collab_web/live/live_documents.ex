@@ -4,7 +4,10 @@ defmodule RenewCollabWeb.LiveDocuments do
 
   alias RenewCollab.Renew
 
+  @topic "documents"
+
   def mount(_params, _session, socket) do
+    RenewCollabWeb.Endpoint.subscribe(@topic)
     socket = assign(socket, :documents, Renew.list_documents())
     {:ok, socket}
   end
@@ -19,5 +22,9 @@ defmodule RenewCollabWeb.LiveDocuments do
       <% end %>
     </div>
     """
+  end
+
+  def handle_info(%{topic: @topic, payload: state}, socket) do
+    {:noreply, socket |> assign(:documents, Renew.list_documents())}
   end
 end
