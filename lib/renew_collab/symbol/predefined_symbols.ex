@@ -15210,7 +15210,8 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     "unit" => "width",
                     "value" => 0
                   }
-                }
+                },
+                %{"relative" => false}
               ],
               "start" => %{
                 "relative" => false,
@@ -15281,8 +15282,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                     "unit" => "width",
                     "value" => 1
                   }
-                },
-                %{"relative" => false}
+                }
               ],
               "start" => %{
                 "relative" => false,
@@ -17182,6 +17182,667 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
                   },
                   "unit" => "height",
                   "value" => 0
+                }
+              }
+            }
+          ],
+          "stroke_color" => "inherit"
+        }
+      ]
+    },
+    %{
+      "name" => "arrow-tip-normal",
+      "paths" => [
+        %{
+          "fill_color" => "inherit",
+          "segments" => [
+            %{
+              "steps" => [
+                %{
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => -1.5
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => -1
+                  }
+                },
+                %{
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => -1.5
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 2
+                  }
+                },
+                %{
+                  "relative" => false
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "width",
+                  "value" => 1
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0.5
+                }
+              }
+            }
+          ],
+          "stroke_color" => "inherit"
+        }
+      ]
+    },
+    %{
+      "name" => "arrow-tip-double",
+      "paths" => [
+        %{
+          "fill_color" => "inherit",
+          "segments" => [
+            %{
+              "steps" => [
+                %{
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => -1.5
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => -1
+                  }
+                },
+                %{
+                  "relative" => false,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 0
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => -1.5
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => -0.9
+                  }
+                },
+                %{
+                  "relative" => false,
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 2
+                  }
+                },
+                %{
+                  "relative" => true,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 1.5
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => -0.9
+                  }
+                },
+                %{
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => -1.5
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 2
+                  }
+                },
+                %{
+                  "relative" => false
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "width",
+                  "value" => 1
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0.5
+                }
+              }
+            }
+          ],
+          "stroke_color" => "inherit"
+        }
+      ]
+    },
+    %{
+      "name" => "arrow-tip-lines",
+      "paths" => [
+        %{
+          "fill_color" => "none",
+          "segments" => [
+            %{
+              "steps" => [
+                %{
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "width",
+                      "rel_value" => 1,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 1
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 0.5
+                  }
+                },
+                %{
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "width",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => -1.5
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 2
+                  }
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => -1.5
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => -1
+                }
+              }
+            }
+          ],
+          "stroke_color" => "inherit"
+        }
+      ]
+    },
+    %{
+      "name" => "arrow-tip-triangle",
+      "paths" => [
+        %{
+          "fill_color" => "inherit",
+          "segments" => [
+            %{
+              "steps" => [
+                %{
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "width",
+                      "rel_value" => -1,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => -1
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => -1.5
+                  }
+                },
+                %{
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "width",
+                      "rel_value" => -1,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => -1
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 2.5
+                  }
+                },
+                %{
+                  "relative" => false
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "sum",
+                    "rel_unit" => "height",
+                    "rel_value" => 1.5,
+                    "static" => 0
+                  },
+                  "unit" => "width",
+                  "value" => 1
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0.5
+                }
+              }
+            }
+          ],
+          "stroke_color" => "inherit"
+        }
+      ]
+    },
+    %{
+      "name" => "arrow-tip-diamond",
+      "paths" => [
+        %{
+          "fill_color" => "inherit",
+          "segments" => [
+            %{
+              "steps" => [
+                %{
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => 0.5
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => -1.5
+                  }
+                },
+                %{
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "width",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => -1.5
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 0.5
+                  }
+                },
+                %{
+                  "relative" => false,
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "width",
+                    "value" => 0.5
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 2.5
+                  }
+                },
+                %{
+                  "relative" => false
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "sum",
+                    "rel_unit" => "width",
+                    "rel_value" => 1,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 1.5
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0.5
+                }
+              }
+            }
+          ],
+          "stroke_color" => "inherit"
+        }
+      ]
+    },
+    %{
+      "name" => "arrow-tip-circle",
+      "paths" => [
+        %{
+          "fill_color" => "inherit",
+          "segments" => [
+            %{
+              "steps" => [
+                %{
+                  "relative" => false,
+                  "arc" => %{
+                    "large" => true,
+                    "sweep" => true,
+                    "angle" => 0,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "sum",
+                        "rel_unit" => "width",
+                        "rel_value" => 0.5,
+                        "static" => 0
+                      },
+                      "unit" => "height",
+                      "value" => 0.5
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "sum",
+                        "rel_unit" => "width",
+                        "rel_value" => 0.5,
+                        "static" => 0
+                      },
+                      "unit" => "height",
+                      "value" => 0.5
+                    }
+                  },
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "width",
+                      "rel_value" => 1,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 1
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 0.5
+                  }
+                },
+                %{
+                  "relative" => false,
+                  "arc" => %{
+                    "large" => true,
+                    "sweep" => true,
+                    "angle" => 0,
+                    "rx" => %{
+                      "offset" => %{
+                        "op" => "sum",
+                        "rel_unit" => "width",
+                        "rel_value" => 0.5,
+                        "static" => 0
+                      },
+                      "unit" => "height",
+                      "value" => 0.5
+                    },
+                    "ry" => %{
+                      "offset" => %{
+                        "op" => "sum",
+                        "rel_unit" => "width",
+                        "rel_value" => 0.5,
+                        "static" => 0
+                      },
+                      "unit" => "height",
+                      "value" => 0.5
+                    }
+                  },
+                  "x" => %{
+                    "offset" => %{
+                      "op" => "sum",
+                      "rel_unit" => "width",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => -1
+                  },
+                  "y" => %{
+                    "offset" => %{
+                      "op" => "min",
+                      "rel_unit" => "minsize",
+                      "rel_value" => 0,
+                      "static" => 0
+                    },
+                    "unit" => "height",
+                    "value" => 0.5
+                  }
+                }
+              ],
+              "start" => %{
+                "relative" => false,
+                "x" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => -1
+                },
+                "y" => %{
+                  "offset" => %{
+                    "op" => "min",
+                    "rel_unit" => "minsize",
+                    "rel_value" => 0,
+                    "static" => 0
+                  },
+                  "unit" => "height",
+                  "value" => 0.5
                 }
               }
             }
