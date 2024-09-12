@@ -25,6 +25,7 @@ defmodule RenewCollab.Renew do
           from(e in Layer,
             order_by: [asc: :z_index],
             preload: [
+              direct_parent: [],
               box: [
                 symbol_shape: []
               ],
@@ -112,5 +113,17 @@ defmodule RenewCollab.Renew do
       style: [],
       sockets: []
     )
+  end
+
+  def toggle_visible(layer_id) do
+    query =
+      from(
+        l in Layer,
+        where: l.id == ^layer_id,
+        update: [set: [hidden: not l.hidden]]
+      )
+
+    # Update the record
+    Repo.update_all(query, [])
   end
 end

@@ -105,7 +105,64 @@ defmodule RenewCollabWeb.LiveDocument do
           <% end%>
         <% end %>
       </svg>
+
+      <div style="position: fixed; width: 40em; right: 0; top: 0; bottom: 0; overflow: auto">
+        <h2>Hierarchy</h2>
+      <table border="1" cellspacing="0" cellpadding="5">
+        <thead>
+          <tr>
+            <td width="20" align="center">Vis</td>
+            <td width="20" align="center">Box</td>
+            <td width="20" align="center">Text</td>
+            <td width="20" align="center">Edge</td>
+            <td width="20" align="right">Ord.</td>
+            <td>
+              ID/Type
+            </td>
+          </tr>
+        </thead>
+        <tbody>
+        <%= layer_hierarchy(assigns, 0, nil) %>
+      </tbody>
+      </table>
+      </div>
     </div>
+    """
+  end
+
+  defp layer_hierarchy(assigns, depth, nil) do
+    ~H"""
+        <%= for layer <- @document.layers, layer.direct_parent == nil do %> 
+          <%= layer_hierarchy_row(layer, depth) %>
+          <%= layer_hierarchy(assigns, depth+1, layer.id) %>
+        <% end %>
+    """
+  end
+
+  defp layer_hierarchy(assigns, depth, parent_id) do
+    ~H"""
+        <%= for layer <- @document.layers, layer.direct_parent, layer.direct_parent.ancestor_id == parent_id do %> 
+          <%= layer_hierarchy_row(layer, depth) %>
+          <%= layer_hierarchy(assigns, depth+1, layer.id) %>
+        <% end %>
+    """
+  end
+
+  defp layer_hierarchy_row(layer, depth) do
+    assigns = %{layer: layer}
+
+    ~H"""
+        <tr>
+          <td width="20" align="center" style="cursor:pointer;" phx-click="toggle_visible" phx-value-id={layer.id}><%= if layer.hidden do %><% else %>👁<% end %></td>
+          <td width="20" align="center"><%= if layer.box do %>☐<% end %></td>
+          <td width="20" align="center"><%= if layer.text do %>T<% end %></td>
+          <td width="20" align="center"><%= if layer.edge do %>⭝<% end %></td>
+          <td width="20" align="right"><%= layer.z_index %></td>
+          <td style={"padding-left: #{2*depth}em"}>
+            <%= layer.id %>
+            <br><small><code><%= layer.semantic_tag %></code></small>
+          </td>
+        </tr>
     """
   end
 
@@ -182,5 +239,13 @@ defmodule RenewCollabWeb.LiveDocument do
       end)
 
     [min_viewbox_x, min_viewbox_y, max_viewbox_x, max_viewbox_y] |> Enum.join(" ")
+  end
+
+  def handle_event("toggle_visible", %{"id" => id}, socket) do
+    Renew.toggle_visible(id)
+
+    {:noreply,
+     socket
+     |> assign(:document, Renew.get_document_with_elements!(socket.assigns.document.id))}
   end
 end

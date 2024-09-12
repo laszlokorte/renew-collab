@@ -15,6 +15,15 @@ defmodule RenewCollab.Hierarchy.Layer do
     has_one :style, RenewCollab.Style.LayerStyle, on_delete: :delete_all
     has_many :sockets, RenewCollab.Element.Socket, on_delete: :delete_all
 
+    has_one :direct_parent, RenewCollab.Hierarchy.LayerParenthood,
+      foreign_key: :descendant_id,
+      where: [depth: 1]
+
+    has_one :ancestors, RenewCollab.Hierarchy.LayerParenthood,
+      foreign_key: :descendant_id,
+      where: [depth: {:>, 0}],
+      preload_order: [asc: :depth]
+
     timestamps(type: :utc_datetime)
   end
 
