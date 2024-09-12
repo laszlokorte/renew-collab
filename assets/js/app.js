@@ -28,7 +28,7 @@ Hooks.ResizeRenewText = {
   // Callbacks
   mounted(e) { 
     const bbox = this.el.getBBox()
-    const sibling = this.el.previousElementSibling
+    const sibling = this.el.previousElementSibling.firstElementChild
     sibling.setAttribute('x', bbox.x)
     sibling.setAttribute('y', bbox.y)
     sibling.setAttribute('width', bbox.width)
@@ -37,7 +37,7 @@ Hooks.ResizeRenewText = {
   beforeUpdate() {  },
   updated() { 
     const bbox = this.el.getBBox()
-    const sibling = this.el.previousElementSibling
+    const sibling = this.el.previousElementSibling.firstElementChild
     sibling.setAttribute('x', bbox.x)
     sibling.setAttribute('y', bbox.y)
     sibling.setAttribute('width', bbox.width)

@@ -23,14 +23,16 @@ defmodule RenewCollabWeb.LiveDocument do
         <%= for {layer, i} <- @document.layers |> Enum.with_index do %> 
           <%= if not layer.hidden  do %>
           <%= if layer.text do %>
-          <g opacity={layer.style.opacity}>
-            <rect stroke-dasharray={layer.style.border_dash_array} stroke-width={layer.style.border_width} fill={layer.style.background_color} stroke={layer.style.border_color} id={"#{layer.text.id}-outline-box"} x={layer.text.position_x} y={layer.text.position_y} width={0} height={0}></rect>
+          <g opacity={layer.style.opacity}  id={"#{layer.text.id}-wrapper"}>
+            <g stroke-dasharray={layer.style.border_dash_array} stroke-width={layer.style.border_width} fill={layer.style.background_color} stroke={layer.style.border_color} >
+              <rect id={"#{layer.text.id}-outline-box"} phx-update="ignore" x={layer.text.position_x} y={layer.text.position_y} width="0" height="0"></rect>
+            </g>
             <text 
               fill={layer.text.style.text_color}
               font-weight={if(layer.text.style.bold, do: "bold", else: "normal")}
               font-style={if(layer.text.style.italic, do: "italic", else: "normal")}
               text-decoration={if(layer.text.style.underline, do: "underline", else: "none")}
-              font-size={layer.text.style.font_size} font-family={layer.text.style.font_family} id={"#{layer.text.id}"} phx-hook="ResizeRenewText" x={layer.text.position_x} y={layer.text.position_y}>
+              font-size={layer.text.style.font_size} font-family={layer.text.style.font_family} id={"#{layer.text.id}-text"} phx-hook="ResizeRenewText" x={layer.text.position_x} y={layer.text.position_y}>
               <%= for line <- layer.text.body |> String.split("\n") do %>
                 <tspan x={layer.text.position_x} dy="1em"><%= line %></tspan>
               <% end %>
@@ -70,32 +72,32 @@ defmodule RenewCollabWeb.LiveDocument do
             stroke-line-cap={layer.edge.style.stroke_cap}
             stroke-dasharray={layer.edge.style.stroke_dash_array} stroke="black" d={edge_path(layer.edge)} fill="none"></path>
 
-            <%= if layer.edge.style.source_tip do %>
+            <%= if layer.edge.style.source_tip_symbol_shape_id do %>
             <g transform={"rotate(#{edge_angle(:source, layer.edge)} #{layer.edge.source_x} #{layer.edge.source_y})"}>
               <rect opacity="0.5" fill="red" x={layer.edge.source_x - 20} y={layer.edge.source_y - 5} width="20" height="10" />
 
-               <%= for path <- Enum.find_value(@symbols, fn {_, s} -> if(s.name == "triangle-right", do: s) end).paths do %> 
+               <%= for path <- @symbols[layer.edge.style.source_tip_symbol_shape_id].paths do %> 
                   <path stroke={path.stroke_color} fill={path.fill_color} d={Symbol.build_symbol_path(%{
-                    position_x: layer.edge.source_x - 10,
-                    position_y: layer.edge.source_y - 5,
-                    width: 10,
-                    height: 10,
+                    position_x: layer.edge.source_x - (Integer.parse(layer.edge.style.stroke_width) |> elem(0)),
+                    position_y: layer.edge.source_y - (Integer.parse(layer.edge.style.stroke_width) |> elem(0)),
+                    width: (Integer.parse(layer.edge.style.stroke_width) |> elem(0))*2,
+                    height: (Integer.parse(layer.edge.style.stroke_width) |> elem(0))*2,
                 }, path)} fill-rule="evenodd" />
                 <% end %>
             </g>
             <% end %>
 
 
-            <%= if layer.edge.style.target_tip do %>
+            <%= if layer.edge.style.target_tip_symbol_shape_id do %>
             <g transform={"rotate(#{edge_angle(:target, layer.edge)} #{layer.edge.target_x} #{layer.edge.target_y})"}>
               <rect opacity="0.5" fill="red" x={layer.edge.target_x - 20} y={layer.edge.target_y - 5} width="20" height="10" />
 
-               <%= for path <- Enum.find_value(@symbols, fn {_, s} -> if(s.name == "triangle-right", do: s) end).paths do %> 
+               <%= for path <- @symbols[layer.edge.style.target_tip_symbol_shape_id].paths do %> 
                   <path stroke={path.stroke_color} fill={path.fill_color} d={Symbol.build_symbol_path(%{
-                    position_x: layer.edge.target_x - 10,
-                    position_y: layer.edge.target_y - 5,
-                    width: 10,
-                    height: 10,
+                    position_x: layer.edge.target_x - (Integer.parse(layer.edge.style.stroke_width) |> elem(0)),
+                    position_y: layer.edge.target_y - (Integer.parse(layer.edge.style.stroke_width) |> elem(0)),
+                    width: (Integer.parse(layer.edge.style.stroke_width) |> elem(0))*2,
+                    height: (Integer.parse(layer.edge.style.stroke_width) |> elem(0))*2,
                 }, path)}   fill-rule="evenodd" />
                 <% end %>
             </g>
@@ -149,7 +151,7 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   defp layer_hierarchy_row(layer, depth) do
-    assigns = %{layer: layer}
+    assigns = %{layer: layer, depth: depth}
 
     ~H"""
         <tr>
@@ -158,7 +160,7 @@ defmodule RenewCollabWeb.LiveDocument do
           <td width="20" align="center"><%= if layer.text do %>T<% end %></td>
           <td width="20" align="center"><%= if layer.edge do %>⭝<% end %></td>
           <td width="20" align="right"><%= layer.z_index %></td>
-          <td style={"padding-left: #{2*depth}em"}>
+          <td style={"padding-left: #{2*@depth}em"}>
             <%= layer.id %>
             <br><small><code><%= layer.semantic_tag %></code></small>
           </td>

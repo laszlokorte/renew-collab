@@ -184,6 +184,20 @@ defmodule RenewCollab.Import.DocumentImport do
                         convert_line_decoration(
                           resolve_ref(refs, Map.get(fields, :end_decoration))
                         ),
+                      "source_tip_symbol_shape_id" =>
+                        Map.get(
+                          symbol_ids,
+                          convert_line_decoration(
+                            resolve_ref(refs, Map.get(fields, :start_decoration))
+                          )
+                        ),
+                      "target_tip_symbol_shape_id" =>
+                        Map.get(
+                          symbol_ids,
+                          convert_line_decoration(
+                            resolve_ref(refs, Map.get(fields, :start_decoration))
+                          )
+                        ),
                       "smoothness" => ""
                     }
                 end
@@ -267,21 +281,20 @@ defmodule RenewCollab.Import.DocumentImport do
   defp convert_line_decoration(nil), do: nil
 
   defp convert_line_decoration(%Renewex.Storable{
-         class_name: class_name,
-         fields: %{
-           angle: angle,
-           outer_radius: outer_radius,
-           inner_radius: inner_radius,
-           filled: filled
-         }
+         class_name: class_name
        }) do
-    "#{class_name}(#{angle}:#{outer_radius}:#{inner_radius}:#{filled})"
-  end
-
-  defp convert_line_decoration(%Renewex.Storable{
-         class_name: "de.renew.gui.CircleDecoration" = class_name
-       }) do
-    "#{class_name}"
+    case class_name do
+      "de.renew.gui.AssocArrowTip" -> "arrow-tip-normal"
+      "de.renew.diagram.AssocArrowTip" -> "arrow-tip-normal"
+      "de.renew.gui.CompositionArrowTip" -> "arrow-tip-lines"
+      "de.renew.gui.IsaArrowTip" -> "arrow-tip-triangle"
+      "de.renew.gui.fs.IsaArrowTip" -> "arrow-tip-triangle"
+      "de.renew.gui.fs.AssocArrowTip" -> "arrow-tip-normal"
+      "de.renew.diagram.SynchronousMessageArrowTip" -> "arrow-tip-lines"
+      "de.renew.gui.CircleDecoration" -> "arrow-tip-circle"
+      "CH.ifa.draw.figures.ArrowTip" -> "arrow-tip-normal"
+      "de.renew.gui.DoubleArrowTip" -> "arrow-tip-double"
+    end
   end
 
   defp convert_line_decoration(other), do: dbg(other)
