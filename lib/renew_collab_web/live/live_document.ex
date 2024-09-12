@@ -116,7 +116,7 @@ defmodule RenewCollabWeb.LiveDocument do
     {:noreply, socket}
   end
 
-  def handle_event("repair_hierarchy", %{"value" => ""}, socket) do
+  def handle_event("repair_hierarchy", %{}, socket) do
     RenewCollab.RenewHierarchy.repair_parenthood(socket.assigns.document.id)
 
     {:noreply,

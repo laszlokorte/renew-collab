@@ -24,24 +24,40 @@ import topbar from "../vendor/topbar"
 
 let Hooks = {}
 
-Hooks.ResizeRenewText = {
-  // Callbacks
-  mounted(e) { 
-    const bbox = this.el.getBBox()
-    const sibling = this.el.previousElementSibling.firstElementChild
+function renewTextAlignment(el) {
+  const bbox = el.getBBox()
+
+  if(el.previousElementSibling.hasAttribute("data-background-box")) {
+     const sibling = el.previousElementSibling.firstElementChild
     sibling.setAttribute('x', bbox.x)
     sibling.setAttribute('y', bbox.y)
     sibling.setAttribute('width', bbox.width)
     sibling.setAttribute('height', bbox.height)
+  }
+
+  const origX = parseFloat(el.getAttribute("x"))
+  const align = el.getAttribute("data-text-anchor")
+  const weight = {
+    'start': 0,
+    'middle':0.5,
+    'end':1,
+  }[align||"start"]
+  const children = Array.from(el.children)
+  for(let c=children.length-1;c>=0;c--) {
+    children[c].setAttribute('x', bbox.x + weight*bbox.width)
+  }
+  el.setAttribute("text-anchor", align)
+  el.setAttribute('x', bbox.x + weight*bbox.width)
+}
+
+Hooks.ResizeRenewText = {
+  // Callbacks
+  mounted() { 
+    renewTextAlignment(this.el)
   },
   beforeUpdate() {  },
   updated() { 
-    const bbox = this.el.getBBox()
-    const sibling = this.el.previousElementSibling.firstElementChild
-    sibling.setAttribute('x', bbox.x)
-    sibling.setAttribute('y', bbox.y)
-    sibling.setAttribute('width', bbox.width)
-    sibling.setAttribute('height', bbox.height)
+    renewTextAlignment(this.el)
   },
   destroyed() {  },
   disconnected() {  },
