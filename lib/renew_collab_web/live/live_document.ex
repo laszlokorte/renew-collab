@@ -9,6 +9,8 @@ defmodule RenewCollabWeb.LiveDocument do
     socket =
       socket
       |> assign(:document, Renew.get_document_with_elements!(id))
+      |> assign(:hierachy_missing, RenewCollab.RenewHierarchy.find_missing(id))
+      |> assign(:hierachy_invalid, RenewCollab.RenewHierarchy.find_invalids(id))
       |> assign(:selection, nil)
       |> assign(:symbols, Symbol.list_shapes() |> Enum.map(fn s -> {s.id, s} end) |> Map.new())
 
@@ -23,13 +25,24 @@ defmodule RenewCollabWeb.LiveDocument do
       <.link href={~p"/live/documents"}>Back</.link>
       <h2><%= @document.name %></h2>
       <svg id={"document-#{@document.id}"} viewBox={viewbox(@document)} style="display: block;" width="1000" height="1000">
-        <%= for {layer, i} <- @document.layers |> Enum.with_index do %> 
-          <.live_component id={layer.id} module={RenewCollabWeb.HierarchyLayerComponent} layer={layer}  selected={@selection == layer.id} symbols={@symbols} />
+        <%= for layer <- @document.layers, layer.direct_parent == nil do %> 
+          <.live_component id={layer.id} module={RenewCollabWeb.HierarchyLayerComponent} document={@document} layer={layer} selection={@selection} selected={@selection == layer.id} symbols={@symbols} />
         <% end %>
       </svg>
 
-      <div style="position: fixed; width: 40em; right: 0; top: 0; bottom: 0; overflow: auto">
+      <div style="position: fixed; width: 40em; right: 0; top: 0; bottom: 0; overflow: auto;">
         <h2>Hierarchy</h2>
+        <div>
+          <dl style="display: grid; grid-template-columns: auto auto; justify-content: start; gap: 1ex 1em">
+            <dt style="margin: 0">Missing Parenthoods</dt>
+            <dd style="margin: 0"><%= Enum.count(@hierachy_missing)%></dd>
+            <dt style="margin: 0">Invalid Parenthoods</dt>
+            <dd style="margin: 0"><%= Enum.count(@hierachy_invalid)%></dd>
+          </dl>
+
+          <button type="button" phx-click="repair_hierarchy">Repair</button>
+        </div>
+
       <table border="1" cellspacing="0" cellpadding="5">
         <thead>
           <tr>
@@ -44,7 +57,7 @@ defmodule RenewCollabWeb.LiveDocument do
           </tr>
         </thead>
         <tbody>
-        <.live_component id={"hierarchy-list"} module={RenewCollabWeb.HierarchyListComponent} document={@document} selection={@selection}  symbols={@symbols} />
+        <.live_component id={"hierarchy-list"} module={RenewCollabWeb.HierarchyListComponent} document={@document} selection={@selection} symbols={@symbols} />
 
       </tbody>
       </table>
@@ -101,6 +114,22 @@ defmodule RenewCollabWeb.LiveDocument do
     )
 
     {:noreply, socket}
+  end
+
+  def handle_event("repair_hierarchy", %{"value" => ""}, socket) do
+    RenewCollab.RenewHierarchy.repair_parenthood(socket.assigns.document.id)
+
+    {:noreply,
+     socket
+     |> assign(
+       :hierachy_missing,
+       RenewCollab.RenewHierarchy.find_missing(socket.assigns.document.id)
+     )
+     |> assign(
+       :hierachy_invalid,
+       RenewCollab.RenewHierarchy.find_invalids(socket.assigns.document.id)
+     )
+     |> assign(:document, Renew.get_document_with_elements!(socket.assigns.document.id))}
   end
 
   def handle_event("select_layer", %{"id" => id}, socket) do

@@ -16,10 +16,11 @@ defmodule RenewCollab.Import.DocumentImport do
       unique_figs =
         figs
         |> Enum.group_by(fn {{_, uid}, _} -> uid end)
-        |> Enum.map(fn {uid, [first | _]} -> first end)
+        |> Enum.map(fn {uid, dupls} -> List.last(dupls) end)
 
       hierarchy = Enum.flat_map(figures, fn fig -> collect_hierarchy(fig, refs_with_ids) end)
 
+      # raise "x"
       # FrameColor
       # FillColor
       # TextColor
@@ -453,6 +454,7 @@ defmodule RenewCollab.Import.DocumentImport do
     case Enum.at(refs_with_ids, r) do
       {%Renewex.Storable{class_name: class_name, fields: %{figures: figures}}, _} = el ->
         figures
+        |> fix_hierarchy_order(class_name)
         |> Enum.with_index()
         |> Enum.flat_map(fn {fig, i} ->
           collect_nested_figures(fig, i, refs_with_ids)
@@ -473,10 +475,17 @@ defmodule RenewCollab.Import.DocumentImport do
     end
   end
 
+  defp fix_hierarchy_order(refs, "de.renew.netcomponents.NetComponentFigure") do
+    refs |> Enum.sort_by(fn {:ref, ref_index} -> ref_index end)
+  end
+
+  defp fix_hierarchy_order(refs, _), do: refs
+
   defp collect_hierarchy({:ref, r}, refs_with_ids, ancestors \\ []) do
     case Enum.at(refs_with_ids, r) do
       {%Renewex.Storable{class_name: class_name, fields: %{figures: figures}}, own_id} = el ->
         figures
+        |> fix_hierarchy_order(class_name)
         |> Enum.flat_map(fn fig ->
           collect_hierarchy(
             fig,

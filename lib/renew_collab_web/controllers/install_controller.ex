@@ -7,6 +7,7 @@ defmodule RenewCollabWeb.InstallController do
 
   def reset(conn, _params) do
     Symbol.reset()
+    RenewCollab.Renew.reset()
 
     RenewCollab.Auth.create_account("test@test.de", "secret")
 

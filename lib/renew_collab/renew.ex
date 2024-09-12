@@ -11,6 +11,10 @@ defmodule RenewCollab.Renew do
   alias RenewCollab.Connection.Waypoint
   alias RenewCollab.Hierarchy.LayerParenthood
 
+  def reset do
+    Repo.delete_all(Document)
+  end
+
   def list_documents do
     Repo.all(Document, order_by: [asc: :inserted_at])
   end
