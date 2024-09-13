@@ -9,6 +9,8 @@ defmodule RenewCollab.Renew do
   alias RenewCollab.Document.Document
   alias RenewCollab.Hierarchy.Layer
   alias RenewCollab.Style.LayerStyle
+  alias RenewCollab.Style.EdgeStyle
+  alias RenewCollab.Style.TextStyle
   alias RenewCollab.Connection.Waypoint
   alias RenewCollab.Hierarchy.LayerParenthood
 
@@ -132,16 +134,73 @@ defmodule RenewCollab.Renew do
     Repo.update_all(query, [])
   end
 
-  def update_layer_style(document_id, layer_id, :background_color, color) do
+  def layer_style_key("opacity"), do: :opacity
+  def layer_style_key("background_color"), do: :background_color
+  def layer_style_key("border_color"), do: :border_color
+  def layer_style_key("border_width"), do: :border_width
+  def layer_style_key("border_dash_array"), do: :border_dash_array
+
+  def update_layer_style(document_id, layer_id, style_attr, color) do
     Ecto.Multi.new()
     |> Ecto.Multi.one(:layer, from(l in Layer, where: l.id == ^layer_id))
     |> Ecto.Multi.insert(
       :style,
       fn %{layer: layer} ->
         Ecto.build_assoc(layer, :style)
-        |> LayerStyle.changeset(%{"background_color" => color})
+        |> LayerStyle.changeset(%{style_attr => color})
       end,
-      on_conflict: {:replace, [:background_color]}
+      on_conflict: {:replace, [style_attr]}
+    )
+    |> Repo.transaction()
+  end
+
+  def layer_edge_style_key("stroke_width"), do: :stroke_width
+  def layer_edge_style_key("stroke_color"), do: :stroke_color
+  def layer_edge_style_key("stroke_join"), do: :stroke_join
+  def layer_edge_style_key("stroke_cap"), do: :stroke_cap
+  def layer_edge_style_key("stroke_dash_array"), do: :stroke_dash_array
+  def layer_edge_style_key("smoothness"), do: :smoothness
+  def layer_edge_style_key("source_tip_symbol_shape_id"), do: :source_tip_symbol_shape_id
+  def layer_edge_style_key("target_tip_symbol_shape_id"), do: :target_tip_symbol_shape_id
+
+  def update_layer_edge_style(document_id, layer_id, style_attr, color) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.one(
+      :edge,
+      from(l in Layer, join: e in assoc(l, :edge), where: l.id == ^layer_id, select: e)
+    )
+    |> Ecto.Multi.insert(
+      :style,
+      fn %{edge: edge} ->
+        Ecto.build_assoc(edge, :style)
+        |> EdgeStyle.changeset(%{style_attr => color})
+      end,
+      on_conflict: {:replace, [style_attr]}
+    )
+    |> Repo.transaction()
+  end
+
+  def layer_text_style_key("italic"), do: :italic
+  def layer_text_style_key("underline"), do: :underline
+  def layer_text_style_key("alignment"), do: :alignment
+  def layer_text_style_key("font_size"), do: :font_size
+  def layer_text_style_key("font_family"), do: :font_family
+  def layer_text_style_key("bold"), do: :bold
+  def layer_text_style_key("text_color"), do: :text_color
+
+  def update_layer_text_style(document_id, layer_id, style_attr, color) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.one(
+      :text,
+      from(l in Layer, join: e in assoc(l, :text), where: l.id == ^layer_id, select: e)
+    )
+    |> Ecto.Multi.insert(
+      :style,
+      fn %{text: text} ->
+        Ecto.build_assoc(text, :style)
+        |> TextStyle.changeset(%{style_attr => color})
+      end,
+      on_conflict: {:replace, [style_attr]}
     )
     |> Repo.transaction()
   end

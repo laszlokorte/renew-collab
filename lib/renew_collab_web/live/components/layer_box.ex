@@ -28,7 +28,7 @@ defmodule RenewCollabWeb.HierarchyLayerBoxComponent do
       <% end %>
 
       <%= if @selected do %>
-        <rect stroke="magenta" stroke-width="4" fill="magenta" fill-opacity="0.2" id={"box-select-#{@layer.box.id}"} x={@layer.box.position_x} y={@layer.box.position_y} width={@layer.box.width} height={@layer.box.height}></rect>
+        <rect stroke="magenta" stroke-linejoin="round" stroke-linecap="round" opacity="0.3" stroke-width="4" fill="magenta" fill-opacity="0.2" id={"box-select-#{@layer.box.id}"} x={@layer.box.position_x} y={@layer.box.position_y} width={@layer.box.width} height={@layer.box.height}></rect>
       <% end %>
     </g>
     """

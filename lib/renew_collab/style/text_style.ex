@@ -7,11 +7,11 @@ defmodule RenewCollab.Style.TextStyle do
   schema "element_text_style" do
     field :italic, :boolean, default: false
     field :underline, :boolean, default: false
-    field :alignment, Ecto.Enum, values: [:left, :center, :right]
-    field :font_size, :float
-    field :font_family, :string
+    field :alignment, Ecto.Enum, values: [:left, :center, :right], default: :left
+    field :font_size, :float, default: 12.0
+    field :font_family, :string, default: "sans-serif"
     field :bold, :boolean, default: false
-    field :text_color, :string
+    field :text_color, :string, default: "black"
     belongs_to :text, RenewCollab.Element.Text
 
     timestamps(type: :utc_datetime)

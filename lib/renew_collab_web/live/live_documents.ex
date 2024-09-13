@@ -73,6 +73,9 @@ defmodule RenewCollabWeb.LiveDocuments do
     """
   end
 
+  defp blank?(str_or_nil),
+    do: "" == str_or_nil |> to_string() |> String.trim()
+
   def handle_event("duplicate", %{"id" => id}, socket) do
     # TODO
     {:noreply, socket}
@@ -81,9 +84,6 @@ defmodule RenewCollabWeb.LiveDocuments do
   def handle_event("validate", params, socket) do
     {:noreply, assign(socket, import_form: to_form(params))}
   end
-
-  defp blank?(str_or_nil),
-    do: "" == str_or_nil |> to_string() |> String.trim()
 
   def handle_event("create_document", params, socket) do
     case consume_uploaded_entries(socket, :import_file, fn %{path: path},

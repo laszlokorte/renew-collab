@@ -28,6 +28,9 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
           <%= if @selected do %>
             <text 
             stroke="magenta"
+            stroke-linejoin="round" 
+            stroke-linecap="round"
+            opacity="0.3"
             stroke-width="5"
             fill="none"
             phx-hook="ResizeRenewText" 

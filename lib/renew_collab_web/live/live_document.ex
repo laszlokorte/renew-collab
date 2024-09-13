@@ -141,12 +141,69 @@ defmodule RenewCollabWeb.LiveDocument do
         %{
           "layer_id" => layer_id,
           "element" => "layer",
-          "style" => "background_color",
+          "style" => style_attr,
           "value" => color
         },
         socket
       ) do
-    Renew.update_layer_style(socket.assigns.document.id, layer_id, :background_color, color)
+    Renew.update_layer_style(
+      socket.assigns.document.id,
+      layer_id,
+      Renew.layer_style_key(style_attr),
+      color
+    )
+
+    RenewCollabWeb.Endpoint.broadcast!(
+      "document:#{socket.assigns.document.id}",
+      "layer:update",
+      %{"id" => layer_id}
+    )
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "update_style",
+        %{
+          "layer_id" => layer_id,
+          "element" => "edge",
+          "style" => style_attr,
+          "value" => color
+        },
+        socket
+      ) do
+    Renew.update_layer_edge_style(
+      socket.assigns.document.id,
+      layer_id,
+      Renew.layer_edge_style_key(style_attr),
+      color
+    )
+
+    RenewCollabWeb.Endpoint.broadcast!(
+      "document:#{socket.assigns.document.id}",
+      "layer:update",
+      %{"id" => layer_id}
+    )
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "update_style",
+        %{
+          "layer_id" => layer_id,
+          "element" => "text",
+          "style" => style_attr,
+          "value" => color
+        },
+        socket
+      ) do
+    Renew.update_layer_text_style(
+      socket.assigns.document.id,
+      layer_id,
+      Renew.layer_text_style_key(style_attr),
+      color
+    )
 
     RenewCollabWeb.Endpoint.broadcast!(
       "document:#{socket.assigns.document.id}",

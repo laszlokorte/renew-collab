@@ -6659,7 +6659,7 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
       const rnwLayerId = this.el.getAttribute("rnw-layer-id");
       this.el.addEventListener("change", (evt) => {
         this.pushEvent("update_style", {
-          value: evt.currentTarget.value,
+          value: ["radio", "checkbox"].indexOf(evt.currentTarget.type) > -1 ? evt.currentTarget.checked : evt.currentTarget.value,
           element: rnwElement,
           style: rnwStyle,
           layer_id: rnwLayerId

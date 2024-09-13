@@ -22,8 +22,64 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
           <% end %>
         </td>
         <td width="20" align="right"><%= @layer.z_index %></td>
-        <td width="20" align="right"><input value={style_or_default(@layer, :background_color)} id={"#{@layer.id}-layer_background"} phx-hook="RenewStyleAttribute" rnw-layer-id={"#{@layer.id}"} rnw-element="layer" rnw-style="background_color" style="padding: 0; width: 2em; height: 2em" type="color" /></td>
-        <td style={"cursor: pointer; padding-left: #{2*@depth}em"} phx-click="select_layer" phx-value-id={@layer.id}><%= @layer.id %><br><small><code><%= @layer.semantic_tag %></code></small></td>
+        <td style={"cursor: pointer; padding-left: #{2*@depth}em"} phx-click="select_layer" phx-value-id={@layer.id}>
+          <%= @layer.id %><br><small><code><%= @layer.semantic_tag %></code></small>
+
+          <%= if @selected do %>
+          <div>
+            <%= for {attr, type} <- [
+            opacity: :number,
+            background_color: :color,
+            border_color: :color,
+            border_width: :number,
+            border_dash_array: :text,
+            ] do %>
+            <label>
+              <%= attr %>
+            <input value={style_or_default(@layer, attr)} id={"layer-style-#{@layer.id}-#{attr}"} phx-hook="RenewStyleAttribute" rnw-layer-id={"#{@layer.id}"} rnw-element="layer" rnw-style={attr} style="padding: 0; " type={type} />
+            </label>
+            <br>
+            <% end %>
+          </div>
+          <%= unless is_nil(@layer.edge) do %>
+          <div>
+            <%= for {attr, type} <- [
+            stroke_width: :number,
+            stroke_color: :color,
+            stroke_join: :text,
+            stroke_cap: :text,
+            stroke_dash_array: :text,
+            smoothness: :number,
+            source_tip_symbol_shape_id: :number,
+            target_tip_symbol_shape_id: :number,
+            ] do %>
+            <label>
+              <%= attr %>
+            <input value={style_or_default(@layer.edge, attr)} id={"edge-style#{@layer.id}-#{attr}"} phx-hook="RenewStyleAttribute" rnw-layer-id={"#{@layer.id}"} rnw-element="edge" rnw-style={attr} style="padding: 0; " type={type} />
+            </label><br>
+            <% end %>
+          </div>
+          <% end %>
+          <%= unless is_nil(@layer.text) do %>
+          <div>
+            <%= for {attr, type} <- [
+            bold: :checkbox,
+            italic: :checkbox,
+            underline: :checkbox,
+            alignment: :text,
+            font_size: :number,
+            font_family: :text,
+            text_color: :color,
+            ] do %>
+            <label>
+              <%= attr %>
+            <input {if(type == :checkbox, do: [checked: style_or_default(@layer.text, attr)], else: [value: style_or_default(@layer.text, attr)])} id={"text-style-#{@layer.id}-#{attr}"} phx-hook="RenewStyleAttribute" rnw-layer-id={"#{@layer.id}"} rnw-element="text" rnw-style={attr} style="padding: 0; " type={type} />
+            </label><br>
+            <% end %>
+          </div>
+          <% end %>
+          <% end %>
+        </td>
       </tr>
     """
   end
