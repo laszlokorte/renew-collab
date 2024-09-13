@@ -11,6 +11,6 @@ defmodule RenewCollabWeb.InstallController do
 
     RenewCollab.Auth.create_account("test@test.de", "secret")
 
-    redirect(conn, to: ~p"/")
+    redirect(conn, to: ~p"/live/documents")
   end
 end

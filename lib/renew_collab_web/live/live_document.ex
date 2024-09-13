@@ -67,39 +67,51 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   defp viewbox(document) do
-    min_viewbox_x =
+    edge_points =
       document.layers
-      |> Enum.map(& &1.box)
-      |> Enum.reduce(0, fn
-        nil, acc -> acc
-        b, acc -> min(acc, b.position_x)
+      |> Enum.map(& &1.edge)
+      |> Enum.flat_map(fn
+        nil ->
+          []
+
+        e ->
+          [
+            {e.source_x, e.source_y},
+            {e.target_x, e.target_y}
+            | e.waypoints |> Enum.map(fn %{position_x: x, position_y: y} -> {x, y} end)
+          ]
       end)
 
-    min_viewbox_y =
+    box_points =
       document.layers
       |> Enum.map(& &1.box)
-      |> Enum.reduce(0, fn
-        nil, acc -> acc
-        b, acc -> min(acc, b.position_y)
+      |> Enum.flat_map(fn
+        nil ->
+          []
+
+        b ->
+          [
+            {b.position_x, b.position_y},
+            {b.position_x + b.height, b.position_y},
+            {b.position_x + b.height, b.position_y + b.height},
+            {b.position_x, b.position_y + b.height}
+          ]
       end)
 
-    max_viewbox_x =
-      document.layers
-      |> Enum.map(& &1.box)
-      |> Enum.reduce(0, fn
-        nil, acc -> acc
-        b, acc -> max(acc, b.position_x + b.width)
-      end)
+    points = Enum.concat(edge_points, box_points)
 
-    max_viewbox_y =
-      document.layers
-      |> Enum.map(& &1.box)
-      |> Enum.reduce(0, fn
-        nil, acc -> acc
-        b, acc -> max(acc, b.position_y + b.height)
-      end)
+    {{min_viewbox_x, _}, {max_viewbox_x, _}} =
+      points |> Enum.min_max_by(&elem(&1, 0), fn -> {{0, 0}, {0, 0}} end)
 
-    [min_viewbox_x - 200, min_viewbox_y - 200, max_viewbox_x + 400, max_viewbox_y + 400]
+    {{_, min_viewbox_y}, {_, max_viewbox_y}} =
+      points |> Enum.min_max_by(&elem(&1, 1), fn -> {{0, 0}, {0, 0}} end)
+
+    [
+      min_viewbox_x - 300,
+      min_viewbox_y - 200,
+      max_viewbox_x - min_viewbox_x + 2 * 200,
+      max_viewbox_y - min_viewbox_y + 2 * 300
+    ]
     |> Enum.map(&round(&1))
     |> Enum.join(" ")
   end

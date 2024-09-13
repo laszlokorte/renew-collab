@@ -52,7 +52,12 @@ defmodule RenewCollab.Import.DocumentImport do
               style =
                 case attrs do
                   nil ->
-                    nil
+                    %{
+                      "opacity" => 1,
+                      "background_color" => "#70DB93",
+                      "border_color" => "black",
+                      "border_width" => "1"
+                    }
 
                   attrs ->
                     %{
@@ -69,7 +74,7 @@ defmodule RenewCollab.Import.DocumentImport do
               %{
                 "semantic_tag" => class_name,
                 "z_index" => z_index,
-                "hidden" => convert_visibility_to_hidden(Map.get(attrs, "Visibility")),
+                "hidden" => convert_attrs_hidden(attrs),
                 "id" => uuid,
                 "box" => %{
                   "position_x" => x,
@@ -96,7 +101,13 @@ defmodule RenewCollab.Import.DocumentImport do
               style =
                 case attrs do
                   nil ->
-                    nil
+                    %{
+                      "opacity" => 1,
+                      "background_color" => "#70DB93",
+                      "border_color" => "black",
+                      "border_width" => "1",
+                      "border_dash_array" => nil
+                    }
 
                   attrs ->
                     %{
@@ -111,13 +122,13 @@ defmodule RenewCollab.Import.DocumentImport do
               %{
                 "semantic_tag" => class_name,
                 "z_index" => z_index,
-                "hidden" => convert_visibility_to_hidden(Map.get(attrs, "Visibility")),
+                "hidden" => convert_attrs_hidden(attrs),
                 "id" => uuid,
                 "style" => style,
                 "text" => %{
                   "position_x" => x,
                   "position_y" => y,
-                  "body" => body,
+                  "body" => if(is_nil(body), do: "", else: body),
                   "style" => %{
                     "underline" =>
                       convert_font_style(Map.get(fields, :fCurrentFontStyle, 0), :underlined),
@@ -154,7 +165,12 @@ defmodule RenewCollab.Import.DocumentImport do
               style =
                 case attrs do
                   nil ->
-                    nil
+                    %{
+                      "opacity" => 1,
+                      "background_color" => "#70DB93",
+                      "border_color" => "black",
+                      "border_width" => "1"
+                    }
 
                   attrs ->
                     %{
@@ -168,7 +184,36 @@ defmodule RenewCollab.Import.DocumentImport do
               line_style =
                 case attrs do
                   nil ->
-                    nil
+                    %{
+                      "stroke_width" => "1",
+                      "stroke_color" => "black",
+                      "stroke_join" => "rect",
+                      "stroke_cap" => "rect",
+                      "stroke_dash_array" => nil,
+                      "source_tip" =>
+                        convert_line_decoration(
+                          resolve_ref(refs, Map.get(fields, :start_decoration))
+                        ),
+                      "target_tip" =>
+                        convert_line_decoration(
+                          resolve_ref(refs, Map.get(fields, :end_decoration))
+                        ),
+                      "source_tip_symbol_shape_id" =>
+                        Map.get(
+                          symbol_ids,
+                          convert_line_decoration(
+                            resolve_ref(refs, Map.get(fields, :start_decoration))
+                          )
+                        ),
+                      "target_tip_symbol_shape_id" =>
+                        Map.get(
+                          symbol_ids,
+                          convert_line_decoration(
+                            resolve_ref(refs, Map.get(fields, :end_decoration))
+                          )
+                        ),
+                      "smoothness" => ""
+                    }
 
                   attrs ->
                     %{
@@ -196,7 +241,7 @@ defmodule RenewCollab.Import.DocumentImport do
                         Map.get(
                           symbol_ids,
                           convert_line_decoration(
-                            resolve_ref(refs, Map.get(fields, :start_decoration))
+                            resolve_ref(refs, Map.get(fields, :end_decoration))
                           )
                         ),
                       "smoothness" => ""
@@ -206,7 +251,7 @@ defmodule RenewCollab.Import.DocumentImport do
               %{
                 "semantic_tag" => class_name,
                 "z_index" => z_index,
-                "hidden" => convert_visibility_to_hidden(Map.get(attrs, "Visibility")),
+                "hidden" => convert_attrs_hidden(attrs),
                 "id" => uuid,
                 "style" => style,
                 "edge" => %{
@@ -296,9 +341,15 @@ defmodule RenewCollab.Import.DocumentImport do
       "CH.ifa.draw.figures.ArrowTip" -> "arrow-tip-normal"
       "de.renew.gui.DoubleArrowTip" -> "arrow-tip-double"
     end
+    |> dbg()
   end
 
   defp convert_line_decoration(other), do: dbg(other)
+
+  defp convert_attrs_hidden(nil), do: false
+
+  defp convert_attrs_hidden(%{} = attrs),
+    do: convert_visibility_to_hidden(Map.get(attrs, "Visibility"))
 
   defp convert_visibility_to_hidden(visible) when is_boolean(visible), do: not visible
   defp convert_visibility_to_hidden(nil), do: false

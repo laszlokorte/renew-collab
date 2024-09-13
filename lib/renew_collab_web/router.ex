@@ -22,7 +22,7 @@ defmodule RenewCollabWeb.Router do
     pipe_through :api
     post "/auth/login", SessionController, :new
     resources "/symbols", SymbolController, only: [:index]
-    get "/install", InstallController, :reset
+    post "/install", InstallController, :reset
   end
 
   scope "/api", RenewCollabWeb do

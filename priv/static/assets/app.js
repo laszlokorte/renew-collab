@@ -6629,10 +6629,10 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
     }[align || "start"];
     const children = Array.from(el.children);
     for (let c = children.length - 1; c >= 0; c--) {
-      children[c].setAttribute("x", bbox.x + weight * bbox.width);
+      children[c].setAttribute("x", origX + weight * bbox.width);
     }
     el.setAttribute("text-anchor", align);
-    el.setAttribute("x", bbox.x + weight * bbox.width);
+    el.setAttribute("x", origX + weight * bbox.width);
   }
   Hooks2.ResizeRenewText = {
     // Callbacks
