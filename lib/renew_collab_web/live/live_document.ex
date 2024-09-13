@@ -43,24 +43,8 @@ defmodule RenewCollabWeb.LiveDocument do
           <button type="button" phx-click="repair_hierarchy">Repair</button>
         </div>
 
-      <table border="1" cellspacing="0" cellpadding="5">
-        <thead>
-          <tr>
-            <td width="20" align="center">Vis</td>
-            <td width="20" align="center">Box</td>
-            <td width="20" align="center">Text</td>
-            <td width="20" align="center">Edge</td>
-            <td width="20" align="right">Ord.</td>
-            <td>
-              ID/Type
-            </td>
-          </tr>
-        </thead>
-        <tbody>
-        <.live_component id={"hierarchy-list"} module={RenewCollabWeb.HierarchyListComponent} document={@document} selection={@selection} symbols={@symbols} />
+      <.live_component id={"hierarchy-list"} module={RenewCollabWeb.HierarchyListComponent} document={@document} selection={@selection} symbols={@symbols} />
 
-      </tbody>
-      </table>
       </div>
     </div>
     """
@@ -92,8 +76,8 @@ defmodule RenewCollabWeb.LiveDocument do
         b ->
           [
             {b.position_x, b.position_y},
-            {b.position_x + b.height, b.position_y},
-            {b.position_x + b.height, b.position_y + b.height},
+            {b.position_x + b.width, b.position_y},
+            {b.position_x + b.width, b.position_y + b.height},
             {b.position_x, b.position_y + b.height}
           ]
       end)
@@ -106,11 +90,13 @@ defmodule RenewCollabWeb.LiveDocument do
     {{_, min_viewbox_y}, {_, max_viewbox_y}} =
       points |> Enum.min_max_by(&elem(&1, 1), fn -> {{0, 0}, {0, 0}} end)
 
+    padding = 100
+
     [
-      min_viewbox_x - 300,
-      min_viewbox_y - 200,
-      max_viewbox_x - min_viewbox_x + 2 * 200,
-      max_viewbox_y - min_viewbox_y + 2 * 300
+      min_viewbox_x - padding,
+      min_viewbox_y - padding,
+      max_viewbox_x - min_viewbox_x + 2 * padding,
+      max_viewbox_y - min_viewbox_y + 2 * padding
     ]
     |> Enum.map(&round(&1))
     |> Enum.join(" ")
@@ -148,6 +134,27 @@ defmodule RenewCollabWeb.LiveDocument do
     {:noreply,
      socket
      |> assign(:selection, id)}
+  end
+
+  def handle_event(
+        "update_style",
+        %{
+          "layer_id" => layer_id,
+          "element" => "layer",
+          "style" => "background_color",
+          "value" => color
+        },
+        socket
+      ) do
+    Renew.update_layer_style(socket.assigns.document.id, layer_id, :background_color, color)
+
+    RenewCollabWeb.Endpoint.broadcast!(
+      "document:#{socket.assigns.document.id}",
+      "layer:update",
+      %{"id" => layer_id}
+    )
+
+    {:noreply, socket}
   end
 
   def handle_info(%{topic: <<"document:", doc_id::binary>>, payload: state}, socket) do

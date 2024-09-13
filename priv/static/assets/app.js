@@ -6651,6 +6651,32 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
     reconnected() {
     }
   };
+  Hooks2.RenewStyleAttribute = {
+    // Callbacks
+    mounted() {
+      const rnwElement = this.el.getAttribute("rnw-element");
+      const rnwStyle = this.el.getAttribute("rnw-style");
+      const rnwLayerId = this.el.getAttribute("rnw-layer-id");
+      this.el.addEventListener("change", (evt) => {
+        this.pushEvent("update_style", {
+          value: evt.currentTarget.value,
+          element: rnwElement,
+          style: rnwStyle,
+          layer_id: rnwLayerId
+        });
+      });
+    },
+    beforeUpdate() {
+    },
+    updated() {
+    },
+    destroyed() {
+    },
+    disconnected() {
+    },
+    reconnected() {
+    }
+  };
   var csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
   var liveSocket = new LiveSocket("/live", Socket, {
     longPollFallbackMs: 2500,

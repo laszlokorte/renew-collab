@@ -23,10 +23,9 @@ defmodule RenewCollab.Style.LayerStyle do
       :background_color,
       :border_color,
       :border_width,
-      :border_width,
       :border_dash_array
     ])
-    # |> validate_required([:opacity, :background_color, :border_color, :border_width, :border_width])
+    # |> validate_required([:opacity, :background_color, :border_color, :border_width])
     |> unique_constraint(:element_id)
   end
 end

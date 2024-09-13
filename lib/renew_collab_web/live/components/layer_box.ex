@@ -5,7 +5,7 @@ defmodule RenewCollabWeb.HierarchyLayerBoxComponent do
   @impl true
   def render(assigns) do
     ~H"""
-    <g id={"box-#{@layer.box.id}"} stroke-dasharray={@layer.style.border_dash_array} stroke-width={@layer.style.border_width} fill={@layer.style.background_color} stroke={@layer.style.border_color} opacity={@layer.style.opacity} >
+    <g id={"box-#{@layer.box.id}"} stroke-dasharray={style_or_default(@layer, :border_dash_array)} stroke-width={style_or_default(@layer, :border_width)} fill={style_or_default(@layer, :background_color)} stroke={style_or_default(@layer, :border_color)} opacity={style_or_default(@layer, :opacity)} >
       <%= if @layer.box.symbol_shape_id do %>
        <%= case @layer.box.symbol_shape.name do %>
         <% "rect-round" -> %>
@@ -49,4 +49,18 @@ defmodule RenewCollabWeb.HierarchyLayerBoxComponent do
       A #{box.width / 2} #{box.height / 2} 0 #{if(angle_diff < 180, do: ~c"0 0", else: ~c"1 0")} #{box.position_x + box.width / 2 + cos_end * box.width / 2},
        #{box.position_y + box.height / 2 - sin_end * box.height / 2} z"
   end
+
+  defp style_or_default(%{:style => nil}, style_key) do
+    default_style(style_key)
+  end
+
+  defp style_or_default(%{:style => style}, style_key) do
+    with %{^style_key => value} <- style do
+      value
+    else
+      _ -> default_style(style_key)
+    end
+  end
+
+  defp default_style(style_key), do: nil
 end

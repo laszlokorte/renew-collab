@@ -8,6 +8,7 @@ defmodule RenewCollab.Renew do
 
   alias RenewCollab.Document.Document
   alias RenewCollab.Hierarchy.Layer
+  alias RenewCollab.Style.LayerStyle
   alias RenewCollab.Connection.Waypoint
   alias RenewCollab.Hierarchy.LayerParenthood
 
@@ -129,5 +130,19 @@ defmodule RenewCollab.Renew do
 
     # Update the record
     Repo.update_all(query, [])
+  end
+
+  def update_layer_style(document_id, layer_id, :background_color, color) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.one(:layer, from(l in Layer, where: l.id == ^layer_id))
+    |> Ecto.Multi.insert(
+      :style,
+      fn %{layer: layer} ->
+        Ecto.build_assoc(layer, :style)
+        |> LayerStyle.changeset(%{"background_color" => color})
+      end,
+      on_conflict: {:replace, [:background_color]}
+    )
+    |> Repo.transaction()
   end
 end

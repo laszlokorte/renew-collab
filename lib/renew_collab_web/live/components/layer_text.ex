@@ -10,12 +10,12 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
             <rect id={"#{@layer.text.id}-outline-box"} phx-update="ignore" x={@layer.text.position_x} y={@layer.text.position_y} width="0" height="0"></rect>
           </g>
           <text 
-            fill={@layer.text.style.text_color}
-            data-text-anchor={text_anchor(@layer.text.style.alignment)}
-            font-weight={if(@layer.text.style.bold, do: "bold", else: "normal")}
-            font-style={if(@layer.text.style.italic, do: "italic", else: "normal")}
-            text-decoration={if(@layer.text.style.underline, do: "underline", else: "none")}
-            font-size={@layer.text.style.font_size} font-family={@layer.text.style.font_family} 
+            fill={style_or_default(@layer.text, :text_color)}
+            data-text-anchor={text_anchor(style_or_default(@layer.text, :alignment))}
+            font-weight={if(style_or_default(@layer.text, :bold), do: "bold", else: "normal")}
+            font-style={if(style_or_default(@layer.text, :italic), do: "italic", else: "normal")}
+            text-decoration={if(style_or_default(@layer.text, :underline), do: "underline", else: "none")}
+            font-size={style_or_default(@layer.text, :font_size)} font-family={style_or_default(@layer.text, :font_family)} 
             id={"text-#{@layer.text.id}"} 
             phx-hook="ResizeRenewText" 
             x={@layer.text.position_x} 
@@ -31,11 +31,11 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
             stroke-width="5"
             fill="none"
             phx-hook="ResizeRenewText" 
-            data-text-anchor={text_anchor(@layer.text.style.alignment)}
-            font-weight={if(@layer.text.style.bold, do: "bold", else: "normal")}
-            font-style={if(@layer.text.style.italic, do: "italic", else: "normal")}
-            text-decoration={if(@layer.text.style.underline, do: "underline", else: "none")}
-            font-size={@layer.text.style.font_size} font-family={@layer.text.style.font_family} 
+            data-text-anchor={text_anchor(style_or_default(@layer.text, :alignment))}
+            font-weight={if(style_or_default(@layer.text, :bold), do: "bold", else: "normal")}
+            font-style={if(style_or_default(@layer.text, :italic), do: "italic", else: "normal")}
+            text-decoration={if(style_or_default(@layer.text, :underline), do: "underline", else: "none")}
+            font-size={style_or_default(@layer.text, :font_size)} font-family={style_or_default(@layer.text, :font_family)} 
             id={"text-select-#{@layer.text.id}"} 
             x={@layer.text.position_x} 
             y={@layer.text.position_y}>
@@ -51,4 +51,18 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
   defp text_anchor(:left), do: "start"
   defp text_anchor(:center), do: "middle"
   defp text_anchor(:right), do: "end"
+
+  defp style_or_default(%{:style => nil}, style_key) do
+    default_style(style_key)
+  end
+
+  defp style_or_default(%{:style => style}, style_key) do
+    with %{^style_key => value} <- style do
+      value
+    else
+      _ -> default_style(style_key)
+    end
+  end
+
+  defp default_style(style_key), do: nil
 end

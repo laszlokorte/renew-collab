@@ -5,36 +5,37 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
   @impl true
   def render(assigns) do
     ~H"""
-    <g>
-      <path 
-            stroke={@layer.edge.style.stroke_color}
-            stroke-width={@layer.edge.style.stroke_width}
-            stroke-line-join={@layer.edge.style.stroke_join}
-            stroke-line-cap={@layer.edge.style.stroke_cap}
-            stroke-dasharray={@layer.edge.style.stroke_dash_array} stroke="black" d={edge_path(@layer.edge)} fill="none"></path>
-            <%= if @layer.edge.style.source_tip_symbol_shape_id do %>
+    <g stroke={style_or_default(@layer.edge, :stroke_color)}
+        stroke-width={style_or_default(@layer.edge, :stroke_width)}
+        stroke-line-join={style_or_default(@layer.edge, :stroke_join)}
+        stroke-line-cap={style_or_default(@layer.edge, :stroke_cap)}
+        >
+      <path stroke-dasharray={style_or_default(@layer.edge, :stroke_dash_array)} stroke="black" d={edge_path(@layer.edge)} fill="none"></path>
+            
+            <%= if style_or_default(@layer.edge, :source_tip_symbol_shape_id) do %>
             <g  id={"edge-#{@layer.edge.id}-source-tip"} transform={"rotate(#{edge_angle(:source, @layer.edge)} #{@layer.edge.source_x} #{@layer.edge.source_y})"}>
               <%!-- <rect opacity="0.5" fill="red" x={@layer.edge.source_x - 20} y={@layer.edge.source_y - 5} width="20" height="10" /> --%>
-               <%= for path <- @symbols[@layer.edge.style.source_tip_symbol_shape_id].paths do %> 
+               <%= for path <- @symbols[style_or_default(@layer.edge, :source_tip_symbol_shape_id)].paths do %> 
                   <path stroke={path.stroke_color} fill={path.fill_color} d={Symbol.build_symbol_path(%{
-                    position_x: @layer.edge.source_x - (Integer.parse(@layer.edge.style.stroke_width) |> elem(0)),
-                    position_y: @layer.edge.source_y - (Integer.parse(@layer.edge.style.stroke_width) |> elem(0)),
-                    width: (Integer.parse(@layer.edge.style.stroke_width) |> elem(0))*2,
-                    height: (Integer.parse(@layer.edge.style.stroke_width) |> elem(0))*2,
+                    position_x: @layer.edge.source_x - (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)),
+                    position_y: @layer.edge.source_y - (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)),
+                    width: (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0))*2,
+                    height: (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0))*2,
                 }, path)} fill-rule="evenodd" />
                 <% end %>
             </g>
             <% end %>
-            <%= if @layer.edge.style.target_tip_symbol_shape_id do %>
+
+            <%= if style_or_default(@layer.edge, :target_tip_symbol_shape_id) do %>
             <g  id={"edge-#{@layer.edge.id}-target-tip"} transform={"rotate(#{edge_angle(:target, @layer.edge)} #{@layer.edge.target_x} #{@layer.edge.target_y})"}>
               <%!-- <rect opacity="0.5" fill="red" x={@layer.edge.target_x - 20} y={@layer.edge.target_y - 5} width="20" height="10" /> --%>
 
-               <%= for path <- @symbols[@layer.edge.style.target_tip_symbol_shape_id].paths do %> 
+               <%= for path <- @symbols[style_or_default(@layer.edge, :target_tip_symbol_shape_id)].paths do %> 
                   <path stroke={path.stroke_color} fill={path.fill_color} d={Symbol.build_symbol_path(%{
-                    position_x: @layer.edge.target_x - (Integer.parse(@layer.edge.style.stroke_width) |> elem(0)),
-                    position_y: @layer.edge.target_y - (Integer.parse(@layer.edge.style.stroke_width) |> elem(0)),
-                    width: (Integer.parse(@layer.edge.style.stroke_width) |> elem(0))*2,
-                    height: (Integer.parse(@layer.edge.style.stroke_width) |> elem(0))*2,
+                    position_x: @layer.edge.target_x - (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)),
+                    position_y: @layer.edge.target_y - (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)),
+                    width: (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0))*2,
+                    height: (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0))*2,
                 }, path)}   fill-rule="evenodd" />
                 <% end %>
             </g>
@@ -47,6 +48,20 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
       </g>
     """
   end
+
+  defp style_or_default(%{:style => nil}, style_key) do
+    default_style(style_key)
+  end
+
+  defp style_or_default(%{:style => style}, style_key) do
+    with %{^style_key => value} <- style do
+      value
+    else
+      _ -> default_style(style_key)
+    end
+  end
+
+  defp default_style(style_key), do: nil
 
   defp edge_path(edge) do
     waypoints =

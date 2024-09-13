@@ -52,12 +52,14 @@ defmodule RenewCollab.Import.DocumentImport do
               style =
                 case attrs do
                   nil ->
-                    %{
-                      "opacity" => 1,
-                      "background_color" => "#70DB93",
-                      "border_color" => "black",
-                      "border_width" => "1"
-                    }
+                    nil
+
+                  # %{
+                  #   "opacity" => 1,
+                  #   "background_color" => "#70DB93",
+                  #   "border_color" => "black",
+                  #   "border_width" => "1"
+                  # }
 
                   attrs ->
                     %{
@@ -101,13 +103,15 @@ defmodule RenewCollab.Import.DocumentImport do
               style =
                 case attrs do
                   nil ->
-                    %{
-                      "opacity" => 1,
-                      "background_color" => "#70DB93",
-                      "border_color" => "black",
-                      "border_width" => "1",
-                      "border_dash_array" => nil
-                    }
+                    nil
+
+                  # %{
+                  #   "opacity" => 1,
+                  #   "background_color" => "#70DB93",
+                  #   "border_color" => "black",
+                  #   "border_width" => "1",
+                  #   "border_dash_array" => nil
+                  # }
 
                   attrs ->
                     %{
@@ -165,12 +169,14 @@ defmodule RenewCollab.Import.DocumentImport do
               style =
                 case attrs do
                   nil ->
-                    %{
-                      "opacity" => 1,
-                      "background_color" => "#70DB93",
-                      "border_color" => "black",
-                      "border_width" => "1"
-                    }
+                    nil
+
+                  # %{
+                  #   "opacity" => 1,
+                  #   "background_color" => "#70DB93",
+                  #   "border_color" => "black",
+                  #   "border_width" => "1"
+                  # }
 
                   attrs ->
                     %{
@@ -190,28 +196,6 @@ defmodule RenewCollab.Import.DocumentImport do
                       "stroke_join" => "rect",
                       "stroke_cap" => "rect",
                       "stroke_dash_array" => nil,
-                      "source_tip" =>
-                        convert_line_decoration(
-                          resolve_ref(refs, Map.get(fields, :start_decoration))
-                        ),
-                      "target_tip" =>
-                        convert_line_decoration(
-                          resolve_ref(refs, Map.get(fields, :end_decoration))
-                        ),
-                      "source_tip_symbol_shape_id" =>
-                        Map.get(
-                          symbol_ids,
-                          convert_line_decoration(
-                            resolve_ref(refs, Map.get(fields, :start_decoration))
-                          )
-                        ),
-                      "target_tip_symbol_shape_id" =>
-                        Map.get(
-                          symbol_ids,
-                          convert_line_decoration(
-                            resolve_ref(refs, Map.get(fields, :end_decoration))
-                          )
-                        ),
                       "smoothness" => ""
                     }
 
@@ -222,31 +206,26 @@ defmodule RenewCollab.Import.DocumentImport do
                       "stroke_join" => "rect",
                       "stroke_cap" => "rect",
                       "stroke_dash_array" => convert_line_style(Map.get(attrs, "LineStyle")),
-                      "source_tip" =>
-                        convert_line_decoration(
-                          resolve_ref(refs, Map.get(fields, :start_decoration))
-                        ),
-                      "target_tip" =>
-                        convert_line_decoration(
-                          resolve_ref(refs, Map.get(fields, :end_decoration))
-                        ),
-                      "source_tip_symbol_shape_id" =>
-                        Map.get(
-                          symbol_ids,
-                          convert_line_decoration(
-                            resolve_ref(refs, Map.get(fields, :start_decoration))
-                          )
-                        ),
-                      "target_tip_symbol_shape_id" =>
-                        Map.get(
-                          symbol_ids,
-                          convert_line_decoration(
-                            resolve_ref(refs, Map.get(fields, :end_decoration))
-                          )
-                        ),
                       "smoothness" => ""
                     }
                 end
+
+              tips = %{
+                "source_tip" =>
+                  convert_line_decoration(resolve_ref(refs, Map.get(fields, :start_decoration))),
+                "target_tip" =>
+                  convert_line_decoration(resolve_ref(refs, Map.get(fields, :end_decoration))),
+                "source_tip_symbol_shape_id" =>
+                  Map.get(
+                    symbol_ids,
+                    convert_line_decoration(resolve_ref(refs, Map.get(fields, :start_decoration)))
+                  ),
+                "target_tip_symbol_shape_id" =>
+                  Map.get(
+                    symbol_ids,
+                    convert_line_decoration(resolve_ref(refs, Map.get(fields, :end_decoration)))
+                  )
+              }
 
               %{
                 "semantic_tag" => class_name,
@@ -272,7 +251,7 @@ defmodule RenewCollab.Import.DocumentImport do
                         "position_y" => p[:y]
                       }
                     end),
-                  "style" => line_style
+                  "style" => Map.merge(line_style, tips)
                 }
               }
 
