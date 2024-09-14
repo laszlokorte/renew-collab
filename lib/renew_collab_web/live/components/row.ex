@@ -21,12 +21,92 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
           <% end %>
           <% end %>
         </td>
-        <td width="20" align="right"><%= @layer.z_index %></td>
-        <td style={"cursor: pointer; padding-left: #{2*@depth}em"} phx-click="select_layer" phx-value-id={@layer.id}>
-          <%= @layer.id %><br><small><code><%= @layer.semantic_tag %></code></small>
+        <td width="20" align="right">
+          <%= if @selected do %>
+          <input type="number" step="1" min="0"  phx-hook="RenewZIndex"  id={"layer-zindex-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"} value={@layer.z_index} size="2" />
+          <%= else%>
+          <%= @layer.z_index %>
+          <%= end%>
+        </td>
+        <td {unless(@selected, do: [style: "cursor: pointer; padding-left: #{2*@depth}em", "phx-click": "select_layer"], else: [])} phx-value-id={@layer.id}>
+          <%= if @selected do %>
+          <small><button phx-click="select_layer" phx-value-id={"-"}>unselect</button></small><br>
+          <% end %>
+          <small><code><%= @layer.id %></code></small><br><small><code><%= @layer.semantic_tag %></code></small>
 
           <%= if @selected do %>
-          <div>
+          <%= unless is_nil(@layer.box) do %>
+          <fieldset>
+            <legend>Box Size</legend>
+            <form phx-hook="RenewBoxSize" id={"layer-box-size-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"}>
+              <dl>
+                <dt>X</dt>
+                <dd><input type="number" name="position_x" value={@layer.box.position_x} /></dd>
+                <dt>Y</dt>
+                <dd><input type="number" name="position_y" value={@layer.box.position_y} /></dd>
+                <dt>Width</dt>
+                <dd><input type="number" name="width" value={@layer.box.width} /></dd>
+                <dt>Height</dt>
+                <dd><input type="number" name="height" value={@layer.box.height} /></dd>
+              </dl>
+            </form>
+          </fieldset>
+          <% end %>
+          <%= unless is_nil(@layer.edge) do %>
+          <fieldset>
+            <legend>Edge Path</legend>
+            <form phx-hook="RenewEdgePosition" id={"layer-edge-position-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"}>
+              <dl>
+                <dt>Source X</dt>
+                <dd><input type="number" name="source_x" value={@layer.edge.source_x} /></dd>
+                <dt>Source Y</dt>
+                <dd><input type="number" name="source_y" value={@layer.edge.source_y} /></dd>
+                <dt>Target X</dt>
+                <dd><input type="number" name="target_x" value={@layer.edge.target_x} /></dd>
+                <dt>Target Y</dt>
+                <dd><input type="number" name="target_y" value={@layer.edge.target_y} /></dd>
+              </dl>
+            </form>
+            <ul>
+                <li>
+                  <button phx-hook="RenewEdgeWaypointCreate"  id={"layer-edge-position-#{@layer.id}-waypoint-new"} rnw-layer-id={"#{@layer.id}"} type="button">+</button>
+                </li>
+              <%= for w <- @layer.edge.waypoints do %>
+                <li>
+                  <form style="display: inline" phx-hook="RenewEdgeWaypointPosition" id={"layer-edge-position-#{@layer.id}-waypoint-#{w.id}"} rnw-layer-id={"#{@layer.id}"} rnw-waypoint-id={"#{w.id}"}>
+                    <input type="number" name="position_x" value={w.position_x} size="4" />
+                    <input type="number" name="position_y" value={w.position_y} size="4" />
+                  </form>
+                  <button phx-hook="RenewEdgeWaypointDelete"  id={"layer-edge-position-#{@layer.id}-waypoint-#{w.id}-delete"} rnw-layer-id={"#{@layer.id}"} rnw-waypoint-id={"#{w.id}"} type="button">X</button>
+                </li>
+                <li>
+                  <button phx-hook="RenewEdgeWaypointCreate"  id={"layer-edge-position-#{@layer.id}-waypoint-#{w.id}-new"} rnw-layer-id={"#{@layer.id}"} rnw-waypoint-id={"#{w.id}"} type="button">+</button>
+                </li>
+              <% end %>
+            </ul>
+          </fieldset>
+          <% end %>
+          <%= unless is_nil(@layer.text) do %>
+          <fieldset>
+            <legend>Text Position</legend>
+            <form phx-hook="RenewTextPosition" id={"layer-text-position-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"}>
+              <dl>
+                <dt>X</dt>
+                <dd><input type="number" name="position_x" value={@layer.text.position_x} /></dd>
+                <dt>Y</dt>
+                <dd><input type="number" name="position_y" value={@layer.text.position_y} /></dd>
+              </dl>
+            </form>
+          </fieldset>
+          <% end %>
+          <%= unless is_nil(@layer.text) do %>
+          <fieldset>
+            <legend>Text</legend>
+            <textarea rows="5" cols="30" phx-hook="RenewTextBody" id={"layer-text-body-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"}><%= @layer.text.body %></textarea>
+          </fieldset>
+          <% end %>
+          <fieldset>
+            <legend>Layer Style</legend>
             <%= for {attr, type} <- [
             opacity: :number,
             background_color: :color,
@@ -34,15 +114,12 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
             border_width: :number,
             border_dash_array: :text,
             ] do %>
-            <label>
-              <%= attr %>
-            <input value={style_or_default(@layer, attr)} id={"layer-style-#{@layer.id}-#{attr}"} phx-hook="RenewStyleAttribute" rnw-layer-id={"#{@layer.id}"} rnw-element="layer" rnw-style={attr} style="padding: 0; " type={type} />
-            </label>
-            <br>
+            <.live_component value={style_or_default(@layer, attr)}  element="layer" id={"layer-style-#{@layer.id}-#{attr}"} module={RenewCollabWeb.HierarchyStyleField} layer={@layer} attr={attr} type={type}  />
             <% end %>
-          </div>
+          </fieldset>
           <%= unless is_nil(@layer.edge) do %>
-          <div>
+          <fieldset>
+            <legend>Edge Style</legend>
             <%= for {attr, type} <- [
             stroke_width: :number,
             stroke_color: :color,
@@ -53,15 +130,13 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
             source_tip_symbol_shape_id: :number,
             target_tip_symbol_shape_id: :number,
             ] do %>
-            <label>
-              <%= attr %>
-            <input value={style_or_default(@layer.edge, attr)} id={"edge-style#{@layer.id}-#{attr}"} phx-hook="RenewStyleAttribute" rnw-layer-id={"#{@layer.id}"} rnw-element="edge" rnw-style={attr} style="padding: 0; " type={type} />
-            </label><br>
+            <.live_component value={style_or_default(@layer.edge, attr)}  element="edge" id={"edge-style-#{@layer.id}-#{attr}"} module={RenewCollabWeb.HierarchyStyleField} layer={@layer} attr={attr} type={type}  />
             <% end %>
-          </div>
+          </fieldset>
           <% end %>
           <%= unless is_nil(@layer.text) do %>
-          <div>
+          <fieldset>
+            <legend>Text Style</legend>
             <%= for {attr, type} <- [
             bold: :checkbox,
             italic: :checkbox,
@@ -71,12 +146,9 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
             font_family: :text,
             text_color: :color,
             ] do %>
-            <label>
-              <%= attr %>
-            <input {if(type == :checkbox, do: [checked: style_or_default(@layer.text, attr)], else: [value: style_or_default(@layer.text, attr)])} id={"text-style-#{@layer.id}-#{attr}"} phx-hook="RenewStyleAttribute" rnw-layer-id={"#{@layer.id}"} rnw-element="text" rnw-style={attr} style="padding: 0; " type={type} />
-            </label><br>
+            <.live_component value={style_or_default(@layer.text, attr)}  element="text" id={"text-style-#{@layer.id}-#{attr}"} module={RenewCollabWeb.HierarchyStyleField} layer={@layer} attr={attr} type={type}  />
             <% end %>
-          </div>
+          </fieldset>
           <% end %>
           <% end %>
         </td>

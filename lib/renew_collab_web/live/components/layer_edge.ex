@@ -7,8 +7,8 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
     ~H"""
     <g stroke={style_or_default(@layer.edge, :stroke_color)}
         stroke-width={style_or_default(@layer.edge, :stroke_width)}
-        stroke-line-join={style_or_default(@layer.edge, :stroke_join)}
-        stroke-line-cap={style_or_default(@layer.edge, :stroke_cap)}
+        stroke-linejoin={style_or_default(@layer.edge, :stroke_join)}
+        stroke-linecap={style_or_default(@layer.edge, :stroke_cap)}
         >
       <path stroke-dasharray={style_or_default(@layer.edge, :stroke_dash_array)} d={edge_path(@layer.edge)} fill="none"></path>
             

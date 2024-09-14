@@ -204,4 +204,302 @@ defmodule RenewCollab.Renew do
     )
     |> Repo.transaction()
   end
+
+  def update_layer_text_body(
+        document_id,
+        layer_id,
+        new_body
+      ) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.one(
+      :text,
+      from(l in Layer, join: t in assoc(l, :text), where: l.id == ^layer_id, select: t)
+    )
+    |> Ecto.Multi.update(
+      :body,
+      fn %{text: text} ->
+        Ecto.Changeset.change(text, body: new_body)
+      end
+    )
+    |> Repo.transaction()
+  end
+
+  def update_layer_box_size(
+        document_id,
+        layer_id,
+        %{
+          position_x: position_x,
+          position_y: position_y,
+          width: width,
+          height: height
+        }
+      ) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.one(
+      :box,
+      from(l in Layer, join: b in assoc(l, :box), where: l.id == ^layer_id, select: b)
+    )
+    |> Ecto.Multi.update(
+      :size,
+      fn %{box: box} ->
+        Ecto.Changeset.change(box, %{
+          position_x: position_x,
+          position_y: position_y,
+          width: width,
+          height: height
+        })
+      end
+    )
+    |> Repo.transaction()
+  end
+
+  def parse_layer_box_size(%{
+        "position_x" => position_x,
+        "position_y" => position_y,
+        "width" => width,
+        "height" => height
+      }) do
+    with {position_x, _} <- Float.parse(position_x),
+         {position_y, _} <- Float.parse(position_y),
+         {width, _} <- Float.parse(width),
+         {height, _} <- Float.parse(height) do
+      %{
+        position_x: position_x,
+        position_y: position_y,
+        width: width,
+        height: height
+      }
+    end
+  end
+
+  def update_layer_text_position(
+        document_id,
+        layer_id,
+        %{
+          position_x: position_x,
+          position_y: position_y
+        }
+      ) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.one(
+      :text,
+      from(l in Layer, join: t in assoc(l, :text), where: l.id == ^layer_id, select: t)
+    )
+    |> Ecto.Multi.update(
+      :size,
+      fn %{text: text} ->
+        Ecto.Changeset.change(text, %{
+          position_x: position_x,
+          position_y: position_y
+        })
+      end
+    )
+    |> Repo.transaction()
+  end
+
+  def parse_layer_text_position(%{
+        "position_x" => position_x,
+        "position_y" => position_y
+      }) do
+    with {position_x, _} <- Float.parse(position_x),
+         {position_y, _} <- Float.parse(position_y) do
+      %{
+        position_x: position_x,
+        position_y: position_y
+      }
+    end
+  end
+
+  def update_layer_z_index(
+        document_id,
+        layer_id,
+        z_index
+      ) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.one(
+      :layer,
+      from(l in Layer, where: l.id == ^layer_id, select: l)
+    )
+    |> Ecto.Multi.update(
+      :z_index,
+      fn %{layer: layer} ->
+        Ecto.Changeset.change(layer, %{
+          z_index: z_index
+        })
+      end
+    )
+    |> Repo.transaction()
+  end
+
+  def parse_layer_z_index(z_index) do
+    with {z_index, _} <- Integer.parse(z_index) do
+      z_index
+    end
+  end
+
+  def update_layer_edge_position(
+        document_id,
+        layer_id,
+        %{
+          source_x: source_x,
+          source_y: source_y,
+          target_x: target_x,
+          target_y: target_y
+        }
+      ) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.one(
+      :edge,
+      from(l in Layer, join: b in assoc(l, :edge), where: l.id == ^layer_id, select: b)
+    )
+    |> Ecto.Multi.update(
+      :position,
+      fn %{edge: edge} ->
+        Ecto.Changeset.change(edge, %{
+          source_x: source_x,
+          source_y: source_y,
+          target_x: target_x,
+          target_y: target_y
+        })
+      end
+    )
+    |> Repo.transaction()
+  end
+
+  def parse_layer_edge_position(%{
+        "source_x" => source_x,
+        "source_y" => source_y,
+        "target_x" => target_x,
+        "target_y" => target_y
+      }) do
+    with {source_x, _} <- Float.parse(source_x),
+         {source_y, _} <- Float.parse(source_y),
+         {target_x, _} <- Float.parse(target_x),
+         {target_y, _} <- Float.parse(target_y) do
+      %{
+        source_x: source_x,
+        source_y: source_y,
+        target_x: target_x,
+        target_y: target_y
+      }
+    end
+  end
+
+  def update_layer_edge_waypoint_position(
+        document_id,
+        layer_id,
+        waypoint_id,
+        %{
+          position_x: position_x,
+          position_y: position_y
+        }
+      ) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.one(
+      :waypoint,
+      from(l in Layer,
+        join: e in assoc(l, :edge),
+        join: w in assoc(e, :waypoints),
+        where: l.id == ^layer_id and w.id == ^waypoint_id,
+        select: w
+      )
+    )
+    |> Ecto.Multi.update(
+      :size,
+      fn %{waypoint: waypoint} ->
+        Ecto.Changeset.change(waypoint, %{
+          position_x: position_x,
+          position_y: position_y
+        })
+      end
+    )
+    |> Repo.transaction()
+  end
+
+  def parse_layer_edge_waypoint_position(%{
+        "position_x" => position_x,
+        "position_y" => position_y
+      }) do
+    with {position_x, _} <- Float.parse(position_x),
+         {position_y, _} <- Float.parse(position_y) do
+      %{
+        position_x: position_x,
+        position_y: position_y
+      }
+    end
+  end
+
+  def delete_layer_edge_waypoint(
+        document_id,
+        layer_id,
+        waypoint_id
+      ) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.one(
+      :waypoint,
+      from(l in Layer,
+        join: e in assoc(l, :edge),
+        join: w in assoc(e, :waypoints),
+        where: l.id == ^layer_id and w.id == ^waypoint_id,
+        select: w
+      )
+    )
+    |> Ecto.Multi.delete(
+      :deletion,
+      fn %{waypoint: waypoint} ->
+        waypoint
+      end
+    )
+    |> Repo.transaction()
+  end
+
+  def create_layer_edge_waypoint(
+        document_id,
+        layer_id,
+        after_waypoint_id
+      ) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.one(
+      :edge,
+      if is_nil(after_waypoint_id) do
+        from(l in Layer,
+          join: e in assoc(l, :edge),
+          where: l.id == ^layer_id,
+          select: {e, nil}
+        )
+      else
+        from(l in Layer,
+          join: e in assoc(l, :edge),
+          left_join: w in assoc(e, :waypoints),
+          on: w.id == ^after_waypoint_id,
+          where: l.id == ^layer_id,
+          select: {e, w}
+        )
+      end
+    )
+    |> Ecto.Multi.insert(
+      :insert,
+      fn
+        %{edge: {edge, nil}} ->
+          %Waypoint{}
+          |> Waypoint.changeset(%{
+            sort: 0,
+            position_x: 0,
+            position_y: 0,
+            edge_id: edge.id
+          })
+
+        %{edge: {edge, waypoint}} ->
+          %Waypoint{}
+          |> Waypoint.changeset(%{
+            sort: 0,
+            position_x: 0,
+            position_y: 0,
+            edge_id: edge.id
+          })
+      end,
+      on_conflict: {:replace, [:position_x, :position_y]}
+    )
+    |> Repo.transaction()
+  end
 end

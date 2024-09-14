@@ -71,9 +71,15 @@ Hooks.RenewStyleAttribute = {
     const rnwStyle = this.el.getAttribute('rnw-style')
     const rnwLayerId = this.el.getAttribute('rnw-layer-id')
 
-    this.el.addEventListener('change', (evt) => {
+    const eventType = this.el.tagName == "BUTTON" ? 'click' : 'change'
+
+    this.el.addEventListener(eventType, (evt) => {
+      const newValue = ['radio','checkbox'].indexOf(evt.currentTarget.type) > -1 ? evt.currentTarget.checked: evt.currentTarget.value
+
+      console.log(newValue)
+
       this.pushEvent("update_style", {
-        value: ['radio','checkbox'].indexOf(evt.currentTarget.type) > -1 ? evt.currentTarget.checked: evt.currentTarget.value,
+        value: newValue,
         element: rnwElement,
         style: rnwStyle,
         layer_id: rnwLayerId,
@@ -82,6 +88,181 @@ Hooks.RenewStyleAttribute = {
   },
   beforeUpdate() {  },
   updated() { 
+  },
+  destroyed() {  },
+  disconnected() {  },
+  reconnected()  {  },
+}
+
+Hooks.RenewBoxSize = {
+  // Callbacks
+  mounted() {
+    this.el.addEventListener('change', (evt) => {
+      const {position_x, position_y, width, height} = Object.fromEntries(new FormData(evt.currentTarget))
+      const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
+
+      this.pushEvent("update_box_size", {
+        value: {position_x, position_y, width, height},
+        layer_id: rnwLayerId,
+      })
+    }) 
+  },
+  beforeUpdate() {  },
+  updated() { 
+
+  },
+  destroyed() {  },
+  disconnected() {  },
+  reconnected()  {  },
+}
+Hooks.RenewTextBody = {
+  // Callbacks
+  mounted() { 
+    this.el.addEventListener('change', (evt) => {
+      const body = evt.currentTarget.value
+      const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
+
+      this.pushEvent("update_text_body", {
+        value: body,
+        layer_id: rnwLayerId,
+      })
+    }) 
+  },
+  beforeUpdate() {  },
+  updated() { 
+  },
+  destroyed() {  },
+  disconnected() {  },
+  reconnected()  {  },
+}
+Hooks.RenewTextPosition = {
+  // Callbacks
+  mounted() {
+    this.el.addEventListener('change', (evt) => {
+      const {position_x, position_y} = Object.fromEntries(new FormData(evt.currentTarget))
+      const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
+
+      this.pushEvent("update_text_position", {
+        value: {position_x, position_y},
+        layer_id: rnwLayerId,
+      })
+    }) 
+  },
+  beforeUpdate() {  },
+  updated() { 
+
+  },
+  destroyed() {  },
+  disconnected() {  },
+  reconnected()  {  },
+}
+
+Hooks.RenewZIndex = {
+  // Callbacks
+  mounted() {
+    this.el.addEventListener('change', (evt) => {
+      const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
+      const newValue = evt.currentTarget.value
+
+      this.pushEvent("update_z_index", {
+        value: newValue,
+        layer_id: rnwLayerId,
+      })
+    }) 
+  },
+  beforeUpdate() {  },
+  updated() { 
+
+  },
+  destroyed() {  },
+  disconnected() {  },
+  reconnected()  {  },
+}
+
+Hooks.RenewEdgePosition = {
+  // Callbacks
+  mounted() {
+    this.el.addEventListener('change', (evt) => {
+      const {source_x, source_y, target_x, target_y} = Object.fromEntries(new FormData(evt.currentTarget))
+      const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
+
+      this.pushEvent("update_edge_position", {
+        value: {source_x, source_y, target_x, target_y},
+        layer_id: rnwLayerId,
+      })
+    }) 
+  },
+  beforeUpdate() {  },
+  updated() { 
+
+  },
+  destroyed() {  },
+  disconnected() {  },
+  reconnected()  {  },
+}
+
+Hooks.RenewEdgeWaypointCreate = {
+  // Callbacks
+  mounted() {
+    this.el.addEventListener('click', (evt) => {
+      const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
+      const rnwWaypointId = evt.currentTarget.getAttribute('rnw-waypoint-id')
+      
+      this.pushEvent("create_waypoint", {
+        layer_id: rnwLayerId,
+        after_waypoint_id: rnwWaypointId,
+      })
+    })
+  },
+  beforeUpdate() {  },
+  updated() { 
+
+  },
+  destroyed() {  },
+  disconnected() {  },
+  reconnected()  {  },
+}
+
+Hooks.RenewEdgeWaypointPosition = {
+  // Callbacks
+  mounted() {
+    this.el.addEventListener('change', (evt) => {
+      const {position_x, position_y} = Object.fromEntries(new FormData(evt.currentTarget))
+      const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
+      const rnwWaypointId = evt.currentTarget.getAttribute('rnw-waypoint-id')
+
+      this.pushEvent("update_waypoint_position", {
+        value: {position_x, position_y},
+        layer_id: rnwLayerId,
+        waypoint_id: rnwWaypointId,
+      })
+    }) 
+  },
+  beforeUpdate() {  },
+  updated() { 
+
+  },
+  destroyed() {  },
+  disconnected() {  },
+  reconnected()  {  },
+}
+
+Hooks.RenewEdgeWaypointDelete = {
+  // Callbacks
+  mounted() {
+    this.el.addEventListener('click', (evt) => {
+      const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
+      const rnwWaypointId = evt.currentTarget.getAttribute('rnw-waypoint-id')
+
+      this.pushEvent("delete_waypoint", {
+        layer_id: rnwLayerId,
+        waypoint_id: rnwWaypointId,
+      })
+    }) 
+  },
+  beforeUpdate() {  },
+  updated() { 
+
   },
   destroyed() {  },
   disconnected() {  },
