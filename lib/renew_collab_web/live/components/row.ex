@@ -73,6 +73,8 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
                 </li>
               <%= for w <- @layer.edge.waypoints do %>
                 <li>
+                  <small style="white-space: nowrap;"><%= w.sort %> - <%= w.id %></small>
+                  <br>
                   <form style="display: inline" phx-hook="RenewEdgeWaypointPosition" id={"layer-edge-position-#{@layer.id}-waypoint-#{w.id}"} rnw-layer-id={"#{@layer.id}"} rnw-waypoint-id={"#{w.id}"}>
                     <input type="number" name="position_x" value={w.position_x} size="4" />
                     <input type="number" name="position_y" value={w.position_y} size="4" />

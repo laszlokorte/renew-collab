@@ -5,7 +5,10 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
   @impl true
   def render(assigns) do
     ~H"""
-    <g stroke={style_or_default(@layer.edge, :stroke_color)}
+    <g>
+    <g 
+    opacity={style_or_default(@layer, :opacity)}
+      stroke={style_or_default(@layer.edge, :stroke_color)}
         stroke-width={style_or_default(@layer.edge, :stroke_width)}
         stroke-linejoin={style_or_default(@layer.edge, :stroke_join)}
         stroke-linecap={style_or_default(@layer.edge, :stroke_cap)}
@@ -41,11 +44,17 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
             </g>
             <% end %>
 
+      </g>
+
 
       <%= if @selected do %>
         <path stroke="magenta" stroke-linejoin="round" stroke-linecap="round"  opacity="0.3" stroke-width="8" d={edge_path(@layer.edge)} fill="none" id={"edge-select-#{@layer.edge.id}"}></path>
+
+        <%= for w <- @layer.edge.waypoints do %>
+          <circle cx={w.position_x} cy={w.position_y} r="5" fill="magenta"></circle>
+        <% end %>
       <% end %>
-      </g>
+    </g>
     """
   end
 

@@ -456,49 +456,111 @@ defmodule RenewCollab.Renew do
   def create_layer_edge_waypoint(
         document_id,
         layer_id,
-        after_waypoint_id
+        prev_waypoint_id
       ) do
     Ecto.Multi.new()
     |> Ecto.Multi.one(
       :edge,
-      if is_nil(after_waypoint_id) do
+      if is_nil(prev_waypoint_id) do
         from(l in Layer,
           join: e in assoc(l, :edge),
+          left_join: w2 in assoc(e, :waypoints),
+          left_join: w3 in assoc(e, :waypoints),
           where: l.id == ^layer_id,
-          select: {e, nil}
+          order_by: [asc: w2.sort],
+          group_by: e.id,
+          limit: 1,
+          select: {e, nil, w2, max(w3.sort)}
         )
       else
         from(l in Layer,
           join: e in assoc(l, :edge),
           left_join: w in assoc(e, :waypoints),
-          on: w.id == ^after_waypoint_id,
+          on: w.id == ^prev_waypoint_id,
+          left_join: w2 in assoc(e, :waypoints),
+          on: w2.sort > w.sort,
+          left_join: w3 in assoc(e, :waypoints),
           where: l.id == ^layer_id,
-          select: {e, w}
+          order_by: [asc: w2.sort],
+          group_by: e.id,
+          limit: 1,
+          select: {e, w, w2, max(w3.sort)}
         )
       end
+    )
+    |> Ecto.Multi.update_all(
+      :increment_future_waypoints,
+      fn
+        %{edge: {edge, nil, _, max_sort}} ->
+          from(w in Waypoint,
+            where: w.edge_id == ^edge.id,
+            update: [inc: [sort: 1 + ^max_sort * 2]]
+          )
+
+        %{edge: {edge, prev_waypoint_id, _, max_sort}} ->
+          from(w in Waypoint,
+            where: w.edge_id == ^edge.id and w.sort > ^prev_waypoint_id.sort,
+            update: [inc: [sort: 1 + ^max_sort * 2]]
+          )
+      end,
+      []
+    )
+    |> Ecto.Multi.update_all(
+      :offset_waypoints,
+      fn
+        %{edge: {edge, nil, _, max_sort}} ->
+          from(w in Waypoint,
+            where: w.edge_id == ^edge.id,
+            update: [inc: [sort: -(^max_sort) * 2]]
+          )
+
+        %{edge: {edge, prev_waypoint_id, _, max_sort}} ->
+          from(w in Waypoint,
+            where: w.edge_id == ^edge.id and w.sort > ^prev_waypoint_id.sort,
+            update: [inc: [sort: -(^max_sort) * 2]]
+          )
+      end,
+      []
     )
     |> Ecto.Multi.insert(
       :insert,
       fn
-        %{edge: {edge, nil}} ->
+        %{edge: {edge, nil, nil, max_sort}} ->
           %Waypoint{}
           |> Waypoint.changeset(%{
             sort: 0,
-            position_x: 0,
-            position_y: 0,
+            position_x: (edge.source_x + edge.target_x) / 2,
+            position_y: (edge.source_y + edge.target_y) / 2,
             edge_id: edge.id
           })
 
-        %{edge: {edge, waypoint}} ->
+        %{edge: {edge, prev_waypoint, nil, max_sort}} ->
           %Waypoint{}
           |> Waypoint.changeset(%{
-            sort: 0,
-            position_x: 0,
-            position_y: 0,
+            sort: prev_waypoint.sort + 1,
+            position_x: (prev_waypoint.position_x + edge.target_x) / 2,
+            position_y: (prev_waypoint.position_y + edge.target_y) / 2,
             edge_id: edge.id
           })
-      end,
-      on_conflict: {:replace, [:position_x, :position_y]}
+
+        %{edge: {edge, nil, next_waypoint, max_sort}} ->
+          %Waypoint{}
+          |> Waypoint.changeset(%{
+            sort: next_waypoint.sort,
+            position_x: (next_waypoint.position_x + edge.source_x) / 2,
+            position_y: (next_waypoint.position_y + edge.source_y) / 2,
+            edge_id: edge.id
+          })
+
+        %{edge: {edge, prev_waypoint, next_waypoint, max_sort}} ->
+          %Waypoint{}
+          |> Waypoint.changeset(%{
+            sort: next_waypoint.sort,
+            position_x: (next_waypoint.position_x + prev_waypoint.position_x) / 2,
+            position_y: (next_waypoint.position_y + prev_waypoint.position_y) / 2,
+            edge_id: edge.id
+          })
+      end
     )
     |> Repo.transaction()
   end
