@@ -32,7 +32,12 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
           <%= if @selected do %>
           <small><button phx-click="select_layer" phx-value-id={"-"}>unselect</button></small><br>
           <% end %>
-          <small><code><%= @layer.id %></code></small><br><small><code><%= @layer.semantic_tag %></code></small>
+          <small><code><%= @layer.id %></code></small><br>
+          <%= if @selected do %>
+          <input  phx-hook="RenewSemanticTag" id={"semantic-tag-#{@layer.id}"}  type="text" value={@layer.semantic_tag} style="width: 100%; box-sizing: border-box" />
+          <% else %>
+          <small><code><%= @layer.semantic_tag %></code></small>
+          <% end %>
 
           <%= if @selected do %>
           <%= unless is_nil(@layer.box) do %>
@@ -49,6 +54,30 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
                 <dt>Height</dt>
                 <dd><input type="number" name="height" value={@layer.box.height} /></dd>
               </dl>
+            </form>
+          </fieldset>
+          <% end %>
+          <%= unless is_nil(@layer.box) do %>
+          <fieldset>
+            <legend>Shape</legend>
+            <form phx-hook="RenewBoxShape" id={"layer-box-shape-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"}>
+               <dl>
+                <dt>X</dt>
+                <dd>
+               <select>
+                <option {if(is_nil(@layer.box.symbol_shape_id), do: [selected: "selected"], else: [])}>---</option>
+                 <%= for {id, symbol} <- @symbols do %>
+                  <option  {if(id == @layer.box.symbol_shape_id, do: [selected: "selected"], else: [])}><%= symbol.name %></option>
+                  <% end %>
+               </select>
+             </dd>
+             <dt>
+               Attributes
+             </dt>
+             <dd>
+               <textarea></textarea>
+             </dd>
+           </dl>
             </form>
           </fieldset>
           <% end %>
@@ -70,6 +99,8 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
             <ul>
                 <li>
                   <button phx-hook="RenewEdgeWaypointCreate"  id={"layer-edge-position-#{@layer.id}-waypoint-new"} rnw-layer-id={"#{@layer.id}"} type="button">+</button>
+
+                  <button phx-hook="RenewEdgeWaypointsClear"  id={"layer-edge-position-#{@layer.id}-waypoints-clear"} rnw-layer-id={"#{@layer.id}"} type="button">Clear</button>
                 </li>
               <%= for w <- @layer.edge.waypoints do %>
                 <li>

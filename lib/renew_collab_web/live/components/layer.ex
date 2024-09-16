@@ -5,7 +5,7 @@ defmodule RenewCollabWeb.HierarchyLayerComponent do
   @impl true
   def render(assigns) do
     ~H"""
-    <g style={"display: #{if(@layer.hidden, do: "none", else: "initial")}"} stroke-width="200">
+    <g style={"display: #{if(@layer.hidden, do: "none", else: "initial")}"} phx-click="select_layer" phx-value-id={@layer.id}>
       <g>
         <%= for child <- @document.layers, child.direct_parent, child.direct_parent.ancestor_id == @layer.id do %> 
           <.live_component id={child.id} module={RenewCollabWeb.HierarchyLayerComponent} document={@document} layer={child} selected={@selection == child.id} symbols={@symbols} />

@@ -43,7 +43,7 @@ defmodule RenewCollabWeb.LiveDocument do
           <button type="button" phx-click="repair_hierarchy">Repair</button>
         </div>
 
-      <.live_component id={"hierarchy-list"} module={RenewCollabWeb.HierarchyListComponent} document={@document} selection={@selection} symbols={@symbols} />
+      <.live_component id={"hierarchy-list"} module={RenewCollabWeb.HierarchyListComponent} document={@document} symbols={@symbols} selection={@selection} symbols={@symbols} />
 
       </div>
     </div>

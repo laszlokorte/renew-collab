@@ -269,6 +269,45 @@ Hooks.RenewEdgeWaypointDelete = {
   reconnected()  {  },
 }
 
+Hooks.RenewEdgeWaypointDelete = {
+  // Callbacks
+  mounted() {
+  },
+  beforeUpdate() {  },
+  updated() { 
+
+  },
+  destroyed() {  },
+  disconnected() {  },
+  reconnected()  {  },
+}
+
+Hooks.RenewSemanticTag = {
+  // Callbacks
+  mounted() {
+  },
+  beforeUpdate() {  },
+  updated() { 
+
+  },
+  destroyed() {  },
+  disconnected() {  },
+  reconnected()  {  },
+}
+
+Hooks.RenewBoxShape = {
+  // Callbacks
+  mounted() {
+  },
+  beforeUpdate() {  },
+  updated() { 
+
+  },
+  destroyed() {  },
+  disconnected() {  },
+  reconnected()  {  },
+}
+
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,

@@ -10,6 +10,7 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
             <rect id={"#{@layer.text.id}-outline-box"} phx-update="ignore" x={@layer.text.position_x} y={@layer.text.position_y} width="0" height="0"></rect>
           </g>
           <text 
+            cursor="default"
             fill={style_or_default(@layer.text, :text_color)}
             data-text-anchor={text_anchor(style_or_default(@layer.text, :alignment))}
             font-weight={if(style_or_default(@layer.text, :bold), do: "bold", else: "normal")}
@@ -27,6 +28,7 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
 
           <%= if @selected do %>
             <text 
+            cursor="default"
             stroke="magenta"
             stroke-linejoin="round" 
             stroke-linecap="round"

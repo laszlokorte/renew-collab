@@ -6866,6 +6866,51 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
     reconnected() {
     }
   };
+  Hooks2.RenewEdgeWaypointDelete = {
+    // Callbacks
+    mounted() {
+    },
+    beforeUpdate() {
+    },
+    updated() {
+    },
+    destroyed() {
+    },
+    disconnected() {
+    },
+    reconnected() {
+    }
+  };
+  Hooks2.RenewSemanticTag = {
+    // Callbacks
+    mounted() {
+    },
+    beforeUpdate() {
+    },
+    updated() {
+    },
+    destroyed() {
+    },
+    disconnected() {
+    },
+    reconnected() {
+    }
+  };
+  Hooks2.RenewBoxShape = {
+    // Callbacks
+    mounted() {
+    },
+    beforeUpdate() {
+    },
+    updated() {
+    },
+    destroyed() {
+    },
+    disconnected() {
+    },
+    reconnected() {
+    }
+  };
   var csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
   var liveSocket = new LiveSocket("/live", Socket, {
     longPollFallbackMs: 2500,
