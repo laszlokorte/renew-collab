@@ -196,7 +196,7 @@ defmodule RenewCollab.Import.DocumentImport do
                       "stroke_join" => "rect",
                       "stroke_cap" => "rect",
                       "stroke_dash_array" => nil,
-                      "smoothness" => ""
+                      "smoothness" => convert_smoothness(0)
                     }
 
                   attrs ->
@@ -206,7 +206,7 @@ defmodule RenewCollab.Import.DocumentImport do
                       "stroke_join" => "rect",
                       "stroke_cap" => "rect",
                       "stroke_dash_array" => convert_line_style(Map.get(attrs, "LineStyle")),
-                      "smoothness" => ""
+                      "smoothness" => convert_smoothness(Map.get(attrs, "LineShape", 0))
                     }
                 end
 
@@ -304,6 +304,9 @@ defmodule RenewCollab.Import.DocumentImport do
   defp convert_border_width(nil), do: nil
 
   defp convert_line_decoration(nil), do: nil
+
+  defp convert_smoothness(0), do: "0"
+  defp convert_smoothness(1), do: "1"
 
   defp convert_line_decoration(%Renewex.Storable{
          class_name: class_name

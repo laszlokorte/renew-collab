@@ -73,12 +73,38 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
   defp default_style(style_key), do: nil
 
   defp edge_path(edge) do
-    waypoints =
-      edge.waypoints
-      |> Enum.map(fn %{position_x: x, position_y: y} -> "L #{x} #{y}" end)
-      |> Enum.join(" ")
+    smooth = edge.style.smoothness == "1"
 
-    "M #{edge.source_x} #{edge.source_y} #{waypoints} L #{edge.target_x} #{edge.target_y}"
+    if smooth do
+      case edge.waypoints do
+        [] ->
+          "M #{edge.source_x} #{edge.source_y} L #{edge.target_x} #{edge.target_y}"
+
+        [w] ->
+          "M #{edge.source_x} #{edge.source_y}  Q #{w.position_x} #{w.position_y} #{edge.target_x} #{edge.target_y}"
+
+        more ->
+          waypoints =
+            more
+            |> Enum.map(fn %{position_x: x, position_y: y} -> {x, y} end)
+            |> then(&Enum.concat([{edge.source_x, edge.source_y}], &1))
+            |> Enum.chunk_every(2, 1, :discard)
+            |> Enum.drop(1)
+            |> Enum.map(fn [{x1, y1}, {x2, y2}] ->
+              "Q #{x1} #{y1} #{(x2 + x1) / 2} #{(y2 + y1) / 2}"
+            end)
+            |> Enum.join(" ")
+
+          "M #{edge.source_x} #{edge.source_y} #{waypoints} T #{edge.target_x} #{edge.target_y}"
+      end
+    else
+      waypoints =
+        edge.waypoints
+        |> Enum.map(fn %{position_x: x, position_y: y} -> "L #{x} #{y}" end)
+        |> Enum.join(" ")
+
+      "M #{edge.source_x} #{edge.source_y} #{waypoints} L #{edge.target_x} #{edge.target_y}"
+    end
   end
 
   defp edge_angle(:source, edge) do

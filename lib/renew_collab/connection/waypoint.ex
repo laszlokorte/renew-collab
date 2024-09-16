@@ -17,7 +17,7 @@ defmodule RenewCollab.Connection.Waypoint do
   def changeset(waypoint, attrs) do
     waypoint
     |> cast(attrs, [:position_x, :position_y, :sort, :edge_id])
-    |> unique_constraint([:edge_id, :sort])
-    |> validate_required([:position_x, :position_y, :sort, :edge_id])
+    |> unique_constraint([:edge, :sort])
+    |> validate_required([:position_x, :position_y, :sort])
   end
 end

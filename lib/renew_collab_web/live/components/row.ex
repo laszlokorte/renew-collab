@@ -34,7 +34,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
           <% end %>
           <small><code><%= @layer.id %></code></small><br>
           <%= if @selected do %>
-          <input  phx-hook="RenewSemanticTag" id={"semantic-tag-#{@layer.id}"}  type="text" value={@layer.semantic_tag} style="width: 100%; box-sizing: border-box" />
+          <input  phx-hook="RenewSemanticTag" id={"semantic-tag-#{@layer.id}"}  type="text" value={@layer.semantic_tag} style="width: 100%; box-sizing: border-box"  rnw-layer-id={"#{@layer.id}"} />
           <% else %>
           <small><code><%= @layer.semantic_tag %></code></small>
           <% end %>
@@ -64,10 +64,10 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
                <dl>
                 <dt>X</dt>
                 <dd>
-               <select>
+               <select name="shape_id">
                 <option {if(is_nil(@layer.box.symbol_shape_id), do: [selected: "selected"], else: [])}>---</option>
                  <%= for {id, symbol} <- @symbols do %>
-                  <option  {if(id == @layer.box.symbol_shape_id, do: [selected: "selected"], else: [])}><%= symbol.name %></option>
+                  <option value={id} {if(id == @layer.box.symbol_shape_id, do: [selected: "selected"], else: [])}><%= symbol.name %></option>
                   <% end %>
                </select>
              </dd>
@@ -75,7 +75,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
                Attributes
              </dt>
              <dd>
-               <textarea></textarea>
+               <textarea name="shape_attributes"></textarea>
              </dd>
            </dl>
             </form>
@@ -159,9 +159,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
             stroke_join: :text,
             stroke_cap: :text,
             stroke_dash_array: :text,
-            smoothness: :number,
-            source_tip_symbol_shape_id: :number,
-            target_tip_symbol_shape_id: :number,
+            smoothness: :text
             ] do %>
             <.live_component value={style_or_default(@layer.edge, attr)}  element="edge" id={"edge-style-#{@layer.id}-#{attr}"} module={RenewCollabWeb.HierarchyStyleField} layer={@layer} attr={attr} type={type}  />
             <% end %>

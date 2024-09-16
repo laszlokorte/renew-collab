@@ -97,7 +97,7 @@ Hooks.RenewStyleAttribute = {
 Hooks.RenewBoxSize = {
   // Callbacks
   mounted() {
-    this.el.addEventListener('change', (evt) => {
+    this.el.addEventListener('input', (evt) => {
       const {position_x, position_y, width, height} = Object.fromEntries(new FormData(evt.currentTarget))
       const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
 
@@ -118,7 +118,7 @@ Hooks.RenewBoxSize = {
 Hooks.RenewTextBody = {
   // Callbacks
   mounted() { 
-    this.el.addEventListener('change', (evt) => {
+    this.el.addEventListener('input', (evt) => {
       const body = evt.currentTarget.value
       const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
 
@@ -138,7 +138,7 @@ Hooks.RenewTextBody = {
 Hooks.RenewTextPosition = {
   // Callbacks
   mounted() {
-    this.el.addEventListener('change', (evt) => {
+    this.el.addEventListener('input', (evt) => {
       const {position_x, position_y} = Object.fromEntries(new FormData(evt.currentTarget))
       const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
 
@@ -160,7 +160,7 @@ Hooks.RenewTextPosition = {
 Hooks.RenewZIndex = {
   // Callbacks
   mounted() {
-    this.el.addEventListener('change', (evt) => {
+    this.el.addEventListener('input', (evt) => {
       const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
       const newValue = evt.currentTarget.value
 
@@ -182,7 +182,7 @@ Hooks.RenewZIndex = {
 Hooks.RenewEdgePosition = {
   // Callbacks
   mounted() {
-    this.el.addEventListener('change', (evt) => {
+    this.el.addEventListener('input', (evt) => {
       const {source_x, source_y, target_x, target_y} = Object.fromEntries(new FormData(evt.currentTarget))
       const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
 
@@ -226,7 +226,7 @@ Hooks.RenewEdgeWaypointCreate = {
 Hooks.RenewEdgeWaypointPosition = {
   // Callbacks
   mounted() {
-    this.el.addEventListener('change', (evt) => {
+    this.el.addEventListener('input', (evt) => {
       const {position_x, position_y} = Object.fromEntries(new FormData(evt.currentTarget))
       const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
       const rnwWaypointId = evt.currentTarget.getAttribute('rnw-waypoint-id')
@@ -269,9 +269,16 @@ Hooks.RenewEdgeWaypointDelete = {
   reconnected()  {  },
 }
 
-Hooks.RenewEdgeWaypointDelete = {
+Hooks.RenewEdgeWaypointsClear = {
   // Callbacks
   mounted() {
+    this.el.addEventListener('click', (evt) => {
+      const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
+
+      this.pushEvent("clear_waypoints", {
+        layer_id: rnwLayerId,
+      })
+    }) 
   },
   beforeUpdate() {  },
   updated() { 
@@ -285,6 +292,15 @@ Hooks.RenewEdgeWaypointDelete = {
 Hooks.RenewSemanticTag = {
   // Callbacks
   mounted() {
+    this.el.addEventListener('input', (evt) => {
+      const semanticTag = evt.currentTarget.value
+      const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
+
+      this.pushEvent("update_semantic_tag", {
+        value: semanticTag,
+        layer_id: rnwLayerId,
+      })
+    })
   },
   beforeUpdate() {  },
   updated() { 
@@ -298,6 +314,15 @@ Hooks.RenewSemanticTag = {
 Hooks.RenewBoxShape = {
   // Callbacks
   mounted() {
+    this.el.addEventListener('input', (evt) => {
+      const {shape_id, shape_attributes} = Object.fromEntries(new FormData(evt.currentTarget))
+      const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
+
+      this.pushEvent("update_shape", {
+        value: {shape_id, shape_attributes: shape_attributes.trim() ? JSON.parse(shape_attributes) : null},
+        layer_id: rnwLayerId,
+      })
+    }) 
   },
   beforeUpdate() {  },
   updated() { 

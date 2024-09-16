@@ -71,8 +71,8 @@ defmodule RenewCollabWeb.HierarchyStyleField do
 
   def options(el, attr, type), do: nil
 
-  def attrs(el, :opacity, :number), do: [step: 0.01]
-  def attrs(el, :border_width, :number), do: [step: 0.01]
-  def attrs(el, :font_size, :number), do: [step: 1]
+  def attrs(el, :opacity, :number), do: [step: 0.01, min: 0, max: 1]
+  def attrs(el, :border_width, :number), do: [step: 0.01, min: 0]
+  def attrs(el, :font_size, :number), do: [step: 1, min: 0]
   def attrs(el, attr, type), do: []
 end

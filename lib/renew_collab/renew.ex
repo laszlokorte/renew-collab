@@ -521,6 +521,88 @@ defmodule RenewCollab.Renew do
     )
   end
 
+  def remove_all_layer_edge_waypoints(
+        document_id,
+        layer_id
+      ) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.one(
+      :edge,
+      from(l in Layer, join: b in assoc(l, :edge), where: l.id == ^layer_id, select: b)
+    )
+    |> Ecto.Multi.delete_all(
+      :waypoint,
+      fn
+        %{edge: edge} ->
+          from(w in Waypoint,
+            where: w.edge_id == ^edge.id,
+            select: w
+          )
+      end
+    )
+    |> Repo.transaction()
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "redux_document:#{document_id}",
+      {:document_changed, document_id}
+    )
+  end
+
+  def update_layer_semantic_tag(
+        document_id,
+        layer_id,
+        new_tag
+      ) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.one(
+      :layer,
+      from(l in Layer, where: l.id == ^layer_id, select: l)
+    )
+    |> Ecto.Multi.update(
+      :update,
+      fn %{layer: layer} ->
+        Ecto.Changeset.change(layer, semantic_tag: new_tag)
+      end
+    )
+    |> Repo.transaction()
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "redux_document:#{document_id}",
+      {:document_changed, document_id}
+    )
+  end
+
+  def update_layer_box_shape(
+        document_id,
+        layer_id,
+        shape_id,
+        attributes
+      ) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.one(
+      :box,
+      from(l in Layer, join: b in assoc(l, :box), where: l.id == ^layer_id, select: b)
+    )
+    |> Ecto.Multi.update(
+      :size,
+      fn %{box: box} ->
+        Ecto.Changeset.change(box, %{
+          symbol_shape_id: shape_id,
+          symbol_shape_attributes: attributes
+        })
+      end
+    )
+    |> Repo.transaction()
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "redux_document:#{document_id}",
+      {:document_changed, document_id}
+    )
+  end
+
   def create_layer_edge_waypoint(
         document_id,
         layer_id,

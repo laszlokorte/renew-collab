@@ -367,6 +367,56 @@ defmodule RenewCollabWeb.LiveDocument do
     {:noreply, socket}
   end
 
+  def handle_event(
+        "clear_waypoints",
+        %{
+          "layer_id" => layer_id
+        },
+        socket
+      ) do
+    Renew.remove_all_layer_edge_waypoints(
+      socket.assigns.document.id,
+      layer_id
+    )
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "update_semantic_tag",
+        %{
+          "layer_id" => layer_id,
+          "value" => new_tag
+        },
+        socket
+      ) do
+    Renew.update_layer_semantic_tag(
+      socket.assigns.document.id,
+      layer_id,
+      new_tag
+    )
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "update_shape",
+        %{
+          "layer_id" => layer_id,
+          "value" => %{"shape_id" => shape_id, "shape_attributes" => shape_attributes}
+        },
+        socket
+      ) do
+    Renew.update_layer_box_shape(
+      socket.assigns.document.id,
+      layer_id,
+      shape_id,
+      shape_attributes
+    )
+
+    {:noreply, socket}
+  end
+
   def handle_info({:document_changed, document_id}, socket) do
     if document_id == socket.assigns.document.id do
       {:noreply,
