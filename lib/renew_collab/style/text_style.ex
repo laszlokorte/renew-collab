@@ -8,6 +8,7 @@ defmodule RenewCollab.Style.TextStyle do
     field :italic, :boolean, default: false
     field :underline, :boolean, default: false
     field :rich, :boolean, default: false
+    field :blank_lines, :boolean, default: false
     field :alignment, Ecto.Enum, values: [:left, :center, :right], default: :left
     field :font_size, :float, default: 12.0
     field :font_family, :string, default: "sans-serif"
@@ -29,7 +30,8 @@ defmodule RenewCollab.Style.TextStyle do
       :italic,
       :underline,
       :rich,
-      :text_color
+      :text_color,
+      :blank_lines
     ])
     |> validate_required([
       :alignment,
@@ -39,7 +41,8 @@ defmodule RenewCollab.Style.TextStyle do
       :italic,
       :underline,
       :rich,
-      :text_color
+      :text_color,
+      :blank_lines
     ])
     |> unique_constraint(:element_text_id)
   end

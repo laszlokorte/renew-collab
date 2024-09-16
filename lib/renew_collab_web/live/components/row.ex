@@ -23,7 +23,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
         </td>
         <td width="20" align="right" style="white-space: nowrap; word-wrap: none">
           <%= if @selected do %>
-          <input type="number" step="1" min="0"  phx-hook="RenewZIndex"  id={"layer-zindex-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"} value={@layer.z_index} size="2" />
+          <input style="width: 3em" type="number" step="1" min="0"  phx-hook="RenewZIndex"  id={"layer-zindex-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"} value={@layer.z_index} size="2" width="30" />
           <%= else%>
           <%= @layer.z_index %>
           <%= end%>
@@ -185,6 +185,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
             font_family: :text,
             text_color: :color,
             rich: :checkbox,
+            blank_lines: :checkbox,
             ] do %>
             <.live_component value={style_or_default(@layer.text, attr)}  element="text" id={"text-style-#{@layer.id}-#{attr}"} module={RenewCollabWeb.HierarchyStyleField} layer={@layer} attr={attr} type={type}  />
             <% end %>

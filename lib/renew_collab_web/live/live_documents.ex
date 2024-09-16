@@ -77,7 +77,7 @@ defmodule RenewCollabWeb.LiveDocuments do
     do: "" == str_or_nil |> to_string() |> String.trim()
 
   def handle_event("duplicate", %{"id" => id}, socket) do
-    # TODO
+    RenewCollab.Renew.duplicate_document(id)
     {:noreply, socket}
   end
 
@@ -100,12 +100,6 @@ defmodule RenewCollabWeb.LiveDocuments do
       [{:ok, %{"name" => doc_name} = document_params, hierarchy}] ->
         with {:ok, %RenewCollab.Document.Document{} = document} <-
                RenewCollab.Renew.create_document(document_params, hierarchy) do
-          RenewCollabWeb.Endpoint.broadcast!(
-            "documents",
-            "document:new",
-            Map.take(document, [:name, :kind, :id])
-            |> Map.put("href", url(~p"/api/documents/#{document}"))
-          )
         else
           _ ->
             with {:ok, %RenewCollab.Document.Document{} = document} <-
@@ -122,12 +116,6 @@ defmodule RenewCollabWeb.LiveDocuments do
       [] ->
         with {:ok, %RenewCollab.Document.Document{} = document} <-
                RenewCollab.Renew.create_document(params |> Map.put("kind", "empty")) do
-          RenewCollabWeb.Endpoint.broadcast!(
-            "documents",
-            "document:new",
-            Map.take(document, [:name, :kind, :id])
-            |> Map.put("href", url(~p"/api/documents/#{document}"))
-          )
         end
     end
 
@@ -150,12 +138,6 @@ defmodule RenewCollabWeb.LiveDocuments do
 
   def handle_event("delete", %{"id" => id}, socket) do
     Renew.delete_document(%RenewCollab.Document.Document{id: id})
-
-    RenewCollabWeb.Endpoint.broadcast!(
-      "documents",
-      "document:deleted",
-      %{"id" => id}
-    )
 
     {:noreply, socket}
   end

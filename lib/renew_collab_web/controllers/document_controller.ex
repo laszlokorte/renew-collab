@@ -33,6 +33,24 @@ defmodule RenewCollabWeb.DocumentController do
     render(conn, :show, document: document)
   end
 
+  def template(conn, %{"id" => id}) do
+    document_params = Renew.get_document_with_elements_as_template!(id)
+
+    with {:ok, %Document{} = document} <- Renew.create_document(document_params) do
+      RenewCollabWeb.Endpoint.broadcast!(
+        "documents",
+        "document:new",
+        Map.take(document, [:name, :kind, :id])
+        |> Map.put("href", url(~p"/api/documents/#{document}"))
+      )
+
+      conn
+      |> put_status(:created)
+      |> put_resp_header("location", ~p"/api/documents/#{document}")
+      |> render(:show, document: document)
+    end
+  end
+
   def delete(conn, %{"id" => id}) do
     document = Renew.get_document!(id)
 

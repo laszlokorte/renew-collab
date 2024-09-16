@@ -15,14 +15,18 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
             data-text-anchor={text_anchor(style_or_default(@layer.text, :alignment))}
             font-weight={if(style_or_default(@layer.text, :bold), do: "bold", else: "normal")}
             font-style={if(style_or_default(@layer.text, :italic), do: "italic", else: "normal")}
-            text-decoration={if(style_or_default(@layer.text, :underline), do: "underline", else: "none")}
             font-size={style_or_default(@layer.text, :font_size)} font-family={style_or_default(@layer.text, :font_family)} 
             id={"text-#{@layer.text.id}"} 
             phx-hook="ResizeRenewText" 
             x={@layer.text.position_x} 
             y={@layer.text.position_y}>
-            <%= for {{line, format}, li} <- @layer.text.body |> String.split("\n") |> Enum.map(&format_line(@layer.text.style.rich, &1)) |> Enum.with_index() do %>
-              <tspan {format} {if(li==0 and @layer.text.style.rich, do: ["font-weight": "bold"], else: [])} x={@layer.text.position_x} {[dy: if(li>0, do: "1.2em", else: "1em")]}><%= line %></tspan>
+            <%= for {{line, format}, li} <- @layer.text.body |> String.split("\n") |> filter_blank_lines(@layer.text.style.blank_lines) |> Enum.map(&format_line(@layer.text.style.rich, &1)) |> Enum.with_index() do %>
+              <%= if String.trim(line) != "" do %>
+              <tspan 
+            text-decoration={if(style_or_default(@layer.text, :underline), do: "underline", else: "none")} {format} {if(li==0 and @layer.text.style.rich, do: ["font-weight": "bold"], else: [])} x={@layer.text.position_x} {[dy: if(li>0, do: "1.2em", else: "1em")]}><%= line %></tspan>
+              <% else %>
+              <tspan fill="transparent" stroke="transparent" text-decoration="none" x={@layer.text.position_x} {[dy: if(li>0, do: "1.2em", else: "1em")]} visibility="hidden">&nbsp;</tspan>
+              <% end %>              
             <% end %>
           </text>
 
@@ -39,14 +43,17 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
             data-text-anchor={text_anchor(style_or_default(@layer.text, :alignment))}
             font-weight={if(style_or_default(@layer.text, :bold), do: "bold", else: "normal")}
             font-style={if(style_or_default(@layer.text, :italic), do: "italic", else: "normal")}
-            text-decoration={if(style_or_default(@layer.text, :underline), do: "underline", else: "none")}
             font-size={style_or_default(@layer.text, :font_size)} font-family={style_or_default(@layer.text, :font_family)} 
             id={"text-select-#{@layer.text.id}"} 
             x={@layer.text.position_x} 
             y={@layer.text.position_y}>
-            <%= for {{line, format}, li} <- @layer.text.body |> String.split("\n") |> Enum.map(&format_line(@layer.text.style.rich, &1)) |> Enum.with_index() do %>
-              <tspan {format} x={@layer.text.position_x} {[dy: if(li>0, do: "1.2em", else: "1em")]}><%= line %></tspan>
-            <% end %>
+            <%= for {{line, format}, li} <- @layer.text.body |> String.split("\n") |> filter_blank_lines(@layer.text.style.blank_lines) |> Enum.map(&format_line(@layer.text.style.rich, &1)) |> Enum.with_index() do %>
+              <%= if String.trim(line) != "" do %>
+              <tspan 
+            text-decoration={if(style_or_default(@layer.text, :underline), do: "underline", else: "none")} {format} {if(li==0 and @layer.text.style.rich, do: ["font-weight": "bold"], else: [])} x={@layer.text.position_x} {[dy: if(li>0, do: "1.2em", else: "1em")]}><%= line %></tspan>
+              <% else %>
+              <tspan fill="transparent" stroke="transparent" text-decoration="none" visibility="hidden" x={@layer.text.position_x} {[dy: if(li>0, do: "1.2em", else: "1em")]}>&nbsp;</tspan>
+              <% end %>              <% end %>
           </text>
           <% end %>
         </g>
@@ -75,4 +82,9 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
   defp format_line(true, <<"\\", rest::binary>>), do: {rest, ["font-style": "italic"]}
 
   defp format_line(_, line), do: {line, []}
+
+  defp filter_blank_lines(lines, true), do: lines
+
+  defp filter_blank_lines(lines, false),
+    do: Enum.filter(lines, fn line -> String.trim(line) |> String.length() > 0 end)
 end

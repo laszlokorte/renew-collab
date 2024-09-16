@@ -47,8 +47,103 @@ defmodule RenewCollab.Renew do
           )
       )
 
+  def deep_clone_document!(id) do
+    doc = get_document_with_elements!(id)
+
+    new_layers_ids =
+      doc.layers
+      |> Enum.map(fn layer -> {layer.id, Ecto.UUID.generate()} end)
+      |> Map.new()
+
+    document_data =
+      doc
+      |> strip_id
+      |> Map.update(:layers, [], fn layers ->
+        layers
+        |> Enum.map(fn layer ->
+          layer
+          |> Map.from_struct()
+          |> Map.update(:id, nil, &Map.get(new_layers_ids, &1))
+          |> Map.update(:box, nil, &strip_id/1)
+          |> Map.update(:box, nil, &strip_fk(&1, :layer_id))
+          |> Map.update(:text, nil, &strip_id(&1, [:style]))
+          |> Map.update(:text, nil, &strip_fk(&1, :layer_id))
+          |> Map.update(:edge, nil, &strip_id(&1, [:style]))
+          |> Map.update(:edge, nil, &strip_fk(&1, :layer_id))
+          |> Map.update(:edge, nil, fn
+            nil ->
+              nil
+
+            edge ->
+              %{
+                edge
+                | waypoints: edge.waypoints |> strip_id() |> Enum.map(&Map.delete(&1, :edge_id)),
+                  source_bond: nil,
+                  target_bond: nil
+              }
+          end)
+          |> Map.update(:style, nil, &strip_id/1)
+          |> Map.update(:style, nil, &strip_fk(&1, :layer_id))
+        end)
+      end)
+
+    new_parenthoods =
+      from(p in LayerParenthood, where: p.document_id == ^id, select: p)
+      |> Repo.all()
+      |> Enum.map(fn %{depth: d, ancestor_id: anc, descendant_id: dec} ->
+        {
+          Map.get(new_layers_ids, anc),
+          Map.get(new_layers_ids, dec),
+          d
+        }
+      end)
+
+    {document_data, new_parenthoods}
+  end
+
+  def duplicate_document(id) do
+    {doc_params, parenthoods} = deep_clone_document!(id)
+
+    create_document(
+      doc_params
+      |> Map.update(:name, "Untitled", &"#{String.trim_trailing(&1, "(Copy)")} (Copy)"),
+      parenthoods
+    )
+  end
+
+  defp strip_id(struct, path \\ [])
+
+  defp strip_id(%{} = struct, []) do
+    struct
+    |> Map.from_struct()
+    |> Map.delete(:id)
+  end
+
+  defp strip_id(%{} = struct, [key | rest]) do
+    struct
+    |> Map.from_struct()
+    |> Map.delete(:id)
+    |> Map.update(key, nil, &strip_id(&1, rest))
+  end
+
+  defp strip_id([_ | _] = list, keys) do
+    Enum.map(list, &strip_id(&1, keys))
+  end
+
+  defp strip_id([] = list, _), do: list
+  defp strip_id(nil, _), do: nil
+
+  defp strip_fk(%{} = map, fkid) do
+    map
+    |> Map.delete(fkid)
+  end
+
+  defp strip_fk(nil, fkid) do
+    nil
+  end
+
   def create_document(attrs \\ %{}, parenthoods \\ []) do
-    with {:ok, transaction} <-
+    with {:ok, %{insert_document: inserted_document}} <-
            Ecto.Multi.new()
            |> Ecto.Multi.insert(
              :insert_document,
@@ -73,7 +168,13 @@ defmodule RenewCollab.Renew do
              on_conflict: {:replace, [:depth, :ancestor_id, :descendant_id]}
            )
            |> Repo.transaction() do
-      {:ok, Map.get(transaction, :insert_document)}
+      RenewCollabWeb.Endpoint.broadcast!(
+        "documents",
+        "documents:new",
+        {"document:new", inserted_document.id}
+      )
+
+      {:ok, inserted_document}
     else
       e -> dbg(e)
     end
@@ -81,6 +182,12 @@ defmodule RenewCollab.Renew do
 
   def delete_document(%Document{} = document) do
     Repo.delete(document)
+
+    RenewCollabWeb.Endpoint.broadcast!(
+      "documents",
+      "document:deleted",
+      %{"id" => document.id}
+    )
   end
 
   def create_element(%Document{} = document, attrs \\ %{}) do
@@ -208,6 +315,7 @@ defmodule RenewCollab.Renew do
   def layer_text_style_key("bold"), do: :bold
   def layer_text_style_key("text_color"), do: :text_color
   def layer_text_style_key("rich"), do: :rich
+  def layer_text_style_key("blank_lines"), do: :blank_lines
 
   def update_layer_text_style(document_id, layer_id, style_attr, color) do
     Ecto.Multi.new()
