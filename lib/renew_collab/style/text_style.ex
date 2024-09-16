@@ -7,6 +7,7 @@ defmodule RenewCollab.Style.TextStyle do
   schema "element_text_style" do
     field :italic, :boolean, default: false
     field :underline, :boolean, default: false
+    field :rich, :boolean, default: false
     field :alignment, Ecto.Enum, values: [:left, :center, :right], default: :left
     field :font_size, :float, default: 12.0
     field :font_family, :string, default: "sans-serif"
@@ -20,7 +21,16 @@ defmodule RenewCollab.Style.TextStyle do
   @doc false
   def changeset(element_text_style, attrs) do
     element_text_style
-    |> cast(attrs, [:alignment, :font_size, :font_family, :bold, :italic, :underline, :text_color])
+    |> cast(attrs, [
+      :alignment,
+      :font_size,
+      :font_family,
+      :bold,
+      :italic,
+      :underline,
+      :rich,
+      :text_color
+    ])
     |> validate_required([
       :alignment,
       :font_size,
@@ -28,6 +38,7 @@ defmodule RenewCollab.Style.TextStyle do
       :bold,
       :italic,
       :underline,
+      :rich,
       :text_color
     ])
     |> unique_constraint(:element_text_id)

@@ -13,7 +13,7 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
         stroke-linejoin={style_or_default(@layer.edge, :stroke_join)}
         stroke-linecap={style_or_default(@layer.edge, :stroke_cap)}
         >
-      <path stroke-dasharray={style_or_default(@layer.edge, :stroke_dash_array)} d={edge_path(@layer.edge)} fill="none"></path>
+      <path stroke-dasharray={style_or_default(@layer.edge, :stroke_dash_array)} d={edge_path(@layer.edge, @layer.edge.style.smoothness)} fill="none"></path>
             
             <%= if style_or_default(@layer.edge, :source_tip_symbol_shape_id) do %>
             <g fill={style_or_default(@layer, :background_color)}  id={"edge-#{@layer.edge.id}-source-tip"} transform={"rotate(#{edge_angle(:source, @layer.edge)} #{@layer.edge.source_x} #{@layer.edge.source_y})"}>
@@ -48,7 +48,7 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
 
 
       <%= if @selected do %>
-        <path stroke="magenta" stroke-linejoin="round" stroke-linecap="round"  opacity="0.3" stroke-width="8" d={edge_path(@layer.edge)} fill="none" id={"edge-select-#{@layer.edge.id}"}></path>
+        <path stroke="magenta" stroke-linejoin="round" stroke-linecap="round"  opacity="0.3" stroke-width="8" d={edge_path(@layer.edge, @layer.edge.style.smoothness)} fill="none" id={"edge-select-#{@layer.edge.id}"}></path>
 
         <%= for w <- @layer.edge.waypoints do %>
           <circle cx={w.position_x} cy={w.position_y} r="5" fill="magenta"></circle>
@@ -72,38 +72,36 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
 
   defp default_style(style_key), do: nil
 
-  defp edge_path(edge) do
-    smooth = edge.style.smoothness == "1"
+  defp edge_path(edge, :linear) do
+    waypoints =
+      edge.waypoints
+      |> Enum.map(fn %{position_x: x, position_y: y} -> "L #{x} #{y}" end)
+      |> Enum.join(" ")
 
-    if smooth do
-      case edge.waypoints do
-        [] ->
-          "M #{edge.source_x} #{edge.source_y} L #{edge.target_x} #{edge.target_y}"
+    "M #{edge.source_x} #{edge.source_y} #{waypoints} L #{edge.target_x} #{edge.target_y}"
+  end
 
-        [w] ->
-          "M #{edge.source_x} #{edge.source_y}  Q #{w.position_x} #{w.position_y} #{edge.target_x} #{edge.target_y}"
+  defp edge_path(edge, :autobezier) do
+    case edge.waypoints do
+      [] ->
+        "M #{edge.source_x} #{edge.source_y} L #{edge.target_x} #{edge.target_y}"
 
-        more ->
-          waypoints =
-            more
-            |> Enum.map(fn %{position_x: x, position_y: y} -> {x, y} end)
-            |> then(&Enum.concat([{edge.source_x, edge.source_y}], &1))
-            |> Enum.chunk_every(2, 1, :discard)
-            |> Enum.drop(1)
-            |> Enum.map(fn [{x1, y1}, {x2, y2}] ->
-              "Q #{x1} #{y1} #{(x2 + x1) / 2} #{(y2 + y1) / 2}"
-            end)
-            |> Enum.join(" ")
+      [w] ->
+        "M #{edge.source_x} #{edge.source_y}  Q #{w.position_x} #{w.position_y} #{edge.target_x} #{edge.target_y}"
 
-          "M #{edge.source_x} #{edge.source_y} #{waypoints} T #{edge.target_x} #{edge.target_y}"
-      end
-    else
-      waypoints =
-        edge.waypoints
-        |> Enum.map(fn %{position_x: x, position_y: y} -> "L #{x} #{y}" end)
-        |> Enum.join(" ")
+      more ->
+        waypoints =
+          more
+          |> Enum.map(fn %{position_x: x, position_y: y} -> {x, y} end)
+          |> then(&Enum.concat([{edge.source_x, edge.source_y}], &1))
+          |> Enum.chunk_every(2, 1, :discard)
+          |> Enum.drop(1)
+          |> Enum.map(fn [{x1, y1}, {x2, y2}] ->
+            "Q #{x1} #{y1} #{(x2 + x1) / 2} #{(y2 + y1) / 2}"
+          end)
+          |> Enum.join(" ")
 
-      "M #{edge.source_x} #{edge.source_y} #{waypoints} L #{edge.target_x} #{edge.target_y}"
+        "M #{edge.source_x} #{edge.source_y} #{waypoints} T #{edge.target_x} #{edge.target_y}"
     end
   end
 

@@ -143,7 +143,8 @@ defmodule RenewCollab.Import.DocumentImport do
                     "bold" => convert_font_style(Map.get(fields, :fCurrentFontStyle, 0), :bold),
                     "italic" =>
                       convert_font_style(Map.get(fields, :fCurrentFontStyle, 0), :italic),
-                    "text_color" => convert_color(Map.get(attrs, "TextColor", "black"))
+                    "text_color" => convert_color(Map.get(attrs, "TextColor", "black")),
+                    "rich" => is_rich_text(parser.grammar, class_name)
                   }
                 }
               }
@@ -181,7 +182,17 @@ defmodule RenewCollab.Import.DocumentImport do
                   attrs ->
                     %{
                       "opacity" => Map.get(attrs, "Opacity", 1),
-                      "background_color" => convert_color(Map.get(attrs, "FillColor", "#70DB93")),
+                      "background_color" =>
+                        convert_color(
+                          Map.get(
+                            attrs,
+                            "FillColor",
+                            convert_line_decoration_background(
+                              resolve_ref(refs, Map.get(fields, :start_decoration)),
+                              resolve_ref(refs, Map.get(fields, :end_decoration))
+                            )
+                          )
+                        ),
                       "border_color" => convert_color(Map.get(attrs, "FrameColor", "black")),
                       "border_width" => convert_border_width(Map.get(attrs, "LineWidth", 1))
                     }
@@ -275,7 +286,7 @@ defmodule RenewCollab.Import.DocumentImport do
   defp convert_color({:rgb, 255, 199, 158}), do: "transparent"
 
   defp convert_color({:rgba, r, g, b, a}) when is_integer(a),
-    do: "rgba(#{r},#{g},#{b},#{a / 250.0})"
+    do: "rgba(#{r},#{g},#{b},#{a / 255.0})"
 
   defp convert_color({:rgba, r, g, b, a}) when is_float(a) and a <= 1.0,
     do: "rgba(#{r},#{g},#{b},#{a})"
@@ -303,10 +314,10 @@ defmodule RenewCollab.Import.DocumentImport do
   defp convert_border_width(width) when is_binary(width), do: width
   defp convert_border_width(nil), do: nil
 
-  defp convert_line_decoration(nil), do: nil
+  defp convert_smoothness(0), do: :linear
+  defp convert_smoothness(1), do: :autobezier
 
-  defp convert_smoothness(0), do: "0"
-  defp convert_smoothness(1), do: "1"
+  defp convert_line_decoration(nil), do: nil
 
   defp convert_line_decoration(%Renewex.Storable{
          class_name: class_name
@@ -323,10 +334,28 @@ defmodule RenewCollab.Import.DocumentImport do
       "CH.ifa.draw.figures.ArrowTip" -> "arrow-tip-normal"
       "de.renew.gui.DoubleArrowTip" -> "arrow-tip-double"
     end
-    |> dbg()
   end
 
   defp convert_line_decoration(other), do: dbg(other)
+
+  defp convert_line_decoration_background(
+         %Renewex.Storable{
+           class_name: "CH.ifa.draw.figures.ArrowTip",
+           fields: %{filled: true}
+         },
+         _
+       ) do
+    "black"
+  end
+
+  defp convert_line_decoration_background(_, %Renewex.Storable{
+         class_name: "CH.ifa.draw.figures.ArrowTip",
+         fields: %{filled: true}
+       }) do
+    "black"
+  end
+
+  defp convert_line_decoration_background(_, _), do: "transparent"
 
   defp convert_attrs_hidden(nil), do: false
 
@@ -344,6 +373,9 @@ defmodule RenewCollab.Import.DocumentImport do
   defp convert_line_cyclicity(grammar, class_name) do
     Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.contrib.PolygonFigure")
   end
+
+  defp is_rich_text(grammar, class_name),
+    do: Renewex.Hierarchy.is_subtype_of(grammar, class_name, "de.renew.gui.fs.ConceptFigure")
 
   defp convert_shape(grammar, class_name, fields, attrs) do
     cond do
@@ -451,6 +483,9 @@ defmodule RenewCollab.Import.DocumentImport do
 
       Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.contrib.DiamondFigure") ->
         {"diamond", nil}
+
+      Renewex.Hierarchy.is_subtype_of(grammar, class_name, "de.renew.gui.VirtualPlaceFigure") ->
+        {"ellipse-double-in", nil}
 
       Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.figures.EllipseFigure") ->
         {"ellipse", nil}

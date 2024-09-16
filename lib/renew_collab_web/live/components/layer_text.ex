@@ -21,8 +21,8 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
             phx-hook="ResizeRenewText" 
             x={@layer.text.position_x} 
             y={@layer.text.position_y}>
-            <%= for line <- @layer.text.body |> String.split("\n") do %>
-              <tspan x={@layer.text.position_x} dy="1.2em"><%= line %></tspan>
+            <%= for {{line, format}, li} <- @layer.text.body |> String.split("\n") |> Enum.map(&format_line(@layer.text.style.rich, &1)) |> Enum.with_index() do %>
+              <tspan {format} {if(li==0 and @layer.text.style.rich, do: ["font-weight": "bold"], else: [])} x={@layer.text.position_x} {[dy: if(li>0, do: "1.2em", else: "1em")]}><%= line %></tspan>
             <% end %>
           </text>
 
@@ -44,8 +44,8 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
             id={"text-select-#{@layer.text.id}"} 
             x={@layer.text.position_x} 
             y={@layer.text.position_y}>
-            <%= for line <- @layer.text.body |> String.split("\n") do %>
-              <tspan x={@layer.text.position_x} dy="1.2em"><%= line %></tspan>
+            <%= for {{line, format}, li} <- @layer.text.body |> String.split("\n") |> Enum.map(&format_line(@layer.text.style.rich, &1)) |> Enum.with_index() do %>
+              <tspan {format} x={@layer.text.position_x} {[dy: if(li>0, do: "1.2em", else: "1em")]}><%= line %></tspan>
             <% end %>
           </text>
           <% end %>
@@ -70,4 +70,9 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
   end
 
   defp default_style(style_key), do: nil
+
+  defp format_line(true, <<"_", rest::binary>>), do: {rest, ["text-decoration": "underline"]}
+  defp format_line(true, <<"\\", rest::binary>>), do: {rest, ["font-style": "italic"]}
+
+  defp format_line(_, line), do: {line, []}
 end

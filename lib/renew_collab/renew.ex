@@ -207,6 +207,7 @@ defmodule RenewCollab.Renew do
   def layer_text_style_key("font_family"), do: :font_family
   def layer_text_style_key("bold"), do: :bold
   def layer_text_style_key("text_color"), do: :text_color
+  def layer_text_style_key("rich"), do: :rich
 
   def update_layer_text_style(document_id, layer_id, style_attr, color) do
     Ecto.Multi.new()

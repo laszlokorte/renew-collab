@@ -24,7 +24,7 @@ defmodule RenewCollab.Symbol do
 
   """
   def list_shapes do
-    Repo.all(Shape)
+    Repo.all(Shape, order_by: [asc: :name])
     |> Repo.preload(
       paths:
         from(p in Path,

@@ -21,14 +21,18 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
           <% end %>
           <% end %>
         </td>
-        <td width="20" align="right">
+        <td width="20" align="right" style="white-space: nowrap; word-wrap: none">
           <%= if @selected do %>
           <input type="number" step="1" min="0"  phx-hook="RenewZIndex"  id={"layer-zindex-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"} value={@layer.z_index} size="2" />
           <%= else%>
           <%= @layer.z_index %>
           <%= end%>
         </td>
-        <td {unless(@selected, do: [style: "cursor: pointer; padding-left: #{2*@depth}em", "phx-click": "select_layer"], else: [])} phx-value-id={@layer.id}>
+        <td style={"padding-left: #{0.2+ 2*@depth}em"}>
+            <span phx-hook="RenewGrabber" id={"layer-grab-#{@layer.id}"} style="cursor: grab; padding: 0.5em; background: black; color: white">☰</span>
+
+        </td>
+        <td style={"padding-left: #{0.2+ 2*@depth}em"} {unless(@selected, do: [style: "cursor: pointer;", "phx-click": "select_layer"], else: [])} phx-value-id={@layer.id}>
           <%= if @selected do %>
           <small><button phx-click="select_layer" phx-value-id={"-"}>unselect</button></small><br>
           <% end %>
@@ -66,7 +70,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
                 <dd>
                <select name="shape_id">
                 <option {if(is_nil(@layer.box.symbol_shape_id), do: [selected: "selected"], else: [])}>---</option>
-                 <%= for {id, symbol} <- @symbols do %>
+                 <%= for {id, symbol} <- @symbols |> Enum.sort_by(&(elem(&1, 1).name)) do %>
                   <option value={id} {if(id == @layer.box.symbol_shape_id, do: [selected: "selected"], else: [])}><%= symbol.name %></option>
                   <% end %>
                </select>
@@ -176,6 +180,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
             font_size: :number,
             font_family: :text,
             text_color: :color,
+            rich: :checkbox,
             ] do %>
             <.live_component value={style_or_default(@layer.text, attr)}  element="text" id={"text-style-#{@layer.id}-#{attr}"} module={RenewCollabWeb.HierarchyStyleField} layer={@layer} attr={attr} type={type}  />
             <% end %>

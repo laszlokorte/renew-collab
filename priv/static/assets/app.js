@@ -6933,6 +6933,24 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
     reconnected() {
     }
   };
+  Hooks2.RenewGrabber = {
+    // Callbacks
+    mounted() {
+      this.el.setAttribute("draggable", true);
+      this.el.addEventListener("dragstart", (evt) => {
+      });
+    },
+    beforeUpdate() {
+    },
+    updated() {
+    },
+    destroyed() {
+    },
+    disconnected() {
+    },
+    reconnected() {
+    }
+  };
   var csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
   var liveSocket = new LiveSocket("/live", Socket, {
     longPollFallbackMs: 2500,

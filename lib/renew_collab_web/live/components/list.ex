@@ -14,6 +14,7 @@ defmodule RenewCollabWeb.HierarchyListComponent do
             <td width="20" align="center">Text</td>
             <td width="20" align="center">Edge</td>
             <td width="20" align="right">Ord.</td>
+            <td width="20" align="right"></td>
             <td>
               ID/Type
             </td>

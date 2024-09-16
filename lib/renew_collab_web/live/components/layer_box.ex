@@ -9,7 +9,7 @@ defmodule RenewCollabWeb.HierarchyLayerBoxComponent do
       <%= if @layer.box.symbol_shape_id do %>
        <%= case @layer.box.symbol_shape.name do %>
         <% "rect-round" -> %>
-              <rect  id={"roundrect-#{@layer.box.id}"} rx={@layer.box.symbol_shape_attributes["rx"] / 2}  ry={@layer.box.symbol_shape_attributes["ry"]  /2} x={@layer.box.position_x} y={@layer.box.position_y} width={@layer.box.width} height={@layer.box.height}></rect>
+              <rect  id={"roundrect-#{@layer.box.id}"} rx={(@layer.box.symbol_shape_attributes["rx"]||0) / 2}  ry={(@layer.box.symbol_shape_attributes["ry"]||0) /2} x={@layer.box.position_x} y={@layer.box.position_y} width={@layer.box.width} height={@layer.box.height}></rect>
         <% "pie" -> %>
               
             <path  id={"pie-#{@layer.box.id}"} d={pie_path(@layer.box, @layer.box.symbol_shape_attributes["start_angle"], @layer.box.symbol_shape_attributes["end_angle"])} fill-rule="evenodd" />
@@ -35,10 +35,10 @@ defmodule RenewCollabWeb.HierarchyLayerBoxComponent do
   end
 
   defp pie_path(box, start_angle, end_angle) do
-    cos_start = :math.cos(:math.pi() / 180 * start_angle)
-    sin_start = :math.sin(:math.pi() / 180 * start_angle)
-    cos_end = :math.cos(:math.pi() / 180 * end_angle)
-    sin_end = :math.sin(:math.pi() / 180 * end_angle)
+    cos_start = :math.cos(:math.pi() / 180 * (start_angle || 0))
+    sin_start = :math.sin(:math.pi() / 180 * (start_angle || 0))
+    cos_end = :math.cos(:math.pi() / 180 * (end_angle || 180))
+    sin_end = :math.sin(:math.pi() / 180 * (end_angle || 180))
 
     dot = cos_start * cos_end + sin_start * sin_end
     det = cos_start * sin_end - sin_start * cos_end

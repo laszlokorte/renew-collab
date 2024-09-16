@@ -333,6 +333,23 @@ Hooks.RenewBoxShape = {
   reconnected()  {  },
 }
 
+
+Hooks.RenewGrabber = {
+  // Callbacks
+  mounted() {
+    this.el.setAttribute("draggable", true)
+    this.el.addEventListener('dragstart', (evt) => {
+    }) 
+  },
+  beforeUpdate() {  },
+  updated() { 
+
+  },
+  destroyed() {  },
+  disconnected() {  },
+  reconnected()  {  },
+}
+
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,

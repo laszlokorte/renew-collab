@@ -63,6 +63,12 @@ defmodule RenewCollabWeb.HierarchyStyleField do
       :square
     ]
 
+  def options(el, :smoothness, :text),
+    do: [
+      :linear,
+      :autobezier
+    ]
+
   def options(el, _, :checkbox),
     do: [
       true,
