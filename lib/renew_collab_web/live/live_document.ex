@@ -14,7 +14,7 @@ defmodule RenewCollabWeb.LiveDocument do
       |> assign(:selection, nil)
       |> assign(:symbols, Symbol.list_shapes() |> Enum.map(fn s -> {s.id, s} end) |> Map.new())
 
-    RenewCollabWeb.Endpoint.subscribe("document:#{id}")
+    RenewCollabWeb.Endpoint.subscribe("redux_document:#{id}")
 
     {:ok, socket}
   end
@@ -129,13 +129,7 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def handle_event("toggle_visible", %{"id" => id}, socket) do
-    Renew.toggle_visible(id)
-
-    RenewCollabWeb.Endpoint.broadcast!(
-      "document:#{socket.assigns.document.id}",
-      "layer:update",
-      %{"id" => id}
-    )
+    Renew.toggle_visible(socket.assigns.document.id, id)
 
     {:noreply, socket}
   end
@@ -179,12 +173,6 @@ defmodule RenewCollabWeb.LiveDocument do
       color
     )
 
-    RenewCollabWeb.Endpoint.broadcast!(
-      "document:#{socket.assigns.document.id}",
-      "layer:update",
-      %{"id" => layer_id}
-    )
-
     {:noreply, socket}
   end
 
@@ -203,12 +191,6 @@ defmodule RenewCollabWeb.LiveDocument do
       layer_id,
       Renew.layer_edge_style_key(style_attr),
       color
-    )
-
-    RenewCollabWeb.Endpoint.broadcast!(
-      "document:#{socket.assigns.document.id}",
-      "layer:update",
-      %{"id" => layer_id}
     )
 
     {:noreply, socket}
@@ -231,12 +213,6 @@ defmodule RenewCollabWeb.LiveDocument do
       color
     )
 
-    RenewCollabWeb.Endpoint.broadcast!(
-      "document:#{socket.assigns.document.id}",
-      "layer:update",
-      %{"id" => layer_id}
-    )
-
     {:noreply, socket}
   end
 
@@ -245,12 +221,6 @@ defmodule RenewCollabWeb.LiveDocument do
       socket.assigns.document.id,
       layer_id,
       new_body
-    )
-
-    RenewCollabWeb.Endpoint.broadcast!(
-      "document:#{socket.assigns.document.id}",
-      "layer:update",
-      %{"id" => layer_id}
     )
 
     {:noreply, socket}
@@ -276,12 +246,6 @@ defmodule RenewCollabWeb.LiveDocument do
       Renew.parse_layer_box_size(new_size)
     )
 
-    RenewCollabWeb.Endpoint.broadcast!(
-      "document:#{socket.assigns.document.id}",
-      "layer:update",
-      %{"id" => layer_id}
-    )
-
     {:noreply, socket}
   end
 
@@ -301,12 +265,6 @@ defmodule RenewCollabWeb.LiveDocument do
       socket.assigns.document.id,
       layer_id,
       Renew.parse_layer_text_position(new_position)
-    )
-
-    RenewCollabWeb.Endpoint.broadcast!(
-      "document:#{socket.assigns.document.id}",
-      "layer:update",
-      %{"id" => layer_id}
     )
 
     {:noreply, socket}
@@ -332,12 +290,6 @@ defmodule RenewCollabWeb.LiveDocument do
       Renew.parse_layer_edge_position(new_size)
     )
 
-    RenewCollabWeb.Endpoint.broadcast!(
-      "document:#{socket.assigns.document.id}",
-      "layer:update",
-      %{"id" => layer_id}
-    )
-
     {:noreply, socket}
   end
 
@@ -353,12 +305,6 @@ defmodule RenewCollabWeb.LiveDocument do
       socket.assigns.document.id,
       layer_id,
       Renew.parse_layer_z_index(new_z_index)
-    )
-
-    RenewCollabWeb.Endpoint.broadcast!(
-      "document:#{socket.assigns.document.id}",
-      "layer:update",
-      %{"id" => layer_id}
     )
 
     {:noreply, socket}
@@ -384,12 +330,6 @@ defmodule RenewCollabWeb.LiveDocument do
       Renew.parse_layer_edge_waypoint_position(new_position)
     )
 
-    RenewCollabWeb.Endpoint.broadcast!(
-      "document:#{socket.assigns.document.id}",
-      "layer:update",
-      %{"id" => layer_id}
-    )
-
     {:noreply, socket}
   end
 
@@ -405,12 +345,6 @@ defmodule RenewCollabWeb.LiveDocument do
       socket.assigns.document.id,
       layer_id,
       waypoint_d
-    )
-
-    RenewCollabWeb.Endpoint.broadcast!(
-      "document:#{socket.assigns.document.id}",
-      "layer:update",
-      %{"id" => layer_id}
     )
 
     {:noreply, socket}
@@ -430,21 +364,15 @@ defmodule RenewCollabWeb.LiveDocument do
       after_waypoint_id
     )
 
-    RenewCollabWeb.Endpoint.broadcast!(
-      "document:#{socket.assigns.document.id}",
-      "layer:update",
-      %{"id" => layer_id}
-    )
-
     {:noreply, socket}
   end
 
-  def handle_info(%{topic: <<"document:", doc_id::binary>>, payload: state}, socket) do
-    if doc_id == socket.assigns.document.id do
+  def handle_info({:document_changed, document_id}, socket) do
+    if document_id == socket.assigns.document.id do
       {:noreply,
        socket
        |> update(:document, fn _ ->
-         Renew.get_document_with_elements!(socket.assigns.document.id)
+         Renew.get_document_with_elements!(document_id)
        end)}
     end
   end

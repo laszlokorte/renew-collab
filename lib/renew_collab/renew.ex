@@ -122,16 +122,24 @@ defmodule RenewCollab.Renew do
     )
   end
 
-  def toggle_visible(layer_id) do
+  def toggle_visible(document_id, layer_id) do
     query =
       from(
         l in Layer,
-        where: l.id == ^layer_id,
+        where: l.id == ^layer_id and l.document_id == ^document_id,
         update: [set: [hidden: not l.hidden]]
       )
 
     # Update the record
     Repo.update_all(query, [])
+    |> case do
+      {1, nil} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
   end
 
   def layer_style_key("opacity"), do: :opacity
@@ -152,6 +160,12 @@ defmodule RenewCollab.Renew do
       on_conflict: {:replace, [style_attr]}
     )
     |> Repo.transaction()
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "redux_document:#{document_id}",
+      {:document_changed, document_id}
+    )
   end
 
   def layer_edge_style_key("stroke_width"), do: :stroke_width
@@ -178,6 +192,12 @@ defmodule RenewCollab.Renew do
       on_conflict: {:replace, [style_attr]}
     )
     |> Repo.transaction()
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "redux_document:#{document_id}",
+      {:document_changed, document_id}
+    )
   end
 
   def layer_text_style_key("italic"), do: :italic
@@ -203,6 +223,12 @@ defmodule RenewCollab.Renew do
       on_conflict: {:replace, [style_attr]}
     )
     |> Repo.transaction()
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "redux_document:#{document_id}",
+      {:document_changed, document_id}
+    )
   end
 
   def update_layer_text_body(
@@ -222,6 +248,12 @@ defmodule RenewCollab.Renew do
       end
     )
     |> Repo.transaction()
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "redux_document:#{document_id}",
+      {:document_changed, document_id}
+    )
   end
 
   def update_layer_box_size(
@@ -251,6 +283,12 @@ defmodule RenewCollab.Renew do
       end
     )
     |> Repo.transaction()
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "redux_document:#{document_id}",
+      {:document_changed, document_id}
+    )
   end
 
   def parse_layer_box_size(%{
@@ -295,6 +333,12 @@ defmodule RenewCollab.Renew do
       end
     )
     |> Repo.transaction()
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "redux_document:#{document_id}",
+      {:document_changed, document_id}
+    )
   end
 
   def parse_layer_text_position(%{
@@ -329,6 +373,12 @@ defmodule RenewCollab.Renew do
       end
     )
     |> Repo.transaction()
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "redux_document:#{document_id}",
+      {:document_changed, document_id}
+    )
   end
 
   def parse_layer_z_index(z_index) do
@@ -364,6 +414,12 @@ defmodule RenewCollab.Renew do
       end
     )
     |> Repo.transaction()
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "redux_document:#{document_id}",
+      {:document_changed, document_id}
+    )
   end
 
   def parse_layer_edge_position(%{
@@ -414,6 +470,12 @@ defmodule RenewCollab.Renew do
       end
     )
     |> Repo.transaction()
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "redux_document:#{document_id}",
+      {:document_changed, document_id}
+    )
   end
 
   def parse_layer_edge_waypoint_position(%{
@@ -451,6 +513,12 @@ defmodule RenewCollab.Renew do
       end
     )
     |> Repo.transaction()
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "redux_document:#{document_id}",
+      {:document_changed, document_id}
+    )
   end
 
   def create_layer_edge_waypoint(
@@ -563,5 +631,11 @@ defmodule RenewCollab.Renew do
       end
     )
     |> Repo.transaction()
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "redux_document:#{document_id}",
+      {:document_changed, document_id}
+    )
   end
 end
