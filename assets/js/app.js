@@ -71,7 +71,7 @@ Hooks.RenewStyleAttribute = {
     const rnwStyle = this.el.getAttribute('rnw-style')
     const rnwLayerId = this.el.getAttribute('rnw-layer-id')
 
-    const eventType = this.el.tagName == "BUTTON" ? 'click' : 'change'
+    const eventType = this.el.tagName == "BUTTON" ? 'click' : 'input'
 
     this.el.addEventListener(eventType, (evt) => {
       const newValue = ['radio','checkbox'].indexOf(evt.currentTarget.type) > -1 ? evt.currentTarget.checked: evt.currentTarget.value
@@ -319,7 +319,7 @@ Hooks.RenewBoxShape = {
       const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
 
       this.pushEvent("update_shape", {
-        value: {shape_id, shape_attributes: shape_attributes.trim() ? JSON.parse(shape_attributes) : null},
+        value: {shape_id: shape_id || null, shape_attributes: shape_attributes.trim() ? JSON.parse(shape_attributes) : null},
         layer_id: rnwLayerId,
       })
     }) 
@@ -337,8 +337,72 @@ Hooks.RenewBoxShape = {
 Hooks.RenewGrabber = {
   // Callbacks
   mounted() {
-    this.el.setAttribute("draggable", true)
     this.el.addEventListener('dragstart', (evt) => {
+      evt.dataTransfer.setData("text/plain", evt.currentTarget.getAttribute('rnw-layer-id'));
+    }) 
+    let counter = 0
+    this.el.addEventListener('dragenter', (evt) => {
+      evt.currentTarget.style.backgroundColor="green"
+      counter++
+    }) 
+    this.el.addEventListener('dragleave', (evt) => {
+      if(--counter < 1) {
+        evt.currentTarget.style.backgroundColor="black"
+      }
+    }) 
+    this.el.addEventListener('drop', (evt) => {
+        counter = 0
+        evt.currentTarget.style.backgroundColor="black"
+
+        const subjectId = evt.dataTransfer.getData("text");
+        const targetId = evt.currentTarget.getAttribute('rnw-layer-id');
+
+        if(subjectId==targetId) {
+          return
+        }
+
+        this.pushEvent("move_layer", {
+          target_layer_id: targetId,
+          layer_id: subjectId,
+          relative: 'above' // vs below
+        })
+    }) 
+  },
+  beforeUpdate() {  },
+  updated() { 
+
+  },
+  destroyed() {  },
+  disconnected() {  },
+  reconnected()  {  },
+}
+Hooks.RenewDropper = {
+  // Callbacks
+  mounted() {
+    let counter = 0
+    this.el.addEventListener('dragenter', (evt) => {
+      evt.currentTarget.style.backgroundColor="green"
+      counter++
+    }) 
+    this.el.addEventListener('dragleave', (evt) => {
+      if(--counter < 1) {
+        evt.currentTarget.style.backgroundColor="initial"
+      }
+    }) 
+    this.el.addEventListener('drop', (evt) => {
+        counter = 0
+        evt.currentTarget.style.backgroundColor="initial"
+        const subjectId = evt.dataTransfer.getData("text");
+        const targetId = evt.currentTarget.getAttribute('rnw-layer-id');
+        if(subjectId==targetId) {
+          return
+        }
+
+        this.pushEvent("move_layer", {
+          target_layer_id: targetId,
+          layer_id: subjectId,
+          relative: 'inside_bottom' // vs inside_top
+        })
     }) 
   },
   beforeUpdate() {  },

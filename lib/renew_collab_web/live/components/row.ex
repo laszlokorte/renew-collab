@@ -29,19 +29,23 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
           <%= end%>
         </td>
         <td style={"padding-left: #{0.2+ 2*@depth}em"}>
-            <span phx-hook="RenewGrabber" id={"layer-grab-#{@layer.id}"} style="cursor: grab; padding: 0.5em; background: black; color: white">☰</span>
+            <span draggable="true" phx-hook="RenewGrabber" id={"layer-grab-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"} style="user-select: none; cursor: grab; padding: 0.5em; background: black; color: white">☰</span>
 
         </td>
         <td style={"padding-left: #{0.2+ 2*@depth}em"} {unless(@selected, do: [style: "cursor: pointer;", "phx-click": "select_layer"], else: [])} phx-value-id={@layer.id}>
           <%= if @selected do %>
           <small><button phx-click="select_layer" phx-value-id={"-"}>unselect</button></small><br>
           <% end %>
+                    <div phx-hook="RenewDropper" id={"dropper-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"}>
+
           <small><code><%= @layer.id %></code></small><br>
-          <%= if @selected do %>
-          <input  phx-hook="RenewSemanticTag" id={"semantic-tag-#{@layer.id}"}  type="text" value={@layer.semantic_tag} style="width: 100%; box-sizing: border-box"  rnw-layer-id={"#{@layer.id}"} />
-          <% else %>
-          <small><code><%= @layer.semantic_tag %></code></small>
-          <% end %>
+          
+            <%= if @selected do %>
+            <input  phx-hook="RenewSemanticTag" id={"semantic-tag-#{@layer.id}"}  type="text" value={@layer.semantic_tag} style="width: 100%; box-sizing: border-box"  rnw-layer-id={"#{@layer.id}"} />
+            <% else %>
+            <small><code><%= @layer.semantic_tag %></code></small>
+            <% end %>
+          </div>
 
           <%= if @selected do %>
           <%= unless is_nil(@layer.box) do %>
@@ -69,7 +73,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
                 <dt>X</dt>
                 <dd>
                <select name="shape_id">
-                <option {if(is_nil(@layer.box.symbol_shape_id), do: [selected: "selected"], else: [])}>---</option>
+                <option {if(is_nil(@layer.box.symbol_shape_id), do: [selected: "selected"], else: [])} value="">---</option>
                  <%= for {id, symbol} <- @symbols |> Enum.sort_by(&(elem(&1, 1).name)) do %>
                   <option value={id} {if(id == @layer.box.symbol_shape_id, do: [selected: "selected"], else: [])}><%= symbol.name %></option>
                   <% end %>

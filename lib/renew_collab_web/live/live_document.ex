@@ -417,6 +417,18 @@ defmodule RenewCollabWeb.LiveDocument do
     {:noreply, socket}
   end
 
+  def handle_event(
+        "move_layer",
+        %{
+          "target_layer_id" => target_layer_id,
+          "layer_id" => layer_id,
+          "relative" => relative
+        },
+        socket
+      ) do
+    {:noreply, socket}
+  end
+
   def handle_info({:document_changed, document_id}, socket) do
     if document_id == socket.assigns.document.id do
       {:noreply,

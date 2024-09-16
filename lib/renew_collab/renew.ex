@@ -589,7 +589,9 @@ defmodule RenewCollab.Renew do
     |> Ecto.Multi.update(
       :size,
       fn %{box: box} ->
-        Ecto.Changeset.change(box, %{
+        dbg(shape_id)
+
+        RenewCollab.Element.Box.changeset(box, %{
           symbol_shape_id: shape_id,
           symbol_shape_attributes: attributes
         })
