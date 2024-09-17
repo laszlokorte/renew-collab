@@ -103,14 +103,14 @@ defmodule RenewCollabWeb.LiveDocuments do
           kind: kind,
           layers: layers,
           hierarchy: hierarchy,
-          annotation_links: annotation_links
+          hyperlinks: hyperlinks
         }
       ] ->
         with {:ok, %RenewCollab.Document.Document{} = document} <-
                RenewCollab.Renew.create_document(
                  %{"name" => doc_name, "kind" => kind, "layers" => layers},
                  hierarchy,
-                 annotation_links
+                 hyperlinks
                ) do
         else
           _ ->

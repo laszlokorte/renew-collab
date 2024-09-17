@@ -24,6 +24,14 @@ defmodule RenewCollab.Hierarchy.Layer do
       where: [depth: {:>, 0}],
       preload_order: [asc: :depth]
 
+    has_many :incoming_links, RenewCollab.Connection.Hyperlink,
+      on_delete: :delete_all,
+      foreign_key: :target_layer_id
+
+    has_one :outgoing_link, RenewCollab.Connection.Hyperlink,
+      on_delete: :delete_all,
+      foreign_key: :source_layer_id
+
     has_many :available_sockets, through: [:interface, :socket_schema, :sockets]
     has_many :attached_bonds, RenewCollab.Connection.Bond, on_delete: :delete_all
     has_many :attached_edges, through: [:attached_bonds, :edge]

@@ -277,7 +277,7 @@ defmodule RenewCollab.Import.DocumentImport do
           end
         end
 
-      annotation_links =
+      hyperlinks =
         for {{%Renewex.Storable{
                 class_name: class_name,
                 fields: %{fParent: {:ref, text_parent_ref}} = fields
@@ -287,8 +287,8 @@ defmodule RenewCollab.Import.DocumentImport do
               |> elem(1),
             not is_nil(target_id) do
           %{
-            text_layer_id: uuid,
-            layer_id: target_id
+            source_layer_id: uuid,
+            target_layer_id: target_id
           }
         end
 
@@ -298,7 +298,7 @@ defmodule RenewCollab.Import.DocumentImport do
          kind: class_name,
          layers: layers,
          hierarchy: hierarchy,
-         annotation_links: annotation_links
+         hyperlinks: hyperlinks
        }}
     end
   end

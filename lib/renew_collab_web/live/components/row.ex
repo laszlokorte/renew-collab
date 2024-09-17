@@ -6,11 +6,11 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
     ~H"""
       <tr id={"layer-list-item-#{@layer.id}"} bgcolor={if(@selected, do: "#ffaaff", else: "white")}>
         <td width="20" align="center" style="cursor:pointer;" phx-click="toggle_visible" phx-value-id={@layer.id}><%= if @layer.hidden do %><% else %>👁<% end %></td>
+        <td width="20">          <%= if @layer.outgoing_link do %><span style="cursor: pointer" phx-click="select_layer" phx-value-id={@layer.outgoing_link.target_layer_id}>🔗</span><% end %></td>
         <td width="20" align="center"><%= if @layer.box do %>☐<% end %></td>
         <td width="20" align="center">
           <%= if @layer.text do %>
           T
-          <%= if @layer.text.annotation_link do %><span style="cursor: pointer" phx-click="select_layer" phx-value-id={@layer.text.annotation_link.layer_id}>🔗</span><% end %>
           <% end %>
         </td>
         <td width="20" align="center">

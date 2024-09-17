@@ -10,6 +10,7 @@ defmodule RenewCollabWeb.HierarchyListComponent do
         <thead>
           <tr>
             <td width="20" align="center">Vis</td>
+            <td width="20" align="center">Link</td>
             <td width="20" align="center">Box</td>
             <td width="20" align="center">Text</td>
             <td width="20" align="center">Edge</td>

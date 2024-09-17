@@ -11,9 +11,6 @@ defmodule RenewCollab.Element.Text do
     belongs_to :layer, RenewCollab.Hierarchy.Layer
     has_one :style, RenewCollab.Style.TextStyle, on_delete: :delete_all
 
-    has_one :annotation_link, RenewCollab.Connection.AnnotationLink, on_delete: :delete_all
-    has_one :annotation_target, through: [:annotation_link, :layer]
-
     timestamps(type: :utc_datetime)
   end
 
@@ -22,7 +19,6 @@ defmodule RenewCollab.Element.Text do
     element_text
     |> cast(attrs, [:position_x, :position_y, :body])
     |> cast_assoc(:style)
-    |> cast_assoc(:annotation_link)
     |> validate_required([:position_x, :position_y, :body])
     |> unique_constraint(:element_id)
   end
