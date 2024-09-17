@@ -12,6 +12,7 @@ defmodule RenewCollab.Renew do
   alias RenewCollab.Style.EdgeStyle
   alias RenewCollab.Style.TextStyle
   alias RenewCollab.Connection.Waypoint
+  alias RenewCollab.Connection.AnnotationLink
   alias RenewCollab.Hierarchy.LayerParenthood
 
   def reset do
@@ -36,12 +37,13 @@ defmodule RenewCollab.Renew do
               box: [
                 symbol_shape: []
               ],
-              text: [style: []],
+              text: [style: [], annotation_link: []],
               edge: [
                 waypoints: ^from(w in Waypoint, order_by: [asc: :sort]),
                 style: []
               ],
-              style: []
+              style: [],
+              interface: []
             ]
           )
       )
@@ -141,7 +143,7 @@ defmodule RenewCollab.Renew do
     nil
   end
 
-  def create_document(attrs \\ %{}, parenthoods \\ []) do
+  def create_document(attrs \\ %{}, parenthoods \\ [], annotations \\ []) do
     with {:ok, %{insert_document: inserted_document}} <-
            Ecto.Multi.new()
            |> Ecto.Multi.insert(
@@ -165,6 +167,34 @@ defmodule RenewCollab.Renew do
                )
              end,
              on_conflict: {:replace, [:depth, :ancestor_id, :descendant_id]}
+           )
+           |> Ecto.Multi.all(
+             :text_layers,
+             fn %{insert_document: new_document} ->
+               from(l in Layer,
+                 join: t in assoc(l, :text),
+                 where: l.document_id == ^new_document.id,
+                 select: {l.id, t.id}
+               )
+             end
+           )
+           |> Ecto.Multi.insert_all(
+             :insert_annotations,
+             AnnotationLink,
+             fn %{text_layers: text_layers} ->
+               now = DateTime.utc_now() |> DateTime.truncate(:second)
+               text_layer_map = Map.new(text_layers)
+
+               annotations
+               |> Enum.map(fn %{text_layer_id: text_layer_id, layer_id: layer_id} ->
+                 %{
+                   layer_id: layer_id,
+                   text_id: Map.get(text_layer_map, text_layer_id),
+                   inserted_at: now,
+                   updated_at: now
+                 }
+               end)
+             end
            )
            |> Repo.transaction() do
       RenewCollabWeb.Endpoint.broadcast!(

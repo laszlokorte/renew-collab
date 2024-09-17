@@ -6,8 +6,27 @@ defmodule RenewCollab.Connection.Socket do
   @foreign_key_type :binary_id
   schema "socket" do
     field :name, :string
-    field :kind, :string
     belongs_to :socket_schema, RenewCollab.Connection.SocketSchema
+
+    field :x_value, :float, default: 0.0
+    field :x_unit, Ecto.Enum, values: [:width, :height, :minsize, :maxsize], default: :width
+    field :x_offset_operation, Ecto.Enum, values: [:sum, :min, :max], default: :sum
+    field :x_offset_value_static, :float, default: 0.0
+    field :x_offset_dynamic_value, :float, default: 0.0
+
+    field :x_offset_dynamic_unit, Ecto.Enum,
+      values: [:width, :height, :minsize, :maxsize],
+      default: :width
+
+    field :y_value, :float, default: 0.0
+    field :y_unit, Ecto.Enum, values: [:width, :height, :minsize, :maxsize], default: :height
+    field :y_offset_operation, Ecto.Enum, values: [:sum, :min, :max], default: :sum
+    field :y_offset_value_static, :float, default: 0.0
+    field :y_offset_dynamic_value, :float, default: 0.0
+
+    field :y_offset_dynamic_unit, Ecto.Enum,
+      values: [:width, :height, :minsize, :maxsize],
+      default: :height
 
     timestamps(type: :utc_datetime)
   end
@@ -15,8 +34,8 @@ defmodule RenewCollab.Connection.Socket do
   @doc false
   def changeset(socket, attrs) do
     socket
-    |> cast(attrs, [:name, :kind])
-    |> validate_required([:name, :kind])
-    |> unique_constraint(:element_id)
+    |> cast(attrs, [:name])
+    |> validate_required([:name])
+    |> unique_constraint([:socket_schema, :name])
   end
 end

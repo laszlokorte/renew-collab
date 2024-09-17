@@ -13,6 +13,7 @@ defmodule RenewCollab.Hierarchy.Layer do
     has_one :text, RenewCollab.Element.Text, on_delete: :delete_all
     has_one :edge, RenewCollab.Element.Edge, on_delete: :delete_all
     has_one :style, RenewCollab.Style.LayerStyle, on_delete: :delete_all
+    has_one :interface, RenewCollab.Element.Interface, on_delete: :delete_all
 
     has_one :direct_parent, RenewCollab.Hierarchy.LayerParenthood,
       foreign_key: :descendant_id,
@@ -22,6 +23,11 @@ defmodule RenewCollab.Hierarchy.Layer do
       foreign_key: :descendant_id,
       where: [depth: {:>, 0}],
       preload_order: [asc: :depth]
+
+    has_many :available_sockets, through: [:interface, :socket_schema, :sockets]
+    has_many :attached_bonds, RenewCollab.Connection.Bond, on_delete: :delete_all
+    has_many :attached_edges, through: [:attached_bonds, :edge]
+    has_many :used_sockets, through: [:attached_bonds, :socket]
 
     timestamps(type: :utc_datetime)
   end

@@ -12,9 +12,13 @@ defmodule RenewCollab.Element.Edge do
     field :cyclic, :boolean, default: false
     belongs_to :layer, RenewCollab.Hierarchy.Layer
 
-    has_one :source_bond, RenewCollab.Connection.SourceBond, on_delete: :delete_all
+    has_one :source_bond, RenewCollab.Connection.Bond,
+      on_delete: :delete_all,
+      where: [kind: :source]
 
-    has_one :target_bond, RenewCollab.Connection.TargetBond, on_delete: :delete_all
+    has_one :target_bond, RenewCollab.Connection.Bond,
+      on_delete: :delete_all,
+      where: [kind: :target]
 
     has_one :style, RenewCollab.Style.EdgeStyle, on_delete: :delete_all
 

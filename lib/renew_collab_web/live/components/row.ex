@@ -7,7 +7,12 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
       <tr id={"layer-list-item-#{@layer.id}"} bgcolor={if(@selected, do: "#ffaaff", else: "white")}>
         <td width="20" align="center" style="cursor:pointer;" phx-click="toggle_visible" phx-value-id={@layer.id}><%= if @layer.hidden do %><% else %>👁<% end %></td>
         <td width="20" align="center"><%= if @layer.box do %>☐<% end %></td>
-        <td width="20" align="center"><%= if @layer.text do %>T<% end %></td>
+        <td width="20" align="center">
+          <%= if @layer.text do %>
+          T
+          <%= if @layer.text.annotation_link do %><span style="cursor: pointer" phx-click="select_layer" phx-value-id={@layer.text.annotation_link.layer_id}>🔗</span><% end %>
+          <% end %>
+        </td>
         <td width="20" align="center">
           <%= if not (is_nil(@layer.edge) or is_nil(@layer.edge.style)) do %>
           <%= if @layer.edge.style.source_tip_symbol_shape_id do %>

@@ -17,6 +17,8 @@ defmodule RenewCollab.Repo.Migrations.AddSocketSchema do
       add :socket_schema_id, references(:socket_schema, on_delete: :delete_all, type: :binary_id),
         null: false
 
+      add :name, :string, null: false
+
       add :y_value, :float, null: false
       add :y_unit, :string, null: false, default: "height"
       add :y_offset_operation, :string, null: false, default: "sum"
@@ -33,5 +35,7 @@ defmodule RenewCollab.Repo.Migrations.AddSocketSchema do
 
       timestamps(type: :utc_datetime)
     end
+
+    create unique_index(:socket, [:socket_schema_id, :name])
   end
 end

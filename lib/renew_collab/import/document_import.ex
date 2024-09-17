@@ -277,7 +277,29 @@ defmodule RenewCollab.Import.DocumentImport do
           end
         end
 
-      {:ok, %{"name" => name, "kind" => class_name, "layers" => layers}, hierarchy}
+      annotation_links =
+        for {{%Renewex.Storable{
+                class_name: class_name,
+                fields: %{fParent: {:ref, text_parent_ref}} = fields
+              }, uuid}, z_index} <- unique_figs,
+            target_id =
+              Enum.at(refs_with_ids, text_parent_ref)
+              |> elem(1),
+            not is_nil(target_id) do
+          %{
+            text_layer_id: uuid,
+            layer_id: target_id
+          }
+        end
+
+      {:ok,
+       %RenewCollab.Import.Converted{
+         name: name,
+         kind: class_name,
+         layers: layers,
+         hierarchy: hierarchy,
+         annotation_links: annotation_links
+       }}
     end
   end
 

@@ -97,9 +97,21 @@ defmodule RenewCollabWeb.LiveDocuments do
            {:ok, content} = File.read(path)
            RenewCollab.Import.DocumentImport.import(doc_name, content)
          end) do
-      [{:ok, %{"name" => doc_name} = document_params, hierarchy}] ->
+      [
+        %RenewCollab.Import.Converted{
+          name: doc_name,
+          kind: kind,
+          layers: layers,
+          hierarchy: hierarchy,
+          annotation_links: annotation_links
+        }
+      ] ->
         with {:ok, %RenewCollab.Document.Document{} = document} <-
-               RenewCollab.Renew.create_document(document_params, hierarchy) do
+               RenewCollab.Renew.create_document(
+                 %{"name" => doc_name, "kind" => kind, "layers" => layers},
+                 hierarchy,
+                 annotation_links
+               ) do
         else
           _ ->
             with {:ok, %RenewCollab.Document.Document{} = document} <-
