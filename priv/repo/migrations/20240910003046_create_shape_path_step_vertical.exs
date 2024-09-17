@@ -6,7 +6,7 @@ defmodule RenewCollab.Repo.Migrations.CreateShapePathStepVertical do
       add :id, :binary_id, primary_key: true
 
       add :y_value, :float, null: false
-      add :y_unit, :string, null: "width"
+      add :y_unit, :string, null: false, default: "height"
       add :y_offset_operation, :string, null: false, default: "sum"
       add :y_offset_value_static, :float, null: false, default: 0
       add :y_offset_dynamic_value, :float, null: false, default: 0

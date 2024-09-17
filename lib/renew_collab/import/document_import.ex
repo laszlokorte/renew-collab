@@ -54,12 +54,12 @@ defmodule RenewCollab.Import.DocumentImport do
                   nil ->
                     nil
 
-                  # %{
-                  #   "opacity" => 1,
-                  #   "background_color" => "#70DB93",
-                  #   "border_color" => "black",
-                  #   "border_width" => "1"
-                  # }
+                    %{
+                      "opacity" => 1,
+                      "background_color" => "#70DB93",
+                      "border_color" => "black",
+                      "border_width" => "1"
+                    }
 
                   attrs ->
                     %{

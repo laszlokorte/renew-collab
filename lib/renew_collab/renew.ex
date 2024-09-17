@@ -41,8 +41,7 @@ defmodule RenewCollab.Renew do
                 waypoints: ^from(w in Waypoint, order_by: [asc: :sort]),
                 style: []
               ],
-              style: [],
-              sockets: []
+              style: []
             ]
           )
       )
@@ -224,8 +223,7 @@ defmodule RenewCollab.Renew do
         waypoints: from(w in Waypoint, order_by: [asc: :sort]),
         style: []
       ],
-      style: [],
-      sockets: []
+      style: []
     )
   end
 

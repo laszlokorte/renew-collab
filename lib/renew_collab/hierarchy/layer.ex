@@ -13,7 +13,6 @@ defmodule RenewCollab.Hierarchy.Layer do
     has_one :text, RenewCollab.Element.Text, on_delete: :delete_all
     has_one :edge, RenewCollab.Element.Edge, on_delete: :delete_all
     has_one :style, RenewCollab.Style.LayerStyle, on_delete: :delete_all
-    has_many :sockets, RenewCollab.Element.Socket, on_delete: :delete_all
 
     has_one :direct_parent, RenewCollab.Hierarchy.LayerParenthood,
       foreign_key: :descendant_id,
@@ -35,7 +34,6 @@ defmodule RenewCollab.Hierarchy.Layer do
     |> cast_assoc(:text)
     |> cast_assoc(:edge)
     |> cast_assoc(:style)
-    |> cast_assoc(:sockets)
     |> validate_required([:z_index])
   end
 end

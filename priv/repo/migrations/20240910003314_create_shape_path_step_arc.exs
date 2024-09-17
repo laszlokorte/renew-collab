@@ -9,14 +9,14 @@ defmodule RenewCollab.Repo.Migrations.CreateShapePathStepArc do
       add :large, :boolean, default: false, null: false
 
       add :rx_value, :float, null: false
-      add :rx_unit, :string, null: "width"
+      add :rx_unit, :string, null: false, default: "width"
       add :rx_offset_operation, :string, null: false, default: "sum"
       add :rx_offset_value_static, :float, null: false, default: 0
       add :rx_offset_dynamic_value, :float, null: false, default: 0
       add :rx_offset_dynamic_unit, :string, default: "min"
 
       add :ry_value, :float, null: false
-      add :ry_unit, :string, null: "width"
+      add :ry_unit, :string, null: false, default: "height"
       add :ry_offset_operation, :string, null: false, default: "sum"
       add :ry_offset_value_static, :float, null: false, default: 0
       add :ry_offset_dynamic_value, :float, null: false, default: 0

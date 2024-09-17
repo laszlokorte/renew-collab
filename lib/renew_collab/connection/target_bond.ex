@@ -6,7 +6,7 @@ defmodule RenewCollab.Connection.TargetBond do
   @foreign_key_type :binary_id
   schema "element_connection_target_bond" do
     belongs_to :edge, RenewCollab.Element.Edge
-    belongs_to :target_socket, RenewCollab.Element.Socket
+    belongs_to :target_socket, RenewCollab.Connection.Socket
 
     timestamps(type: :utc_datetime)
   end
