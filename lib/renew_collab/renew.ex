@@ -218,31 +218,38 @@ defmodule RenewCollab.Renew do
                )
              end
            )
-           |> Ecto.Multi.insert_all(
-             :insert_bonds,
-             Bond,
-             fn %{layer_edge_ids: layer_edge_ids} ->
-               layer_edge_map = Map.new(layer_edge_ids)
+           |> then(fn multi ->
+             bonds
+             |> Enum.chunk_every(500)
+             |> Enum.with_index()
+             |> Enum.reduce(multi, fn {bond_chunk, chunk_index}, multi ->
+               Ecto.Multi.insert_all(
+                 multi,
+                 :"insert_bonds_#{chunk_index}",
+                 Bond,
+                 fn %{layer_edge_ids: layer_edge_ids} ->
+                   layer_edge_map = Map.new(layer_edge_ids)
 
-               bonds
-               |> Enum.map(fn %{
-                                edge_layer_id: edge_layer_id,
-                                layer_id: layer_id,
-                                socket_id: socket_id,
-                                kind: kind
-                              } ->
-                 %{
-                   element_edge_id: Map.get(layer_edge_map, edge_layer_id),
-                   layer_id: layer_id,
-                   socket_id: socket_id,
-                   kind: kind,
-                   inserted_at: now,
-                   updated_at: now
-                 }
-               end)
-               |> dbg
-             end
-           )
+                   bond_chunk
+                   |> Enum.map(fn %{
+                                    edge_layer_id: edge_layer_id,
+                                    layer_id: layer_id,
+                                    socket_id: socket_id,
+                                    kind: kind
+                                  } ->
+                     %{
+                       element_edge_id: Map.get(layer_edge_map, edge_layer_id),
+                       layer_id: layer_id,
+                       socket_id: socket_id,
+                       kind: kind,
+                       inserted_at: now,
+                       updated_at: now
+                     }
+                   end)
+                 end
+               )
+             end)
+           end)
            |> Repo.transaction() do
       RenewCollabWeb.Endpoint.broadcast!(
         "documents",
@@ -466,6 +473,84 @@ defmodule RenewCollab.Renew do
         })
       end
     )
+    |> Ecto.Multi.all(
+      :affected_bonds,
+      fn %{box: box} ->
+        from(bond in Bond,
+          join: l in assoc(bond, :layer),
+          join: edge in assoc(bond, :element_edge),
+          join: box in assoc(l, :box),
+          join: socket in assoc(bond, :socket),
+          where: box.id == ^box.id,
+          group_by: bond.id,
+          select: %{
+            bond: bond,
+            box: box,
+            socket: socket,
+            edge: edge
+          }
+        )
+      end
+    )
+    |> Ecto.Multi.all(
+      :affected_waypoints,
+      fn %{affected_bonds: affected_bonds} ->
+        from(w in Waypoint,
+          where: w.edge_id in ^Enum.map(affected_bonds, & &1.bond.element_edge_id),
+          order_by: [asc: w.sort]
+        )
+      end
+    )
+    |> Ecto.Multi.run(:update_edge_points, fn repo,
+                                              %{
+                                                affected_bonds: affected_bonds,
+                                                box: box,
+                                                affected_waypoints: affected_waypoints
+                                              } ->
+      waypoint_map = Enum.group_by(affected_waypoints, & &1.edge_id) |> Map.new()
+
+      affected_bonds
+      |> Enum.reduce_while({:ok, []}, fn %{
+                                           bond: bond,
+                                           box: box,
+                                           edge: edge,
+                                           socket: socket
+                                         },
+                                         {:ok, acc} ->
+        waypoints = Map.get(waypoint_map, bond.element_edge_id, [])
+
+        first_waypoint =
+          List.first(waypoints, %{position_x: edge.source_x, position_y: edge.source_y})
+
+        last_waypoint =
+          List.last(waypoints, %{position_x: edge.target_x, position_y: edge.target_y})
+
+        target_x = box.position_x + box.width / 2
+        target_y = box.position_y + box.height / 2
+
+        offset_x = 10
+        offset_y = 10
+
+        case bond.kind do
+          :source ->
+            Ecto.Changeset.change(%Edge{id: bond.element_edge_id}, %{
+              source_x: target_x + offset_x,
+              source_y: target_y + offset_y
+            })
+
+          :target ->
+            Ecto.Changeset.change(%Edge{id: bond.element_edge_id}, %{
+              target_x: target_x + offset_x,
+              target_y: target_y + offset_y
+            })
+        end
+        |> Repo.update()
+        |> case do
+          {:ok, r} -> {:cont, {:ok, [r | acc]}}
+          e -> {:halt, {e}}
+        end
+      end)
+    end)
     |> Repo.transaction()
 
     Phoenix.PubSub.broadcast(
@@ -597,6 +682,46 @@ defmodule RenewCollab.Renew do
         })
       end
     )
+    |> Ecto.Multi.all(
+      :affected_bonds,
+      fn %{edge: edge} ->
+        from(bond in Bond,
+          join: l in assoc(bond, :layer),
+          join: box in assoc(l, :box),
+          join: socket in assoc(bond, :socket),
+          where: bond.element_edge_id == ^edge.id,
+          group_by: bond.id,
+          select: %{
+            bond: bond,
+            box: box,
+            socket: socket
+          }
+        )
+      end
+    )
+    |> Ecto.Multi.run(:update_edge_points, fn repo, %{affected_bonds: affected_bonds} ->
+      affected_bonds
+      |> Enum.reduce_while({:ok, []}, fn %{bond: bond, box: box, socket: socket}, {:ok, acc} ->
+        case bond.kind do
+          :source ->
+            Ecto.Changeset.change(%Edge{id: bond.element_edge_id}, %{
+              source_x: box.position_x + box.width / 2,
+              source_y: box.position_y + box.height / 2
+            })
+
+          :target ->
+            Ecto.Changeset.change(%Edge{id: bond.element_edge_id}, %{
+              target_x: box.position_x + box.width / 2,
+              target_y: box.position_y + box.height / 2
+            })
+        end
+        |> Repo.update()
+        |> case do
+          {:ok, r} -> {:cont, {:ok, [r | acc]}}
+          e -> {:halt, {e}}
+        end
+      end)
+    end)
     |> Repo.transaction()
 
     Phoenix.PubSub.broadcast(
