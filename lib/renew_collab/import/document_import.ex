@@ -1,6 +1,7 @@
 defmodule RenewCollab.Import.DocumentImport do
   def import(name, content) do
     symbol_ids = RenewCollab.Symbol.ids_by_name()
+    socket_ids = RenewCollab.Sockets.ids_by_name()
 
     with {:ok, true} <- check_utf8_binary?(content),
          {:ok, %Renewex.Document{root: root, refs: refs}} <- Renewex.parse_document(content),
@@ -292,13 +293,38 @@ defmodule RenewCollab.Import.DocumentImport do
           }
         end
 
+      bonds =
+        for {{%Renewex.Storable{
+                class_name: class_name,
+                fields: %{start: start_figure, end: end_figure} = fields
+              }, uuid}, _} <- unique_figs,
+            {{:ref, ref}, kind} <- [{start_figure, :source}, {end_figure, :target}],
+            connector =
+              Enum.at(refs_with_ids, ref),
+            not is_nil(connector),
+            {%Renewex.Storable{
+               class_name: connector_class,
+               fields: %{owner: {:ref, target_ref}}
+             }, _} = connector,
+            {_, layer_id} =
+              Enum.at(refs_with_ids, target_ref),
+            not is_nil(layer_id) do
+          %{
+            edge_layer_id: uuid,
+            layer_id: layer_id,
+            socket_id: Map.get(socket_ids, {"simple-socket-schema", "center-socket"}),
+            kind: kind
+          }
+        end
+
       {:ok,
        %RenewCollab.Import.Converted{
          name: name,
          kind: class_name,
          layers: layers,
          hierarchy: hierarchy,
-         hyperlinks: hyperlinks
+         hyperlinks: hyperlinks,
+         bonds: bonds
        }}
     end
   end

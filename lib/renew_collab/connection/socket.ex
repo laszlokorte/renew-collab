@@ -34,8 +34,23 @@ defmodule RenewCollab.Connection.Socket do
   @doc false
   def changeset(socket, attrs) do
     socket
-    |> cast(attrs, [:name])
+    |> cast(attrs, [
+      :socket_schema_id,
+      :name,
+      :x_value,
+      :x_unit,
+      :x_offset_operation,
+      :x_offset_value_static,
+      :x_offset_dynamic_value,
+      :x_offset_dynamic_unit,
+      :y_value,
+      :y_unit,
+      :y_offset_operation,
+      :y_offset_value_static,
+      :y_offset_dynamic_value,
+      :y_offset_dynamic_unit
+    ])
     |> validate_required([:name])
-    |> unique_constraint([:socket_schema, :name])
+    |> unique_constraint([:socket_schema_id, :name])
   end
 end

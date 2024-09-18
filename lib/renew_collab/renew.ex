@@ -13,10 +13,28 @@ defmodule RenewCollab.Renew do
   alias RenewCollab.Style.TextStyle
   alias RenewCollab.Connection.Waypoint
   alias RenewCollab.Connection.Hyperlink
+  alias RenewCollab.Connection.SocketSchema
+  alias RenewCollab.Connection.Bond
   alias RenewCollab.Hierarchy.LayerParenthood
+  alias RenewCollab.Element.Edge
 
   def reset do
     Repo.delete_all(Document)
+
+    %SocketSchema{}
+    |> SocketSchema.changeset(%{
+      name: "simple-socket-schema",
+      sockets: [
+        %{
+          name: "center-socket",
+          x_value: 0.5,
+          x_unit: :width,
+          y_value: 0.5,
+          y_unit: :height
+        }
+      ]
+    })
+    |> Repo.insert()
   end
 
   def list_documents do
@@ -145,7 +163,7 @@ defmodule RenewCollab.Renew do
     nil
   end
 
-  def create_document(attrs \\ %{}, parenthoods \\ [], hyperlinks \\ []) do
+  def create_document(attrs \\ %{}, parenthoods \\ [], hyperlinks \\ [], bonds \\ []) do
     now = DateTime.utc_now() |> DateTime.truncate(:second)
 
     with {:ok, %{insert_document: inserted_document}} <-
@@ -188,6 +206,41 @@ defmodule RenewCollab.Renew do
                    updated_at: now
                  }
                end)
+             end
+           )
+           |> Ecto.Multi.all(
+             :layer_edge_ids,
+             fn %{insert_document: new_document} ->
+               from(e in Edge,
+                 join: l in assoc(e, :layer),
+                 where: l.document_id == ^new_document.id,
+                 select: {l.id, e.id}
+               )
+             end
+           )
+           |> Ecto.Multi.insert_all(
+             :insert_bonds,
+             Bond,
+             fn %{layer_edge_ids: layer_edge_ids} ->
+               layer_edge_map = Map.new(layer_edge_ids)
+
+               bonds
+               |> Enum.map(fn %{
+                                edge_layer_id: edge_layer_id,
+                                layer_id: layer_id,
+                                socket_id: socket_id,
+                                kind: kind
+                              } ->
+                 %{
+                   element_edge_id: Map.get(layer_edge_map, edge_layer_id),
+                   layer_id: layer_id,
+                   socket_id: socket_id,
+                   kind: kind,
+                   inserted_at: now,
+                   updated_at: now
+                 }
+               end)
+               |> dbg
              end
            )
            |> Repo.transaction() do

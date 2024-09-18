@@ -4,8 +4,8 @@ defmodule RenewCollab.Connection.Bond do
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
-  schema "element_connection_bond" do
-    belongs_to :edge, RenewCollab.Element.Edge
+  schema "connection_bond" do
+    belongs_to :element_edge, RenewCollab.Element.Edge
     belongs_to :socket, RenewCollab.Connection.Socket
     belongs_to :layer, RenewCollab.Hierarchy.Layer
     field :kind, Ecto.Enum, values: [:source, :target], null: false
@@ -16,8 +16,8 @@ defmodule RenewCollab.Connection.Bond do
   @doc false
   def changeset(element_connection_bond, attrs) do
     element_connection_bond
-    |> cast(attrs, [:edge_id, :socket_id, :kind])
-    |> validate_required([:edge_id, :socket_id, :kind])
-    |> unique_constraint([:edge_id, :kind])
+    |> cast(attrs, [:element_edge_id, :socket_id, :layer_id, :kind])
+    |> validate_required([:element_edge_id, :socket_id, :layer_id, :kind])
+    |> unique_constraint([:element_edge_id, :kind])
   end
 end

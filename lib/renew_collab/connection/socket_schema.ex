@@ -4,7 +4,7 @@ defmodule RenewCollab.Connection.SocketSchema do
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
-  schema "socket" do
+  schema "socket_schema" do
     field :name, :string
     has_many :sockets, RenewCollab.Connection.Socket
 
@@ -15,6 +15,7 @@ defmodule RenewCollab.Connection.SocketSchema do
   def changeset(socket_schema, attrs) do
     socket_schema
     |> cast(attrs, [:name])
+    |> cast_assoc(:sockets)
     |> validate_required([:name])
     |> unique_constraint(:element_id)
   end

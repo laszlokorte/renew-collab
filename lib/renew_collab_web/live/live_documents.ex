@@ -103,14 +103,16 @@ defmodule RenewCollabWeb.LiveDocuments do
           kind: kind,
           layers: layers,
           hierarchy: hierarchy,
-          hyperlinks: hyperlinks
+          hyperlinks: hyperlinks,
+          bonds: bonds
         }
       ] ->
         with {:ok, %RenewCollab.Document.Document{} = document} <-
                RenewCollab.Renew.create_document(
                  %{"name" => doc_name, "kind" => kind, "layers" => layers},
                  hierarchy,
-                 hyperlinks
+                 hyperlinks,
+                 bonds
                ) do
         else
           _ ->
@@ -135,9 +137,9 @@ defmodule RenewCollabWeb.LiveDocuments do
   end
 
   def handle_event("reset", %{}, socket) do
-    RenewCollab.Symbol.reset()
     RenewCollab.Renew.reset()
     RenewCollab.Auth.create_account("test@test.de", "secret")
+    RenewCollab.Symbol.reset()
 
     RenewCollabWeb.Endpoint.broadcast!(
       "documents",

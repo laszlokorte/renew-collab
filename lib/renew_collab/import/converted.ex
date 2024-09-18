@@ -4,7 +4,8 @@ defmodule RenewCollab.Import.Converted do
     :kind,
     :layers,
     :hierarchy,
-    :hyperlinks
+    :hyperlinks,
+    :bonds
   ]
 
   def new(
@@ -12,14 +13,16 @@ defmodule RenewCollab.Import.Converted do
         kind,
         layers,
         hierarchy,
-        hyperlinks
+        hyperlinks,
+        bonds
       ) do
     %RenewCollab.Import.Converted{
       name: name,
       kind: kind,
       layers: layers,
       hierarchy: hierarchy,
-      hyperlinks: hyperlinks
+      hyperlinks: hyperlinks,
+      bonds: bonds
     }
   end
 end
