@@ -17,6 +17,8 @@ defmodule RenewCollab.Renew do
   alias RenewCollab.Connection.Bond
   alias RenewCollab.Hierarchy.LayerParenthood
   alias RenewCollab.Element.Edge
+  alias RenewCollab.Element.Box
+  alias RenewCollab.Element.Text
 
   def reset do
     Repo.delete_all(Document)
@@ -119,16 +121,51 @@ defmodule RenewCollab.Renew do
         }
       end)
 
-    {document_data, new_parenthoods}
+    hyperlinks =
+      from(h in Hyperlink,
+        join: s in assoc(h, :source_layer),
+        join: t in assoc(h, :target_layer),
+        where: s.document_id == ^id and t.document_id == ^id,
+        select: h
+      )
+      |> Repo.all()
+      |> Enum.map(fn hyperlink ->
+        Map.new()
+        |> Map.put(:source_layer_id, Map.get(new_layers_ids, hyperlink.source_layer_id))
+        |> Map.put(:target_layer_id, Map.get(new_layers_ids, hyperlink.target_layer_id))
+      end)
+
+    new_bonds =
+      from(b in Bond,
+        join: e in assoc(b, :element_edge),
+        join: l in assoc(e, :layer),
+        where: l.document_id == ^id,
+        select: %{
+          edge_layer_id: l.id,
+          layer_id: b.layer_id,
+          socket_id: b.socket_id,
+          kind: b.kind
+        }
+      )
+      |> Repo.all()
+      |> Enum.map(fn bond ->
+        bond
+        |> Map.update(:edge_layer_id, nil, &Map.get(new_layers_ids, &1))
+        |> Map.update(:layer_id, nil, &Map.get(new_layers_ids, &1))
+      end)
+
+    {document_data, new_parenthoods, hyperlinks, new_bonds}
   end
 
   def duplicate_document(id) do
-    {doc_params, parenthoods} = deep_clone_document!(id)
+    {doc_params, parenthoods, hyperlinks, bonds} = deep_clone_document!(id)
 
     create_document(
       doc_params
       |> Map.update(:name, "Untitled", &"#{String.trim_trailing(&1, "(Copy)")} (Copy)"),
-      parenthoods
+      parenthoods,
+      hyperlinks,
+      bonds
     )
   end
 
@@ -166,100 +203,103 @@ defmodule RenewCollab.Renew do
   def create_document(attrs \\ %{}, parenthoods \\ [], hyperlinks \\ [], bonds \\ []) do
     now = DateTime.utc_now() |> DateTime.truncate(:second)
 
-    with {:ok, %{insert_document: inserted_document}} <-
-           Ecto.Multi.new()
-           |> Ecto.Multi.insert(
-             :insert_document,
-             %Document{} |> Document.changeset(attrs)
-           )
-           |> Ecto.Multi.insert_all(
-             :insert_parenthoods,
-             LayerParenthood,
-             fn %{insert_document: new_document} ->
-               Enum.map(
-                 parenthoods,
-                 fn {ancestor_id, descendant_id, depth} ->
-                   %{
-                     depth: depth,
-                     ancestor_id: ancestor_id,
-                     descendant_id: descendant_id,
-                     document_id: new_document.id
-                   }
-                 end
-               )
-             end,
-             on_conflict: {:replace, [:depth, :ancestor_id, :descendant_id]}
-           )
-           |> Ecto.Multi.insert_all(
-             :insert_hyperlinks,
-             Hyperlink,
-             fn _ ->
-               hyperlinks
-               |> Enum.map(fn %{
-                                source_layer_id: source_layer_id,
-                                target_layer_id: target_layer_id
-                              } ->
-                 %{
-                   source_layer_id: source_layer_id,
-                   target_layer_id: target_layer_id,
-                   inserted_at: now,
-                   updated_at: now
-                 }
-               end)
-             end
-           )
-           |> Ecto.Multi.all(
-             :layer_edge_ids,
-             fn %{insert_document: new_document} ->
-               from(e in Edge,
-                 join: l in assoc(e, :layer),
-                 where: l.document_id == ^new_document.id,
-                 select: {l.id, e.id}
-               )
-             end
-           )
-           |> then(fn multi ->
-             bonds
-             |> Enum.chunk_every(500)
-             |> Enum.with_index()
-             |> Enum.reduce(multi, fn {bond_chunk, chunk_index}, multi ->
-               Ecto.Multi.insert_all(
-                 multi,
-                 :"insert_bonds_#{chunk_index}",
-                 Bond,
-                 fn %{layer_edge_ids: layer_edge_ids} ->
-                   layer_edge_map = Map.new(layer_edge_ids)
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(
+      :insert_document,
+      %Document{} |> Document.changeset(attrs)
+    )
+    |> Ecto.Multi.insert_all(
+      :insert_parenthoods,
+      LayerParenthood,
+      fn %{insert_document: new_document} ->
+        Enum.map(
+          parenthoods,
+          fn {ancestor_id, descendant_id, depth} ->
+            %{
+              depth: depth,
+              ancestor_id: ancestor_id,
+              descendant_id: descendant_id,
+              document_id: new_document.id
+            }
+          end
+        )
+      end,
+      on_conflict: {:replace, [:depth, :ancestor_id, :descendant_id]}
+    )
+    |> Ecto.Multi.insert_all(
+      :insert_hyperlinks,
+      Hyperlink,
+      fn _ ->
+        hyperlinks
+        |> Enum.map(fn %{
+                         source_layer_id: source_layer_id,
+                         target_layer_id: target_layer_id
+                       } ->
+          %{
+            source_layer_id: source_layer_id,
+            target_layer_id: target_layer_id,
+            inserted_at: now,
+            updated_at: now
+          }
+        end)
+      end
+    )
+    |> Ecto.Multi.all(
+      :layer_edge_ids,
+      fn %{insert_document: new_document} ->
+        from(e in Edge,
+          join: l in assoc(e, :layer),
+          where: l.document_id == ^new_document.id,
+          select: {l.id, e.id}
+        )
+      end
+    )
+    |> then(fn multi ->
+      bonds
+      |> Enum.chunk_every(500)
+      |> Enum.with_index()
+      |> Enum.reduce(multi, fn {bond_chunk, chunk_index}, multi ->
+        Ecto.Multi.insert_all(
+          multi,
+          :"insert_bonds_#{chunk_index}",
+          Bond,
+          fn %{layer_edge_ids: layer_edge_ids} ->
+            layer_edge_map = Map.new(layer_edge_ids)
 
-                   bond_chunk
-                   |> Enum.map(fn %{
-                                    edge_layer_id: edge_layer_id,
-                                    layer_id: layer_id,
-                                    socket_id: socket_id,
-                                    kind: kind
-                                  } ->
-                     %{
-                       element_edge_id: Map.get(layer_edge_map, edge_layer_id),
-                       layer_id: layer_id,
-                       socket_id: socket_id,
-                       kind: kind,
-                       inserted_at: now,
-                       updated_at: now
-                     }
-                   end)
-                 end
-               )
-             end)
-           end)
-           |> Repo.transaction() do
-      RenewCollabWeb.Endpoint.broadcast!(
-        "documents",
-        "documents:new",
-        {"document:new", inserted_document.id}
-      )
+            bond_chunk
+            |> Enum.map(fn
+              %{
+                edge_layer_id: edge_layer_id,
+                layer_id: layer_id,
+                socket_id: socket_id,
+                kind: kind
+              } ->
+                %{
+                  element_edge_id: Map.get(layer_edge_map, edge_layer_id),
+                  layer_id: layer_id,
+                  socket_id: socket_id,
+                  kind: kind,
+                  inserted_at: now,
+                  updated_at: now
+                }
+            end)
+          end
+        )
+      end)
+    end)
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{insert_document: inserted_document}} ->
+        RenewCollabWeb.Endpoint.broadcast!(
+          "documents",
+          "documents:new",
+          {"document:new", inserted_document.id}
+        )
 
-      {:ok, inserted_document}
-    else
-      e -> dbg(e)
+        {:ok, inserted_document}
+
+      e ->
+        dbg(e)
     end
   end
 
@@ -435,7 +475,7 @@ defmodule RenewCollab.Renew do
     |> Ecto.Multi.update(
       :body,
       fn %{text: text} ->
-        Ecto.Changeset.change(text, body: new_body)
+        Text.changeset(text, body: new_body)
       end
     )
     |> Repo.transaction()
@@ -450,12 +490,7 @@ defmodule RenewCollab.Renew do
   def update_layer_box_size(
         document_id,
         layer_id,
-        %{
-          position_x: position_x,
-          position_y: position_y,
-          width: width,
-          height: height
-        }
+        new_size
       ) do
     Ecto.Multi.new()
     |> Ecto.Multi.one(
@@ -465,12 +500,7 @@ defmodule RenewCollab.Renew do
     |> Ecto.Multi.update(
       :size,
       fn %{box: box} ->
-        Ecto.Changeset.change(box, %{
-          position_x: position_x,
-          position_y: position_y,
-          width: width,
-          height: height
-        })
+        Box.change_size(box, new_size)
       end
     )
     |> Ecto.Multi.all(
@@ -533,13 +563,13 @@ defmodule RenewCollab.Renew do
 
         case bond.kind do
           :source ->
-            Ecto.Changeset.change(%Edge{id: bond.element_edge_id}, %{
+            Edge.change_position(%Edge{id: bond.element_edge_id}, %{
               source_x: target_x + offset_x,
               source_y: target_y + offset_y
             })
 
           :target ->
-            Ecto.Changeset.change(%Edge{id: bond.element_edge_id}, %{
+            Edge.change_position(%Edge{id: bond.element_edge_id}, %{
               target_x: target_x + offset_x,
               target_y: target_y + offset_y
             })
@@ -560,32 +590,10 @@ defmodule RenewCollab.Renew do
     )
   end
 
-  def parse_layer_box_size(%{
-        "position_x" => position_x,
-        "position_y" => position_y,
-        "width" => width,
-        "height" => height
-      }) do
-    with {position_x, _} <- Float.parse(position_x),
-         {position_y, _} <- Float.parse(position_y),
-         {width, _} <- Float.parse(width),
-         {height, _} <- Float.parse(height) do
-      %{
-        position_x: position_x,
-        position_y: position_y,
-        width: width,
-        height: height
-      }
-    end
-  end
-
   def update_layer_text_position(
         document_id,
         layer_id,
-        %{
-          position_x: position_x,
-          position_y: position_y
-        }
+        new_position
       ) do
     Ecto.Multi.new()
     |> Ecto.Multi.one(
@@ -595,10 +603,7 @@ defmodule RenewCollab.Renew do
     |> Ecto.Multi.update(
       :size,
       fn %{text: text} ->
-        Ecto.Changeset.change(text, %{
-          position_x: position_x,
-          position_y: position_y
-        })
+        Text.change_position(text, new_position)
       end
     )
     |> Repo.transaction()
@@ -608,19 +613,6 @@ defmodule RenewCollab.Renew do
       "redux_document:#{document_id}",
       {:document_changed, document_id}
     )
-  end
-
-  def parse_layer_text_position(%{
-        "position_x" => position_x,
-        "position_y" => position_y
-      }) do
-    with {position_x, _} <- Float.parse(position_x),
-         {position_y, _} <- Float.parse(position_y) do
-      %{
-        position_x: position_x,
-        position_y: position_y
-      }
-    end
   end
 
   def update_layer_z_index(
@@ -636,7 +628,7 @@ defmodule RenewCollab.Renew do
     |> Ecto.Multi.update(
       :z_index,
       fn %{layer: layer} ->
-        Ecto.Changeset.change(layer, %{
+        Layer.changeset(layer, %{
           z_index: z_index
         })
       end
@@ -650,21 +642,10 @@ defmodule RenewCollab.Renew do
     )
   end
 
-  def parse_layer_z_index(z_index) do
-    with {z_index, _} <- Integer.parse(z_index) do
-      z_index
-    end
-  end
-
   def update_layer_edge_position(
         document_id,
         layer_id,
-        %{
-          source_x: source_x,
-          source_y: source_y,
-          target_x: target_x,
-          target_y: target_y
-        }
+        new_position
       ) do
     Ecto.Multi.new()
     |> Ecto.Multi.one(
@@ -674,12 +655,7 @@ defmodule RenewCollab.Renew do
     |> Ecto.Multi.update(
       :position,
       fn %{edge: edge} ->
-        Ecto.Changeset.change(edge, %{
-          source_x: source_x,
-          source_y: source_y,
-          target_x: target_x,
-          target_y: target_y
-        })
+        Edge.change_position(edge, new_position)
       end
     )
     |> Ecto.Multi.all(
@@ -704,13 +680,13 @@ defmodule RenewCollab.Renew do
       |> Enum.reduce_while({:ok, []}, fn %{bond: bond, box: box, socket: socket}, {:ok, acc} ->
         case bond.kind do
           :source ->
-            Ecto.Changeset.change(%Edge{id: bond.element_edge_id}, %{
+            Edge.change_position(%Edge{id: bond.element_edge_id}, %{
               source_x: box.position_x + box.width / 2,
               source_y: box.position_y + box.height / 2
             })
 
           :target ->
-            Ecto.Changeset.change(%Edge{id: bond.element_edge_id}, %{
+            Edge.change_position(%Edge{id: bond.element_edge_id}, %{
               target_x: box.position_x + box.width / 2,
               target_y: box.position_y + box.height / 2
             })
@@ -731,33 +707,11 @@ defmodule RenewCollab.Renew do
     )
   end
 
-  def parse_layer_edge_position(%{
-        "source_x" => source_x,
-        "source_y" => source_y,
-        "target_x" => target_x,
-        "target_y" => target_y
-      }) do
-    with {source_x, _} <- Float.parse(source_x),
-         {source_y, _} <- Float.parse(source_y),
-         {target_x, _} <- Float.parse(target_x),
-         {target_y, _} <- Float.parse(target_y) do
-      %{
-        source_x: source_x,
-        source_y: source_y,
-        target_x: target_x,
-        target_y: target_y
-      }
-    end
-  end
-
   def update_layer_edge_waypoint_position(
         document_id,
         layer_id,
         waypoint_id,
-        %{
-          position_x: position_x,
-          position_y: position_y
-        }
+        new_position
       ) do
     Ecto.Multi.new()
     |> Ecto.Multi.one(
@@ -772,10 +726,7 @@ defmodule RenewCollab.Renew do
     |> Ecto.Multi.update(
       :size,
       fn %{waypoint: waypoint} ->
-        Ecto.Changeset.change(waypoint, %{
-          position_x: position_x,
-          position_y: position_y
-        })
+        Waypoint.change_position(waypoint, new_position)
       end
     )
     |> Repo.transaction()
@@ -785,19 +736,6 @@ defmodule RenewCollab.Renew do
       "redux_document:#{document_id}",
       {:document_changed, document_id}
     )
-  end
-
-  def parse_layer_edge_waypoint_position(%{
-        "position_x" => position_x,
-        "position_y" => position_y
-      }) do
-    with {position_x, _} <- Float.parse(position_x),
-         {position_y, _} <- Float.parse(position_y) do
-      %{
-        position_x: position_x,
-        position_y: position_y
-      }
-    end
   end
 
   def delete_layer_edge_waypoint(
@@ -917,8 +855,21 @@ defmodule RenewCollab.Renew do
   def create_layer_edge_waypoint(
         document_id,
         layer_id,
-        prev_waypoint_id
+        prev_waypoint_id,
+        position \\ nil
       ) do
+    set_position =
+      case position do
+        {x, y} ->
+          %{
+            position_x: x,
+            position_y: y
+          }
+
+        nil ->
+          %{}
+      end
+
     Ecto.Multi.new()
     |> Ecto.Multi.one(
       :edge,
@@ -994,6 +945,7 @@ defmodule RenewCollab.Renew do
             position_y: (edge.source_y + edge.target_y) / 2,
             edge_id: edge.id
           })
+          |> Waypoint.changeset(set_position)
 
         %{edge: {edge, prev_waypoint, nil, max_sort}} ->
           %Waypoint{}
@@ -1003,6 +955,7 @@ defmodule RenewCollab.Renew do
             position_y: (prev_waypoint.position_y + edge.target_y) / 2,
             edge_id: edge.id
           })
+          |> Waypoint.changeset(set_position)
 
         %{edge: {edge, nil, next_waypoint, max_sort}} ->
           %Waypoint{}
@@ -1012,6 +965,7 @@ defmodule RenewCollab.Renew do
             position_y: (next_waypoint.position_y + edge.source_y) / 2,
             edge_id: edge.id
           })
+          |> Waypoint.changeset(set_position)
 
         %{edge: {edge, prev_waypoint, next_waypoint, max_sort}} ->
           %Waypoint{}
@@ -1021,7 +975,26 @@ defmodule RenewCollab.Renew do
             position_y: (next_waypoint.position_y + prev_waypoint.position_y) / 2,
             edge_id: edge.id
           })
+          |> Waypoint.changeset(set_position)
       end
+    )
+    |> Repo.transaction()
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "redux_document:#{document_id}",
+      {:document_changed, document_id}
+    )
+  end
+
+  def delete_layer(document_id, layer_id) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.delete_all(
+      :delete_layer,
+      fn _ ->
+        from(l in Layer, where: l.id == ^layer_id and l.document_id == ^document_id)
+      end,
+      []
     )
     |> Repo.transaction()
 

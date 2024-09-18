@@ -6660,7 +6660,7 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
       const eventType = this.el.tagName == "BUTTON" ? "click" : "input";
       this.el.addEventListener(eventType, (evt) => {
         const newValue = ["radio", "checkbox"].indexOf(evt.currentTarget.type) > -1 ? evt.currentTarget.checked : evt.currentTarget.value;
-        console.log(newValue);
+        console.log("update_style");
         this.pushEvent("update_style", {
           value: newValue,
           element: rnwElement,
@@ -6686,6 +6686,7 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
       this.el.addEventListener("input", (evt) => {
         const { position_x, position_y, width, height } = Object.fromEntries(new FormData(evt.currentTarget));
         const rnwLayerId = evt.currentTarget.getAttribute("rnw-layer-id");
+        console.log("update_box_size");
         this.pushEvent("update_box_size", {
           value: { position_x, position_y, width, height },
           layer_id: rnwLayerId
@@ -6709,6 +6710,7 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
       this.el.addEventListener("input", (evt) => {
         const body = evt.currentTarget.value;
         const rnwLayerId = evt.currentTarget.getAttribute("rnw-layer-id");
+        console.log("update_text_body");
         this.pushEvent("update_text_body", {
           value: body,
           layer_id: rnwLayerId
@@ -6732,6 +6734,7 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
       this.el.addEventListener("input", (evt) => {
         const { position_x, position_y } = Object.fromEntries(new FormData(evt.currentTarget));
         const rnwLayerId = evt.currentTarget.getAttribute("rnw-layer-id");
+        console.log("update_text_position");
         this.pushEvent("update_text_position", {
           value: { position_x, position_y },
           layer_id: rnwLayerId
@@ -6754,7 +6757,8 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
     mounted() {
       this.el.addEventListener("input", (evt) => {
         const rnwLayerId = evt.currentTarget.getAttribute("rnw-layer-id");
-        const newValue = evt.currentTarget.value;
+        const newValue = evt.currentTarget.valueAsNumber;
+        console.log("update_z_index");
         this.pushEvent("update_z_index", {
           value: newValue,
           layer_id: rnwLayerId
@@ -6778,6 +6782,7 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
       this.el.addEventListener("input", (evt) => {
         const { source_x, source_y, target_x, target_y } = Object.fromEntries(new FormData(evt.currentTarget));
         const rnwLayerId = evt.currentTarget.getAttribute("rnw-layer-id");
+        console.log("update_edge_position");
         this.pushEvent("update_edge_position", {
           value: { source_x, source_y, target_x, target_y },
           layer_id: rnwLayerId
@@ -6801,6 +6806,7 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
       this.el.addEventListener("click", (evt) => {
         const rnwLayerId = evt.currentTarget.getAttribute("rnw-layer-id");
         const rnwWaypointId = evt.currentTarget.getAttribute("rnw-waypoint-id");
+        console.lcreate_waypointg("create_waypoint");
         this.pushEvent("create_waypoint", {
           layer_id: rnwLayerId,
           after_waypoint_id: rnwWaypointId
@@ -6825,6 +6831,7 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
         const { position_x, position_y } = Object.fromEntries(new FormData(evt.currentTarget));
         const rnwLayerId = evt.currentTarget.getAttribute("rnw-layer-id");
         const rnwWaypointId = evt.currentTarget.getAttribute("rnw-waypoint-id");
+        console.log("update_waypoint_position");
         this.pushEvent("update_waypoint_position", {
           value: { position_x, position_y },
           layer_id: rnwLayerId,
@@ -6849,6 +6856,7 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
       this.el.addEventListener("click", (evt) => {
         const rnwLayerId = evt.currentTarget.getAttribute("rnw-layer-id");
         const rnwWaypointId = evt.currentTarget.getAttribute("rnw-waypoint-id");
+        console.log("delete_waypoint");
         this.pushEvent("delete_waypoint", {
           layer_id: rnwLayerId,
           waypoint_id: rnwWaypointId
@@ -6871,6 +6879,7 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
     mounted() {
       this.el.addEventListener("click", (evt) => {
         const rnwLayerId = evt.currentTarget.getAttribute("rnw-layer-id");
+        console.log("clear_waypoints");
         this.pushEvent("clear_waypoints", {
           layer_id: rnwLayerId
         });
@@ -6893,6 +6902,7 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
       this.el.addEventListener("input", (evt) => {
         const semanticTag = evt.currentTarget.value;
         const rnwLayerId = evt.currentTarget.getAttribute("rnw-layer-id");
+        console.log("update_semantic_tag");
         this.pushEvent("update_semantic_tag", {
           value: semanticTag,
           layer_id: rnwLayerId
@@ -6916,6 +6926,7 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
       this.el.addEventListener("input", (evt) => {
         const { shape_id, shape_attributes } = Object.fromEntries(new FormData(evt.currentTarget));
         const rnwLayerId = evt.currentTarget.getAttribute("rnw-layer-id");
+        console.log("update_shape");
         this.pushEvent("update_shape", {
           value: { shape_id: shape_id || null, shape_attributes: shape_attributes.trim() ? JSON.parse(shape_attributes) : null },
           layer_id: rnwLayerId
@@ -6957,6 +6968,7 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
         if (subjectId == targetId) {
           return;
         }
+        console.log("move_layer");
         this.pushEvent("move_layer", {
           target_layer_id: targetId,
           layer_id: subjectId,
@@ -6997,6 +7009,7 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
         if (subjectId == targetId) {
           return;
         }
+        console.log("move_layer");
         this.pushEvent("move_layer", {
           target_layer_id: targetId,
           layer_id: subjectId,
@@ -7010,6 +7023,296 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
     updated() {
     },
     destroyed() {
+    },
+    disconnected() {
+    },
+    reconnected() {
+    }
+  };
+  Hooks2.RnwBoxDragger = {
+    // Callbacks
+    mounted() {
+      let x = 0;
+      let y = 0;
+      const rnwLayerId = this.el.getAttribute("rnw-layer-id");
+      const svg = this.el.ownerSVGElement;
+      const pt = svg.createSVGPoint();
+      function cursorPoint(evt) {
+        pt.x = evt.clientX;
+        pt.y = evt.clientY;
+        return pt.matrixTransform(svg.getScreenCTM().inverse());
+      }
+      this.dragMove = (evt) => {
+        const p = cursorPoint(evt);
+        const dx = p.x - x;
+        const dy = p.y - y;
+        this.el.setAttribute("transform", `translate(${dx}, ${dy})`);
+      };
+      this.mouseUp = (evt) => {
+        evt.preventDefault();
+        window.removeEventListener("mousemove", this.dragMove);
+        window.removeEventListener("mouseup", this.mouseUp);
+        const p = cursorPoint(evt);
+        const dx = p.x - x;
+        const dy = p.y - y;
+        console.log("update_box_size");
+        const bbox = this.el.getBBox();
+        this.pushEvent("update_box_size", {
+          value: { position_x: String(bbox.x + dx), position_y: String(bbox.y + dy), width: String(bbox.width), height: String(bbox.height) },
+          layer_id: rnwLayerId
+        });
+      };
+      this.el.addEventListener("mousedown", (evt) => {
+        evt.preventDefault();
+        const p = cursorPoint(evt);
+        x = p.x;
+        y = p.y;
+        window.addEventListener("mousemove", this.dragMove);
+        window.addEventListener("mouseup", this.mouseUp);
+      });
+    },
+    beforeUpdate() {
+    },
+    updated() {
+    },
+    destroyed() {
+      window.removeEventListener("mousemove", this.dragMove);
+      window.removeEventListener("mouseup", this.mouseUp);
+    },
+    disconnected() {
+    },
+    reconnected() {
+    }
+  };
+  Hooks2.RnwEdgeDragger = {
+    // Callbacks
+    mounted() {
+      let x = 0;
+      let y = 0;
+      const rnwLayerId = this.el.getAttribute("rnw-layer-id");
+      const rnwEdgeSide = this.el.getAttribute("rnw-edge-side");
+      const svg = this.el.ownerSVGElement;
+      const pt = svg.createSVGPoint();
+      let moved = 0;
+      function cursorPoint(evt) {
+        pt.x = evt.clientX;
+        pt.y = evt.clientY;
+        return pt.matrixTransform(svg.getScreenCTM().inverse());
+      }
+      this.dragMove = (evt) => {
+        const p = cursorPoint(evt);
+        const dx = p.x - x;
+        const dy = p.y - y;
+        moved += Math.hypot(dx, dy);
+        this.el.setAttribute("transform", `translate(${dx}, ${dy})`);
+      };
+      this.mouseUp = (evt) => {
+        evt.preventDefault();
+        window.removeEventListener("mousemove", this.dragMove);
+        window.removeEventListener("mouseup", this.mouseUp);
+        const p = cursorPoint(evt);
+        if (moved > 2) {
+          console.log("update_edge_position");
+          this.pushEvent("update_edge_position", {
+            value: { [`${rnwEdgeSide}_x`]: p.x, [`${rnwEdgeSide}_y`]: p.y },
+            layer_id: rnwLayerId,
+            side: rnwEdgeSide
+          });
+        }
+      };
+      this.el.addEventListener("mousedown", (evt) => {
+        evt.preventDefault();
+        const p = cursorPoint(evt);
+        x = p.x;
+        y = p.y;
+        moved = 0;
+        window.addEventListener("mousemove", this.dragMove);
+        window.addEventListener("mouseup", this.mouseUp);
+      });
+    },
+    beforeUpdate() {
+    },
+    updated() {
+    },
+    destroyed() {
+      window.removeEventListener("mousemove", this.dragMove);
+      window.removeEventListener("mouseup", this.mouseUp);
+    },
+    disconnected() {
+    },
+    reconnected() {
+    }
+  };
+  Hooks2.RnwWaypointDragger = {
+    // Callbacks
+    mounted() {
+      let x = 0;
+      let y = 0;
+      const rnwLayerId = this.el.getAttribute("rnw-layer-id");
+      const rnwWaypointId = this.el.getAttribute("rnw-waypoint-id");
+      const svg = this.el.ownerSVGElement;
+      const pt = svg.createSVGPoint();
+      let moved = 0;
+      function cursorPoint(evt) {
+        pt.x = evt.clientX;
+        pt.y = evt.clientY;
+        return pt.matrixTransform(svg.getScreenCTM().inverse());
+      }
+      this.dragMove = (evt) => {
+        const p = cursorPoint(evt);
+        const dx = p.x - x;
+        const dy = p.y - y;
+        moved += Math.hypot(dx, dy);
+        this.el.setAttribute("transform", `translate(${dx}, ${dy})`);
+      };
+      this.mouseUp = (evt) => {
+        evt.preventDefault();
+        window.removeEventListener("mousemove", this.dragMove);
+        window.removeEventListener("mouseup", this.mouseUp);
+        const p = cursorPoint(evt);
+        if (moved > 2) {
+          console.log("update_waypoint_position");
+          this.pushEvent("update_waypoint_position", {
+            value: { position_x: p.x, position_y: p.y },
+            layer_id: rnwLayerId,
+            waypoint_id: rnwWaypointId
+          });
+        }
+      };
+      this.el.addEventListener("mousedown", (evt) => {
+        evt.preventDefault();
+        const p = cursorPoint(evt);
+        x = p.x;
+        y = p.y;
+        moved = 0;
+        window.addEventListener("mousemove", this.dragMove);
+        window.addEventListener("mouseup", this.mouseUp);
+      });
+      this.el.addEventListener("dblclick", (evt) => {
+        console.log("delete_waypoint");
+        this.pushEvent("delete_waypoint", {
+          layer_id: rnwLayerId,
+          waypoint_id: rnwWaypointId
+        });
+      });
+    },
+    beforeUpdate() {
+    },
+    updated() {
+    },
+    destroyed() {
+      window.removeEventListener("mousemove", this.dragMove);
+      window.removeEventListener("mouseup", this.mouseUp);
+    },
+    disconnected() {
+    },
+    reconnected() {
+    }
+  };
+  Hooks2.RnwWaypointCreator = {
+    // Callbacks
+    mounted() {
+      let x = 0;
+      let y = 0;
+      const svg = this.el.ownerSVGElement;
+      const pt = svg.createSVGPoint();
+      function cursorPoint(evt) {
+        pt.x = evt.clientX;
+        pt.y = evt.clientY;
+        return pt.matrixTransform(svg.getScreenCTM().inverse());
+      }
+      this.dragMove = (evt) => {
+        const p = cursorPoint(evt);
+        const dx = p.x - x;
+        const dy = p.y - y;
+        this.el.setAttribute("transform", `translate(${dx}, ${dy})`);
+      };
+      this.mouseUp = (evt) => {
+        evt.preventDefault();
+        window.removeEventListener("mousemove", this.dragMove);
+        window.removeEventListener("mouseup", this.mouseUp);
+        const p = cursorPoint(evt);
+        const rnwLayerId = this.el.getAttribute("rnw-layer-id");
+        const rnwWaypointId = this.el.getAttribute("rnw-waypoint-id");
+        console.log("create_waypoint");
+        this.pushEvent("create_waypoint", {
+          layer_id: rnwLayerId,
+          after_waypoint_id: rnwWaypointId,
+          position_x: p.x,
+          position_y: p.y
+        });
+      };
+      this.el.addEventListener("mousedown", (evt) => {
+        evt.preventDefault();
+        const p = cursorPoint(evt);
+        x = p.x;
+        y = p.y;
+        window.addEventListener("mousemove", this.dragMove);
+        window.addEventListener("mouseup", this.mouseUp);
+      });
+    },
+    beforeUpdate() {
+    },
+    updated() {
+    },
+    destroyed() {
+      window.removeEventListener("mousemove", this.dragMove);
+      window.removeEventListener("mouseup", this.mouseUp);
+    },
+    disconnected() {
+    },
+    reconnected() {
+    }
+  };
+  Hooks2.RnwTextDragger = {
+    // Callbacks
+    mounted() {
+      let x = 0;
+      let y = 0;
+      const rnwLayerId = this.el.getAttribute("rnw-layer-id");
+      const svg = this.el.ownerSVGElement;
+      const pt = svg.createSVGPoint();
+      function cursorPoint(evt) {
+        pt.x = evt.clientX;
+        pt.y = evt.clientY;
+        return pt.matrixTransform(svg.getScreenCTM().inverse());
+      }
+      this.dragMove = (evt) => {
+        const p = cursorPoint(evt);
+        const dx = p.x - x;
+        const dy = p.y - y;
+        this.el.setAttribute("transform", `translate(${dx}, ${dy})`);
+      };
+      this.mouseUp = (evt) => {
+        evt.preventDefault();
+        window.removeEventListener("mousemove", this.dragMove);
+        window.removeEventListener("mouseup", this.mouseUp);
+        const p = cursorPoint(evt);
+        const dx = p.x - x;
+        const dy = p.y - y;
+        console.log("update_text_position");
+        const bbox = this.el.getBBox();
+        this.pushEvent("update_text_position", {
+          value: { position_x: String(bbox.x + dx), position_y: String(bbox.y + dy) },
+          layer_id: rnwLayerId
+        });
+      };
+      this.el.addEventListener("mousedown", (evt) => {
+        evt.preventDefault();
+        const p = cursorPoint(evt);
+        x = p.x;
+        y = p.y;
+        window.addEventListener("mousemove", this.dragMove);
+        window.addEventListener("mouseup", this.mouseUp);
+      });
+    },
+    beforeUpdate() {
+    },
+    updated() {
+    },
+    destroyed() {
+      window.removeEventListener("mousemove", this.dragMove);
+      window.removeEventListener("mouseup", this.mouseUp);
     },
     disconnected() {
     },

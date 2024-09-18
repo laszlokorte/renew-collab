@@ -22,4 +22,12 @@ defmodule RenewCollab.Element.Text do
     |> validate_required([:position_x, :position_y, :body])
     |> unique_constraint(:element_id)
   end
+
+  def change_position(element_text, attrs) do
+    element_text
+    |> cast(attrs, [
+      :position_x,
+      :position_y
+    ])
+  end
 end

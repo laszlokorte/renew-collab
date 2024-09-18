@@ -30,4 +30,14 @@ defmodule RenewCollab.Element.Box do
     |> validate_required([:position_x, :position_y, :width, :height])
     |> unique_constraint(:element_id)
   end
+
+  def change_size(element_box, attrs) do
+    element_box
+    |> cast(attrs, [
+      :position_x,
+      :position_y,
+      :width,
+      :height
+    ])
+  end
 end

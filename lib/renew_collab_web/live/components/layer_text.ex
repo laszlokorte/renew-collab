@@ -31,7 +31,13 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
           </text>
 
           <%= if @selected do %>
+          <g cursor="move" phx-hook="RnwTextDragger" rnw-layer-id={@layer.id} id={"#{@layer.text.id}-outline-box-selection-dragger"}>
+            <g data-background-box id={"#{@layer.text.id}-outline-box-selection-container"}>
+              <rect fill="magenta" opacity="0.2" id={"#{@layer.text.id}-outline-box-selection"} phx-update="ignore" x={@layer.text.position_x} y={@layer.text.position_y} width="0" height="0"></rect>
+            </g>
+
             <text 
+            pointer-events="none"
             cursor="default"
             stroke="magenta"
             stroke-linejoin="round" 
@@ -55,6 +61,7 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
               <tspan fill="transparent" stroke="transparent" text-decoration="none" visibility="hidden" x={@layer.text.position_x} {[dy: if(li>0, do: "1.2em", else: "1em")]}>&nbsp;</tspan>
               <% end %>              <% end %>
           </text>
+      </g>
           <% end %>
         </g>
     """

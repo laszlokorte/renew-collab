@@ -38,4 +38,14 @@ defmodule RenewCollab.Element.Edge do
     |> validate_required([:source_x, :source_y, :target_x, :target_y])
     |> unique_constraint(:element_id)
   end
+
+  def change_position(element_edge, attrs) do
+    element_edge
+    |> cast(attrs, [
+      :source_x,
+      :source_y,
+      :target_x,
+      :target_y
+    ])
+  end
 end

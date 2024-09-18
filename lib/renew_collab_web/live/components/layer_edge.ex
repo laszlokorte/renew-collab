@@ -46,13 +46,22 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
 
       </g>
 
+      <path stroke="transparent" stroke-linejoin="round" stroke-linecap="round"  opacity="0.3" stroke-width="8" d={edge_path(@layer.edge, @layer.edge.style.smoothness)} fill="none" id={"edge-hitarea-#{@layer.edge.id}"}></path>
 
       <%= if @selected do %>
         <path stroke="magenta" stroke-linejoin="round" stroke-linecap="round"  opacity="0.3" stroke-width="8" d={edge_path(@layer.edge, @layer.edge.style.smoothness)} fill="none" id={"edge-select-#{@layer.edge.id}"}></path>
 
         <%= for w <- @layer.edge.waypoints do %>
-          <circle cx={w.position_x} cy={w.position_y} r="5" fill="magenta"></circle>
+          <circle stroke="transparent" stroke-width="10" cursor="move" phx-hook="RnwWaypointDragger" rnw-layer-id={"#{@layer.id}"} rnw-waypoint-id={"#{w.id}"} id={"waypoint-#{w.id}"} cx={w.position_x} cy={w.position_y} r="5" fill="magenta"></circle>
         <% end %>
+
+        <%= for [w1,w2] <- [%{id: nil, position_x: @layer.edge.source_x, position_y: @layer.edge.source_y}] |> Enum.concat(@layer.edge.waypoints) |> Enum.chunk_every(2, 1, [%{position_x: @layer.edge.target_x, position_y: @layer.edge.target_y}]) do %>
+          <circle stroke="transparent" stroke-width="10" cursor="move" phx-hook="RnwWaypointCreator" rnw-layer-id={"#{@layer.id}"} rnw-waypoint-id={w1.id} id={"waypoint-after-#{w1.id}"} cx={(w1.position_x+w2.position_x)/2} cy={(w1.position_y+w2.position_y)/2} r="5" fill="cyan"></circle>
+        <% end %>
+
+        <circle stroke="transparent" stroke-width="10" cursor="move" phx-hook="RnwEdgeDragger" rnw-layer-id={"#{@layer.id}"} rnw-edge-side={"source"} id={"waypoint-#{@layer.edge.id}-source"} cx={@layer.edge.source_x} cy={@layer.edge.source_y} r="5" fill="blue"></circle>
+        <circle stroke="transparent" stroke-width="10" cursor="move" phx-hook="RnwEdgeDragger" rnw-layer-id={"#{@layer.id}"} rnw-edge-side={"target"} id={"waypoint-#{@layer.edge.id}-target"} cx={@layer.edge.target_x} cy={@layer.edge.target_y} r="5" fill="blue"></circle>
+
       <% end %>
     </g>
     """

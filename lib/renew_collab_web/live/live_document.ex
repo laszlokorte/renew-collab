@@ -243,7 +243,7 @@ defmodule RenewCollabWeb.LiveDocument do
     Renew.update_layer_box_size(
       socket.assigns.document.id,
       layer_id,
-      Renew.parse_layer_box_size(new_size)
+      new_size
     )
 
     {:noreply, socket}
@@ -264,7 +264,7 @@ defmodule RenewCollabWeb.LiveDocument do
     Renew.update_layer_text_position(
       socket.assigns.document.id,
       layer_id,
-      Renew.parse_layer_text_position(new_position)
+      new_position
     )
 
     {:noreply, socket}
@@ -274,20 +274,14 @@ defmodule RenewCollabWeb.LiveDocument do
         "update_edge_position",
         %{
           "layer_id" => layer_id,
-          "value" =>
-            %{
-              "source_x" => source_x,
-              "source_y" => source_y,
-              "target_x" => target_x,
-              "target_y" => target_y
-            } = new_size
+          "value" => new_position
         },
         socket
       ) do
     Renew.update_layer_edge_position(
       socket.assigns.document.id,
       layer_id,
-      Renew.parse_layer_edge_position(new_size)
+      new_position
     )
 
     {:noreply, socket}
@@ -304,7 +298,7 @@ defmodule RenewCollabWeb.LiveDocument do
     Renew.update_layer_z_index(
       socket.assigns.document.id,
       layer_id,
-      Renew.parse_layer_z_index(new_z_index)
+      new_z_index
     )
 
     {:noreply, socket}
@@ -327,7 +321,7 @@ defmodule RenewCollabWeb.LiveDocument do
       socket.assigns.document.id,
       layer_id,
       waypoint_id,
-      Renew.parse_layer_edge_waypoint_position(new_position)
+      new_position
     )
 
     {:noreply, socket}
@@ -345,6 +339,26 @@ defmodule RenewCollabWeb.LiveDocument do
       socket.assigns.document.id,
       layer_id,
       waypoint_d
+    )
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "create_waypoint",
+        %{
+          "layer_id" => layer_id,
+          "after_waypoint_id" => after_waypoint_id,
+          "position_x" => position_x,
+          "position_y" => position_y
+        },
+        socket
+      ) do
+    Renew.create_layer_edge_waypoint(
+      socket.assigns.document.id,
+      layer_id,
+      after_waypoint_id,
+      {position_x, position_y}
     )
 
     {:noreply, socket}
@@ -426,6 +440,19 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "delete_layer",
+        %{"id" => layer_id},
+        socket
+      ) do
+    Renew.delete_layer(
+      socket.assigns.document.id,
+      layer_id
+    )
+
     {:noreply, socket}
   end
 
