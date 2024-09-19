@@ -475,7 +475,7 @@ defmodule RenewCollab.Renew do
     |> Ecto.Multi.update(
       :body,
       fn %{text: text} ->
-        Text.changeset(text, body: new_body)
+        Text.changeset(text, %{body: new_body})
       end
     )
     |> Repo.transaction()
