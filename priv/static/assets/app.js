@@ -6806,7 +6806,7 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
       this.el.addEventListener("click", (evt) => {
         const rnwLayerId = evt.currentTarget.getAttribute("rnw-layer-id");
         const rnwWaypointId = evt.currentTarget.getAttribute("rnw-waypoint-id");
-        console.lcreate_waypointg("create_waypoint");
+        console.log("create_waypoint");
         this.pushEvent("create_waypoint", {
           layer_id: rnwLayerId,
           after_waypoint_id: rnwWaypointId

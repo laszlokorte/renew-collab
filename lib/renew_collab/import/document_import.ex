@@ -352,6 +352,7 @@ defmodule RenewCollab.Import.DocumentImport do
 
   defp convert_font("SansSerif"), do: "sans-serif"
   defp convert_font("Serif"), do: "serif"
+  defp convert_font("Monospaced"), do: "monospace"
   defp convert_font(other), do: other
 
   defp convert_line_style(gap) when is_integer(gap), do: Integer.to_string(gap)
