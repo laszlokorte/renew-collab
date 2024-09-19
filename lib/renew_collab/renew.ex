@@ -1046,7 +1046,7 @@ defmodule RenewCollab.Renew do
         document_id,
         layer_id,
         target_layer_id,
-        target
+        {order, relative}
       ) do
     Ecto.Multi.new()
     |> Ecto.Multi.one(:conflict_count, fn _ ->
@@ -1059,6 +1059,70 @@ defmodule RenewCollab.Renew do
       _, %{conflict_count: 0} = changes -> {:ok, changes}
       _, changes -> {:error, changes}
     end)
+    # |> Ecto.Multi.all(:target_parents, fn _ ->
+    #   from(p in LayerParenthood,
+    #     where: p.document_id == ^document_id and p.descendant_id == ^target_layer_id
+    #   )
+    # end)
+    |> Ecto.Multi.all(:new_parents, fn _ ->
+      # SELECT low.child_id,
+      # high.parent_id, 
+      # low.depth + high.depth + 1
+      # FROM site_closure low, site_closure high
+      # WHERE low.parent_id = 3 AND high.child_id=5;
+      from(
+        low in LayerParenthood,
+        join: high in LayerParenthood,
+        where: low.ancestor_id == ^layer_id,
+        where: high.descendant_id == ^target_layer_id,
+        select: %{
+          document_id: ^document_id,
+          descendant_id: low.descendant_id,
+          ancestor_id: high.ancestor_id,
+          depth: low.depth + high.depth + 1
+        }
+      )
+    end)
+    |> Ecto.Multi.delete_all(
+      :delete_old_parents,
+      fn
+        # DELETE FROM site_closure WHERE id IN (
+        # SELECT bad.id FROM site_closure ok 
+        # LEFT JOIN site_closure bad ON bad.child_id=ok.child_id
+        # WHERE ok.parent_id=3 and ok.depth < bad.depth
+        # );
+
+        _ ->
+          from(p in LayerParenthood,
+            where:
+              p.id in subquery(
+                from(ok in LayerParenthood,
+                  left_join: bad in LayerParenthood,
+                  on: bad.descendant_id == ok.descendant_id,
+                  where: ok.ancestor_id == ^layer_id and ok.depth < bad.depth,
+                  select: bad.id
+                )
+              )
+          )
+      end
+    )
+    |> Ecto.Multi.insert_all(
+      :insert_new_parents,
+      LayerParenthood,
+      fn
+        # INSERT INTO site_closure(child_id, parent_id, depth)
+        # SELECT low.child_id,
+        # high.parent_id, 
+        # low.depth + high.depth + 1
+        # FROM site_closure low, site_closure high
+        # WHERE low.parent_id = 3 AND high.child_id=5;
+
+        %{new_parents: new_parents} ->
+          new_parents
+          |> Enum.map(&Map.put(&1, :id, Ecto.UUID.generate()))
+          |> dbg()
+      end
+    )
     |> Repo.transaction()
     |> case do
       {:ok, _} ->
