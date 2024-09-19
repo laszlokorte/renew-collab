@@ -28,7 +28,12 @@ defmodule RenewCollabWeb.HierarchyLayerBoxComponent do
       <% end %>
 
       <%= if @selected do %>
-        <rect cursor="move" phx-hook="RnwBoxDragger" rnw-layer-id={@layer.id} stroke="magenta" stroke-linejoin="round" stroke-linecap="round" opacity="0.3" stroke-width="4" fill="magenta" fill-opacity="0.2" id={"box-select-#{@layer.box.id}"} x={@layer.box.position_x} y={@layer.box.position_y} width={@layer.box.width} height={@layer.box.height}></rect>
+       <g>
+          <rect cursor="move" phx-hook="RnwBoxDragger" rnw-layer-id={@layer.id} stroke="magenta" stroke-linejoin="round" stroke-linecap="round" opacity="0.3" stroke-width="4" fill="magenta" fill-opacity="0.2" id={"box-select-#{@layer.box.id}"} x={@layer.box.position_x} y={@layer.box.position_y} width={@layer.box.width} height={@layer.box.height}></rect>
+
+        <circle stroke="transparent" stroke-width="10" cursor="move" phx-hook="RnwBoxResizeDragger" rnw-layer-id={"#{@layer.id}"} id={"box-resize-#{@layer.box.id}"} cx={@layer.box.position_x + @layer.box.width + 5} cy={@layer.box.position_y + @layer.box.height + 5} r="5" fill="green"></circle>
+
+       </g>
       <% end %>
     </g>
     """

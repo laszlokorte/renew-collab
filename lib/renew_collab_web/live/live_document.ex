@@ -230,13 +230,7 @@ defmodule RenewCollabWeb.LiveDocument do
         "update_box_size",
         %{
           "layer_id" => layer_id,
-          "value" =>
-            %{
-              "position_x" => position_x,
-              "position_y" => position_y,
-              "width" => width,
-              "height" => height
-            } = new_size
+          "value" => new_size
         },
         socket
       ) do

@@ -7084,6 +7084,59 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
     reconnected() {
     }
   };
+  Hooks2.RnwBoxResizeDragger = {
+    // Callbacks
+    mounted() {
+      let x = 0;
+      let y = 0;
+      const rnwLayerId = this.el.getAttribute("rnw-layer-id");
+      const svg = this.el.ownerSVGElement;
+      const pt = svg.createSVGPoint();
+      function cursorPoint(evt) {
+        pt.x = evt.clientX;
+        pt.y = evt.clientY;
+        return pt.matrixTransform(svg.getScreenCTM().inverse());
+      }
+      this.dragMove = (evt) => {
+        const p = cursorPoint(evt);
+        const dx = p.x - x;
+        const dy = p.y - y;
+        this.el.setAttribute("transform", `translate(${dx}, ${dy})`);
+      };
+      this.mouseUp = (evt) => {
+        evt.preventDefault();
+        window.removeEventListener("mousemove", this.dragMove);
+        window.removeEventListener("mouseup", this.mouseUp);
+        const p = cursorPoint(evt);
+        console.log("update_box_size");
+        const bbox = this.el.previousElementSibling.getBBox();
+        this.pushEvent("update_box_size", {
+          value: { width: Math.max(3, p.x - bbox.x), height: Math.max(3, p.y - bbox.y) },
+          layer_id: rnwLayerId
+        });
+      };
+      this.el.addEventListener("mousedown", (evt) => {
+        evt.preventDefault();
+        const p = cursorPoint(evt);
+        x = p.x;
+        y = p.y;
+        window.addEventListener("mousemove", this.dragMove);
+        window.addEventListener("mouseup", this.mouseUp);
+      });
+    },
+    beforeUpdate() {
+    },
+    updated() {
+    },
+    destroyed() {
+      window.removeEventListener("mousemove", this.dragMove);
+      window.removeEventListener("mouseup", this.mouseUp);
+    },
+    disconnected() {
+    },
+    reconnected() {
+    }
+  };
   Hooks2.RnwEdgeDragger = {
     // Callbacks
     mounted() {
