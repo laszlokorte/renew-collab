@@ -71,94 +71,97 @@ defmodule RenewCollab.Renew do
       )
 
   def deep_clone_document!(id) do
-    doc = get_document_with_elements!(id)
+    Repo.transaction(fn ->
+      doc = get_document_with_elements!(id)
 
-    new_layers_ids =
-      doc.layers
-      |> Enum.map(fn layer -> {layer.id, Ecto.UUID.generate()} end)
-      |> Map.new()
+      new_layers_ids =
+        doc.layers
+        |> Enum.map(fn layer -> {layer.id, Ecto.UUID.generate()} end)
+        |> Map.new()
 
-    document_data =
-      doc
-      |> strip_id
-      |> Map.update(:layers, [], fn layers ->
-        layers
-        |> Enum.map(fn layer ->
-          layer
-          |> Map.from_struct()
-          |> Map.update(:id, nil, &Map.get(new_layers_ids, &1))
-          |> Map.update(:box, nil, &strip_id/1)
-          |> Map.update(:box, nil, &strip_fk(&1, :layer_id))
-          |> Map.update(:text, nil, &strip_id(&1, [:style]))
-          |> Map.update(:text, nil, &strip_fk(&1, :layer_id))
-          |> Map.update(:edge, nil, &strip_id(&1, [:style]))
-          |> Map.update(:edge, nil, &strip_fk(&1, :layer_id))
-          |> Map.update(:edge, nil, fn
-            nil ->
-              nil
+      document_data =
+        doc
+        |> strip_id
+        |> Map.update(:layers, [], fn layers ->
+          layers
+          |> Enum.map(fn layer ->
+            layer
+            |> Map.from_struct()
+            |> Map.update(:id, nil, &Map.get(new_layers_ids, &1))
+            |> Map.update(:box, nil, &strip_id/1)
+            |> Map.update(:box, nil, &strip_fk(&1, :layer_id))
+            |> Map.update(:text, nil, &strip_id(&1, [:style]))
+            |> Map.update(:text, nil, &strip_fk(&1, :layer_id))
+            |> Map.update(:edge, nil, &strip_id(&1, [:style]))
+            |> Map.update(:edge, nil, &strip_fk(&1, :layer_id))
+            |> Map.update(:edge, nil, fn
+              nil ->
+                nil
 
-            edge ->
-              %{
-                edge
-                | waypoints: edge.waypoints |> strip_id() |> Enum.map(&Map.delete(&1, :edge_id)),
-                  source_bond: nil,
-                  target_bond: nil
-              }
+              edge ->
+                %{
+                  edge
+                  | waypoints:
+                      edge.waypoints |> strip_id() |> Enum.map(&Map.delete(&1, :edge_id)),
+                    source_bond: nil,
+                    target_bond: nil
+                }
+            end)
+            |> Map.update(:style, nil, &strip_id/1)
+            |> Map.update(:style, nil, &strip_fk(&1, :layer_id))
           end)
-          |> Map.update(:style, nil, &strip_id/1)
-          |> Map.update(:style, nil, &strip_fk(&1, :layer_id))
         end)
-      end)
 
-    new_parenthoods =
-      from(p in LayerParenthood, where: p.document_id == ^id, select: p)
-      |> Repo.all()
-      |> Enum.map(fn %{depth: d, ancestor_id: anc, descendant_id: dec} ->
-        {
-          Map.get(new_layers_ids, anc),
-          Map.get(new_layers_ids, dec),
-          d
-        }
-      end)
+      new_parenthoods =
+        from(p in LayerParenthood, where: p.document_id == ^id, select: p)
+        |> Repo.all()
+        |> Enum.map(fn %{depth: d, ancestor_id: anc, descendant_id: dec} ->
+          {
+            Map.get(new_layers_ids, anc),
+            Map.get(new_layers_ids, dec),
+            d
+          }
+        end)
 
-    hyperlinks =
-      from(h in Hyperlink,
-        join: s in assoc(h, :source_layer),
-        join: t in assoc(h, :target_layer),
-        where: s.document_id == ^id and t.document_id == ^id,
-        select: h
-      )
-      |> Repo.all()
-      |> Enum.map(fn hyperlink ->
-        Map.new()
-        |> Map.put(:source_layer_id, Map.get(new_layers_ids, hyperlink.source_layer_id))
-        |> Map.put(:target_layer_id, Map.get(new_layers_ids, hyperlink.target_layer_id))
-      end)
+      hyperlinks =
+        from(h in Hyperlink,
+          join: s in assoc(h, :source_layer),
+          join: t in assoc(h, :target_layer),
+          where: s.document_id == ^id and t.document_id == ^id,
+          select: h
+        )
+        |> Repo.all()
+        |> Enum.map(fn hyperlink ->
+          Map.new()
+          |> Map.put(:source_layer_id, Map.get(new_layers_ids, hyperlink.source_layer_id))
+          |> Map.put(:target_layer_id, Map.get(new_layers_ids, hyperlink.target_layer_id))
+        end)
 
-    new_bonds =
-      from(b in Bond,
-        join: e in assoc(b, :element_edge),
-        join: l in assoc(e, :layer),
-        where: l.document_id == ^id,
-        select: %{
-          edge_layer_id: l.id,
-          layer_id: b.layer_id,
-          socket_id: b.socket_id,
-          kind: b.kind
-        }
-      )
-      |> Repo.all()
-      |> Enum.map(fn bond ->
-        bond
-        |> Map.update(:edge_layer_id, nil, &Map.get(new_layers_ids, &1))
-        |> Map.update(:layer_id, nil, &Map.get(new_layers_ids, &1))
-      end)
+      new_bonds =
+        from(b in Bond,
+          join: e in assoc(b, :element_edge),
+          join: l in assoc(e, :layer),
+          where: l.document_id == ^id,
+          select: %{
+            edge_layer_id: l.id,
+            layer_id: b.layer_id,
+            socket_id: b.socket_id,
+            kind: b.kind
+          }
+        )
+        |> Repo.all()
+        |> Enum.map(fn bond ->
+          bond
+          |> Map.update(:edge_layer_id, nil, &Map.get(new_layers_ids, &1))
+          |> Map.update(:layer_id, nil, &Map.get(new_layers_ids, &1))
+        end)
 
-    {document_data, new_parenthoods, hyperlinks, new_bonds}
+      {document_data, new_parenthoods, hyperlinks, new_bonds}
+    end)
   end
 
   def duplicate_document(id) do
-    {doc_params, parenthoods, hyperlinks, bonds} = deep_clone_document!(id)
+    {:ok, {doc_params, parenthoods, hyperlinks, bonds}} = deep_clone_document!(id)
 
     create_document(
       doc_params
@@ -987,12 +990,46 @@ defmodule RenewCollab.Renew do
     )
   end
 
-  def delete_layer(document_id, layer_id) do
+  def delete_layer(document_id, layer_id, delete_children \\ true) do
     Ecto.Multi.new()
+    |> Ecto.Multi.all(:child_layers, fn _ ->
+      from(p in LayerParenthood,
+        where:
+          p.ancestor_id == ^layer_id and p.document_id == ^document_id and
+            (p.depth == 0 or ^delete_children),
+        select: p.descendant_id
+      )
+    end)
+    |> Ecto.Multi.all(:connected_edge_layers, fn
+      %{child_layers: child_layers} ->
+        from(b in Bond,
+          join: e in assoc(b, :element_edge),
+          where: b.layer_id in ^child_layers,
+          select: e.layer_id
+        )
+    end)
+    |> Ecto.Multi.all(:hyperlinked_layers, fn
+      %{child_layers: child_layers, connected_edge_layers: edge_layers} ->
+        from(h in Hyperlink,
+          where: h.target_layer_id in ^child_layers or h.target_layer_id in ^edge_layers,
+          select: h.source_layer_id
+        )
+    end)
+    |> Ecto.Multi.delete_all(
+      :delete_edges,
+      fn %{connected_edge_layers: edge_layers, hyperlinked_layers: hyperlinked_layers} ->
+        from(l in Layer,
+          where:
+            (l.id in ^edge_layers or l.id in ^hyperlinked_layers) and
+              l.document_id == ^document_id
+        )
+      end,
+      []
+    )
     |> Ecto.Multi.delete_all(
       :delete_layer,
-      fn _ ->
-        from(l in Layer, where: l.id == ^layer_id and l.document_id == ^document_id)
+      fn %{child_layers: child_layers} ->
+        from(l in Layer, where: l.id in ^child_layers and l.document_id == ^document_id)
       end,
       []
     )

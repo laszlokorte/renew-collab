@@ -26,7 +26,7 @@ defmodule RenewCollabWeb.LiveDocument do
       <h2><%= @document.name %></h2>
       <svg id={"document-#{@document.id}"} viewBox={viewbox(@document)} style="display: block;" width="1000" height="1000">
         <%= for layer <- @document.layers, layer.direct_parent == nil do %> 
-          <.live_component id={layer.id} module={RenewCollabWeb.HierarchyLayerComponent} document={@document} layer={layer} selection={@selection} selected={@selection == layer.id} symbols={@symbols} />
+          <.live_component selectable={true} id={layer.id} module={RenewCollabWeb.HierarchyLayerComponent} document={@document} layer={layer} selection={@selection} selected={@selection == layer.id} symbols={@symbols} />
         <% end %>
       </svg>
 

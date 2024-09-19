@@ -460,7 +460,7 @@ Hooks.RnwBoxDragger = {
           console.log("update_box_size")
           const bbox = this.el.getBBox()
       this.pushEvent("update_box_size", {
-        value: {position_x:String(bbox.x+dx), position_y:String(bbox.y+dy), width: String(bbox.width), height: String(bbox.height)},
+        value: {position_x:bbox.x+dx, position_y:bbox.y+dy},
         layer_id: rnwLayerId,
       })
     }
@@ -779,6 +779,7 @@ Hooks.RnwTextDragger = {
     const rnwLayerId = this.el.getAttribute('rnw-layer-id')
     const svg = this.el.ownerSVGElement
     const pt = svg.createSVGPoint();
+    let moved = 0
 
     function cursorPoint(evt){
       pt.x = evt.clientX; pt.y = evt.clientY;
@@ -789,6 +790,7 @@ Hooks.RnwTextDragger = {
       const p = cursorPoint(evt)
       const dx = p.x - x
       const dy = p.y - y
+      moved += Math.hypot(dx, dy)
 
       this.el.setAttribute('transform', `translate(${dx}, ${dy})`)
     }
@@ -802,13 +804,14 @@ Hooks.RnwTextDragger = {
       const dx = p.x - x
       const dy = p.y - y
 
-      
-        console.log("update_text_position")
+      if(moved > 2) {
+
         const bbox = this.el.getBBox()
-      this.pushEvent("update_text_position", {
-        value: {position_x:String(bbox.x+dx), position_y:String(bbox.y+dy)},
-        layer_id: rnwLayerId,
-      })
+        this.pushEvent("update_text_position", {
+          value: {position_x: bbox.x+dx, position_y: bbox.y+dy},
+          layer_id: rnwLayerId,
+        })
+      }
     }
 
 
@@ -818,6 +821,7 @@ Hooks.RnwTextDragger = {
       const p = cursorPoint(evt)
       x = p.x
       y = p.y
+      moved = 0
 
       window.addEventListener('mousemove', this.dragMove)
       window.addEventListener('mouseup', this.mouseUp)
