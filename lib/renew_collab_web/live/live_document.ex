@@ -35,9 +35,24 @@ defmodule RenewCollabWeb.LiveDocument do
         <div>
           <dl style="display: grid; grid-template-columns: auto auto; justify-content: start; gap: 1ex 1em">
             <dt style="margin: 0">Missing Parenthoods</dt>
-            <dd style="margin: 0"><%= Enum.count(@hierachy_missing)%></dd>
+            <dd style="margin: 0"><details>
+            <summary><%= Enum.count(@hierachy_missing)%></summary>
+            <ul>
+            <%= for i <- @hierachy_missing do %>
+              <li><%= i.id %></li>
+              <% end %>
+          </ul>
+          </details></dd>
             <dt style="margin: 0">Invalid Parenthoods</dt>
-            <dd style="margin: 0"><%= Enum.count(@hierachy_invalid)%></dd>
+            <dd style="margin: 0">
+          <details>
+            <summary><%= Enum.count(@hierachy_invalid)%></summary>
+            <ul>
+            <%= for i <- @hierachy_invalid do %>
+              <li><%= i.id %></li>
+              <% end %>
+          </ul>
+          </details></dd>
           </dl>
 
           <button type="button" phx-click="repair_hierarchy">Repair</button>
@@ -428,12 +443,39 @@ defmodule RenewCollabWeb.LiveDocument do
   def handle_event(
         "move_layer",
         %{
-          "target_layer_id" => target_layer_id,
           "layer_id" => layer_id,
+          "target_layer_id" => target_layer_id,
+          "order" => order,
           "relative" => relative
         },
         socket
       ) do
+    Renew.move_layer(
+      socket.assigns.document.id,
+      layer_id,
+      target_layer_id,
+      Renew.parse_hierarchy_position(order, relative)
+    )
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "move_layer_relative",
+        %{
+          "layer_id" => layer_id,
+          "dx" => dx,
+          "dy" => dy
+        },
+        socket
+      ) do
+    Renew.move_layer_relative(
+      socket.assigns.document.id,
+      layer_id,
+      dx,
+      dy
+    )
+
     {:noreply, socket}
   end
 

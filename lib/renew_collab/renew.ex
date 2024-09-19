@@ -1041,4 +1041,120 @@ defmodule RenewCollab.Renew do
       {:document_changed, document_id}
     )
   end
+
+  def move_layer(
+        document_id,
+        layer_id,
+        target_layer_id,
+        target
+      ) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.one(:conflict_count, fn _ ->
+      from(p in LayerParenthood,
+        where: p.ancestor_id == ^layer_id and p.descendant_id == ^target_layer_id,
+        select: count(p.id)
+      )
+    end)
+    |> Ecto.Multi.run(:check_conflict, fn
+      _, %{conflict_count: 0} = changes -> {:ok, changes}
+      _, changes -> {:error, changes}
+    end)
+    |> Repo.transaction()
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
+  end
+
+  def parse_hierarchy_position("above", "inside"), do: {:above, :inside}
+  def parse_hierarchy_position("above", "outside"), do: {:above, :outside}
+  def parse_hierarchy_position("below", "outside"), do: {:below, :outside}
+  def parse_hierarchy_position("below", "inside"), do: {:below, :inside}
+
+  def move_layer_relative(
+        document_id,
+        layer_id,
+        dx,
+        dy
+      ) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.all(:child_layers, fn _ ->
+      from(p in LayerParenthood,
+        where: p.ancestor_id == ^layer_id and p.document_id == ^document_id,
+        select: p.descendant_id
+      )
+    end)
+    |> Ecto.Multi.all(:connected_edge_layers, fn
+      %{child_layers: child_layers} ->
+        from(b in Bond,
+          join: e in assoc(b, :element_edge),
+          where: b.layer_id in ^child_layers,
+          select: e.layer_id
+        )
+    end)
+    |> Ecto.Multi.all(:hyperlinked_layers, fn
+      %{child_layers: child_layers, connected_edge_layers: edge_layers} ->
+        from(h in Hyperlink,
+          where: h.target_layer_id in ^child_layers or h.target_layer_id in ^edge_layers,
+          select: h.source_layer_id
+        )
+    end)
+    |> Ecto.Multi.run(
+      :combined_layer_ids,
+      fn _,
+         %{
+           child_layers: child_layers,
+           connected_edge_layers: connected_edge_layers,
+           hyperlinked_layers: hyperlinked_layers
+         } ->
+        {:ok, Enum.concat([child_layers, connected_edge_layers, hyperlinked_layers])}
+      end
+    )
+    |> Ecto.Multi.update_all(
+      :update_boxes,
+      fn
+        %{combined_layer_ids: combined_layer_ids} ->
+          from(b in Box,
+            where: b.layer_id in ^combined_layer_ids,
+            update: [inc: [position_x: ^dx, position_y: ^dy]]
+          )
+      end,
+      []
+    )
+    |> Ecto.Multi.update_all(
+      :update_textes,
+      fn
+        %{combined_layer_ids: combined_layer_ids} ->
+          from(t in Text,
+            where: t.layer_id in ^combined_layer_ids,
+            update: [inc: [position_x: ^dx, position_y: ^dy]]
+          )
+      end,
+      []
+    )
+    |> Ecto.Multi.update_all(
+      :update_edges,
+      fn
+        %{combined_layer_ids: combined_layer_ids} ->
+          from(e in Edge,
+            where: e.layer_id in ^combined_layer_ids,
+            update: [inc: [source_x: ^dx, source_y: ^dy, target_x: ^dx, target_y: ^dy]]
+          )
+      end,
+      []
+    )
+    |> Repo.transaction()
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
+  end
 end

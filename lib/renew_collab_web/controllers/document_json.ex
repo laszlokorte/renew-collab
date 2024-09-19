@@ -194,12 +194,6 @@ defmodule RenewCollabWeb.DocumentJSON do
               "border_width" => v.border_width,
               "border_dash_array" => v.border_dash_array
             }
-        end,
-      sockets:
-        case element.sockets do
-          nil -> nil
-          %Ecto.Association.NotLoaded{} -> nil
-          v -> v
         end
     }
   end

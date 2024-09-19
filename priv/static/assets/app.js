@@ -6972,7 +6972,8 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
         this.pushEvent("move_layer", {
           target_layer_id: targetId,
           layer_id: subjectId,
-          relative: "above"
+          order: "above",
+          relative: "outside"
           // vs below
         });
       });
@@ -7013,7 +7014,8 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
         this.pushEvent("move_layer", {
           target_layer_id: targetId,
           layer_id: subjectId,
-          relative: "inside_bottom"
+          order: "below",
+          relative: "inside"
           // vs inside_top
         });
       });
@@ -7370,6 +7372,88 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
     destroyed() {
       window.removeEventListener("mousemove", this.dragMove);
       window.removeEventListener("mouseup", this.mouseUp);
+    },
+    disconnected() {
+    },
+    reconnected() {
+    }
+  };
+  Hooks2.RnwGroupDragger = {
+    // Callbacks
+    mounted() {
+      let x = 0;
+      let y = 0;
+      const rnwLayerId = this.el.getAttribute("rnw-layer-id");
+      const svg = this.el.ownerSVGElement;
+      const pt = svg.createSVGPoint();
+      let moved = 0;
+      function cursorPoint(evt) {
+        pt.x = evt.clientX;
+        pt.y = evt.clientY;
+        return pt.matrixTransform(svg.getScreenCTM().inverse());
+      }
+      this.dragMove = (evt) => {
+        if (!this.el.hasAttribute("selected")) {
+          return;
+        }
+        const p = cursorPoint(evt);
+        const dx = p.x - x;
+        const dy = p.y - y;
+        moved += Math.hypot(dx, dy);
+        this.el.setAttribute("transform", `translate(${dx}, ${dy})`);
+      };
+      let stopClick = false;
+      this.preventClick = (evt) => {
+        if (!this.el.hasAttribute("selected")) {
+          return;
+        }
+        if (stopClick) {
+          evt.stopPropagation();
+          stopClick = false;
+        }
+      };
+      this.mouseUp = (evt) => {
+        if (!this.el.hasAttribute("selected")) {
+          return;
+        }
+        evt.preventDefault();
+        window.removeEventListener("mousemove", this.dragMove);
+        window.removeEventListener("mouseup", this.mouseUp);
+        const p = cursorPoint(evt);
+        const dx = p.x - x;
+        const dy = p.y - y;
+        if (moved > 2) {
+          this.pushEvent("move_layer_relative", {
+            layer_id: rnwLayerId,
+            dx,
+            dy
+          });
+          this.el.setAttribute("transform", ``);
+          stopClick = true;
+        }
+      };
+      window.addEventListener("click", this.preventClick, true);
+      this.el.addEventListener("mousedown", (evt) => {
+        if (!this.el.hasAttribute("selected")) {
+          return;
+        }
+        evt.preventDefault();
+        const p = cursorPoint(evt);
+        x = p.x;
+        y = p.y;
+        moved = 0;
+        window.addEventListener("mousemove", this.dragMove);
+        window.addEventListener("mouseup", this.mouseUp);
+      });
+    },
+    beforeUpdate() {
+    },
+    updated() {
+    },
+    destroyed() {
+      window.removeEventListener("mousemove", this.dragMove);
+      window.removeEventListener("mouseup", this.mouseUp);
+      window.removeEventListener("click", this.preventClick, true);
     },
     disconnected() {
     },
