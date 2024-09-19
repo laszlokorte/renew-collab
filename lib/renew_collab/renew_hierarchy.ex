@@ -88,10 +88,11 @@ defmodule RenewCollab.RenewHierarchy do
       from p in "layer_parenthood",
         as: :parent_query,
         where:
-          (p.depth == 0 and p.descendant_id != p.ancestor_id) or
-            (p.depth != 0 and p.descendant_id == p.ancestor_id) or
-            (p.depth > 1 and not exists(transitives)) or
-            (p.depth > 0 and exists(symmetrics)),
+          ^doc_id == p.document_id and
+            ((p.depth == 0 and p.descendant_id != p.ancestor_id) or
+               (p.depth != 0 and p.descendant_id == p.ancestor_id) or
+               (p.depth > 1 and not exists(transitives)) or
+               (p.depth > 0 and exists(symmetrics))),
         select: %{
           id: p.id
         }
