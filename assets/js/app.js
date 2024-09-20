@@ -350,35 +350,6 @@ Hooks.RenewGrabber = {
     this.el.addEventListener('dragstart', (evt) => {
       evt.dataTransfer.setData("text/plain", evt.currentTarget.getAttribute('rnw-layer-id'));
     }) 
-    let counter = 0
-    this.el.addEventListener('dragenter', (evt) => {
-      evt.currentTarget.style.backgroundColor="green"
-      counter++
-    }) 
-    this.el.addEventListener('dragleave', (evt) => {
-      if(--counter < 1) {
-        evt.currentTarget.style.backgroundColor="black"
-      }
-    }) 
-    this.el.addEventListener('drop', (evt) => {
-        counter = 0
-        evt.currentTarget.style.backgroundColor="black"
-
-        const subjectId = evt.dataTransfer.getData("text");
-        const targetId = evt.currentTarget.getAttribute('rnw-layer-id');
-
-        if(subjectId==targetId) {
-          return
-        }
-
-    console.log("move_layer")
-        this.pushEvent("move_layer", {
-          target_layer_id: targetId,
-          layer_id: subjectId,
-          order: 'above',
-          relative: 'outside' // vs below
-        })
-    }) 
   },
   beforeUpdate() {  },
   updated() { 
@@ -393,29 +364,34 @@ Hooks.RenewDropper = {
   mounted() {
     let counter = 0
     this.el.addEventListener('dragenter', (evt) => {
-      evt.currentTarget.style.backgroundColor="green"
+      evt.currentTarget.style.backgroundColor="lightgreen"
+      evt.currentTarget.style.outline="8px solid lightgreen"
       counter++
     }) 
     this.el.addEventListener('dragleave', (evt) => {
       if(--counter < 1) {
         evt.currentTarget.style.backgroundColor="initial"
+        evt.currentTarget.style.outline="initial"
       }
     }) 
     this.el.addEventListener('drop', (evt) => {
         counter = 0
         evt.currentTarget.style.backgroundColor="initial"
+        evt.currentTarget.style.outline="initial"
         const subjectId = evt.dataTransfer.getData("text");
         const targetId = evt.currentTarget.getAttribute('rnw-layer-id');
+        const relative = evt.currentTarget.getAttribute('rnw-relative');
+        const order = evt.currentTarget.getAttribute('rnw-order');
         if(subjectId==targetId) {
           return
         }
 
-    console.log("move_layer")
+        console.log("move_layer")
         this.pushEvent("move_layer", {
           target_layer_id: targetId,
           layer_id: subjectId,
-          order: 'below',
-          relative: 'inside' // vs inside_top
+          order: order,
+          relative: relative // vs inside_top
         })
     }) 
   },

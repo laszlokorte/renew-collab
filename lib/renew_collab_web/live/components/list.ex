@@ -6,16 +6,16 @@ defmodule RenewCollabWeb.HierarchyListComponent do
     ~H"""
       <div>
 
-      <table border="1" cellspacing="0" cellpadding="5">
+      <table border="1" style="border-collapse: collapse;" cellspacing="0">
         <thead>
           <tr>
-            <td width="20" align="center">Vis</td>
-            <td width="20" align="center">Link</td>
-            <td width="20" align="center">Box</td>
-            <td width="20" align="center">Text</td>
-            <td width="20" align="center">Edge</td>
-            <td width="20" align="right">Ord.</td>
-            <td width="20" align="right"></td>
+            <td width="20" align="center" style="padding: 5px">Vis</td>
+            <td width="20" align="center" style="padding: 5px">Link</td>
+            <td width="20" align="center" style="padding: 5px">Box</td>
+            <td width="20" align="center" style="padding: 5px">Text</td>
+            <td width="20" align="center" style="padding: 5px">Edge</td>
+            <td width="20" align="right" style="padding: 5px">Ord.</td>
+            <td width="20" align="right" style="padding: 5px"></td>
             <td>
               ID/Type
             </td>

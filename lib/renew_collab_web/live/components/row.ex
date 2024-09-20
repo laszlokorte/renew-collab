@@ -34,14 +34,20 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
           <%= end%>
         </td>
         <td style={"padding-left: #{0.2+ 2*@depth}em"}>
-            <span draggable="true" phx-hook="RenewGrabber" id={"layer-grab-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"} style="user-select: none; cursor: grab; padding: 0.5em; background: black; color: white">☰</span>
+            <div draggable="true" phx-hook="RenewGrabber" id={"layer-grab-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"} style="user-select: none; cursor: grab; padding: 2px; background: black; color: white; display: grid; grid-template-rows: 1fr 1fr; grid-template-columns: 1fr 1fr; width: 2em">
+              <div  phx-hook="RenewDropper" id={"dropper-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"} rnw-order="below" rnw-relative="outside" style="grid-row: 1 / span 1; grid-column: 1/span 1; min-height: 1em"></div>
+              <div  phx-hook="RenewDropper" id={"dropper-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"} rnw-order="above" rnw-relative="outside" style="grid-row: 2 / span 1; grid-column: 1/span 1; min-height: 1em"></div>
+              <div  phx-hook="RenewDropper" id={"dropper-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"} rnw-order="below" rnw-relative="inside" style="grid-row: 1 / span 1; grid-column: 2/span 1; min-width: 1em"></div>
+              <div  phx-hook="RenewDropper" id={"dropper-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"} rnw-order="above" rnw-relative="inside" style="grid-row: 2 / span 1; grid-column: 2/span 1; min-width: 1em"></div>
+              <div style="pointer-events: none; grid-row: 1 / span 2; grid-column: 1/span 1; grid-column: 1/span 2; text-align: center; align-self: center;">☰</div>
+
+            </div>
         </td>
         <td style={"padding-left: #{0.2+ 2*@depth}em"} {unless(@selected, do: [style: "cursor: pointer;", "phx-click": "select_layer"], else: [])} phx-value-id={@layer.id}>
           <%= if @selected do %>
           <small><button phx-click="select_layer" phx-value-id={"-"}>unselect</button></small><br>
           <small><button phx-click="delete_layer" phx-value-id={@layer.id}>delete</button></small><br>
           <% end %>
-                    <div phx-hook="RenewDropper" id={"dropper-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"}>
 
           <small><code><%= @layer.id %></code></small><br>
           
@@ -50,7 +56,6 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
             <% else %>
             <small><code><%= @layer.semantic_tag %></code></small>
             <% end %>
-          </div>
 
           <%= if @selected do %>
           <%= unless is_nil(@layer.box) do %>
