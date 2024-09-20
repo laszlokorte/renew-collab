@@ -12,35 +12,71 @@ defmodule RenewCollabWeb.LiveDocuments do
     socket =
       socket
       |> assign(:documents, Renew.list_documents())
+      |> assign(create_form: to_form(%{}))
       |> assign(import_form: to_form(%{}))
-      |> allow_upload(:import_file, accept: ~w(.rnw), max_entries: 1)
+      |> allow_upload(:import_file, accept: ~w(.rnw), max_entries: 10)
 
     {:ok, socket}
   end
 
-  defp error_to_string(:too_large), do: "Too large"
-  defp error_to_string(:too_many_files), do: "You have selected too many files"
-  defp error_to_string(:not_accepted), do: "You have selected an unacceptable file type"
+  defp error_to_string(:too_large), do: "The selected file is too large."
+  defp error_to_string(:too_many_files), do: "You have selected too many files."
+
+  defp error_to_string(:not_accepted),
+    do: "You have selected an unsupported file format. (only .rnw files can be imported)"
 
   def render(assigns) do
     ~H"""
     <div>
-      <h2>Documents</h2>
+      <h1>Renew Online</h1>
 
       <fieldset>
-        <legend>Add</legend>
-        <.form for={@import_form} phx-submit="create_document" phx-change="validate">
-          <input type="text" name="name" value={@import_form[:name].value} id={@import_form[:name].id} />
-          <.live_file_input upload={@uploads.import_file} />
+        <legend>New Document</legend>
+        <.form for={@create_form} phx-submit="create_document" phx-change="validate">
+          <input type="text" name="name" placeholder="Document Name" value={@create_form[:name].value} id={@create_form[:name].id} />
           <button type="submit">Create Document</button>
         </.form>
-        <%= for entry <- @uploads.import_file.entries do %>
-        <%= for err <- upload_errors(@uploads.import_file, entry) do %>
-          <p class="alert alert-danger"><%= error_to_string(err) %></p>
-        <% end %>
-        <% end %>
       </fieldset>
 
+
+      <fieldset>
+        <legend>Import Renew (.rnw) Files</legend>
+        <.form for={@import_form} phx-submit="import_document" phx-change="validate">
+          <.live_file_input upload={@uploads.import_file} />
+          <%= unless Enum.empty?(@uploads.import_file.entries) do %>
+          <dl style="display: grid; grid-template-columns: auto auto auto; justify-content: start;">
+           <%= for entry <- @uploads.import_file.entries do %>
+              <dt style="grid-column: 1">        <button type="button" phx-click="cancel-upload" phx-value-ref={entry.ref} aria-label="cancel">&times;</button>
+    <%= entry.client_name %></dt>
+              <dd><%!-- entry.progress will update automatically for in-flight entries --%>
+        <progress value={entry.progress} max="100"> <%= entry.progress %>% </progress></dd>
+        <dd style="grid-column: 1 / span 3;">
+          <ul>
+            <%= for err <- upload_errors(@uploads.import_file, entry) do %>
+              <li class="alert alert-danger"><%= error_to_string(err) %></li>
+            <% end %>
+          </ul>
+          </dd>
+          <% end %>
+          </dl>
+          <% end %>
+
+          <ul>
+            <%= for err <- upload_errors(@uploads.import_file) do %>
+              <li class="alert alert-danger"><%= error_to_string(err) %></li>
+            <% end %>
+          </ul>
+
+          <%= if Enum.count(@uploads.import_file.entries) > 0 and Enum.count(@uploads.import_file.errors) == 0 do %>
+          <button type="submit">Import</button>
+          <% end %>
+        </.form>
+       
+      </fieldset>
+
+
+
+      <h2>Documents</h2>
       <table>
         <thead>
           <tr>
@@ -62,11 +98,14 @@ defmodule RenewCollabWeb.LiveDocuments do
         </tbody>
       </table>
 
+      <h2>System</h2>
 
       <fieldset>
-        <legend>System</legend>
-              <button type="button" phx-click="reset">Reinstall</button>
-
+        <legend>Setup</legend>
+        <p>
+          Clear all Documents and reset database content.
+        </p>
+        <button type="button" phx-click="reset">Reinstall</button>
       </fieldset>
 
     </div>
@@ -85,52 +124,60 @@ defmodule RenewCollabWeb.LiveDocuments do
     {:noreply, assign(socket, import_form: to_form(params))}
   end
 
-  def handle_event("create_document", params, socket) do
+  def handle_event("cancel-upload", %{"ref" => ref}, socket) do
+    {:noreply, cancel_upload(socket, :import_file, ref)}
+  end
+
+  def handle_event("import_document", params, socket) do
     case consume_uploaded_entries(socket, :import_file, fn %{path: path},
                                                            %{client_name: filename} ->
-           doc_name =
-             case params do
-               %{"name" => name} -> if(blank?(name), do: filename, else: name)
-               _ -> filename
-             end
-
            {:ok, content} = File.read(path)
-           RenewCollab.Import.DocumentImport.import(doc_name, content)
+           RenewCollab.Import.DocumentImport.import(filename, content)
          end) do
-      [
-        %RenewCollab.Import.Converted{
-          name: doc_name,
-          kind: kind,
-          layers: layers,
-          hierarchy: hierarchy,
-          hyperlinks: hyperlinks,
-          bonds: bonds
-        }
-      ] ->
-        with {:ok, %RenewCollab.Document.Document{} = document} <-
-               RenewCollab.Renew.create_document(
-                 %{"name" => doc_name, "kind" => kind, "layers" => layers},
-                 hierarchy,
-                 hyperlinks,
-                 bonds
-               ) do
-        else
-          _ ->
-            with {:ok, %RenewCollab.Document.Document{} = document} <-
-                   RenewCollab.Renew.create_document(%{"name" => doc_name, "kind" => "error"}) do
-              RenewCollabWeb.Endpoint.broadcast!(
-                "documents",
-                "document:new",
-                Map.take(document, [:name, :kind, :id])
-                |> Map.put("href", url(~p"/api/documents/#{document}"))
-              )
-            end
+      [_ | _] = converted_docs ->
+        for %RenewCollab.Import.Converted{
+              name: doc_name,
+              kind: kind,
+              layers: layers,
+              hierarchy: hierarchy,
+              hyperlinks: hyperlinks,
+              bonds: bonds
+            } <- converted_docs do
+          with {:ok, %RenewCollab.Document.Document{} = document} <-
+                 RenewCollab.Renew.create_document(
+                   %{"name" => doc_name, "kind" => kind, "layers" => layers},
+                   hierarchy,
+                   hyperlinks,
+                   bonds
+                 ) do
+          else
+            _ ->
+              with {:ok, %RenewCollab.Document.Document{} = document} <-
+                     RenewCollab.Renew.create_document(%{"name" => doc_name, "kind" => "error"}) do
+                RenewCollabWeb.Endpoint.broadcast!(
+                  "documents",
+                  "document:new",
+                  Map.take(document, [:name, :kind, :id])
+                  |> Map.put("href", url(~p"/api/documents/#{document}"))
+                )
+              end
+          end
         end
+    end
 
-      [] ->
-        with {:ok, %RenewCollab.Document.Document{} = document} <-
-               RenewCollab.Renew.create_document(params |> Map.put("kind", "empty")) do
-        end
+    {:noreply, socket}
+  end
+
+  def handle_event("create_document", params, socket) do
+    with {:ok, %RenewCollab.Document.Document{} = document} <-
+           RenewCollab.Renew.create_document(
+             params
+             |> Map.update("name", "", fn
+               "" -> "untitled"
+               n -> n
+             end)
+             |> Map.put("kind", "empty")
+           ) do
     end
 
     {:noreply, socket}

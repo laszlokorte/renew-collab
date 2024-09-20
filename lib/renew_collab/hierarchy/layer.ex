@@ -34,7 +34,7 @@ defmodule RenewCollab.Hierarchy.Layer do
 
     has_many :available_sockets, through: [:interface, :socket_schema, :sockets]
     has_many :attached_bonds, RenewCollab.Connection.Bond, on_delete: :delete_all
-    has_many :attached_edges, through: [:attached_bonds, :edge]
+    has_many :attached_edges, through: [:attached_bonds, :element_edge]
     has_many :used_sockets, through: [:attached_bonds, :socket]
 
     timestamps(type: :utc_datetime)

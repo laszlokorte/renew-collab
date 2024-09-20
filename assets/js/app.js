@@ -443,8 +443,12 @@ Hooks.RnwBoxDragger = {
       })
     }
 
+    this.el.addEventListener('click', function(e) {
+      e.stopPropagation()
+    })
 
     this.el.addEventListener('mousedown', (evt) => {
+      evt.stopPropagation()
 
       evt.preventDefault()
       const p = cursorPoint(evt)
@@ -477,6 +481,8 @@ Hooks.RnwBoxResizeDragger = {
     const rnwLayerId = this.el.getAttribute('rnw-layer-id')
     const svg = this.el.ownerSVGElement
     const pt = svg.createSVGPoint();
+    let offsetX = 0
+    let offsetY = 0
 
     function cursorPoint(evt){
       pt.x = evt.clientX; pt.y = evt.clientY;
@@ -502,18 +508,27 @@ Hooks.RnwBoxResizeDragger = {
           console.log("update_box_size")
           const bbox = this.el.previousElementSibling.getBBox()
       this.pushEvent("update_box_size", {
-        value: {width: Math.max(3, p.x - bbox.x), height: Math.max(3, p.y - bbox.y)},
+        value: {width: Math.max(3, p.x - bbox.x - offsetX), height: Math.max(3, p.y - bbox.y - offsetY)},
         layer_id: rnwLayerId,
       })
     }
 
 
+    this.el.addEventListener('click', function(e) {
+      e.stopPropagation()
+    })
+
     this.el.addEventListener('mousedown', (evt) => {
+      evt.stopPropagation()
 
       evt.preventDefault()
       const p = cursorPoint(evt)
       x = p.x
       y = p.y
+
+      const bbox = this.el.previousElementSibling.getBBox()
+      offsetX = p.x - bbox.x - bbox.width
+      offsetY = p.y - bbox.y - bbox.height
 
       window.addEventListener('mousemove', this.dragMove)
       window.addEventListener('mouseup', this.mouseUp)
@@ -576,7 +591,12 @@ Hooks.RnwEdgeDragger = {
     }
 
 
+    this.el.addEventListener('click', function(e) {
+      e.stopPropagation()
+    })
+
     this.el.addEventListener('mousedown', (evt) => {
+      evt.stopPropagation()
 
       evt.preventDefault()
       const p = cursorPoint(evt)
@@ -647,7 +667,12 @@ Hooks.RnwWaypointDragger = {
     }
 
 
+    this.el.addEventListener('click', function(e) {
+      e.stopPropagation()
+    })
+
     this.el.addEventListener('mousedown', (evt) => {
+      evt.stopPropagation()
 
       evt.preventDefault()
       const p = cursorPoint(evt)
@@ -724,7 +749,12 @@ Hooks.RnwWaypointCreator = {
     }
 
 
+    this.el.addEventListener('click', function(e) {
+      e.stopPropagation()
+    })
+
     this.el.addEventListener('mousedown', (evt) => {
+      evt.stopPropagation()
 
       evt.preventDefault()
       const p = cursorPoint(evt)
@@ -793,7 +823,12 @@ Hooks.RnwTextDragger = {
     }
 
 
+    this.el.addEventListener('click', function(e) {
+      e.stopPropagation()
+    })
+
     this.el.addEventListener('mousedown', (evt) => {
+      evt.stopPropagation()
 
       evt.preventDefault()
       const p = cursorPoint(evt)
@@ -876,7 +911,6 @@ Hooks.RnwGroupDragger = {
           layer_id: rnwLayerId,
           dx: dx, dy: dy
         })
-        this.el.setAttribute('transform', ``)
         stopClick = true
       }
     }
@@ -886,6 +920,7 @@ Hooks.RnwGroupDragger = {
       if(!this.el.hasAttribute('selected')) {
         return
       }
+      evt.stopPropagation()
 
       evt.preventDefault()
       const p = cursorPoint(evt)

@@ -509,12 +509,14 @@ defmodule RenewCollab.Renew do
     |> Ecto.Multi.all(
       :affected_bonds,
       fn %{box: box} ->
-        from(bond in Bond,
-          join: l in assoc(bond, :layer),
-          join: edge in assoc(bond, :element_edge),
-          join: box in assoc(l, :box),
+        from(own_box in Box,
+          join: own_layer in assoc(own_box, :layer),
+          join: edge in assoc(own_layer, :attached_edges),
+          join: bond in assoc(edge, :bonds),
+          join: layer in assoc(bond, :layer),
+          join: box in assoc(layer, :box),
           join: socket in assoc(bond, :socket),
-          where: box.id == ^box.id,
+          where: own_box.id == ^box.id,
           group_by: bond.id,
           select: %{
             bond: bond,
@@ -553,29 +555,25 @@ defmodule RenewCollab.Renew do
         waypoints = Map.get(waypoint_map, bond.element_edge_id, [])
 
         first_waypoint =
-          List.first(waypoints, %{position_x: edge.source_x, position_y: edge.source_y})
+          List.first(waypoints, %{position_x: edge.target_x, position_y: edge.target_y})
 
         last_waypoint =
-          List.last(waypoints, %{position_x: edge.target_x, position_y: edge.target_y})
+          List.last(waypoints, %{position_x: edge.source_x, position_y: edge.source_y})
+
+        relevant_waypoint =
+          case bond.kind do
+            :source -> first_waypoint
+            :target -> last_waypoint
+          end
 
         target_x = box.position_x + box.width / 2
         target_y = box.position_y + box.height / 2
 
-        offset_x = 10
-        offset_y = 10
-
-        case bond.kind do
-          :source ->
-            Edge.change_position(%Edge{id: bond.element_edge_id}, %{
-              source_x: target_x + offset_x,
-              source_y: target_y + offset_y
-            })
-
-          :target ->
-            Edge.change_position(%Edge{id: bond.element_edge_id}, %{
-              target_x: target_x + offset_x,
-              target_y: target_y + offset_y
-            })
+        with {x, y} <- align_to_socket(box, socket, relevant_waypoint) do
+          Edge.change_position(%Edge{id: bond.element_edge_id}, %{
+            :"#{bond.kind}_x" => x,
+            :"#{bond.kind}_y" => y
+          })
         end
         |> Repo.update()
         |> case do
@@ -591,6 +589,22 @@ defmodule RenewCollab.Renew do
       "redux_document:#{document_id}",
       {:document_changed, document_id}
     )
+  end
+
+  defp align_to_socket(box, socket, relevant_waypoint) do
+    target_x = box.position_x + box.width / 2
+    target_y = box.position_y + box.height / 2
+
+    dir_x = relevant_waypoint.position_x - target_x
+    dir_y = relevant_waypoint.position_y - target_y
+    len = :math.sqrt(dir_x * dir_x + dir_y * dir_y)
+    dir_x_norm = dir_x / len
+    dir_y_norm = dir_y / len
+
+    {
+      target_x + dir_x_norm * box.width / 2,
+      target_y + dir_y_norm * box.height / 2
+    }
   end
 
   def update_layer_text_position(
@@ -667,32 +681,65 @@ defmodule RenewCollab.Renew do
         from(bond in Bond,
           join: l in assoc(bond, :layer),
           join: box in assoc(l, :box),
+          join: edge in assoc(bond, :element_edge),
           join: socket in assoc(bond, :socket),
           where: bond.element_edge_id == ^edge.id,
           group_by: bond.id,
           select: %{
             bond: bond,
             box: box,
+            edge: edge,
             socket: socket
           }
         )
       end
     )
-    |> Ecto.Multi.run(:update_edge_points, fn repo, %{affected_bonds: affected_bonds} ->
-      affected_bonds
-      |> Enum.reduce_while({:ok, []}, fn %{bond: bond, box: box, socket: socket}, {:ok, acc} ->
-        case bond.kind do
-          :source ->
-            Edge.change_position(%Edge{id: bond.element_edge_id}, %{
-              source_x: box.position_x + box.width / 2,
-              source_y: box.position_y + box.height / 2
-            })
+    |> Ecto.Multi.all(
+      :affected_waypoints,
+      fn %{affected_bonds: affected_bonds} ->
+        from(w in Waypoint,
+          where: w.edge_id in ^Enum.map(affected_bonds, & &1.bond.element_edge_id),
+          order_by: [asc: w.sort]
+        )
+      end
+    )
+    |> Ecto.Multi.run(:update_edge_points, fn repo,
+                                              %{
+                                                affected_waypoints: affected_waypoints,
+                                                affected_bonds: affected_bonds
+                                              } ->
+      waypoint_map = Enum.group_by(affected_waypoints, & &1.edge_id) |> Map.new()
 
-          :target ->
-            Edge.change_position(%Edge{id: bond.element_edge_id}, %{
-              target_x: box.position_x + box.width / 2,
-              target_y: box.position_y + box.height / 2
-            })
+      affected_bonds
+      |> Enum.reduce_while({:ok, []}, fn %{
+                                           bond: bond,
+                                           box: box,
+                                           edge: edge,
+                                           socket: socket
+                                         },
+                                         {:ok, acc} ->
+        waypoints = Map.get(waypoint_map, bond.element_edge_id, [])
+
+        first_waypoint =
+          List.first(waypoints, %{position_x: edge.target_x, position_y: edge.target_y})
+
+        last_waypoint =
+          List.last(waypoints, %{position_x: edge.source_x, position_y: edge.source_y})
+
+        relevant_waypoint =
+          case bond.kind do
+            :source -> first_waypoint
+            :target -> last_waypoint
+          end
+
+        target_x = box.position_x + box.width / 2
+        target_y = box.position_y + box.height / 2
+
+        with {x, y} <- align_to_socket(box, socket, relevant_waypoint) do
+          Edge.change_position(%Edge{id: bond.element_edge_id}, %{
+            :"#{bond.kind}_x" => x,
+            :"#{bond.kind}_y" => y
+          })
         end
         |> Repo.update()
         |> case do
@@ -732,6 +779,79 @@ defmodule RenewCollab.Renew do
         Waypoint.change_position(waypoint, new_position)
       end
     )
+    |> Ecto.Multi.all(
+      :affected_bonds,
+      fn %{waypoint: waypoint} ->
+        from(bond in Bond,
+          join: l in assoc(bond, :layer),
+          join: box in assoc(l, :box),
+          join: edge in assoc(bond, :element_edge),
+          join: socket in assoc(bond, :socket),
+          where: bond.element_edge_id == ^waypoint.edge_id,
+          group_by: bond.id,
+          select: %{
+            bond: bond,
+            box: box,
+            edge: edge,
+            socket: socket
+          }
+        )
+      end
+    )
+    |> Ecto.Multi.all(
+      :affected_waypoints,
+      fn %{affected_bonds: affected_bonds} ->
+        from(w in Waypoint,
+          where: w.edge_id in ^Enum.map(affected_bonds, & &1.bond.element_edge_id),
+          order_by: [asc: w.sort]
+        )
+      end
+    )
+    |> Ecto.Multi.run(:update_edge_points, fn repo,
+                                              %{
+                                                affected_waypoints: affected_waypoints,
+                                                affected_bonds: affected_bonds
+                                              } ->
+      waypoint_map = Enum.group_by(affected_waypoints, & &1.edge_id) |> Map.new()
+
+      affected_bonds
+      |> Enum.reduce_while({:ok, []}, fn %{
+                                           bond: bond,
+                                           box: box,
+                                           edge: edge,
+                                           socket: socket
+                                         },
+                                         {:ok, acc} ->
+        waypoints = Map.get(waypoint_map, bond.element_edge_id, [])
+
+        first_waypoint =
+          List.first(waypoints, %{position_x: edge.target_x, position_y: edge.target_y})
+
+        last_waypoint =
+          List.last(waypoints, %{position_x: edge.source_x, position_y: edge.source_y})
+
+        relevant_waypoint =
+          case bond.kind do
+            :source -> first_waypoint
+            :target -> last_waypoint
+          end
+
+        target_x = box.position_x + box.width / 2
+        target_y = box.position_y + box.height / 2
+
+        with {x, y} <- align_to_socket(box, socket, relevant_waypoint) do
+          Edge.change_position(%Edge{id: bond.element_edge_id}, %{
+            :"#{bond.kind}_x" => x,
+            :"#{bond.kind}_y" => y
+          })
+        end
+        |> Repo.update()
+        |> case do
+          {:ok, r} -> {:cont, {:ok, [r | acc]}}
+          e -> {:halt, {e}}
+        end
+      end)
+    end)
     |> Repo.transaction()
 
     Phoenix.PubSub.broadcast(
@@ -762,6 +882,79 @@ defmodule RenewCollab.Renew do
         waypoint
       end
     )
+    |> Ecto.Multi.all(
+      :affected_bonds,
+      fn %{waypoint: waypoint} ->
+        from(bond in Bond,
+          join: l in assoc(bond, :layer),
+          join: box in assoc(l, :box),
+          join: edge in assoc(bond, :element_edge),
+          join: socket in assoc(bond, :socket),
+          where: bond.element_edge_id == ^waypoint.edge_id,
+          group_by: bond.id,
+          select: %{
+            bond: bond,
+            box: box,
+            edge: edge,
+            socket: socket
+          }
+        )
+      end
+    )
+    |> Ecto.Multi.all(
+      :affected_waypoints,
+      fn %{affected_bonds: affected_bonds} ->
+        from(w in Waypoint,
+          where: w.edge_id in ^Enum.map(affected_bonds, & &1.bond.element_edge_id),
+          order_by: [asc: w.sort]
+        )
+      end
+    )
+    |> Ecto.Multi.run(:update_edge_points, fn repo,
+                                              %{
+                                                affected_waypoints: affected_waypoints,
+                                                affected_bonds: affected_bonds
+                                              } ->
+      waypoint_map = Enum.group_by(affected_waypoints, & &1.edge_id) |> Map.new()
+
+      affected_bonds
+      |> Enum.reduce_while({:ok, []}, fn %{
+                                           bond: bond,
+                                           box: box,
+                                           edge: edge,
+                                           socket: socket
+                                         },
+                                         {:ok, acc} ->
+        waypoints = Map.get(waypoint_map, bond.element_edge_id, [])
+
+        first_waypoint =
+          List.first(waypoints, %{position_x: edge.target_x, position_y: edge.target_y})
+
+        last_waypoint =
+          List.last(waypoints, %{position_x: edge.source_x, position_y: edge.source_y})
+
+        relevant_waypoint =
+          case bond.kind do
+            :source -> first_waypoint
+            :target -> last_waypoint
+          end
+
+        target_x = box.position_x + box.width / 2
+        target_y = box.position_y + box.height / 2
+
+        with {x, y} <- align_to_socket(box, socket, relevant_waypoint) do
+          Edge.change_position(%Edge{id: bond.element_edge_id}, %{
+            :"#{bond.kind}_x" => x,
+            :"#{bond.kind}_y" => y
+          })
+        end
+        |> Repo.update()
+        |> case do
+          {:ok, r} -> {:cont, {:ok, [r | acc]}}
+          e -> {:halt, {e}}
+        end
+      end)
+    end)
     |> Repo.transaction()
 
     Phoenix.PubSub.broadcast(
@@ -938,7 +1131,7 @@ defmodule RenewCollab.Renew do
       []
     )
     |> Ecto.Multi.insert(
-      :insert,
+      :waypoint,
       fn
         %{edge: {edge, nil, nil, max_sort}} ->
           %Waypoint{}
@@ -981,6 +1174,79 @@ defmodule RenewCollab.Renew do
           |> Waypoint.changeset(set_position)
       end
     )
+    |> Ecto.Multi.all(
+      :affected_bonds,
+      fn %{waypoint: waypoint} ->
+        from(bond in Bond,
+          join: l in assoc(bond, :layer),
+          join: box in assoc(l, :box),
+          join: edge in assoc(bond, :element_edge),
+          join: socket in assoc(bond, :socket),
+          where: bond.element_edge_id == ^waypoint.edge_id,
+          group_by: bond.id,
+          select: %{
+            bond: bond,
+            box: box,
+            edge: edge,
+            socket: socket
+          }
+        )
+      end
+    )
+    |> Ecto.Multi.all(
+      :affected_waypoints,
+      fn %{affected_bonds: affected_bonds} ->
+        from(w in Waypoint,
+          where: w.edge_id in ^Enum.map(affected_bonds, & &1.bond.element_edge_id),
+          order_by: [asc: w.sort]
+        )
+      end
+    )
+    |> Ecto.Multi.run(:update_edge_points, fn repo,
+                                              %{
+                                                affected_waypoints: affected_waypoints,
+                                                affected_bonds: affected_bonds
+                                              } ->
+      waypoint_map = Enum.group_by(affected_waypoints, & &1.edge_id) |> Map.new()
+
+      affected_bonds
+      |> Enum.reduce_while({:ok, []}, fn %{
+                                           bond: bond,
+                                           box: box,
+                                           edge: edge,
+                                           socket: socket
+                                         },
+                                         {:ok, acc} ->
+        waypoints = Map.get(waypoint_map, bond.element_edge_id, [])
+
+        first_waypoint =
+          List.first(waypoints, %{position_x: edge.target_x, position_y: edge.target_y})
+
+        last_waypoint =
+          List.last(waypoints, %{position_x: edge.source_x, position_y: edge.source_y})
+
+        relevant_waypoint =
+          case bond.kind do
+            :source -> first_waypoint
+            :target -> last_waypoint
+          end
+
+        target_x = box.position_x + box.width / 2
+        target_y = box.position_y + box.height / 2
+
+        with {x, y} <- align_to_socket(box, socket, relevant_waypoint) do
+          Edge.change_position(%Edge{id: bond.element_edge_id}, %{
+            :"#{bond.kind}_x" => x,
+            :"#{bond.kind}_y" => y
+          })
+        end
+        |> Repo.update()
+        |> case do
+          {:ok, r} -> {:cont, {:ok, [r | acc]}}
+          e -> {:halt, {e}}
+        end
+      end)
+    end)
     |> Repo.transaction()
 
     Phoenix.PubSub.broadcast(
@@ -1270,6 +1536,81 @@ defmodule RenewCollab.Renew do
       end,
       []
     )
+    |> Ecto.Multi.all(
+      :affected_bonds,
+      fn %{combined_layer_ids: combined_layer_ids} ->
+        from(own_box in Box,
+          join: own_layer in assoc(own_box, :layer),
+          join: edge in assoc(own_layer, :attached_edges),
+          join: bond in assoc(edge, :bonds),
+          join: layer in assoc(bond, :layer),
+          join: box in assoc(layer, :box),
+          join: socket in assoc(bond, :socket),
+          where: own_layer.id in ^combined_layer_ids,
+          group_by: bond.id,
+          select: %{
+            bond: bond,
+            box: box,
+            socket: socket,
+            edge: edge
+          }
+        )
+      end
+    )
+    |> Ecto.Multi.all(
+      :affected_waypoints,
+      fn %{affected_bonds: affected_bonds} ->
+        from(w in Waypoint,
+          where: w.edge_id in ^Enum.map(affected_bonds, & &1.bond.element_edge_id),
+          order_by: [asc: w.sort]
+        )
+      end
+    )
+    |> Ecto.Multi.run(:update_edge_points, fn repo,
+                                              %{
+                                                affected_bonds: affected_bonds,
+                                                affected_waypoints: affected_waypoints
+                                              } ->
+      waypoint_map = Enum.group_by(affected_waypoints, & &1.edge_id) |> Map.new()
+
+      affected_bonds
+      |> Enum.reduce_while({:ok, []}, fn %{
+                                           bond: bond,
+                                           box: box,
+                                           edge: edge,
+                                           socket: socket
+                                         },
+                                         {:ok, acc} ->
+        waypoints = Map.get(waypoint_map, bond.element_edge_id, [])
+
+        first_waypoint =
+          List.first(waypoints, %{position_x: edge.target_x, position_y: edge.target_y})
+
+        last_waypoint =
+          List.last(waypoints, %{position_x: edge.source_x, position_y: edge.source_y})
+
+        relevant_waypoint =
+          case bond.kind do
+            :source -> first_waypoint
+            :target -> last_waypoint
+          end
+
+        target_x = box.position_x + box.width / 2
+        target_y = box.position_y + box.height / 2
+
+        with {x, y} <- align_to_socket(box, socket, relevant_waypoint) do
+          Edge.change_position(%Edge{id: bond.element_edge_id}, %{
+            :"#{bond.kind}_x" => x,
+            :"#{bond.kind}_y" => y
+          })
+        end
+        |> Repo.update()
+        |> case do
+          {:ok, r} -> {:cont, {:ok, [r | acc]}}
+          e -> {:halt, {e}}
+        end
+      end)
+    end)
     |> Repo.transaction()
     |> case do
       {:ok, _} ->

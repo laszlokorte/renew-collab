@@ -35,10 +35,10 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
         </td>
         <td style={"padding-left: #{0.2+ 2*@depth}em"}>
             <div draggable="true" phx-hook="RenewGrabber" id={"layer-grab-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"} style="user-select: none; cursor: grab; padding: 2px; background: black; color: white; display: grid; grid-template-rows: 1fr 1fr; grid-template-columns: 1fr 1fr; width: 2em">
-              <div  phx-hook="RenewDropper" id={"dropper-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"} rnw-order="below" rnw-relative="outside" style="grid-row: 1 / span 1; grid-column: 1/span 1; min-height: 1em"></div>
-              <div  phx-hook="RenewDropper" id={"dropper-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"} rnw-order="above" rnw-relative="outside" style="grid-row: 2 / span 1; grid-column: 1/span 1; min-height: 1em"></div>
-              <div  phx-hook="RenewDropper" id={"dropper-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"} rnw-order="below" rnw-relative="inside" style="grid-row: 1 / span 1; grid-column: 2/span 1; min-width: 1em"></div>
-              <div  phx-hook="RenewDropper" id={"dropper-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"} rnw-order="above" rnw-relative="inside" style="grid-row: 2 / span 1; grid-column: 2/span 1; min-width: 1em"></div>
+              <div  phx-hook="RenewDropper" id={"dropper-#{@layer.id}-below-outside"} rnw-layer-id={"#{@layer.id}"} rnw-order="below" rnw-relative="outside" style="grid-row: 1 / span 1; grid-column: 1/span 1; min-height: 1em"></div>
+              <div  phx-hook="RenewDropper" id={"dropper-#{@layer.id}-above-outside"} rnw-layer-id={"#{@layer.id}"} rnw-order="above" rnw-relative="outside" style="grid-row: 2 / span 1; grid-column: 1/span 1; min-height: 1em"></div>
+              <div  phx-hook="RenewDropper" id={"dropper-#{@layer.id}-below-inside"} rnw-layer-id={"#{@layer.id}"} rnw-order="below" rnw-relative="inside" style="grid-row: 1 / span 1; grid-column: 2/span 1; min-width: 1em"></div>
+              <div  phx-hook="RenewDropper" id={"dropper-#{@layer.id}-above-inside"} rnw-layer-id={"#{@layer.id}"} rnw-order="above" rnw-relative="inside" style="grid-row: 2 / span 1; grid-column: 2/span 1; min-width: 1em"></div>
               <div style="pointer-events: none; grid-row: 1 / span 2; grid-column: 1/span 1; grid-column: 1/span 2; text-align: center; align-self: center;">☰</div>
 
             </div>

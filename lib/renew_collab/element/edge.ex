@@ -20,6 +20,10 @@ defmodule RenewCollab.Element.Edge do
       on_delete: :delete_all,
       where: [kind: :target]
 
+    has_many :bonds, RenewCollab.Connection.Bond,
+      on_delete: :delete_all,
+      foreign_key: :element_edge_id
+
     has_one :style, RenewCollab.Style.EdgeStyle, on_delete: :delete_all
 
     has_many :waypoints, RenewCollab.Connection.Waypoint, on_delete: :delete_all
