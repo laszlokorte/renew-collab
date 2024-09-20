@@ -40,7 +40,7 @@ defmodule RenewCollab.Renew do
   end
 
   def list_documents do
-    Repo.all(Document, order_by: [asc: :inserted_at])
+    Repo.all(from(Document, order_by: [desc: :inserted_at, desc: :updated_at]))
   end
 
   def get_document!(id), do: Repo.get!(Document, id)
@@ -595,15 +595,15 @@ defmodule RenewCollab.Renew do
     target_x = box.position_x + box.width / 2
     target_y = box.position_y + box.height / 2
 
-    dir_x = relevant_waypoint.position_x - target_x
-    dir_y = relevant_waypoint.position_y - target_y
+    dir_x = (relevant_waypoint.position_x - target_x) / box.width * 2
+    dir_y = (relevant_waypoint.position_y - target_y) / box.height * 2
     len = :math.sqrt(dir_x * dir_x + dir_y * dir_y)
-    dir_x_norm = dir_x / len
-    dir_y_norm = dir_y / len
+    dir_x_norm = dir_x / len * box.width / 2
+    dir_y_norm = dir_y / len * box.height / 2
 
     {
-      target_x + dir_x_norm * box.width / 2,
-      target_y + dir_y_norm * box.height / 2
+      target_x + dir_x_norm,
+      target_y + dir_y_norm
     }
   end
 
@@ -1546,7 +1546,7 @@ defmodule RenewCollab.Renew do
           join: layer in assoc(bond, :layer),
           join: box in assoc(layer, :box),
           join: socket in assoc(bond, :socket),
-          where: own_layer.id in ^combined_layer_ids,
+          where: own_layer.id in ^combined_layer_ids or edge.layer_id in ^combined_layer_ids,
           group_by: bond.id,
           select: %{
             bond: bond,
@@ -1595,9 +1595,6 @@ defmodule RenewCollab.Renew do
             :target -> last_waypoint
           end
 
-        target_x = box.position_x + box.width / 2
-        target_y = box.position_y + box.height / 2
-
         with {x, y} <- align_to_socket(box, socket, relevant_waypoint) do
           Edge.change_position(%Edge{id: bond.element_edge_id}, %{
             :"#{bond.kind}_x" => x,
@@ -1611,6 +1608,43 @@ defmodule RenewCollab.Renew do
         end
       end)
     end)
+    |> Repo.transaction()
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
+  end
+
+  def create_layer(document_id, attrs \\ %{}) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(
+      :layer,
+      fn _ ->
+        %Layer{document_id: document_id}
+        |> Layer.changeset(%{
+          z_index: 0,
+          semantic_tag: "new",
+          hidden: false
+        })
+        |> Layer.changeset(attrs)
+      end
+    )
+    |> Ecto.Multi.insert(
+      :parenthood,
+      fn %{layer: layer} ->
+        %LayerParenthood{}
+        |> LayerParenthood.changeset(%{
+          document_id: document_id,
+          ancestor_id: layer.id,
+          descendant_id: layer.id,
+          depth: 0
+        })
+      end
+    )
     |> Repo.transaction()
     |> case do
       {:ok, _} ->

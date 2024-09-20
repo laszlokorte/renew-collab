@@ -6,7 +6,7 @@ defmodule RenewCollabWeb.HierarchyListComponent do
     ~H"""
       <div>
 
-      <table border="1" style="border-collapse: collapse;" cellspacing="0">
+      <table border="1" style="border-collapse: collapse;width:100%" cellspacing="0">
         <thead>
           <tr>
             <td width="20" align="center" style="padding: 5px">Vis</td>

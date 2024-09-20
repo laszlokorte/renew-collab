@@ -29,7 +29,7 @@ defmodule RenewCollabWeb.HierarchyLayerBoxComponent do
 
       <%= if @selected do %>
        <g>
-          <rect cursor="move" phx-hook="RnwBoxDragger" rnw-layer-id={@layer.id} stroke="magenta" stroke-linejoin="round" stroke-linecap="round" opacity="0.3" stroke-width="4" fill="magenta" fill-opacity="0.2" id={"box-select-#{@layer.box.id}"} x={@layer.box.position_x} y={@layer.box.position_y} width={@layer.box.width} height={@layer.box.height}></rect>
+          <rect cursor="move" phx-hook="RnwBoxDragger" rnw-layer-id={@layer.id} stroke="#33aaff" stroke-linejoin="round" stroke-linecap="round" opacity="0.8" stroke-width="4" fill="#33aaff" fill-opacity="0.4" id={"box-select-#{@layer.box.id}"} x={@layer.box.position_x} y={@layer.box.position_y} width={@layer.box.width} height={@layer.box.height}></rect>
 
         <circle stroke="transparent" stroke-width="10" cursor="move" phx-hook="RnwBoxResizeDragger" rnw-layer-id={"#{@layer.id}"} id={"box-resize-#{@layer.box.id}"} cx={@layer.box.position_x + @layer.box.width + 5} cy={@layer.box.position_y + @layer.box.height + 5} r="5" fill="green"></circle>
 
@@ -56,7 +56,7 @@ defmodule RenewCollabWeb.HierarchyLayerBoxComponent do
   end
 
   defp style_or_default(%{:style => nil}, style_key) do
-    default_style(style_key)
+    default_style(style_key) || default_style(style_key)
   end
 
   defp style_or_default(%{:style => style}, style_key) do
@@ -67,5 +67,6 @@ defmodule RenewCollabWeb.HierarchyLayerBoxComponent do
     end
   end
 
+  defp default_style(:background_color), do: "#70DB93"
   defp default_style(style_key), do: nil
 end

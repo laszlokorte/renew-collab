@@ -6967,11 +6967,21 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
     mounted() {
       let counter = 0;
       this.el.addEventListener("dragenter", (evt) => {
+        const subjectId = evt.dataTransfer.getData("text");
+        const targetId = evt.currentTarget.getAttribute("rnw-layer-id");
+        if (subjectId == targetId) {
+          return;
+        }
         evt.currentTarget.style.backgroundColor = "lightgreen";
         evt.currentTarget.style.outline = "8px solid lightgreen";
         counter++;
       });
       this.el.addEventListener("dragleave", (evt) => {
+        const subjectId = evt.dataTransfer.getData("text");
+        const targetId = evt.currentTarget.getAttribute("rnw-layer-id");
+        if (subjectId == targetId) {
+          return;
+        }
         if (--counter < 1) {
           evt.currentTarget.style.backgroundColor = "initial";
           evt.currentTarget.style.outline = "initial";
@@ -7203,6 +7213,7 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
       const svg = this.el.ownerSVGElement;
       const pt = svg.createSVGPoint();
       let moved = 0;
+      let preventClick = false;
       function cursorPoint(evt) {
         pt.x = evt.clientX;
         pt.y = evt.clientY;
@@ -7227,6 +7238,7 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
             layer_id: rnwLayerId,
             waypoint_id: rnwWaypointId
           });
+          preventClick = true;
         }
       };
       this.el.addEventListener("click", function(e) {
@@ -7239,10 +7251,15 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
         x = p.x;
         y = p.y;
         moved = 0;
+        preventClick = false;
         window.addEventListener("mousemove", this.dragMove);
         window.addEventListener("mouseup", this.mouseUp);
       });
       this.el.addEventListener("dblclick", (evt) => {
+        if (preventClick) {
+          preventClick = false;
+          return;
+        }
         console.log("delete_waypoint");
         this.pushEvent("delete_waypoint", {
           layer_id: rnwLayerId,

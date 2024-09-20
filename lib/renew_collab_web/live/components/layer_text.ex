@@ -5,8 +5,8 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
   @impl true
   def render(assigns) do
     ~H"""
-        <g opacity={@layer.style.opacity}  id={"#{@layer.text.id}-wrapper"}>
-          <g data-background-box id={"#{@layer.text.id}-outline-box-container"} stroke-dasharray={@layer.style.border_dash_array} stroke-width={@layer.style.border_width} fill={@layer.style.background_color} stroke={@layer.style.border_color} >
+        <g opacity={style_or_default(@layer, :opacity)}  id={"#{@layer.text.id}-wrapper"}>
+          <g data-background-box id={"#{@layer.text.id}-outline-box-container"} stroke-dasharray={style_or_default(@layer, :border_dash_array)} stroke-width={style_or_default(@layer, :border_width)} fill={style_or_default(@layer, :background_color)} stroke={style_or_default(@layer, :border_color)} >
             <rect id={"#{@layer.text.id}-outline-box"} phx-update="ignore" x={@layer.text.position_x} y={@layer.text.position_y} width="0" height="0"></rect>
           </g>
           <text 
@@ -20,10 +20,10 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
             phx-hook="ResizeRenewText" 
             x={@layer.text.position_x} 
             y={@layer.text.position_y}>
-            <%= for {{line, format}, li} <- @layer.text.body |> String.split("\n") |> filter_blank_lines(@layer.text.style.blank_lines) |> Enum.map(&format_line(@layer.text.style.rich, &1)) |> Enum.with_index() do %>
+            <%= for {{line, format}, li} <- @layer.text.body |> String.split("\n") |> filter_blank_lines(style_or_default(@layer.text, :blank_lines)) |> Enum.map(&format_line(style_or_default(@layer.text, :rich), &1)) |> Enum.with_index() do %>
               <%= if String.trim(line) != "" do %>
               <tspan 
-            {if(style_or_default(@layer.text, :underline), do: ["text-decoration": "underline"], else: [])} {format} {if(li==0 and @layer.text.style.rich, do: ["font-weight": "bold"], else: [])} x={@layer.text.position_x} {[dy: if(li>0, do: "1.2em", else: "1em")]}><%= line %></tspan>
+            {if(style_or_default(@layer.text, :underline), do: ["text-decoration": "underline"], else: [])} {format} {if(li==0 and style_or_default(@layer.text, :rich), do: ["font-weight": "bold"], else: [])} x={@layer.text.position_x} {[dy: if(li>0, do: "1.2em", else: "1em")]}><%= line %></tspan>
               <% else %>
               <tspan fill="transparent" stroke="transparent" text-decoration="none" x={@layer.text.position_x} {[dy: if(li>0, do: "1.2em", else: "1em")]} visibility="hidden">&nbsp;</tspan>
               <% end %>              
@@ -33,13 +33,13 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
           <%= if @selected do %>
           <g cursor="move" phx-hook="RnwTextDragger" rnw-layer-id={@layer.id} id={"#{@layer.text.id}-outline-box-selection-dragger"}>
             <g data-background-box id={"#{@layer.text.id}-outline-box-selection-container"}>
-              <rect fill="magenta" opacity="0.2" id={"#{@layer.text.id}-outline-box-selection"} phx-update="ignore" x={@layer.text.position_x} y={@layer.text.position_y} width="0" height="0"></rect>
+              <rect fill="#33aaff" fill-opacity="0.3" opacity="0.8" id={"#{@layer.text.id}-outline-box-selection"} phx-update="ignore" x={@layer.text.position_x} y={@layer.text.position_y} width="0" height="0"></rect>
             </g>
 
             <text 
             pointer-events="none"
             cursor="default"
-            stroke="magenta"
+            stroke="#33aaff"
             stroke-linejoin="round" 
             stroke-linecap="round"
             opacity="0.3"
@@ -53,9 +53,9 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
             id={"text-select-#{@layer.text.id}"} 
             x={@layer.text.position_x} 
             y={@layer.text.position_y}>
-            <%= for {{line, format}, li} <- @layer.text.body |> String.split("\n") |> filter_blank_lines(@layer.text.style.blank_lines) |> Enum.map(&format_line(@layer.text.style.rich, &1)) |> Enum.with_index() do %>
+            <%= for {{line, format}, li} <- @layer.text.body |> String.split("\n") |> filter_blank_lines(style_or_default(@layer.text, :blank_lines)) |> Enum.map(&format_line(style_or_default(@layer.text, :rich), &1)) |> Enum.with_index() do %>
               <%= if String.trim(line) != "" do %>
-              <tspan {if(style_or_default(@layer.text, :underline), do: ["text-decoration": "underline"], else: [])} {format} {if(li==0 and @layer.text.style.rich, do: ["font-weight": "bold"], else: [])} x={@layer.text.position_x} {[dy: if(li>0, do: "1.2em", else: "1em")]}><%= line %></tspan>
+              <tspan {if(style_or_default(@layer.text, :underline), do: ["text-decoration": "underline"], else: [])} {format} {if(li==0 and style_or_default(@layer.text, :rich), do: ["font-weight": "bold"], else: [])} x={@layer.text.position_x} {[dy: if(li>0, do: "1.2em", else: "1em")]}><%= line %></tspan>
               <% else %>
               <tspan fill="transparent" stroke="transparent" text-decoration="none" visibility="hidden" x={@layer.text.position_x} {[dy: if(li>0, do: "1.2em", else: "1em")]}>&nbsp;</tspan>
               <% end %>              <% end %>
@@ -69,6 +69,7 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
   defp text_anchor(:left), do: "start"
   defp text_anchor(:center), do: "middle"
   defp text_anchor(:right), do: "end"
+  defp text_anchor(nil), do: "start"
 
   defp style_or_default(%{:style => nil}, style_key) do
     default_style(style_key)
@@ -76,12 +77,15 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
 
   defp style_or_default(%{:style => style}, style_key) do
     with %{^style_key => value} <- style do
-      value
+      value || default_style(style_key)
     else
       _ -> default_style(style_key)
     end
   end
 
+  defp default_style(:alignment), do: :left
+  defp default_style(:blank_lines), do: false
+  defp default_style(:background_color), do: "transparent"
   defp default_style(style_key), do: nil
 
   defp format_line(true, <<"_", rest::binary>>), do: {rest, ["text-decoration": "underline"]}

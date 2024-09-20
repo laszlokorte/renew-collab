@@ -6,13 +6,17 @@ defmodule RenewCollabWeb.LiveDocument do
   alias RenewCollab.Symbol
 
   def mount(%{"id" => id}, _session, socket) do
+    document = Renew.get_document_with_elements!(id)
+
     socket =
       socket
-      |> assign(:document, Renew.get_document_with_elements!(id))
+      |> assign(:document, document)
       |> assign(:hierachy_missing, RenewCollab.RenewHierarchy.find_missing(id))
       |> assign(:hierachy_invalid, RenewCollab.RenewHierarchy.find_invalids(id))
       |> assign(:selection, nil)
+      |> assign(:show_hierarchy, false)
       |> assign(:symbols, Symbol.list_shapes() |> Enum.map(fn s -> {s.id, s} end) |> Map.new())
+      |> assign(:viewbox, viewbox(document))
 
     RenewCollabWeb.Endpoint.subscribe("redux_document:#{id}")
 
@@ -21,22 +25,31 @@ defmodule RenewCollabWeb.LiveDocument do
 
   def render(assigns) do
     ~H"""
-    <div style="display: grid;width: 100%; grid-template-rows: auto 1fr;">
-      <.link href={~p"/live/documents"}>Back</.link>
-      <h2><%= @document.name %></h2>
-      <svg id={"document-#{@document.id}"} viewBox={viewbox(@document)} style="display: block;" width="1000" height="1000">
+    <div style="position: absolute; top:0;left:0;bottom: 0; right:0;display: grid; width: 100vw; height: 100vh; grid-template-rows: [top-start right-start] auto [top-end left-start ] 1fr [left-end right-end]; grid-template-columns: [left-start top-start]1fr [left-end right-start]auto [right-end top-end];">
+      <div style="grid-area: top; padding: 1em; background: #333; color: #fff">
+        <.link href={~p"/live/documents"} style="color: inherit">Back</.link>
+      <h2 style="margin: 0;"><%= @document.name %></h2>
+      </div>
+      <div style="grid-area: left; width: 100%; height: 100%; overflow: auto; box-sizing: border-box; padding: 0 2em">
+      <svg   phx-click="select_layer" phx-value-id={""} preserveAspectRatio="xMidYMin meet" id={"document-#{@document.id}"} viewBox={@viewbox} style="display: block; width: 100%" width="1000" height="1000">
         <%= for layer <- @document.layers, layer.direct_parent == nil do %> 
           <.live_component selectable={true} id={layer.id} module={RenewCollabWeb.HierarchyLayerComponent} document={@document} layer={layer} selection={@selection} selected={@selection == layer.id} symbols={@symbols} />
         <% end %>
       </svg>
+    </div>
 
-      <div style="position: fixed; width: 40em; right: 0; top: 0; bottom: 0; overflow: auto;">
-        <h2>Hierarchy</h2>
-        <div>
+      <div style="grid-area: right;width: 100%; height: 100%; overflow: auto; box-sizing: border-box; padding: 0 2em; background: #eee">
+        <p>
+          <button phx-click="update-viewbox"  style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff">Refit Camera</button>
+        </p>
+        <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-hierarchy">Hierarchy</h2>
+          <div hidden={not @show_hierarchy}>
+            <div style="width: 45vw;">
+          <h3>Health</h3>
           <dl style="display: grid; grid-template-columns: auto auto; justify-content: start; gap: 1ex 1em">
             <dt style="margin: 0">Missing Parenthoods</dt>
             <dd style="margin: 0"><details>
-            <summary><%= Enum.count(@hierachy_missing)%></summary>
+            <summary style="cursor: pointer"><%= Enum.count(@hierachy_missing)%></summary>
             <ul>
             <%= for i <- @hierachy_missing do %>
               <li><%= i.id %></li>
@@ -46,20 +59,29 @@ defmodule RenewCollabWeb.LiveDocument do
             <dt style="margin: 0">Invalid Parenthoods</dt>
             <dd style="margin: 0">
           <details>
-            <summary><%= Enum.count(@hierachy_invalid)%></summary>
+            <summary style="cursor: pointer"><%= Enum.count(@hierachy_invalid)%></summary>
             <ul>
             <%= for i <- @hierachy_invalid do %>
               <li><%= i.id %></li>
               <% end %>
           </ul>
           </details></dd>
+          <dt></dt>
+          <dd style="margin: 0"><button type="button" phx-click="repair_hierarchy"  style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff">Repair</button></dd>
           </dl>
 
-          <button type="button" phx-click="repair_hierarchy">Repair</button>
         </div>
+      <h3>Element Tree</h3>
+
+      <div style="display: flex; gap: 1ex; padding: 1ex 0">
+        <button type="button" phx-click="create_group"  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Create Group</button>
+        <button type="button" phx-click="create_text"  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Create Text</button>
+        <button type="button" phx-click="create_box"  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Create Box</button>
+        <button type="button" phx-click="create_edge"  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Create Line</button>
+      </div>
 
       <.live_component id={"hierarchy-list"} module={RenewCollabWeb.HierarchyListComponent} document={@document} symbols={@symbols} selection={@selection} symbols={@symbols} />
-
+    </div>
       </div>
     </div>
     """
@@ -109,13 +131,13 @@ defmodule RenewCollabWeb.LiveDocument do
             {b.position_x, b.position_y},
             {b.position_x,
              b.position_y +
-               b.style.font_size / 2 *
+               (get_in(b, [Access.key(:style, %{}), Access.key(:font_size, %{})]) || 12) / 2 *
                  (b.body
                   |> String.split("\n")
                   |> Enum.filter(&(not blank?(&1)))
                   |> Enum.count())},
             {b.position_x +
-               b.style.font_size / 2 *
+               (get_in(b, [Access.key(:style, %{}), Access.key(:font_size, %{})]) || 12) / 2 *
                  (b.body
                   |> String.split("\n")
                   |> Enum.map(&String.length(&1))
@@ -147,6 +169,16 @@ defmodule RenewCollabWeb.LiveDocument do
     Renew.toggle_visible(socket.assigns.document.id, id)
 
     {:noreply, socket}
+  end
+
+  def handle_event("toggle-hierarchy", %{}, socket) do
+    {:noreply, socket |> update(:show_hierarchy, &(not &1))}
+  end
+
+  def handle_event("update-viewbox", %{}, socket) do
+    {:noreply,
+     socket
+     |> assign(:viewbox, viewbox(socket.assigns.document))}
   end
 
   def handle_event("repair_hierarchy", %{}, socket) do
@@ -488,6 +520,65 @@ defmodule RenewCollabWeb.LiveDocument do
       socket.assigns.document.id,
       layer_id
     )
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "create_group",
+        %{},
+        socket
+      ) do
+    Renew.create_layer(socket.assigns.document.id)
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "create_text",
+        %{},
+        socket
+      ) do
+    Renew.create_layer(socket.assigns.document.id, %{
+      "text" => %{
+        "position_x" => 0,
+        "position_y" => 0,
+        "body" => "Hello World"
+      }
+    })
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "create_box",
+        %{},
+        socket
+      ) do
+    Renew.create_layer(socket.assigns.document.id, %{
+      "box" => %{
+        "position_x" => 0,
+        "position_y" => 0,
+        "width" => 200,
+        "height" => 100
+      }
+    })
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "create_edge",
+        %{},
+        socket
+      ) do
+    Renew.create_layer(socket.assigns.document.id, %{
+      "edge" => %{
+        "source_x" => 0,
+        "source_y" => 0,
+        "target_x" => 200,
+        "target_y" => 100
+      }
+    })
 
     {:noreply, socket}
   end
