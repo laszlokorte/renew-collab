@@ -43,7 +43,7 @@ defmodule RenewCollab.Hierarchy.Layer do
   @doc false
   def changeset(layer, attrs) do
     layer
-    |> cast(attrs, [:id, :z_index, :semantic_tag, :hidden])
+    |> cast(attrs, [:document_id, :id, :z_index, :semantic_tag, :hidden])
     |> cast_assoc(:box)
     |> cast_assoc(:text)
     |> cast_assoc(:edge)

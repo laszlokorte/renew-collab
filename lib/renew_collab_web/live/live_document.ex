@@ -2,6 +2,7 @@ defmodule RenewCollabWeb.LiveDocument do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
+  alias RenewCollab.Versioning
   alias RenewCollab.Renew
   alias RenewCollab.Symbol
 
@@ -11,10 +12,12 @@ defmodule RenewCollabWeb.LiveDocument do
     socket =
       socket
       |> assign(:document, document)
+      |> assign(:snapshots, Versioning.document_versions(id))
       |> assign(:hierachy_missing, RenewCollab.RenewHierarchy.find_missing(id))
       |> assign(:hierachy_invalid, RenewCollab.RenewHierarchy.find_invalids(id))
       |> assign(:selection, nil)
       |> assign(:show_hierarchy, false)
+      |> assign(:show_snapshots, false)
       |> assign(:symbols, Symbol.list_shapes() |> Enum.map(fn s -> {s.id, s} end) |> Map.new())
       |> assign(:viewbox, viewbox(document))
 
@@ -82,6 +85,22 @@ defmodule RenewCollabWeb.LiveDocument do
 
       <.live_component id={"hierarchy-list"} module={RenewCollabWeb.HierarchyListComponent} document={@document} symbols={@symbols} selection={@selection} symbols={@symbols} />
     </div>
+
+              <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-snapshots">Snapshots</h2>
+
+      <div hidden={not @show_snapshots}>
+        <button type="button" phx-click="create_snapshot"  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Create Snaphot</button>
+        <div style="width: 40vw">
+          <%= for {day, snaps} <- @snapshots |> Enum.group_by(&DateTime.to_date(&1.inserted_at)) do %>
+      <h5 style="margin: 0;"><%= day|> Calendar.strftime("%Y-%m-%d")  %></h5>
+      <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.2ex">
+        <%= for s <- snaps  do %>
+          <li style="display: flex; align-items: center;gap: 1ex;"><button  style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff" phx-click="restore" phx-value-id={s.id}>Restore</button><%= s.inserted_at |> Calendar.strftime("%H:%M:%S")  %></li>
+        <% end %>
+      </ul>
+        <% end %>
+        </div>
+      </div>
       </div>
     </div>
     """
@@ -175,6 +194,10 @@ defmodule RenewCollabWeb.LiveDocument do
     {:noreply, socket |> update(:show_hierarchy, &(not &1))}
   end
 
+  def handle_event("toggle-snapshots", %{}, socket) do
+    {:noreply, socket |> update(:show_snapshots, &(not &1))}
+  end
+
   def handle_event("update-viewbox", %{}, socket) do
     {:noreply,
      socket
@@ -194,7 +217,8 @@ defmodule RenewCollabWeb.LiveDocument do
        :hierachy_invalid,
        RenewCollab.RenewHierarchy.find_invalids(socket.assigns.document.id)
      )
-     |> assign(:document, Renew.get_document_with_elements!(socket.assigns.document.id))}
+     |> assign(:document, Renew.get_document_with_elements!(socket.assigns.document.id))
+     |> assign(:snapshots, Versioning.document_versions(socket.assigns.document.id))}
   end
 
   def handle_event("select_layer", %{"id" => id}, socket) do
@@ -583,13 +607,35 @@ defmodule RenewCollabWeb.LiveDocument do
     {:noreply, socket}
   end
 
+  def handle_event(
+        "create_snapshot",
+        %{},
+        socket
+      ) do
+    Versioning.create_snapshot(socket.assigns.document.id)
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "restore",
+        %{"id" => id},
+        socket
+      ) do
+    Versioning.restore_snapshot(socket.assigns.document.id, id)
+
+    {:noreply, socket}
+  end
+
   def handle_info({:document_changed, document_id}, socket) do
     if document_id == socket.assigns.document.id do
       {:noreply,
        socket
-       |> update(:document, fn _ ->
+       |> assign(
+         :document,
          Renew.get_document_with_elements!(document_id)
-       end)}
+       )
+       |> assign(:snapshots, Versioning.document_versions(document_id))}
     end
   end
 
