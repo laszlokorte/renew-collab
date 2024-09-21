@@ -1536,6 +1536,20 @@ defmodule RenewCollab.Renew do
       end,
       []
     )
+    |> Ecto.Multi.update_all(
+      :update_waypoints,
+      fn
+        %{combined_layer_ids: combined_layer_ids} ->
+          from(w in Waypoint,
+            where:
+              w.edge_id in subquery(
+                from(e in Edge, select: e.id, where: e.layer_id in ^combined_layer_ids)
+              ),
+            update: [inc: [position_x: ^dx, position_y: ^dy]]
+          )
+      end,
+      []
+    )
     |> Ecto.Multi.all(
       :affected_bonds,
       fn %{combined_layer_ids: combined_layer_ids} ->
