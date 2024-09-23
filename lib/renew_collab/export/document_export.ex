@@ -317,6 +317,28 @@ defmodule RenewCollab.Export.DocumentExport do
     {:rgba, r, g, b, round(a * opacity)}
   end
 
+  defp color_to_rgba(<<"#", rr::bytes-size(1), gg::bytes-size(1), bb::bytes-size(1)>>, opacity) do
+    {r, ""} = Integer.parse(rr, 16)
+    {g, ""} = Integer.parse(gg, 16)
+    {b, ""} = Integer.parse(bb, 16)
+
+    {:rgba, Bitwise.bsl(r, 8) + r, Bitwise.bsl(g, 8) + g, Bitwise.bsl(b, 8) + b,
+     round(255 * opacity)}
+  end
+
+  defp color_to_rgba(
+         <<"#", rr::bytes-size(1), gg::bytes-size(1), bb::bytes-size(1), aa::bytes-size(1)>>,
+         opacity
+       ) do
+    {r, ""} = Integer.parse(rr, 16)
+    {g, ""} = Integer.parse(gg, 16)
+    {b, ""} = Integer.parse(bb, 16)
+    {a, ""} = Integer.parse(aa, 16)
+
+    {:rgba, Bitwise.bsl(r, 8) + r, Bitwise.bsl(g, 8) + g, Bitwise.bsl(b, 8) + b,
+     round(Bitwise.bsl(a, 8) + a * opacity)}
+  end
+
   defp color_to_rgba(
          <<"rgba", args::utf8>>,
          opacity
@@ -341,6 +363,10 @@ defmodule RenewCollab.Export.DocumentExport do
       |> Enum.map(&round/1)
 
     {:rgba, r, g, b, round(250 * opacity)}
+  end
+
+  defp color_to_rgba("transparent", opacity) do
+    {:rgba, 255, 199, 158, 0}
   end
 
   defp color_to_rgba(color, opacity) do

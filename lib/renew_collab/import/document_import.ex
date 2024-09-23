@@ -278,7 +278,7 @@ defmodule RenewCollab.Import.DocumentImport do
           end
         end
 
-      hyperlinks =
+      text_annotations =
         for {{%Renewex.Storable{
                 class_name: class_name,
                 fields: %{fParent: {:ref, text_parent_ref}} = fields
@@ -292,6 +292,48 @@ defmodule RenewCollab.Import.DocumentImport do
             target_layer_id: target_id
           }
         end
+
+      virtual_place_links =
+        for {{%Renewex.Storable{
+                class_name: class_name,
+                fields: %{place: {:ref, place_ref}} = fields
+              }, uuid}, z_index} <- unique_figs,
+            Renewex.Hierarchy.is_subtype_of(
+              parser.grammar,
+              class_name,
+              "de.renew.gui.VirtualPlaceFigure"
+            ),
+            target_id =
+              Enum.at(refs_with_ids, place_ref)
+              |> elem(1),
+            not is_nil(target_id) do
+          %{
+            source_layer_id: uuid,
+            target_layer_id: target_id
+          }
+        end
+
+      virtual_transition_links =
+        for {{%Renewex.Storable{
+                class_name: class_name,
+                fields: %{transition: {:ref, transition_ref}} = fields
+              }, uuid}, z_index} <- unique_figs,
+            Renewex.Hierarchy.is_subtype_of(
+              parser.grammar,
+              class_name,
+              "de.renew.gui.VirtualPlaceFigure"
+            ),
+            target_id =
+              Enum.at(refs_with_ids, transition_ref)
+              |> elem(1),
+            not is_nil(target_id) do
+          %{
+            source_layer_id: uuid,
+            target_layer_id: target_id
+          }
+        end
+
+      hyperlinks = Enum.concat([text_annotations, virtual_place_links, virtual_transition_links])
 
       bonds =
         for {{%Renewex.Storable{
