@@ -6944,6 +6944,63 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
     reconnected() {
     }
   };
+  Hooks2.RnwEdgeBond = {
+    // Callbacks
+    mounted() {
+      this.el.addEventListener("submit", (evt) => {
+        evt.preventDefault();
+        const rnwEdgeId = evt.currentTarget.getAttribute("rnw-edge-id");
+        const bondKind = evt.currentTarget.getAttribute("rnw-kind");
+        const { layer_id, socket_id } = Object.fromEntries(new FormData(evt.currentTarget));
+        if (layer_id && socket_id) {
+          console.log("create_edge_bond");
+          this.pushEvent("create_edge_bond", {
+            edge_id: rnwEdgeId,
+            kind: bondKind,
+            layer_id,
+            socket_id
+          });
+        }
+      });
+    },
+    beforeUpdate() {
+    },
+    updated() {
+    },
+    destroyed() {
+    },
+    disconnected() {
+    },
+    reconnected() {
+    }
+  };
+  Hooks2.RnwLinkLayer = {
+    // Callbacks
+    mounted() {
+      this.el.addEventListener("change", (evt) => {
+        evt.preventDefault();
+        const rnwLayerId = evt.currentTarget.getAttribute("rnw-layer-id");
+        const { target } = Object.fromEntries(new FormData(evt.currentTarget));
+        if (target) {
+          console.log("link_layer");
+          this.pushEvent("link_layer", {
+            source_layer_id: rnwLayerId,
+            target_layer_id: target
+          });
+        }
+      });
+    },
+    beforeUpdate() {
+    },
+    updated() {
+    },
+    destroyed() {
+    },
+    disconnected() {
+    },
+    reconnected() {
+    }
+  };
   Hooks2.RenewGrabber = {
     // Callbacks
     mounted() {

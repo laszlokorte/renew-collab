@@ -8,4 +8,10 @@ defmodule RenewCollab.Sockets do
     |> Repo.all()
     |> Map.new()
   end
+
+  def all_socket_schemas do
+    from(p in SocketSchema)
+    |> Repo.all()
+    |> Repo.preload(:sockets)
+  end
 end

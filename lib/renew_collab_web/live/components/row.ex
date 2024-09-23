@@ -5,15 +5,34 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
   def render(assigns) do
     ~H"""
       <tr id={"layer-list-item-#{@layer.id}"} bgcolor={if(@selected, do: "#99ddff", else: "white")}>
-        <td width="20" align="center" style="cursor:pointer;" phx-click="toggle_visible" phx-value-id={@layer.id}><%= if @layer.hidden do %><% else %>👁<% end %></td>
-        <td width="20">          <%= if @layer.outgoing_link do %><span style="cursor: pointer" phx-click="select_layer" phx-value-id={@layer.outgoing_link.target_layer_id}>🔗</span><% end %></td>
-        <td width="20" align="center"><%= if @layer.box do %>☐<% end %></td>
-        <td width="20" align="center">
+        <td valign="top" width="20" align="center" style="cursor:pointer;" phx-click="toggle_visible" phx-value-id={@layer.id}><%= if @layer.hidden do %><% else %>👁<% end %></td>
+        <td valign="top" width="20">
+          <%= if @layer.outgoing_link do %>
+          <span style="cursor: pointer" phx-click="select_layer" phx-value-id={@layer.outgoing_link.target_layer_id}>🔗</span>
+          <% end %>
+
+          <%= if @selected do %>
+          <%= if @layer.outgoing_link do %>
+          <button phx-click="unlink_layer" phx-value-id={@layer.id} type="button">unlink</button>
+          <% else %>
+          <form phx-hook="RnwLinkLayer" rnw-layer-id={"#{@layer.id}"} id={"link-layer-#{@layer.id}"}>
+                <select style="width: 5em" name="target">
+                <option value="">Target</option>
+                <%= for l <- @document.layers do %>
+                  <option value={l.id}><%= l.semantic_tag %>/<%= l.id %></option>
+                <%= end %>
+              </select>
+            </form>
+          <% end %>
+          <%= end %>
+        </td>
+        <td valign="top" width="20" align="center"><%= if @layer.box do %>☐<% end %></td>
+        <td valign="top" width="20" align="center">
           <%= if @layer.text do %>
           T
           <% end %>
         </td>
-        <td width="20" align="center">
+        <td valign="top" width="20" align="center">
           <%= if not (is_nil(@layer.edge) or is_nil(@layer.edge.style)) do %>
           <%= if @layer.edge.style.source_tip_symbol_shape_id do %>
             &lt;
@@ -26,14 +45,14 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
           <% end %>
           <% end %>
         </td>
-        <td width="20" align="right" style="white-space: nowrap; word-wrap: none">
+        <td valign="top" width="20" align="right" style="white-space: nowrap; word-wrap: none">
           <%= if @selected do %>
           <input style="width: 3em" style="padding:0.5ex" type="number" step="1" min="0"  phx-hook="RenewZIndex"  id={"layer-zindex-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"} value={@layer.z_index} size="2" width="30" />
-          <%= else%>
+          <% else %>
           <%= @layer.z_index %>
-          <%= end%>
+          <% end%>
         </td>
-        <td style={"padding-left: #{0.2+ 2*@depth}em"}>
+        <td valign="top" style={"padding-left: #{0.2+ 2*@depth}em"}>
             <div draggable="true" phx-hook="RenewGrabber" id={"layer-grab-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"} style="user-select: none; cursor: grab; padding: 2px; background: black; color: white; display: grid; grid-template-rows: 1fr 1fr; grid-template-columns: 1fr 1fr; width: 2em">
               <div  phx-hook="RenewDropper" id={"dropper-#{@layer.id}-below-outside"} rnw-layer-id={"#{@layer.id}"} rnw-order="below" rnw-relative="outside" style="grid-row: 1 / span 1; grid-column: 1/span 1; min-height: 1em"></div>
               <div  phx-hook="RenewDropper" id={"dropper-#{@layer.id}-above-outside"} rnw-layer-id={"#{@layer.id}"} rnw-order="above" rnw-relative="outside" style="grid-row: 2 / span 1; grid-column: 1/span 1; min-height: 1em"></div>
@@ -43,7 +62,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
 
             </div>
         </td>
-        <td {unless(@selected, do: [style: "cursor: pointer;padding-left: #{0.2+ 2*@depth}em", "phx-click": "select_layer"], else: [])} phx-value-id={@layer.id}>
+        <td valign="top" {unless(@selected, do: [style: "cursor: pointer;padding-left: #{0.2+ 2*@depth}em", "phx-click": "select_layer"], else: [])} phx-value-id={@layer.id}>
           <%= if @selected do %>
           <div style="display: flex; padding: 1ex; gap: 0.5ex">
             <small><button style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff" phx-click="select_layer" phx-value-id={"-"}>unselect</button></small><br>
@@ -55,7 +74,10 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
           <small><code><%= @layer.id %></code></small><br>
           
             <%= if @selected do %>
-            <input  phx-hook="RenewSemanticTag" id={"semantic-tag-#{@layer.id}"}  type="text" value={@layer.semantic_tag} style="width: 100%; box-sizing: border-box"  rnw-layer-id={"#{@layer.id}"} />
+            <fieldset>
+              <legend for={"semantic-tag-#{@layer.id}"}>Semantic Tag</legend>
+              <input  phx-hook="RenewSemanticTag" id={"semantic-tag-#{@layer.id}"}  type="text" value={@layer.semantic_tag} style="width: 100%; box-sizing: border-box"  rnw-layer-id={"#{@layer.id}"} />
+            </fieldset>
             <% else %>
             <small><code><%= @layer.semantic_tag %></code></small>
             <% end %>
@@ -83,7 +105,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
             <legend>Shape</legend>
             <form phx-hook="RenewBoxShape" id={"layer-box-shape-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"}>
                <dl style="display: grid; grid-template-columns: max-content 1fr; gap: 0.5em">
-                <dt>X</dt>
+                <dt>Symbol</dt>
                 <dd style="margin: 0">
                <select name="shape_id">
                 <option {if(is_nil(@layer.box.symbol_shape_id), do: [selected: "selected"], else: [])} value="">---</option>
@@ -141,6 +163,73 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
               <% end %>
             </ul>
           </fieldset>
+          <fieldset>
+            <legend>Bonds</legend>
+            <dl>
+              <dt>Source Bond</dt>
+              <dd>
+                
+              <%= if @layer.edge.source_bond do  %>
+              <small  phx-click="select_layer" phx-value-id={@layer.edge.source_bond.layer_id} style="display: inline-block; cursor: pointer; background: #333; color: #fff">
+                <%= @layer.edge.source_bond.layer_id %>/<br>
+              <%= @layer.edge.source_bond.socket_id %></small><br>
+              <button phx-click="detach-bond" phx-value-id={@layer.edge.source_bond.id} type="button">Detach</button>
+              <% else %>
+              <form phx-hook="RnwEdgeBond" rnw-edge-id={"#{@layer.edge.id}"} rnw-kind="source" id={"form-attach-bond-source-#{@layer.id}"}>
+                <select style="width: 5em" name="layer_id">
+                <option value="">Layer</option>
+                <%= for l <- @document.layers, not is_nil(l.box) do %>
+                  <option value={l.id}><%= l.semantic_tag %>/<%= l.id %></option>
+                <%= end %>
+              </select>
+              <select style="width: 5em"  name="socket_id">
+                <option value="">Socket</option>
+
+                 <%= for schema <- @socket_schemas do %>
+                  <optgroup label={schema.name}>
+                    <%= for sock <- schema.sockets do %>
+                      <option value={sock.id}><%= sock.name %></option>
+                  <%= end %>
+                  </optgroup>
+                <%= end %>
+              </select>
+              <button type="submit">Attach</button>
+              </form>
+              <% end %>
+              </dd>
+              <dt>Target Bond</dt>
+              <dd>
+                
+            <%= if @layer.edge.target_bond do  %>
+              <small  phx-click="select_layer" phx-value-id={@layer.edge.target_bond.layer_id} style="display: inline-block; cursor: pointer; background: #333; color: #fff">
+                <%= @layer.edge.target_bond.layer_id %>/<br>
+              <%= @layer.edge.target_bond.socket_id %></small><br>
+              <button phx-click="detach-bond" phx-value-id={@layer.edge.target_bond.id} type="button">Detach</button>
+            <% else %>
+              <form phx-hook="RnwEdgeBond" rnw-edge-id={"#{@layer.edge.id}"} rnw-kind="target" id={"form-attach-bond-target-#{@layer.id}"}>
+                <select style="width: 5em" name="layer_id">
+                <option value="">Layer</option>
+                <%= for l <- @document.layers, not is_nil(l.box) do %>
+                  <option value={l.id}><%= l.semantic_tag %>/<%= l.id %></option>
+                <%= end %>
+              </select>
+              <select style="width: 5em" name="socket_id">
+                <option value="">Socket</option>
+
+                 <%= for schema <- @socket_schemas do %>
+                  <optgroup label={schema.name}>
+                    <%= for sock <- schema.sockets do %>
+                      <option value={sock.id}><%= sock.name %></option>
+                  <%= end %>
+                  </optgroup>
+                <%= end %>
+              </select>
+              <button type="submit">Attach</button>
+              </form>
+            <% end %>
+              </dd>
+            </dl>
+          </fieldset>
           <% end %>
           <%= unless is_nil(@layer.text) do %>
           <fieldset>
@@ -169,7 +258,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
             border_color: :color,
             border_width: :number,
             border_dash_array: :text,
-            ]} element={@layer}  element_type="layer" module={RenewCollabWeb.HierarchyStyleList} layer={@layer}   />
+            ]} symbols={@symbols} element={@layer}  element_type="layer" module={RenewCollabWeb.HierarchyStyleList} layer={@layer}   />
 
 
           </fieldset>
@@ -184,8 +273,10 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
             stroke_join: :text,
             stroke_cap: :text,
             stroke_dash_array: :text,
-            smoothness: :text
-            ]} element={@layer.edge}  element_type="edge" module={RenewCollabWeb.HierarchyStyleList} layer={@layer}   />
+            smoothness: :text,
+            source_tip_symbol_shape_id: :symbol,
+            target_tip_symbol_shape_id: :symbol,
+            ]} symbols={@symbols} element={@layer.edge}  element_type="edge" module={RenewCollabWeb.HierarchyStyleList} layer={@layer}   />
 
 
 
@@ -205,7 +296,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
             text_color: :color,
             rich: :checkbox,
             blank_lines: :checkbox,
-            ]} element={@layer.text}  element_type="text" module={RenewCollabWeb.HierarchyStyleList} layer={@layer}   />
+            ]}  symbols={@symbols} element={@layer.text}  element_type="text" module={RenewCollabWeb.HierarchyStyleList} layer={@layer}   />
 
 
           </fieldset>

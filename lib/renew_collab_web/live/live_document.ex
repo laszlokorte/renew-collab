@@ -5,6 +5,7 @@ defmodule RenewCollabWeb.LiveDocument do
   alias RenewCollab.Versioning
   alias RenewCollab.Renew
   alias RenewCollab.Symbol
+  alias RenewCollab.Sockets
 
   def mount(%{"id" => id}, _session, socket) do
     document = Renew.get_document_with_elements!(id)
@@ -12,6 +13,7 @@ defmodule RenewCollabWeb.LiveDocument do
     socket =
       socket
       |> assign(:document, document)
+      |> assign(:socket_schemas, Sockets.all_socket_schemas())
       |> assign(:snapshots, Versioning.document_versions(id))
       |> assign(:undo_redo, Versioning.document_undo_redo(id))
       |> assign(:hierachy_missing, RenewCollab.RenewHierarchy.find_missing(id))
@@ -84,7 +86,7 @@ defmodule RenewCollabWeb.LiveDocument do
         <button type="button" phx-click="create_edge"  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Create Line</button>
       </div>
 
-      <.live_component id={"hierarchy-list"} module={RenewCollabWeb.HierarchyListComponent} document={@document} symbols={@symbols} selection={@selection} symbols={@symbols} />
+      <.live_component id={"hierarchy-list"} module={RenewCollabWeb.HierarchyListComponent} socket_schemas={@socket_schemas} document={@document} symbols={@symbols} selection={@selection} symbols={@symbols} />
     </div>
     <h2>History</h2>
     <div style="display: flex; gap: 0.5ex">
@@ -236,6 +238,12 @@ defmodule RenewCollabWeb.LiveDocument do
     {:noreply,
      socket
      |> assign(:viewbox, viewbox(socket.assigns.document))}
+  end
+
+  def handle_event("detach-bond", %{"id" => bond_id}, socket) do
+    Renew.detach_bond(socket.assigns.document.id, bond_id)
+
+    {:noreply, socket}
   end
 
   def handle_event("repair_hierarchy", %{}, socket) do
@@ -644,6 +652,59 @@ defmodule RenewCollabWeb.LiveDocument do
         "target_y" => 100
       }
     })
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "create_edge_bond",
+        %{
+          "edge_id" => edge_id,
+          "kind" => kind,
+          "layer_id" => layer_id,
+          "socket_id" => socket_id
+        },
+        socket
+      ) do
+    Renew.create_edge_bond(
+      socket.assigns.document.id,
+      edge_id,
+      kind,
+      layer_id,
+      socket_id
+    )
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "unlink_layer",
+        %{
+          "id" => layer_id
+        },
+        socket
+      ) do
+    Renew.unlink_layer(
+      socket.assigns.document.id,
+      layer_id
+    )
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "link_layer",
+        %{
+          "source_layer_id" => layer_id,
+          "target_layer_id" => target_layer_id
+        },
+        socket
+      ) do
+    Renew.link_layer(
+      socket.assigns.document.id,
+      layer_id,
+      target_layer_id
+    )
 
     {:noreply, socket}
   end

@@ -23,6 +23,7 @@ defmodule RenewCollab.Renew do
 
   def reset do
     Repo.delete_all(Document)
+    Repo.delete_all(SocketSchema)
 
     %SocketSchema{}
     |> SocketSchema.changeset(%{
@@ -61,7 +62,9 @@ defmodule RenewCollab.Renew do
               text: [style: []],
               edge: [
                 waypoints: ^from(w in Waypoint, order_by: [asc: :sort]),
-                style: []
+                style: [],
+                source_bond: [],
+                target_bond: []
               ],
               style: [],
               interface: [],
@@ -769,9 +772,6 @@ defmodule RenewCollab.Renew do
             :target -> last_waypoint
           end
 
-        target_x = box.position_x + box.width / 2
-        target_y = box.position_y + box.height / 2
-
         with {x, y} <- align_to_socket(box, socket, relevant_waypoint) do
           Edge.change_position(%Edge{id: bond.element_edge_id}, %{
             :"#{bond.kind}_x" => x,
@@ -877,9 +877,6 @@ defmodule RenewCollab.Renew do
             :target -> last_waypoint
           end
 
-        target_x = box.position_x + box.width / 2
-        target_y = box.position_y + box.height / 2
-
         with {x, y} <- align_to_socket(box, socket, relevant_waypoint) do
           Edge.change_position(%Edge{id: bond.element_edge_id}, %{
             :"#{bond.kind}_x" => x,
@@ -983,9 +980,6 @@ defmodule RenewCollab.Renew do
             :source -> first_waypoint
             :target -> last_waypoint
           end
-
-        target_x = box.position_x + box.width / 2
-        target_y = box.position_y + box.height / 2
 
         with {x, y} <- align_to_socket(box, socket, relevant_waypoint) do
           Edge.change_position(%Edge{id: bond.element_edge_id}, %{
@@ -1289,9 +1283,6 @@ defmodule RenewCollab.Renew do
             :source -> first_waypoint
             :target -> last_waypoint
           end
-
-        target_x = box.position_x + box.width / 2
-        target_y = box.position_y + box.height / 2
 
         with {x, y} <- align_to_socket(box, socket, relevant_waypoint) do
           Edge.change_position(%Edge{id: bond.element_edge_id}, %{
@@ -1608,11 +1599,11 @@ defmodule RenewCollab.Renew do
     |> Ecto.Multi.update_all(
       :update_waypoints,
       fn
-        %{combined_layer_ids: combined_layer_ids} ->
+        %{child_layers: child_layers} ->
           from(w in Waypoint,
             where:
               w.edge_id in subquery(
-                from(e in Edge, select: e.id, where: e.layer_id in ^combined_layer_ids)
+                from(e in Edge, select: e.id, where: e.layer_id in ^child_layers)
               ),
             update: [inc: [position_x: ^dx, position_y: ^dy]]
           )
@@ -1730,6 +1721,195 @@ defmodule RenewCollab.Renew do
         })
       end
     )
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
+    |> Repo.transaction()
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
+  end
+
+  def detach_bond(document_id, bond_id) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.one(:bond, fn _ ->
+      from(b in Bond,
+        join: e in assoc(b, :element_edge),
+        join: l in assoc(e, :layer),
+        where: l.document_id == ^document_id and b.id == ^bond_id
+      )
+    end)
+    |> Ecto.Multi.delete(:delete_bond, fn %{bond: bond} ->
+      bond
+    end)
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
+    |> Repo.transaction()
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
+  end
+
+  def create_edge_bond(
+        document_id,
+        edge_id,
+        kind,
+        layer_id,
+        socket_id
+      ) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(
+      :new_bond,
+      %Bond{}
+      |> Bond.changeset(%{
+        element_edge_id: edge_id,
+        kind: kind,
+        layer_id: layer_id,
+        socket_id: socket_id
+      })
+    )
+    |> Ecto.Multi.all(
+      :affected_bonds,
+      fn %{new_bond: bond} ->
+        from(bond in Bond,
+          join: l in assoc(bond, :layer),
+          join: box in assoc(l, :box),
+          join: edge in assoc(bond, :element_edge),
+          join: socket in assoc(bond, :socket),
+          where: bond.element_edge_id == ^bond.element_edge_id,
+          group_by: bond.id,
+          select: %{
+            bond: bond,
+            box: box,
+            edge: edge,
+            socket: socket
+          }
+        )
+      end
+    )
+    |> Ecto.Multi.all(
+      :affected_waypoints,
+      fn %{affected_bonds: affected_bonds} ->
+        from(w in Waypoint,
+          where: w.edge_id in ^Enum.map(affected_bonds, & &1.bond.element_edge_id),
+          order_by: [asc: w.sort]
+        )
+      end
+    )
+    |> Ecto.Multi.run(:update_edge_points, fn repo,
+                                              %{
+                                                affected_waypoints: affected_waypoints,
+                                                affected_bonds: affected_bonds
+                                              } ->
+      waypoint_map = Enum.group_by(affected_waypoints, & &1.edge_id) |> Map.new()
+
+      affected_bonds
+      |> Enum.reduce_while({:ok, []}, fn %{
+                                           bond: bond,
+                                           box: box,
+                                           edge: edge,
+                                           socket: socket
+                                         },
+                                         {:ok, acc} ->
+        waypoints = Map.get(waypoint_map, bond.element_edge_id, [])
+
+        first_waypoint =
+          List.first(waypoints, %{position_x: edge.target_x, position_y: edge.target_y})
+
+        last_waypoint =
+          List.last(waypoints, %{position_x: edge.source_x, position_y: edge.source_y})
+
+        relevant_waypoint =
+          case bond.kind do
+            :source -> first_waypoint
+            :target -> last_waypoint
+          end
+
+        with {x, y} <- align_to_socket(box, socket, relevant_waypoint) do
+          Edge.change_position(%Edge{id: bond.element_edge_id}, %{
+            :"#{bond.kind}_x" => x,
+            :"#{bond.kind}_y" => y
+          })
+        end
+        |> Repo.update()
+        |> case do
+          {:ok, r} -> {:cont, {:ok, [r | acc]}}
+          e -> {:halt, {e}}
+        end
+      end)
+    end)
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
+    |> Repo.transaction()
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
+  end
+
+  def unlink_layer(
+        document_id,
+        layer_id
+      ) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.one(
+      :hyperlink,
+      from(h in Hyperlink,
+        join: s in assoc(h, :source_layer),
+        where: s.id == ^layer_id and s.document_id == ^document_id
+      )
+    )
+    |> Ecto.Multi.delete(
+      :delete_ink,
+      fn %{hyperlink: hyperlink} ->
+        hyperlink
+      end
+    )
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
+    |> Repo.transaction()
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
+  end
+
+  def link_layer(
+        document_id,
+        layer_id,
+        target_layer_id
+      ) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.one(
+      :layer,
+      from(s in Layer,
+        where: s.id == ^layer_id and s.document_id == ^document_id
+      )
+    )
+    |> Ecto.Multi.insert(:insert_hyperlink, fn %{layer: layer} ->
+      %Hyperlink{}
+      |> Hyperlink.changeset(%{
+        source_layer_id: layer.id,
+        target_layer_id: target_layer_id
+      })
+    end)
     |> Ecto.Multi.put(:document_id, document_id)
     |> Ecto.Multi.append(Versioning.snapshot_multi())
     |> Repo.transaction()

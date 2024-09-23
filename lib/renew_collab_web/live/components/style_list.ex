@@ -7,11 +7,11 @@ defmodule RenewCollabWeb.HierarchyStyleList do
     <dl style="display: grid; grid-template-columns: max-content 1fr; gap: 0.5em">
       <%= for {attr, type} <- @attrs do %>
       <dt>
-        <label for={"layer-style-#{@layer.id}-#{@element_type}-#{attr}"}><%= attr |> Atom.to_string |> String.capitalize() %></label>
-        <br><%= style_or_default(@element, attr) %>
+        <label for={"layer-style-#{@layer.id}-#{@element_type}-#{attr}"}><%= attr |> Atom.to_string |> String.split("_") |> Enum.map(&String.capitalize/1) |> Enum.join(" ")%></label>
+        <br><small style="display: block; max-width: 10em; overflow: hidden; text-overflow: ellipsis;"><%= style_or_default(@element, attr) %></small>
       </dt>
       <dd>
-      <.live_component value={style_or_default(@element, attr)}  element={@element_type} id={"layer-style-#{@layer.id}-#{attr}"} module={RenewCollabWeb.HierarchyStyleField} layer={@layer} attr={attr} type={type}  />
+      <.live_component symbols={@symbols} value={style_or_default(@element, attr)}  element={@element_type} id={"layer-style-#{@layer.id}-#{attr}"} module={RenewCollabWeb.HierarchyStyleField} layer={@layer} attr={attr} type={type}  />
       </dd>
       <% end %>
     </dl>

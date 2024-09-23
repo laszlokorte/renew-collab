@@ -33,7 +33,7 @@ defmodule RenewCollabWeb.HierarchyListComponent do
   defp layer_hierarchy(assigns, depth, nil) do
     ~H"""
         <%= for layer <- @document.layers, layer.direct_parent == nil do %> 
-          <.live_component symbols={@symbols} id={layer.id} module={RenewCollabWeb.HierarchyRowComponent} layer={layer} selected={@selection == layer.id} depth={depth} />
+          <.live_component document={@document} socket_schemas={@socket_schemas} symbols={@symbols} id={layer.id} module={RenewCollabWeb.HierarchyRowComponent} layer={layer} selected={@selection == layer.id} depth={depth} />
           <%= layer_hierarchy(assigns, depth+1, layer.id) %>
         <% end %>
     """
@@ -42,7 +42,7 @@ defmodule RenewCollabWeb.HierarchyListComponent do
   defp layer_hierarchy(assigns, depth, parent_id) do
     ~H"""
         <%= for layer <- @document.layers, layer.direct_parent, layer.direct_parent.ancestor_id == parent_id do %> 
-          <.live_component symbols={@symbols} id={layer.id}  module={RenewCollabWeb.HierarchyRowComponent} layer={layer} selected={@selection == layer.id} depth={depth} />
+          <.live_component document={@document} socket_schemas={@socket_schemas} symbols={@symbols} id={layer.id}  module={RenewCollabWeb.HierarchyRowComponent} layer={layer} selected={@selection == layer.id} depth={depth} />
           <%= layer_hierarchy(assigns, depth+1, layer.id) %>
         <% end %>
     """

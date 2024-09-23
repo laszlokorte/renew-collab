@@ -5,7 +5,7 @@ defmodule RenewCollab.Connection.Bond do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "connection_bond" do
-    belongs_to :element_edge, RenewCollab.Element.Edge
+    belongs_to :element_edge, RenewCollab.Element.Edge, foreign_key: :element_edge_id
     belongs_to :socket, RenewCollab.Connection.Socket
     belongs_to :layer, RenewCollab.Hierarchy.Layer
     field :kind, Ecto.Enum, values: [:source, :target], null: false

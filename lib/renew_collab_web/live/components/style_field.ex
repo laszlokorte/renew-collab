@@ -8,6 +8,14 @@ defmodule RenewCollabWeb.HierarchyStyleField do
 
       <%= case options(@element, @attr, @type) do %>
 
+      <% :symbols -> %>
+      <select {attrs(@element, @attr, @type)} phx-hook="RenewStyleAttribute" id={"layer-style-#{@layer.id}-#{@element}-#{@attr}"}  rnw-layer-id={"#{@layer.id}"} rnw-element={@element} rnw-style={@attr} style="padding: 0.5ex; ">
+          <option value="">None</option>
+          <%= for {sid, s} <- @symbols, s.name |> String.starts_with?("arrow") do %>
+            <option selected={@value == sid} value={sid}><%= s.name %></option>
+          <% end %>
+        </select>
+
       <% [true, false] -> %>
       <input {attrs(@element, @attr, @type)} checked={@value} phx-hook="RenewStyleAttribute" id={"layer-style-#{@layer.id}-#{@element}-#{@attr}"}  rnw-layer-id={"#{@layer.id}"} rnw-element={@element} rnw-style={@attr} style="padding: 0.5ex;" type={@type} />
 
@@ -70,6 +78,8 @@ defmodule RenewCollabWeb.HierarchyStyleField do
       true,
       false
     ]
+
+  def options(el, attr, :symbol), do: :symbols
 
   def options(el, attr, type), do: nil
 

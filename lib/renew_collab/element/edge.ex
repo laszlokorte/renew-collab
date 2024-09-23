@@ -14,14 +14,17 @@ defmodule RenewCollab.Element.Edge do
 
     has_one :source_bond, RenewCollab.Connection.Bond,
       on_delete: :delete_all,
-      where: [kind: :source]
+      where: [kind: :source],
+      foreign_key: :element_edge_id
 
     has_one :target_bond, RenewCollab.Connection.Bond,
       on_delete: :delete_all,
-      where: [kind: :target]
+      where: [kind: :target],
+      foreign_key: :element_edge_id
 
     has_many :bonds, RenewCollab.Connection.Bond,
       on_delete: :delete_all,
+      foreign_key: :element_edge_id,
       foreign_key: :element_edge_id
 
     has_one :style, RenewCollab.Style.EdgeStyle, on_delete: :delete_all
