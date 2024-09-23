@@ -7,6 +7,7 @@ defmodule RenewCollab.Versioning.Snapshot do
   schema "snapshot" do
     field :content, :map
     belongs_to :document, RenewCollab.Document.Document
+    belongs_to :predecessor, RenewCollab.Versioning.Snapshot
 
     timestamps(type: :utc_datetime)
   end
@@ -14,7 +15,7 @@ defmodule RenewCollab.Versioning.Snapshot do
   @doc false
   def changeset(path, attrs) do
     path
-    |> cast(attrs, [:content, :document_id])
-    |> validate_required([:content, :document_id])
+    |> cast(attrs, [:id, :content, :document_id, :predecessor_id])
+    |> validate_required([:id, :content, :document_id, :predecessor_id])
   end
 end

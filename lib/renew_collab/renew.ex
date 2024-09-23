@@ -19,6 +19,7 @@ defmodule RenewCollab.Renew do
   alias RenewCollab.Element.Edge
   alias RenewCollab.Element.Box
   alias RenewCollab.Element.Text
+  alias RenewCollab.Versioning
 
   def reset do
     Repo.delete_all(Document)
@@ -290,6 +291,10 @@ defmodule RenewCollab.Renew do
         )
       end)
     end)
+    |> Ecto.Multi.run(:document_id, fn _, %{insert_document: inserted_document} ->
+      {:ok, inserted_document.id}
+    end)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
     |> Repo.transaction()
     |> case do
       {:ok, %{insert_document: inserted_document}} ->
@@ -363,9 +368,13 @@ defmodule RenewCollab.Renew do
       )
 
     # Update the record
-    Repo.update_all(query, [])
+    Ecto.Multi.new()
+    |> Ecto.Multi.update_all(:update_visibility, query, [])
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
+    |> Repo.transaction()
     |> case do
-      {1, nil} ->
+      {:ok, _} ->
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "redux_document:#{document_id}",
@@ -391,13 +400,17 @@ defmodule RenewCollab.Renew do
       end,
       on_conflict: {:replace, [style_attr]}
     )
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
     |> Repo.transaction()
-
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "redux_document:#{document_id}",
-      {:document_changed, document_id}
-    )
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
   end
 
   def layer_edge_style_key("stroke_width"), do: :stroke_width
@@ -423,13 +436,17 @@ defmodule RenewCollab.Renew do
       end,
       on_conflict: {:replace, [style_attr]}
     )
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
     |> Repo.transaction()
-
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "redux_document:#{document_id}",
-      {:document_changed, document_id}
-    )
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
   end
 
   def layer_text_style_key("italic"), do: :italic
@@ -456,13 +473,17 @@ defmodule RenewCollab.Renew do
       end,
       on_conflict: {:replace, [style_attr]}
     )
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
     |> Repo.transaction()
-
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "redux_document:#{document_id}",
-      {:document_changed, document_id}
-    )
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
   end
 
   def update_layer_text_body(
@@ -481,13 +502,17 @@ defmodule RenewCollab.Renew do
         Text.changeset(text, %{body: new_body})
       end
     )
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
     |> Repo.transaction()
-
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "redux_document:#{document_id}",
-      {:document_changed, document_id}
-    )
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
   end
 
   def update_layer_box_size(
@@ -582,13 +607,17 @@ defmodule RenewCollab.Renew do
         end
       end)
     end)
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
     |> Repo.transaction()
-
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "redux_document:#{document_id}",
-      {:document_changed, document_id}
-    )
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
   end
 
   defp align_to_socket(box, socket, relevant_waypoint) do
@@ -623,13 +652,17 @@ defmodule RenewCollab.Renew do
         Text.change_position(text, new_position)
       end
     )
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
     |> Repo.transaction()
-
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "redux_document:#{document_id}",
-      {:document_changed, document_id}
-    )
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
   end
 
   def update_layer_z_index(
@@ -650,13 +683,17 @@ defmodule RenewCollab.Renew do
         })
       end
     )
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
     |> Repo.transaction()
-
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "redux_document:#{document_id}",
-      {:document_changed, document_id}
-    )
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
   end
 
   def update_layer_edge_position(
@@ -748,13 +785,17 @@ defmodule RenewCollab.Renew do
         end
       end)
     end)
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
     |> Repo.transaction()
-
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "redux_document:#{document_id}",
-      {:document_changed, document_id}
-    )
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
   end
 
   def update_layer_edge_waypoint_position(
@@ -852,13 +893,17 @@ defmodule RenewCollab.Renew do
         end
       end)
     end)
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
     |> Repo.transaction()
-
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "redux_document:#{document_id}",
-      {:document_changed, document_id}
-    )
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
   end
 
   def delete_layer_edge_waypoint(
@@ -955,13 +1000,17 @@ defmodule RenewCollab.Renew do
         end
       end)
     end)
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
     |> Repo.transaction()
-
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "redux_document:#{document_id}",
-      {:document_changed, document_id}
-    )
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
   end
 
   def remove_all_layer_edge_waypoints(
@@ -984,12 +1033,14 @@ defmodule RenewCollab.Renew do
       end
     )
     |> Repo.transaction()
-
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "redux_document:#{document_id}",
-      {:document_changed, document_id}
-    )
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
   end
 
   def update_layer_semantic_tag(
@@ -1008,13 +1059,17 @@ defmodule RenewCollab.Renew do
         Ecto.Changeset.change(layer, semantic_tag: new_tag)
       end
     )
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
     |> Repo.transaction()
-
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "redux_document:#{document_id}",
-      {:document_changed, document_id}
-    )
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
   end
 
   def update_layer_box_shape(
@@ -1039,13 +1094,17 @@ defmodule RenewCollab.Renew do
         })
       end
     )
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
     |> Repo.transaction()
-
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "redux_document:#{document_id}",
-      {:document_changed, document_id}
-    )
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
   end
 
   def create_layer_edge_waypoint(
@@ -1247,13 +1306,17 @@ defmodule RenewCollab.Renew do
         end
       end)
     end)
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
     |> Repo.transaction()
-
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "redux_document:#{document_id}",
-      {:document_changed, document_id}
-    )
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
   end
 
   def delete_layer(document_id, layer_id, delete_children \\ true) do
@@ -1299,13 +1362,17 @@ defmodule RenewCollab.Renew do
       end,
       []
     )
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
     |> Repo.transaction()
-
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "redux_document:#{document_id}",
-      {:document_changed, document_id}
-    )
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
   end
 
   def move_layer(
@@ -1445,6 +1512,8 @@ defmodule RenewCollab.Renew do
       end,
       []
     )
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
     |> Repo.transaction()
     |> case do
       {:ok, _} ->
@@ -1622,6 +1691,8 @@ defmodule RenewCollab.Renew do
         end
       end)
     end)
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
     |> Repo.transaction()
     |> case do
       {:ok, _} ->
@@ -1659,6 +1730,8 @@ defmodule RenewCollab.Renew do
         })
       end
     )
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
     |> Repo.transaction()
     |> case do
       {:ok, _} ->
