@@ -10,10 +10,21 @@ defmodule RenewCollab.Versioning do
   def document_versions(document_id) do
     from(s in Snapshot,
       where: s.document_id == ^document_id,
-      select: %{id: s.id, inserted_at: s.inserted_at},
+      left_join: l in assoc(s, :latest),
+      select: %{id: s.id, inserted_at: s.inserted_at, is_latest: not is_nil(l.id)},
       order_by: [desc: s.inserted_at]
     )
     |> Repo.all()
+  end
+
+  def document_undo_redo(document_id) do
+    from(s in Snapshot,
+      join: l in LatestSnapshot,
+      on: l.snapshot_id == s.id,
+      where: s.document_id == ^document_id
+    )
+    |> Repo.one()
+    |> Repo.preload(successors: [], predecessor: [])
   end
 
   def snapshot_multi() do

@@ -7,7 +7,9 @@ defmodule RenewCollab.Versioning.Snapshot do
   schema "snapshot" do
     field :content, :map
     belongs_to :document, RenewCollab.Document.Document
-    belongs_to :predecessor, RenewCollab.Versioning.Snapshot
+    belongs_to :predecessor, RenewCollab.Versioning.Snapshot, foreign_key: :predecessor_id
+    has_many :successors, RenewCollab.Versioning.Snapshot, foreign_key: :predecessor_id
+    has_one :latest, RenewCollab.Versioning.LatestSnapshot
 
     timestamps(type: :utc_datetime)
   end

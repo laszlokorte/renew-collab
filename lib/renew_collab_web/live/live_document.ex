@@ -13,6 +13,7 @@ defmodule RenewCollabWeb.LiveDocument do
       socket
       |> assign(:document, document)
       |> assign(:snapshots, Versioning.document_versions(id))
+      |> assign(:undo_redo, Versioning.document_undo_redo(id))
       |> assign(:hierachy_missing, RenewCollab.RenewHierarchy.find_missing(id))
       |> assign(:hierachy_invalid, RenewCollab.RenewHierarchy.find_invalids(id))
       |> assign(:selection, nil)
@@ -85,6 +86,30 @@ defmodule RenewCollabWeb.LiveDocument do
 
       <.live_component id={"hierarchy-list"} module={RenewCollabWeb.HierarchyListComponent} document={@document} symbols={@symbols} selection={@selection} symbols={@symbols} />
     </div>
+    <h2>History</h2>
+    <div style="display: flex; gap: 0.5ex">
+      <%= if @undo_redo.predecessor_id == @undo_redo.id do %>
+      <button style="cursor: pointer;padding: 1ex; border: none; background: #aaa; color: #fff" disabled >Undo</button>
+      <% else %>
+      <button style="cursor: pointer;padding: 1ex; border: none; background: #333; color: #fff"  phx-click="restore" phx-value-id={@undo_redo.predecessor_id}>Undo</button>
+      <% end %>
+    <%= case @undo_redo.successors do %>
+    <%[] ->  %><button style="padding: 1ex; border: none; background: #aaa; color: #fff" disabled>Redo</button>
+    <%[a] ->  %>
+     <%= if a.id == @undo_redo.id do %>
+      <button style="cursor: pointer;padding: 1ex; border: none; background: #aaa; color: #fff" disabled >Undo</button>
+      <% else %>
+      <button style="cursor: pointer;padding: 1ex; border: none; background: #333; color: #fff"  phx-click="restore" phx-value-id={a.predecessor_id}>Undo</button>
+      <% end %>
+
+    <% more ->  %>
+    <div style="display: flex; flex-direction: column; gap: 0.5ex">
+      <%= for a <- more, a.id != @undo_redo.id do %>
+    <button style="cursor: pointer;padding: 1ex; border: none; background: #333; color: #fff" phx-click="restore" phx-value-id={a.id}>Redo</button>
+    <% end%>
+    </div>
+    <% end%>
+    </div>
 
               <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-snapshots">Snapshots</h2>
 
@@ -95,7 +120,16 @@ defmodule RenewCollabWeb.LiveDocument do
       <h5 style="margin: 0;"><%= day|> Calendar.strftime("%Y-%m-%d")  %></h5>
       <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.2ex">
         <%= for s <- snaps  do %>
-          <li style="display: flex; align-items: center;gap: 1ex;"><button  style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff" phx-click="restore" phx-value-id={s.id}>Restore</button><%= s.inserted_at |> Calendar.strftime("%H:%M:%S")  %></li>
+          <li style="display: flex; align-items: center;gap: 1ex;">
+          <%= if s.is_latest do %>
+          <span style="width: max-content; display: inline; padding: 1ex; border: none; background: #33a; color: #fff">
+            Current</span>
+          <%= s.inserted_at |> Calendar.strftime("%H:%M:%S")  %>
+          <% else %>
+            <button  style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff" phx-click="restore" phx-value-id={s.id}>
+            Restore</button><%= s.inserted_at |> Calendar.strftime("%H:%M:%S")  %>
+          <% end %>
+          </li>
         <% end %>
       </ul>
         <% end %>
@@ -218,7 +252,8 @@ defmodule RenewCollabWeb.LiveDocument do
        RenewCollab.RenewHierarchy.find_invalids(socket.assigns.document.id)
      )
      |> assign(:document, Renew.get_document_with_elements!(socket.assigns.document.id))
-     |> assign(:snapshots, Versioning.document_versions(socket.assigns.document.id))}
+     |> assign(:snapshots, Versioning.document_versions(socket.assigns.document.id))
+     |> assign(:undo_redo, Versioning.document_undo_redo(socket.assigns.document.id))}
   end
 
   def handle_event("select_layer", %{"id" => id}, socket) do
@@ -635,7 +670,8 @@ defmodule RenewCollabWeb.LiveDocument do
          :document,
          Renew.get_document_with_elements!(document_id)
        )
-       |> assign(:snapshots, Versioning.document_versions(document_id))}
+       |> assign(:snapshots, Versioning.document_versions(document_id))
+       |> assign(:undo_redo, Versioning.document_undo_redo(document_id))}
     end
   end
 
