@@ -37,7 +37,7 @@ defmodule RenewCollabWeb.Router do
     end
   end
 
-  # get "/api/documents/template/:id", RenewCollabWeb.DocumentController, :template
+  get "/api/documents/:id/export", RenewCollabWeb.DocumentController, :export
 
   scope "/live", RenewCollabWeb do
     pipe_through :browser

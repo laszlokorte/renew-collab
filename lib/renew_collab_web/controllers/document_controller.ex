@@ -33,6 +33,23 @@ defmodule RenewCollabWeb.DocumentController do
     render(conn, :show, document: document)
   end
 
+  def export(conn, %{"id" => id}) do
+    document = Renew.get_document_with_elements!(id)
+
+    {:ok, output} = RenewCollab.Export.DocumentExport.export(document)
+
+    conn
+    |> put_resp_header(
+      "content-disposition",
+      "inline; filename=\"#{document.name |> String.trim_trailing(".rnw")}_exported.rnw\""
+    )
+    |> put_resp_header(
+      "content-type",
+      "text/plain+renew"
+    )
+    |> text(output)
+  end
+
   def template(conn, %{"id" => id}) do
     document_params = Renew.get_document_with_elements_as_template!(id)
 

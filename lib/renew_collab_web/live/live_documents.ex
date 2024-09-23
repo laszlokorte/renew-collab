@@ -103,7 +103,7 @@ defmodule RenewCollabWeb.LiveDocuments do
         <tbody><%= if Enum.empty?(@documents) do %>
             <tr>
               <td colspan="5">
-                <div style="padding: 2em; border: 3px dashed #aaa; text-align: center; font-style: italic;">No Document yet.</div>
+                <div style="padding: 2em; border: 3px dashed #aaa; text-align: center; font-style: italic;">No Documents yet.</div>
               </td>
             </tr>
           <% else %>

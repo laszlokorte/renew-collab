@@ -97,9 +97,9 @@ defmodule RenewCollabWeb.LiveDocument do
     <%[] ->  %><button style="padding: 1ex; border: none; background: #aaa; color: #fff" disabled>Redo</button>
     <%[a] ->  %>
      <%= if a.id == @undo_redo.id do %>
-      <button style="cursor: pointer;padding: 1ex; border: none; background: #aaa; color: #fff" disabled >Undo</button>
+      <button style="cursor: pointer;padding: 1ex; border: none; background: #aaa; color: #fff" disabled >Redo</button>
       <% else %>
-      <button style="cursor: pointer;padding: 1ex; border: none; background: #333; color: #fff"  phx-click="restore" phx-value-id={a.predecessor_id}>Undo</button>
+      <button style="cursor: pointer;padding: 1ex; border: none; background: #333; color: #fff"  phx-click="restore" phx-value-id={a.id}>Redo</button>
       <% end %>
 
     <% more ->  %>
