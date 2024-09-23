@@ -1712,7 +1712,7 @@ defmodule RenewCollab.Renew do
         %Layer{document_id: document_id}
         |> Layer.changeset(%{
           z_index: 0,
-          semantic_tag: "new",
+          semantic_tag: nil,
           hidden: false
         })
         |> Layer.changeset(attrs)

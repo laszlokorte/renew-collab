@@ -588,7 +588,10 @@ defmodule RenewCollabWeb.LiveDocument do
         %{},
         socket
       ) do
-    Renew.create_layer(socket.assigns.document.id)
+    Renew.create_layer(socket.assigns.document.id, %{
+      "semantic_tag" => "CH.ifa.draw.figures.GroupFigure"
+    })
+
     {:noreply, socket}
   end
 
@@ -598,6 +601,7 @@ defmodule RenewCollabWeb.LiveDocument do
         socket
       ) do
     Renew.create_layer(socket.assigns.document.id, %{
+      "semantic_tag" => "CH.ifa.draw.figures.TextFigure",
       "text" => %{
         "position_x" => 0,
         "position_y" => 0,
@@ -614,6 +618,7 @@ defmodule RenewCollabWeb.LiveDocument do
         socket
       ) do
     Renew.create_layer(socket.assigns.document.id, %{
+      "semantic_tag" => "CH.ifa.draw.figures.RectangleFigure",
       "box" => %{
         "position_x" => 0,
         "position_y" => 0,
@@ -631,6 +636,7 @@ defmodule RenewCollabWeb.LiveDocument do
         socket
       ) do
     Renew.create_layer(socket.assigns.document.id, %{
+      "semantic_tag" => "CH.ifa.draw.figures.PolyLineFigure",
       "edge" => %{
         "source_x" => 0,
         "source_y" => 0,

@@ -97,12 +97,12 @@ defmodule RenewCollabWeb.LiveDocuments do
             <th style="border-bottom: 1px solid #333;" align="left" width="1000">Name</th>
             <th style="border-bottom: 1px solid #333;" align="left" width="200">Created</th>
             <th style="border-bottom: 1px solid #333;" align="left" width="200">Last Updated</th>
-            <th style="border-bottom: 1px solid #333;" align="left" width="100" colspan="2">Actions</th>
+            <th style="border-bottom: 1px solid #333;" align="left" width="100" colspan="3">Actions</th>
           </tr>
         </thead>
         <tbody><%= if Enum.empty?(@documents) do %>
             <tr>
-              <td colspan="5">
+              <td colspan="6">
                 <div style="padding: 2em; border: 3px dashed #aaa; text-align: center; font-style: italic;">No Documents yet.</div>
               </td>
             </tr>
@@ -112,7 +112,8 @@ defmodule RenewCollabWeb.LiveDocuments do
               <td><.link style="color: #078" href={~p"/live/document/#{document.id}"}><%= document.name %></.link></td>
               <td><%= document.inserted_at |> Calendar.strftime("%Y-%m-%d %H:%M") %></td>
               <td><%= document.updated_at |> Calendar.strftime("%Y-%m-%d %H:%M") %></td>
-              <td width="50"><button type="button" phx-click="duplicate" phx-value-id={document.id} style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff">Duplicate</button></td>
+              <td width="50"><a href={~p"/api/documents/#{document.id}/export"} ><button style="cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff"> Export</button></a></td>
+              <td width="50"><button type="button" phx-click="duplicate" phx-value-id={document.id} style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Duplicate</button></td>
               <td width="50"><button type="button" phx-click="delete" phx-value-id={document.id} style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff">Delete</button></td>
             </tr>
           <% end %>
@@ -204,7 +205,7 @@ defmodule RenewCollabWeb.LiveDocuments do
                "" -> "untitled"
                n -> n
              end)
-             |> Map.put("kind", "empty")
+             |> Map.put("kind", "CH.ifa.draw.standard.StandardDrawing")
            ) do
     end
 
