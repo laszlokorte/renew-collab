@@ -238,6 +238,19 @@ defmodule RenewCollab.Versioning do
 
   def prune_snaphots(document_id) do
     Ecto.Multi.new()
+    |> Ecto.Multi.insert_all(
+      :new_auto_label,
+      SnapshotLabel,
+      from(l in LatestSnapshot,
+        where: l.document_id == ^document_id,
+        select: %{
+          id: ^Ecto.UUID.generate(),
+          snapshot_id: l.snapshot_id,
+          description: "(auto)"
+        }
+      ),
+      on_conflict: :nothing
+    )
     |> Ecto.Multi.update_all(
       :update_predecessors,
       from(s in Snapshot,

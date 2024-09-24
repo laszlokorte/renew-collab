@@ -8,7 +8,11 @@ defmodule RenewCollab.Versioning.Snapshot do
     field :content, :map
     belongs_to :document, RenewCollab.Document.Document
     belongs_to :predecessor, RenewCollab.Versioning.Snapshot, foreign_key: :predecessor_id
-    has_many :successors, RenewCollab.Versioning.Snapshot, foreign_key: :predecessor_id
+
+    has_many :successors, RenewCollab.Versioning.Snapshot,
+      foreign_key: :predecessor_id,
+      where: [id: {:fragment, "? <> predecessor_id"}]
+
     has_one :latest, RenewCollab.Versioning.LatestSnapshot
     has_one :label, RenewCollab.Versioning.SnapshotLabel
 

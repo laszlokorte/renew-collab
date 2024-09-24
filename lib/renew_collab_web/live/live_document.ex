@@ -32,37 +32,39 @@ defmodule RenewCollabWeb.LiveDocument do
   def render(assigns) do
     ~H"""
     <div style="position: absolute; top:0;left:0;bottom: 0; right:0;display: grid; width: 100vw; height: 100vh; grid-template-rows: [top-start right-start] auto [top-end left-start ] 1fr [left-end right-end]; grid-template-columns: [left-start top-start]1fr [top-end left-end right-start]auto [right-end];">
-      <div style="grid-area: top; padding: 1em; background: #333; color: #fff; display: flex; justify-content: space-between; align-items: center;">
+      <div style="grid-area: top; padding: 1em; background: #333; color: #fff; display: flex; justify-content: space-between; align-items: stretch;">
         <div>
           <.link href={~p"/live/documents"} style="color: inherit">Back</.link>
         <h2 style="margin: 0;"><%= @document.name %></h2>
 
         </div>
-        <div>
-          <div style="display: flex; gap: 0.5ex; width: 8em">
+        <%= if @undo_redo do %>
+        <div style="display: flex; align-items: grow">
+          <div style="display: flex; gap: 0.5ex; flex-grow: 1;">
       <%= if @undo_redo.predecessor_id == @undo_redo.id do %>
-      <button style="cursor: pointer;padding: 1ex; border: none; background: #3ac; color: #fff; opacity: 0.3;" disabled >Undo</button>
+      <button style="cursor: pointer; width: 6em; padding: 1ex; border: none; background: #eff; color: #000; opacity: 0.3;" disabled >Undo</button>
       <% else %>
-      <button style="cursor: pointer;padding: 1ex; border: none; background: #3ac; color: #fff"  phx-click="restore" phx-value-id={@undo_redo.predecessor_id}>Undo</button>
+      <button style="cursor: pointer; width: 6em; padding: 1ex; border: none; background: #eff; color: #000"  phx-click="restore" phx-value-id={@undo_redo.predecessor_id}>Undo</button>
       <% end %>
     <%= case @undo_redo.successors do %>
-    <%[] ->  %><button style="padding: 1ex; border: none; background: #3ac; color: #fff; opacity: 0.3;" disabled>Redo</button>
+    <%[] ->  %><button style="padding: 1ex; width: 6em; border: none; background: #eff; color: #000; opacity: 0.3;" disabled>Redo</button>
     <%[a] ->  %>
      <%= if a.id == @undo_redo.id do %>
-      <button style="cursor: pointer;padding: 1ex; border: none; background: #3ac; color: #fff; opacity: 0.3;" disabled >Redo</button>
+      <button style="cursor: pointer; width: 6em; padding: 1ex; border: none; background: #eff; color: #000; opacity: 0.3;" disabled >Redo</button>
       <% else %>
-      <button style="cursor: pointer;padding: 1ex; border: none; background: #3ac; color: #fff"  phx-click="restore" phx-value-id={a.id}>Redo</button>
+      <button style="cursor: pointer; width: 6em; padding: 1ex; border: none; background: #eff; color: #000"  phx-click="restore" phx-value-id={a.id}>Redo</button>
       <% end %>
 
     <% more ->  %>
     <div style="display: flex; flex-direction: column; gap: 0.5ex; align-self: stretch;">
-      <%= for {a, i} <- more|>Enum.with_index, a.id != @undo_redo.id do %>
-    <button style="flex-grow: 1; justify-content: stretch; cursor: pointer;padding: 0.3ex 1ex; border: none; background: #3ac; color: #fff" phx-click="restore" phx-value-id={a.id}>Redo (<%= i %>)</button>
+      <%= for {a, i} <- more|>Enum.with_index do %>
+    <button style="flex-grow: 1;width: 6em; justify-content: stretch; cursor: pointer;padding: 0.3ex 1ex; border: none; background: #eff; color: #000" phx-click="restore" phx-value-id={a.id}>Redo (<%= i %>)</button>
     <% end%>
     </div>
     <% end%>
     </div>
         </div>
+    <% end%>
 
       </div>
       <div style="grid-area: left; width: 100%; height: 100%; overflow: auto; box-sizing: border-box; padding: 0 2em">
@@ -124,14 +126,14 @@ defmodule RenewCollabWeb.LiveDocument do
       <div hidden={not @show_snapshots}>
         <button type="button" phx-click="create_snapshot"  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Create Snaphot</button>
         <button type="button" phx-click="prune_snaphots"  style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff">Prune Snaphots</button>
-        <div style="width: 40vw">
+        <div style="width: 45vw">
           <%= for {day, snaps} <- @snapshots |> Enum.group_by(&DateTime.to_date(&1.inserted_at)) do %>
       <h5 style="margin: 0;"><%= day|> Calendar.strftime("%Y-%m-%d")  %></h5>
       <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.2ex">
         <%= for s <- snaps  do %>
           <li style="display: flex; align-items: center;gap: 1ex;">
           <%= if s.is_latest do %>
-          <span style="font-size: 10pt; font-family: sans-serif; width: max-content; display: inline; padding: 1ex; border: none; background: #33a; color: #fff">
+          <span style="cursor: default; font-size: 10pt; font-family: sans-serif; width: max-content; display: inline; padding: 1ex; border: none; background: #33a; color: #fff">
             Current</span>
           <%= s.inserted_at |> Calendar.strftime("%H:%M:%S")  %>
 
