@@ -31,10 +31,39 @@ defmodule RenewCollabWeb.LiveDocument do
 
   def render(assigns) do
     ~H"""
-    <div style="position: absolute; top:0;left:0;bottom: 0; right:0;display: grid; width: 100vw; height: 100vh; grid-template-rows: [top-start right-start] auto [top-end left-start ] 1fr [left-end right-end]; grid-template-columns: [left-start top-start]1fr [left-end right-start]auto [right-end top-end];">
-      <div style="grid-area: top; padding: 1em; background: #333; color: #fff">
-        <.link href={~p"/live/documents"} style="color: inherit">Back</.link>
-      <h2 style="margin: 0;"><%= @document.name %></h2>
+    <div style="position: absolute; top:0;left:0;bottom: 0; right:0;display: grid; width: 100vw; height: 100vh; grid-template-rows: [top-start right-start] auto [top-end left-start ] 1fr [left-end right-end]; grid-template-columns: [left-start top-start]1fr [top-end left-end right-start]auto [right-end];">
+      <div style="grid-area: top; padding: 1em; background: #333; color: #fff; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <.link href={~p"/live/documents"} style="color: inherit">Back</.link>
+        <h2 style="margin: 0;"><%= @document.name %></h2>
+
+        </div>
+        <div>
+          <div style="display: flex; gap: 0.5ex; width: 8em">
+      <%= if @undo_redo.predecessor_id == @undo_redo.id do %>
+      <button style="cursor: pointer;padding: 1ex; border: none; background: #3ac; color: #fff; opacity: 0.3;" disabled >Undo</button>
+      <% else %>
+      <button style="cursor: pointer;padding: 1ex; border: none; background: #3ac; color: #fff"  phx-click="restore" phx-value-id={@undo_redo.predecessor_id}>Undo</button>
+      <% end %>
+    <%= case @undo_redo.successors do %>
+    <%[] ->  %><button style="padding: 1ex; border: none; background: #3ac; color: #fff; opacity: 0.3;" disabled>Redo</button>
+    <%[a] ->  %>
+     <%= if a.id == @undo_redo.id do %>
+      <button style="cursor: pointer;padding: 1ex; border: none; background: #3ac; color: #fff; opacity: 0.3;" disabled >Redo</button>
+      <% else %>
+      <button style="cursor: pointer;padding: 1ex; border: none; background: #3ac; color: #fff"  phx-click="restore" phx-value-id={a.id}>Redo</button>
+      <% end %>
+
+    <% more ->  %>
+    <div style="display: flex; flex-direction: column; gap: 0.5ex; align-self: stretch;">
+      <%= for {a, i} <- more|>Enum.with_index, a.id != @undo_redo.id do %>
+    <button style="flex-grow: 1; justify-content: stretch; cursor: pointer;padding: 0.3ex 1ex; border: none; background: #3ac; color: #fff" phx-click="restore" phx-value-id={a.id}>Redo (<%= i %>)</button>
+    <% end%>
+    </div>
+    <% end%>
+    </div>
+        </div>
+
       </div>
       <div style="grid-area: left; width: 100%; height: 100%; overflow: auto; box-sizing: border-box; padding: 0 2em">
       <svg   phx-click="select_layer" phx-value-id={""} preserveAspectRatio="xMidYMin meet" id={"document-#{@document.id}"} viewBox={@viewbox} style="display: block; width: 100%" width="1000" height="1000">
@@ -88,30 +117,7 @@ defmodule RenewCollabWeb.LiveDocument do
 
       <.live_component id={"hierarchy-list"} module={RenewCollabWeb.HierarchyListComponent} socket_schemas={@socket_schemas} document={@document} symbols={@symbols} selection={@selection} symbols={@symbols} />
     </div>
-    <h2>History</h2>
-    <div style="display: flex; gap: 0.5ex">
-      <%= if @undo_redo.predecessor_id == @undo_redo.id do %>
-      <button style="cursor: pointer;padding: 1ex; border: none; background: #aaa; color: #fff" disabled >Undo</button>
-      <% else %>
-      <button style="cursor: pointer;padding: 1ex; border: none; background: #333; color: #fff"  phx-click="restore" phx-value-id={@undo_redo.predecessor_id}>Undo</button>
-      <% end %>
-    <%= case @undo_redo.successors do %>
-    <%[] ->  %><button style="padding: 1ex; border: none; background: #aaa; color: #fff" disabled>Redo</button>
-    <%[a] ->  %>
-     <%= if a.id == @undo_redo.id do %>
-      <button style="cursor: pointer;padding: 1ex; border: none; background: #aaa; color: #fff" disabled >Redo</button>
-      <% else %>
-      <button style="cursor: pointer;padding: 1ex; border: none; background: #333; color: #fff"  phx-click="restore" phx-value-id={a.id}>Redo</button>
-      <% end %>
 
-    <% more ->  %>
-    <div style="display: flex; flex-direction: column; gap: 0.5ex">
-      <%= for a <- more, a.id != @undo_redo.id do %>
-    <button style="cursor: pointer;padding: 1ex; border: none; background: #333; color: #fff" phx-click="restore" phx-value-id={a.id}>Redo</button>
-    <% end%>
-    </div>
-    <% end%>
-    </div>
 
               <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-snapshots">Snapshots</h2>
 
@@ -125,17 +131,30 @@ defmodule RenewCollabWeb.LiveDocument do
         <%= for s <- snaps  do %>
           <li style="display: flex; align-items: center;gap: 1ex;">
           <%= if s.is_latest do %>
-          <span style="width: max-content; display: inline; padding: 1ex; border: none; background: #33a; color: #fff">
+          <span style="font-size: 10pt; font-family: sans-serif; width: max-content; display: inline; padding: 1ex; border: none; background: #33a; color: #fff">
             Current</span>
           <%= s.inserted_at |> Calendar.strftime("%H:%M:%S")  %>
 
-          <form id={"pin-snapshot-#{s.id}"} style="display: flex; align-items: stretch">
-            <input type="text" placeholder="Description"> <button  style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff" type="submit">Pin</button>
+          <%= if not is_nil(s.label) do %>
+                    <button phx-click="remove_snapshot_label" phx-value-id={s.id} type="button"  style="text-align: center; align-self: center; cursor: pointer; border: none; background: #eaa; color: #fff; width: 1.8em; height: 1.8em; display: grid; place-content: center; place-items: center; border-radius: 10%; font-weight: bold;" title="Remove Pin">📌</button>
+
+          <%= s.label %>
+          <% else %>
+          <form phx-hook="RnwSnapshotPin" rnw-snapshot-id={s.id} id={"pin-snapshot-#{s.id}"} style="display: flex; align-items: stretch; gap: 0.2ex">
+            <button  style="text-align: center; align-self: center; cursor: pointer; border: none; background: #aea; color: #fff; width: 1.8em; height: 1.8em; display: grid; place-content: center; place-items: center; border-radius: 10%; font-weight: bold;" type="submit">📌</button>
+            <input name="description" type="text" placeholder="Description"> 
           </form>
+          <% end %>
 
           <% else %>
-            <button  style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff" phx-click="restore" phx-value-id={s.id}>
+            <button  style="font-size: 10pt; font-family: sans-serif; cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff" phx-click="restore" phx-value-id={s.id}>
             Restore</button><%= s.inserted_at |> Calendar.strftime("%H:%M:%S")  %>
+
+            <%= if not is_nil(s.label)  do %>
+          <button phx-click="remove_snapshot_label" phx-value-id={s.id} type="button"  style="text-align: center; align-self: center; cursor: pointer; border: none; background: #eaa; color: #fff; width: 1.8em; height: 1.8em; display: grid; place-content: center; place-items: center; border-radius: 10%; font-weight: bold;" title="Remove Pin">📌</button>
+            <%= s.label %>
+          
+          <% end%>
           <% end %>
           </li>
         <% end %>
@@ -763,6 +782,36 @@ defmodule RenewCollabWeb.LiveDocument do
         socket
       ) do
     Versioning.restore_snapshot(socket.assigns.document.id, id)
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "create_snapshot_label",
+        %{"snapshot_id" => snapshot_id, "description" => description},
+        socket
+      ) do
+    Versioning.create_snapshot_label(socket.assigns.document.id, snapshot_id, description)
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "remove_snapshot_label",
+        %{"id" => snapshot_id},
+        socket
+      ) do
+    Versioning.remove_snapshot_label(socket.assigns.document.id, snapshot_id)
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "prune_snaphots",
+        %{},
+        socket
+      ) do
+    Versioning.prune_snaphots(socket.assigns.document.id)
 
     {:noreply, socket}
   end

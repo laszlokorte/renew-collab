@@ -3,6 +3,7 @@ defmodule RenewCollab.Versioning do
 
   alias RenewCollab.Versioning.Snapshot
   alias RenewCollab.Versioning.LatestSnapshot
+  alias RenewCollab.Versioning.SnapshotLabel
   alias RenewCollab.Repo
   alias RenewCollab.Renew
   alias RenewCollab.Hierarchy.Layer
@@ -11,7 +12,13 @@ defmodule RenewCollab.Versioning do
     from(s in Snapshot,
       where: s.document_id == ^document_id,
       left_join: l in assoc(s, :latest),
-      select: %{id: s.id, inserted_at: s.inserted_at, is_latest: not is_nil(l.id)},
+      left_join: lb in assoc(s, :label),
+      select: %{
+        id: s.id,
+        inserted_at: s.inserted_at,
+        is_latest: not is_nil(l.id),
+        label: lb.description
+      },
       order_by: [desc: s.inserted_at]
     )
     |> Repo.all()
@@ -121,7 +128,7 @@ defmodule RenewCollab.Versioning do
       Ecto.Multi.new()
       |> Ecto.Multi.one(
         :snapshot,
-        from(s in Snapshot, where: s.id == ^snapshot_id)
+        from(s in Snapshot, where: s.id == ^snapshot_id and s.document_id == ^document_id)
       )
       |> Ecto.Multi.run(
         :snapshot_content,
@@ -171,8 +178,105 @@ defmodule RenewCollab.Versioning do
     end
   end
 
-  defp ensure_map(%{__struct__: _} = struct),
-    do: struct |> Map.from_struct() |> Map.delete(:__meta__)
+  def create_snapshot_label(document_id, snapshot_id, description) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.one(
+      :snapshot,
+      from(s in Snapshot, where: s.id == ^snapshot_id and s.document_id == ^document_id)
+    )
+    |> Ecto.Multi.insert(
+      :new_label,
+      fn %{
+           snapshot: snapshot
+         } =
+           results ->
+        %SnapshotLabel{
+          description: description,
+          snapshot_id: snapshot.id
+        }
+      end
+    )
+    |> Repo.transaction()
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
+  end
 
-  defp ensure_map(data), do: data
+  def remove_snapshot_label(document_id, snapshot_id) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.one(
+      :label,
+      from(s in Snapshot,
+        join: l in assoc(s, :label),
+        where: s.id == ^snapshot_id and s.document_id == ^document_id,
+        select: l
+      )
+    )
+    |> Ecto.Multi.delete(
+      :delete_label,
+      fn %{
+           label: label
+         } ->
+        label
+      end
+    )
+    |> Repo.transaction()
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
+  end
+
+  def prune_snaphots(document_id) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.update_all(
+      :update_predecessors,
+      from(s in Snapshot,
+        where:
+          s.document_id == ^document_id and
+            s.id in subquery(
+              from(l in SnapshotLabel,
+                join: ss in assoc(l, :snapshot),
+                where: ss.document_id == ^document_id,
+                select: l.snapshot_id
+              )
+            ),
+        update: [set: [predecessor_id: s.id]]
+      ),
+      []
+    )
+    |> Ecto.Multi.delete_all(
+      :delete_label,
+      from(s in Snapshot,
+        where:
+          s.document_id == ^document_id and
+            s.id not in subquery(
+              from(l in SnapshotLabel,
+                join: ss in assoc(l, :snapshot),
+                where: ss.document_id == ^document_id,
+                select: l.snapshot_id
+              )
+            )
+      ),
+      []
+    )
+    |> Repo.transaction()
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
+  end
 end

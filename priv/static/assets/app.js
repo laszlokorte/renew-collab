@@ -7028,6 +7028,31 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
     reconnected() {
     }
   };
+  Hooks2.RnwSnapshotPin = {
+    // Callbacks
+    mounted() {
+      this.el.addEventListener("submit", (evt) => {
+        evt.preventDefault();
+        const rnwSnapshotId = evt.currentTarget.getAttribute("rnw-snapshot-id");
+        const { description } = Object.fromEntries(new FormData(evt.currentTarget));
+        console.log("create_snapshot_label");
+        this.pushEvent("create_snapshot_label", {
+          snapshot_id: rnwSnapshotId,
+          description
+        });
+      });
+    },
+    beforeUpdate() {
+    },
+    updated() {
+    },
+    destroyed() {
+    },
+    disconnected() {
+    },
+    reconnected() {
+    }
+  };
   Hooks2.RenewGrabber = {
     // Callbacks
     mounted() {

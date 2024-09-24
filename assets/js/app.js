@@ -426,6 +426,31 @@ Hooks.RnwAssignInterface = {
   reconnected()  {  },
 }
 
+Hooks.RnwSnapshotPin = {
+  // Callbacks
+  mounted() {
+    this.el.addEventListener('submit', (evt) => {
+      evt.preventDefault()
+      const rnwSnapshotId = evt.currentTarget.getAttribute('rnw-snapshot-id')
+      const {description} = Object.fromEntries(new FormData(evt.currentTarget))
+
+
+      console.log("create_snapshot_label")
+      this.pushEvent("create_snapshot_label", {
+        snapshot_id: rnwSnapshotId,
+        description: description,
+      })
+    }) 
+  },
+  beforeUpdate() {  },
+  updated() { 
+
+  },
+  destroyed() {  },
+  disconnected() {  },
+  reconnected()  {  },
+}
+
 
 Hooks.RenewGrabber = {
   // Callbacks

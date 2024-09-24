@@ -10,6 +10,7 @@ defmodule RenewCollab.Versioning.Snapshot do
     belongs_to :predecessor, RenewCollab.Versioning.Snapshot, foreign_key: :predecessor_id
     has_many :successors, RenewCollab.Versioning.Snapshot, foreign_key: :predecessor_id
     has_one :latest, RenewCollab.Versioning.LatestSnapshot
+    has_one :label, RenewCollab.Versioning.SnapshotLabel
 
     timestamps(type: :utc_datetime)
   end
