@@ -110,7 +110,7 @@ defmodule RenewCollab.Symbol do
     |> Enum.join(" ")
   end
 
-  defp unify_coord(:x, obj) do
+  def unify_coord(:x, obj) do
     %{
       value: obj.x_value,
       unit: obj.x_unit,
@@ -123,7 +123,7 @@ defmodule RenewCollab.Symbol do
     }
   end
 
-  defp unify_coord(:y, obj) do
+  def unify_coord(:y, obj) do
     %{
       value: obj.y_value,
       unit: obj.y_unit,
@@ -136,7 +136,7 @@ defmodule RenewCollab.Symbol do
     }
   end
 
-  defp unify_coord(:rx, obj) do
+  def unify_coord(:rx, obj) do
     %{
       value: obj.rx_value,
       unit: obj.rx_unit,
@@ -149,7 +149,7 @@ defmodule RenewCollab.Symbol do
     }
   end
 
-  defp unify_coord(:ry, obj) do
+  def unify_coord(:ry, obj) do
     %{
       value: obj.ry_value,
       unit: obj.ry_unit,
@@ -262,7 +262,7 @@ defmodule RenewCollab.Symbol do
        when not is_nil(arg_x) and not is_nil(arg_y),
        do: {arg_x, arg_y}
 
-  defp build_coord(box, axis, relative, coord) do
+  def build_coord(box, axis, relative, coord) do
     # const units = {
     #   maxsize: Math.max(box.width, box.height),
     #   minsize: Math.min(box.width, box.height),

@@ -17,7 +17,8 @@ defmodule RenewCollab.Element.Interface do
   def changeset(element_interface, attrs) do
     element_interface
     |> cast(attrs, [
-      :socket_schema_id
+      :socket_schema_id,
+      :layer_id
     ])
     |> validate_required([:socket_schema_id])
     |> unique_constraint(:layer_id)

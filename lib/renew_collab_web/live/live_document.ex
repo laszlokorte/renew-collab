@@ -39,7 +39,7 @@ defmodule RenewCollabWeb.LiveDocument do
       <div style="grid-area: left; width: 100%; height: 100%; overflow: auto; box-sizing: border-box; padding: 0 2em">
       <svg   phx-click="select_layer" phx-value-id={""} preserveAspectRatio="xMidYMin meet" id={"document-#{@document.id}"} viewBox={@viewbox} style="display: block; width: 100%" width="1000" height="1000">
         <%= for layer <- @document.layers, layer.direct_parent == nil do %> 
-          <.live_component selectable={true} id={layer.id} module={RenewCollabWeb.HierarchyLayerComponent} document={@document} layer={layer} selection={@selection} selected={@selection == layer.id} symbols={@symbols} />
+          <.live_component selectable={true} id={layer.id} module={RenewCollabWeb.HierarchyLayerComponent} socket_schemas={@socket_schemas} document={@document} layer={layer} selection={@selection} selected={@selection == layer.id} symbols={@symbols} />
         <% end %>
       </svg>
     </div>
@@ -117,6 +117,7 @@ defmodule RenewCollabWeb.LiveDocument do
 
       <div hidden={not @show_snapshots}>
         <button type="button" phx-click="create_snapshot"  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Create Snaphot</button>
+        <button type="button" phx-click="prune_snaphots"  style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff">Prune Snaphots</button>
         <div style="width: 40vw">
           <%= for {day, snaps} <- @snapshots |> Enum.group_by(&DateTime.to_date(&1.inserted_at)) do %>
       <h5 style="margin: 0;"><%= day|> Calendar.strftime("%Y-%m-%d")  %></h5>
@@ -127,6 +128,11 @@ defmodule RenewCollabWeb.LiveDocument do
           <span style="width: max-content; display: inline; padding: 1ex; border: none; background: #33a; color: #fff">
             Current</span>
           <%= s.inserted_at |> Calendar.strftime("%H:%M:%S")  %>
+
+          <form id={"pin-snapshot-#{s.id}"} style="display: flex; align-items: stretch">
+            <input type="text" placeholder="Description"> <button  style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff" type="submit">Pin</button>
+          </form>
+
           <% else %>
             <button  style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff" phx-click="restore" phx-value-id={s.id}>
             Restore</button><%= s.inserted_at |> Calendar.strftime("%H:%M:%S")  %>
@@ -704,6 +710,38 @@ defmodule RenewCollabWeb.LiveDocument do
       socket.assigns.document.id,
       layer_id,
       target_layer_id
+    )
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "assign_layer_socket_schema",
+        %{
+          "layer_id" => layer_id,
+          "socket_schema_id" => socket_schema_id
+        },
+        socket
+      ) do
+    Renew.assign_layer_socket_schema(
+      socket.assigns.document.id,
+      layer_id,
+      socket_schema_id
+    )
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "remove_layer_socket_schema",
+        %{
+          "layer_id" => layer_id
+        },
+        socket
+      ) do
+    Renew.remove_layer_socket_schema(
+      socket.assigns.document.id,
+      layer_id
     )
 
     {:noreply, socket}

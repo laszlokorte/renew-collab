@@ -19,26 +19,11 @@ defmodule RenewCollab.Renew do
   alias RenewCollab.Element.Edge
   alias RenewCollab.Element.Box
   alias RenewCollab.Element.Text
+  alias RenewCollab.Element.Interface
   alias RenewCollab.Versioning
 
   def reset do
     Repo.delete_all(Document)
-    Repo.delete_all(SocketSchema)
-
-    %SocketSchema{}
-    |> SocketSchema.changeset(%{
-      name: "simple-socket-schema",
-      sockets: [
-        %{
-          name: "center-socket",
-          x_value: 0.5,
-          x_unit: :width,
-          y_value: 0.5,
-          y_unit: :height
-        }
-      ]
-    })
-    |> Repo.insert()
   end
 
   def list_documents do
@@ -67,7 +52,7 @@ defmodule RenewCollab.Renew do
                 target_bond: []
               ],
               style: [],
-              interface: [],
+              interface: [:socket_schema],
               outgoing_link: [],
               incoming_links: []
             ]
@@ -1909,6 +1894,67 @@ defmodule RenewCollab.Renew do
         source_layer_id: layer.id,
         target_layer_id: target_layer_id
       })
+    end)
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
+    |> Repo.transaction()
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
+  end
+
+  def assign_layer_socket_schema(
+        document_id,
+        layer_id,
+        socket_schema_id
+      ) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.one(
+      :layer,
+      from(s in Layer,
+        where: s.id == ^layer_id and s.document_id == ^document_id
+      )
+    )
+    |> Ecto.Multi.insert(:insert_interface, fn %{layer: layer} ->
+      %Interface{}
+      |> Interface.changeset(%{
+        layer_id: layer.id,
+        socket_schema_id: socket_schema_id
+      })
+    end)
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
+    |> Repo.transaction()
+    |> case do
+      {:ok, _} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "redux_document:#{document_id}",
+          {:document_changed, document_id}
+        )
+    end
+  end
+
+  def remove_layer_socket_schema(
+        document_id,
+        layer_id
+      ) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.one(
+      :interface,
+      from(s in Layer,
+        join: i in assoc(s, :interface),
+        where: s.id == ^layer_id and s.document_id == ^document_id,
+        select: i
+      )
+    )
+    |> Ecto.Multi.delete(:insert_interface, fn %{interface: interface} ->
+      interface
     end)
     |> Ecto.Multi.put(:document_id, document_id)
     |> Ecto.Multi.append(Versioning.snapshot_multi())

@@ -400,6 +400,32 @@ Hooks.RnwLinkLayer = {
   reconnected()  {  },
 }
 
+Hooks.RnwAssignInterface = {
+  // Callbacks
+  mounted() {
+    this.el.addEventListener('change', (evt) => {
+      evt.preventDefault()
+      const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
+      const socket_schema_id = evt.currentTarget.value
+
+      if(socket_schema_id) {
+        console.log("assign_layer_socket_schema")
+        this.pushEvent("assign_layer_socket_schema", {
+          layer_id: rnwLayerId,
+          socket_schema_id: socket_schema_id,
+        })
+      }
+    }) 
+  },
+  beforeUpdate() {  },
+  updated() { 
+
+  },
+  destroyed() {  },
+  disconnected() {  },
+  reconnected()  {  },
+}
+
 
 Hooks.RenewGrabber = {
   // Callbacks

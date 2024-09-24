@@ -75,8 +75,8 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
           
             <%= if @selected do %>
             <fieldset>
-              <legend for={"semantic-tag-#{@layer.id}"}>Semantic Tag</legend>
-              <input  phx-hook="RenewSemanticTag" id={"semantic-tag-#{@layer.id}"}  type="text" value={@layer.semantic_tag} style="width: 100%; box-sizing: border-box"  rnw-layer-id={"#{@layer.id}"} />
+              <legend><label for={"semantic-tag-#{@layer.id}"}>Semantic Tag</label></legend>
+              <input phx-hook="RenewSemanticTag" id={"semantic-tag-#{@layer.id}"}  type="text" value={@layer.semantic_tag} style="width: 100%; box-sizing: border-box"  rnw-layer-id={"#{@layer.id}"} />
             </fieldset>
             <% else %>
             <small><code><%= @layer.semantic_tag %></code></small>
@@ -101,6 +101,24 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
           </fieldset>
           <% end %>
           <%= unless is_nil(@layer.box) do %>
+           <fieldset>
+              <legend for={"layer-interface-#{@layer.id}"}>Interface</legend>
+              <%= if @layer.interface do %>
+              <span style="display: inline-flex; align-items: baseline;gap: 1ex;  padding: 0.5ex 1ex; background: #333; color: #fff">
+                <span>
+                  <%= @layer.interface.socket_schema.name %>
+                </span>
+              <button phx-click="remove_layer_socket_schema" phx-value-layer_id={@layer.id} type="button"  style="text-align: center; align-self: center; cursor: pointer; border: none; background: #333; color: #fff; width: 1.8em; height: 1.8em; display: grid; place-content: center; place-items: center; border-radius: 100%; font-weight: bold;" title="Remove Interface">&times;</button>
+              </span>
+              <% else %>
+              <select phx-hook="RnwAssignInterface" rnw-layer-id={"#{@layer.id}"} id={"layer-interface-#{@layer.id}"} name="socket_schema_id">
+                <option value="">---</option>
+                <%= for {sid, s} <- @socket_schemas do %>
+                <option value={s.id}><%= s.name %></option>
+                <% end %>
+              </select>
+              <% end %>
+            </fieldset>
           <fieldset>
             <legend>Shape</legend>
             <form phx-hook="RenewBoxShape" id={"layer-box-shape-#{@layer.id}"} rnw-layer-id={"#{@layer.id}"}>
@@ -185,7 +203,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
               <select style="width: 5em"  name="socket_id">
                 <option value="">Socket</option>
 
-                 <%= for schema <- @socket_schemas do %>
+                 <%= for {sid, schema} <- @socket_schemas do %>
                   <optgroup label={schema.name}>
                     <%= for sock <- schema.sockets do %>
                       <option value={sock.id}><%= sock.name %></option>
@@ -216,7 +234,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
               <select style="width: 5em" name="socket_id">
                 <option value="">Socket</option>
 
-                 <%= for schema <- @socket_schemas do %>
+                 <%= for {sid, schema} <- @socket_schemas do %>
                   <optgroup label={schema.name}>
                     <%= for sock <- schema.sockets do %>
                       <option value={sock.id}><%= sock.name %></option>
