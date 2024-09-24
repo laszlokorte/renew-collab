@@ -452,6 +452,40 @@ Hooks.RnwSnapshotPin = {
 }
 
 
+Hooks.RnwSocket = {
+  // Callbacks
+  mounted() {
+    this.mouseup = (evt) => {
+      evt.preventDefault()
+      this.el.style.fill=null
+    }
+
+    this.el.addEventListener('mousedown', (evt) => {
+      evt.preventDefault()
+      evt.stopPropagation()
+      this.el.style.fill="purple"
+    })
+
+    this.el.addEventListener('click', (evt) => {
+      evt.preventDefault()
+      evt.stopPropagation()
+    })
+
+    window.addEventListener('mouseup', this.mouseup)
+  },
+  beforeUpdate() {  },
+  updated() { 
+
+  },
+  destroyed() { 
+
+    window.removeEventListener('mouseup', this.mouseup)
+  },
+  disconnected() {  },
+  reconnected()  {  },
+}
+
+
 Hooks.RenewGrabber = {
   // Callbacks
   mounted() {
