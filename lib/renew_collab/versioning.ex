@@ -75,24 +75,29 @@ defmodule RenewCollab.Versioning do
         query.(document_id)
       end)
     end)
-    |> Ecto.Multi.insert(:new_snapshot, fn %{
-                                             document_id: document_id,
-                                             ids: %{
-                                               new_id: new_id,
-                                               predecessor_id: predecessor_id
-                                             }
-                                           } =
-                                             results ->
-      %Snapshot{document_id: document_id}
-      |> Snapshot.changeset(%{
-        id: new_id,
-        predecessor_id: predecessor_id,
-        content:
-          Keyword.keys(queries)
-          |> Enum.map(&{&1, Map.get(results, &1)})
-          |> Map.new()
-      })
-    end)
+    |> Ecto.Multi.insert_or_update(
+      :new_snapshot,
+      fn %{
+           document_id: document_id,
+           ids: %{
+             new_id: new_id,
+             predecessor_id: predecessor_id
+           }
+         } =
+           results ->
+        %Snapshot{document_id: document_id}
+        |> Snapshot.changeset(%{
+          id: new_id,
+          predecessor_id: predecessor_id,
+          content:
+            Keyword.keys(queries)
+            |> Enum.map(&{&1, Map.get(results, &1)})
+            |> Map.new()
+        })
+      end,
+      on_conflict: {:replace, [:content, :updated_at]},
+      returning: [:id]
+    )
     |> Ecto.Multi.insert(
       :new_latest_snapshot,
       fn %{
