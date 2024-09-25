@@ -7061,6 +7061,7 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
       this.draftLine.setAttribute("y1", 100);
       this.draftLine.setAttribute("x2", 200);
       this.draftLine.setAttribute("y2", 200);
+      this.draftLine.setAttribute("pointer-events", "none");
       this.draftLine.setAttribute("stroke", "black");
       this.draftLine.setAttribute("stroke-dasharray", "5 5");
       const svg = this.el.ownerSVGElement;
@@ -7108,6 +7109,7 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
               layer_id: snapped.getAttribute("rnw-layer-id")
             }
           });
+          snapped.style.fill = null;
         }
         if (this.draftLine.parentNode) {
           this.draftLine.parentNode.removeChild(this.draftLine);
@@ -7117,7 +7119,6 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
         window.removeEventListener("mouseout", this.mouseout);
         window.removeEventListener("mouseup", this.mouseup);
         this.el.style.fill = null;
-        snapped.style.fill = null;
       };
       this.mousemove = (evt) => {
         evt.preventDefault();

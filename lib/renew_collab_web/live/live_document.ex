@@ -38,33 +38,8 @@ defmodule RenewCollabWeb.LiveDocument do
         <h2 style="margin: 0;"><%= @document.name %></h2>
 
         </div>
-        <%= if @undo_redo do %>
-        <div style="display: flex; align-items: grow">
-          <div style="display: flex; gap: 0.5ex; flex-grow: 1;">
-      <%= if @undo_redo.predecessor_id == @undo_redo.id do %>
-      <button style="cursor: pointer; width: 6em; padding: 1ex; border: none; background: #eff; color: #000; opacity: 0.3;" disabled >Undo</button>
-      <% else %>
-      <button style="cursor: pointer; width: 6em; padding: 1ex; border: none; background: #eff; color: #000"  phx-click="restore" phx-value-id={@undo_redo.predecessor_id}>Undo</button>
-      <% end %>
-    <%= case @undo_redo.successors do %>
-    <%[] ->  %><button style="padding: 1ex; width: 6em; border: none; background: #eff; color: #000; opacity: 0.3;" disabled>Redo</button>
-    <%[a] ->  %>
-     <%= if a.id == @undo_redo.id do %>
-      <button style="cursor: pointer; width: 6em; padding: 1ex; border: none; background: #eff; color: #000; opacity: 0.3;" disabled >Redo</button>
-      <% else %>
-      <button style="cursor: pointer; width: 6em; padding: 1ex; border: none; background: #eff; color: #000"  phx-click="restore" phx-value-id={a.id}>Redo</button>
-      <% end %>
-
-    <% more ->  %>
-    <div style="display: flex; flex-direction: column; gap: 0.5ex; align-self: stretch;">
-      <%= for {a, i} <- more|>Enum.with_index do %>
-    <button style="flex-grow: 1;width: 6em; justify-content: stretch; cursor: pointer;padding: 0.3ex 1ex; border: none; background: #eff; color: #000" phx-click="restore" phx-value-id={a.id}>Redo (<%= i %>)</button>
-    <% end%>
-    </div>
-    <% end%>
-    </div>
-        </div>
-    <% end%>
+        
+        <.live_component  id={"undo_redo"} module={RenewCollabWeb.UndoRedoComponent} undo_redo={@undo_redo} />
 
       </div>
       <div style="grid-area: left; width: 100%; height: 100%; overflow: auto; box-sizing: border-box; padding: 0 2em">
@@ -80,7 +55,8 @@ defmodule RenewCollabWeb.LiveDocument do
           <button phx-click="update-viewbox"  style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff">Refit Camera</button>
         </p>
         <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-hierarchy">Hierarchy</h2>
-          <div hidden={not @show_hierarchy}>
+          <%= if @show_hierarchy do %>
+          <div>
             <div style="width: 45vw;">
           <h3>Health</h3>
           <dl style="display: grid; grid-template-columns: auto auto; justify-content: start; gap: 1ex 1em">
@@ -119,51 +95,14 @@ defmodule RenewCollabWeb.LiveDocument do
 
       <.live_component id={"hierarchy-list"} module={RenewCollabWeb.HierarchyListComponent} socket_schemas={@socket_schemas} document={@document} symbols={@symbols} selection={@selection} symbols={@symbols} />
     </div>
-
-
-              <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-snapshots">Snapshots</h2>
-
-      <div hidden={not @show_snapshots}>
-        <button type="button" phx-click="create_snapshot"  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Create Snaphot</button>
-        <button type="button" phx-click="prune_snaphots"  style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff">Prune Snaphots</button>
-        <div style="width: 45vw">
-          <%= for {day, snaps} <- @snapshots |> Enum.group_by(&DateTime.to_date(&1.inserted_at))|>Enum.reverse do %>
-      <h5 style="margin: 0;"><%= day|> Calendar.strftime("%Y-%m-%d")  %></h5>
-      <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.2ex">
-        <%= for s <- snaps  do %>
-          <li style="display: flex; align-items: center;gap: 1ex;">
-          <%= if s.is_latest do %>
-          <span style="cursor: default; font-size: 10pt; font-family: sans-serif; width: max-content; display: inline; padding: 1ex; border: none; background: #33a; color: #fff">
-            Current</span>
-          <%= s.inserted_at |> Calendar.strftime("%H:%M:%S")  %>
-
-          <%= if not is_nil(s.label) do %>
-                    <button phx-click="remove_snapshot_label" phx-value-id={s.id} type="button"  style="text-align: center; align-self: center; cursor: pointer; border: none; background: #eaa; color: #fff; width: 1.8em; height: 1.8em; display: grid; place-content: center; place-items: center; border-radius: 10%; font-weight: bold;" title="Remove Pin">📌</button>
-
-          <%= s.label %>
-          <% else %>
-          <form phx-hook="RnwSnapshotPin" rnw-snapshot-id={s.id} id={"pin-snapshot-#{s.id}"} style="display: flex; align-items: stretch; gap: 0.2ex">
-            <button  style="text-align: center; align-self: center; cursor: pointer; border: none; background: #aea; color: #fff; width: 1.8em; height: 1.8em; display: grid; place-content: center; place-items: center; border-radius: 10%; font-weight: bold;" type="submit">📌</button>
-            <input name="description" type="text" placeholder="Description"> 
-          </form>
-          <% end %>
-
-          <% else %>
-            <button  style="font-size: 10pt; font-family: sans-serif; cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff" phx-click="restore" phx-value-id={s.id}>
-            Restore</button><%= s.inserted_at |> Calendar.strftime("%H:%M:%S")  %>
-
-            <%= if not is_nil(s.label)  do %>
-          <button phx-click="remove_snapshot_label" phx-value-id={s.id} type="button"  style="text-align: center; align-self: center; cursor: pointer; border: none; background: #eaa; color: #fff; width: 1.8em; height: 1.8em; display: grid; place-content: center; place-items: center; border-radius: 10%; font-weight: bold;" title="Remove Pin">📌</button>
-            <%= s.label %>
-          
-          <% end%>
-          <% end %>
-          </li>
         <% end %>
-      </ul>
-        <% end %>
-        </div>
-      </div>
+
+
+      <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-snapshots">Snapshots</h2>
+      <%= if @show_snapshots do %>
+      <.live_component id={"snapshot-list"} module={RenewCollabWeb.SnapshotListComponent} snapshots={@snapshots} />
+      
+      <% end %>
       </div>
     </div>
     """

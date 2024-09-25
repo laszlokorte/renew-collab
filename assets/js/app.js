@@ -460,6 +460,7 @@ Hooks.RnwSocket = {
     this.draftLine.setAttribute("y1", 100)
     this.draftLine.setAttribute("x2", 200)
     this.draftLine.setAttribute("y2", 200)
+    this.draftLine.setAttribute("pointer-events", "none")
     this.draftLine.setAttribute("stroke", "black")
     this.draftLine.setAttribute("stroke-dasharray", "5 5")
 
@@ -513,6 +514,7 @@ Hooks.RnwSocket = {
               layer_id:snapped.getAttribute('rnw-layer-id'),
           }
         })
+        snapped.style.fill=null
       }
 
       if(this.draftLine.parentNode) {
@@ -523,7 +525,6 @@ Hooks.RnwSocket = {
       window.removeEventListener('mouseout', this.mouseout)
       window.removeEventListener('mouseup', this.mouseup)
       this.el.style.fill=null
-      snapped.style.fill=null
     }
 
     this.mousemove = (evt) => {
