@@ -526,13 +526,15 @@ defmodule RenewCollab.Renew do
           join: layer in assoc(bond, :layer),
           join: box in assoc(layer, :box),
           join: socket in assoc(bond, :socket),
+          join: socket_schema in assoc(socket, :socket_schema),
           where: own_box.id == ^box.id,
           group_by: bond.id,
           select: %{
             bond: bond,
             box: box,
             socket: socket,
-            edge: edge
+            edge: edge,
+            socket_schema: socket_schema
           }
         )
       end
@@ -651,13 +653,15 @@ defmodule RenewCollab.Renew do
           join: box in assoc(l, :box),
           join: edge in assoc(bond, :element_edge),
           join: socket in assoc(bond, :socket),
+          join: socket_schema in assoc(socket, :socket_schema),
           where: bond.element_edge_id == ^edge.id,
           group_by: bond.id,
           select: %{
             bond: bond,
             box: box,
             edge: edge,
-            socket: socket
+            socket: socket,
+            socket_schema: socket_schema
           }
         )
       end
@@ -706,13 +710,15 @@ defmodule RenewCollab.Renew do
           join: box in assoc(l, :box),
           join: edge in assoc(bond, :element_edge),
           join: socket in assoc(bond, :socket),
+          join: socket_schema in assoc(socket, :socket_schema),
           where: bond.element_edge_id == ^waypoint.edge_id,
           group_by: bond.id,
           select: %{
             bond: bond,
             box: box,
             edge: edge,
-            socket: socket
+            socket: socket,
+            socket_schema: socket_schema
           }
         )
       end
@@ -752,6 +758,27 @@ defmodule RenewCollab.Renew do
         waypoint
       end
     )
+    |> Ecto.Multi.all(
+      :affected_bonds,
+      fn %{waypoint: waypoint} ->
+        from(bond in Bond,
+          join: l in assoc(bond, :layer),
+          join: box in assoc(l, :box),
+          join: edge in assoc(bond, :element_edge),
+          join: socket in assoc(bond, :socket),
+          join: socket_schema in assoc(socket, :socket_schema),
+          where: bond.element_edge_id == ^waypoint.edge_id,
+          group_by: bond.id,
+          select: %{
+            bond: bond,
+            box: box,
+            edge: edge,
+            socket: socket,
+            socket_schema: socket_schema
+          }
+        )
+      end
+    )
     |> Ecto.Multi.append(RenewCollab.Bonding.reposition_multi())
     |> Ecto.Multi.put(:document_id, document_id)
     |> Ecto.Multi.append(Versioning.snapshot_multi())
@@ -785,6 +812,30 @@ defmodule RenewCollab.Renew do
           )
       end
     )
+    |> Ecto.Multi.all(
+      :affected_bonds,
+      fn %{edge: edge} ->
+        from(bond in Bond,
+          join: l in assoc(bond, :layer),
+          join: box in assoc(l, :box),
+          join: edge in assoc(bond, :element_edge),
+          join: socket in assoc(bond, :socket),
+          join: socket_schema in assoc(socket, :socket_schema),
+          where: bond.element_edge_id == ^edge.id,
+          group_by: bond.id,
+          select: %{
+            bond: bond,
+            box: box,
+            edge: edge,
+            socket: socket,
+            socket_schema: socket_schema
+          }
+        )
+      end
+    )
+    |> Ecto.Multi.append(RenewCollab.Bonding.reposition_multi())
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
     |> Repo.transaction()
     |> case do
       {:ok, _} ->
@@ -845,7 +896,6 @@ defmodule RenewCollab.Renew do
         })
       end
     )
-    |> Ecto.Multi.append(RenewCollab.Bonding.reposition_multi())
     |> Ecto.Multi.put(:document_id, document_id)
     |> Ecto.Multi.append(Versioning.snapshot_multi())
     |> Repo.transaction()
@@ -993,13 +1043,15 @@ defmodule RenewCollab.Renew do
           join: box in assoc(l, :box),
           join: edge in assoc(bond, :element_edge),
           join: socket in assoc(bond, :socket),
+          join: socket_schema in assoc(socket, :socket_schema),
           where: bond.element_edge_id == ^waypoint.edge_id,
           group_by: bond.id,
           select: %{
             bond: bond,
             box: box,
             edge: edge,
-            socket: socket
+            socket: socket,
+            socket_schema: socket_schema
           }
         )
       end
@@ -1327,13 +1379,15 @@ defmodule RenewCollab.Renew do
           join: layer in assoc(bond, :layer),
           join: box in assoc(layer, :box),
           join: socket in assoc(bond, :socket),
+          join: socket_schema in assoc(socket, :socket_schema),
           where: own_layer.id in ^combined_layer_ids or edge.layer_id in ^combined_layer_ids,
           group_by: bond.id,
           select: %{
             bond: bond,
             box: box,
             socket: socket,
-            edge: edge
+            edge: edge,
+            socket_schema: socket_schema
           }
         )
       end
@@ -1386,13 +1440,15 @@ defmodule RenewCollab.Renew do
           join: layer in assoc(bond, :layer),
           join: box in assoc(layer, :box),
           join: socket in assoc(bond, :socket),
+          join: socket_schema in assoc(socket, :socket_schema),
           where: edge.layer_id == ^layer.id,
           group_by: bond.id,
           select: %{
             bond: bond,
             box: box,
             socket: socket,
-            edge: edge
+            edge: edge,
+            socket_schema: socket_schema
           }
         )
       end
@@ -1462,13 +1518,15 @@ defmodule RenewCollab.Renew do
           join: box in assoc(l, :box),
           join: edge in assoc(bond, :element_edge),
           join: socket in assoc(bond, :socket),
+          join: socket_schema in assoc(socket, :socket_schema),
           where: bond.element_edge_id == ^bond.element_edge_id,
           group_by: bond.id,
           select: %{
             bond: bond,
             box: box,
             edge: edge,
-            socket: socket
+            socket: socket,
+            socket_schema: socket_schema
           }
         )
       end

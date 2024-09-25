@@ -9,7 +9,7 @@ defmodule RenewCollab.Sockets do
 
       %SocketSchema{}
       |> SocketSchema.changeset(%{
-        name: "simple-socket-schema",
+        name: "simple",
         sockets: [
           %{
             name: "center-socket",
@@ -24,7 +24,39 @@ defmodule RenewCollab.Sockets do
 
       %SocketSchema{}
       |> SocketSchema.changeset(%{
-        name: "simple-socket-schema-2",
+        name: "simple-rect",
+        stencil: "rect",
+        sockets: [
+          %{
+            name: "center-socket",
+            x_value: 0.5,
+            x_unit: :width,
+            y_value: 0.5,
+            y_unit: :height
+          }
+        ]
+      })
+      |> Repo.insert()
+
+      %SocketSchema{}
+      |> SocketSchema.changeset(%{
+        name: "simple-ellipse",
+        stencil: "ellipse",
+        sockets: [
+          %{
+            name: "center-socket",
+            x_value: 0.5,
+            x_unit: :width,
+            y_value: 0.5,
+            y_unit: :height
+          }
+        ]
+      })
+      |> Repo.insert()
+
+      %SocketSchema{}
+      |> SocketSchema.changeset(%{
+        name: "sides",
         sockets: [
           %{
             name: "left",
@@ -60,7 +92,7 @@ defmodule RenewCollab.Sockets do
 
       %SocketSchema{}
       |> SocketSchema.changeset(%{
-        name: "simple-socket-schema-3",
+        name: "corners",
         sockets: [
           %{
             name: "topleft",
@@ -96,7 +128,7 @@ defmodule RenewCollab.Sockets do
 
       %SocketSchema{}
       |> SocketSchema.changeset(%{
-        name: "simple-socket-schema-4",
+        name: "corners-and-sides",
         sockets: [
           %{
             name: "topleft",
@@ -160,7 +192,7 @@ defmodule RenewCollab.Sockets do
 
       %SocketSchema{}
       |> SocketSchema.changeset(%{
-        name: "simple-socket-schema-5",
+        name: "sides-and-center",
         sockets: [
           %{
             name: "center-socket",
@@ -203,7 +235,7 @@ defmodule RenewCollab.Sockets do
 
       %SocketSchema{}
       |> SocketSchema.changeset(%{
-        name: "simple-socket-schema-6",
+        name: "corners-and-center",
         sockets: [
           %{
             name: "center-socket",
@@ -246,7 +278,7 @@ defmodule RenewCollab.Sockets do
 
       %SocketSchema{}
       |> SocketSchema.changeset(%{
-        name: "simple-socket-schema-7",
+        name: "3x3 sockets",
         sockets: [
           %{
             name: "center-socket",

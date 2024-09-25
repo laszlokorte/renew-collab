@@ -354,7 +354,20 @@ defmodule RenewCollab.Import.DocumentImport do
           %{
             edge_layer_id: uuid,
             layer_id: layer_id,
-            socket_id: Map.get(socket_ids, {"simple-socket-schema", "center-socket"}),
+            socket_id:
+              Map.get(
+                socket_ids,
+                case connector_class do
+                  "CH.ifa.draw.standard.ChopBoxConnector" ->
+                    {"simple-rect", "center-socket"}
+
+                  "CH.ifa.draw.figures.ChopEllipseConnector" ->
+                    {"simple-ellipse", "center-socket"}
+
+                  _ ->
+                    {"simple", "center-socket"}
+                end
+              ),
             kind: kind
           }
         end

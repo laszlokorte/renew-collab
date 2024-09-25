@@ -37,43 +37,137 @@ defmodule RenewCollab.Bonding do
       waypoint_map = Enum.group_by(affected_waypoints, & &1.edge_id) |> Map.new()
 
       affected_bonds
-      |> Enum.reduce_while({:ok, []}, fn %{
-                                           bond: bond,
-                                           box: box,
-                                           edge: edge,
-                                           socket: socket
-                                         },
-                                         {:ok, acc} ->
-        waypoints = Map.get(waypoint_map, bond.element_edge_id, [])
+      |> Enum.group_by(& &1.bond.element_edge_id)
+      |> Enum.reduce_while({:ok, []}, fn
+        {edge_id, []}, {:ok, acc} ->
+          {:cont, {:ok, acc}}
 
-        first_waypoint =
-          List.first(waypoints, %{position_x: edge.target_x, position_y: edge.target_y})
+        {edge_id,
+         [
+           %{
+             bond: bond,
+             box: box,
+             edge: edge,
+             socket: socket,
+             socket_schema: socket_schema
+           }
+         ]},
+        {:ok, acc} ->
+          waypoints = Map.get(waypoint_map, bond.element_edge_id, [])
 
-        last_waypoint =
-          List.last(waypoints, %{position_x: edge.source_x, position_y: edge.source_y})
+          first_waypoint =
+            List.first(waypoints, %{position_x: edge.target_x, position_y: edge.target_y})
 
-        relevant_waypoint =
-          case bond.kind do
-            :source -> first_waypoint
-            :target -> last_waypoint
+          last_waypoint =
+            List.last(waypoints, %{position_x: edge.source_x, position_y: edge.source_y})
+
+          relevant_waypoint =
+            case bond.kind do
+              :source -> first_waypoint
+              :target -> last_waypoint
+            end
+
+          with %{position_x: x, position_y: y} <- align_to_socket(box, socket, relevant_waypoint) do
+            Edge.change_position(%Edge{id: bond.element_edge_id}, %{
+              :"#{bond.kind}_x" => x,
+              :"#{bond.kind}_y" => y
+            })
+          end
+          |> Repo.update()
+          |> case do
+            {:ok, r} -> {:cont, {:ok, [r | acc]}}
+            e -> {:halt, {e}}
           end
 
-        with {x, y} <- align_to_socket(box, socket, relevant_waypoint) do
-          Edge.change_position(%Edge{id: bond.element_edge_id}, %{
-            :"#{bond.kind}_x" => x,
-            :"#{bond.kind}_y" => y
-          })
-        end
-        |> Repo.update()
-        |> case do
-          {:ok, r} -> {:cont, {:ok, [r | acc]}}
-          e -> {:halt, {e}}
-        end
+        {edge_id,
+         [
+           %{
+             bond: bond_a,
+             box: box_a,
+             edge: edge,
+             socket: socket_a,
+             socket_schema: socket_schema_a
+           },
+           %{
+             bond: bond_b,
+             box: box_b,
+             edge: edge,
+             socket: socket_b,
+             socket_schema: socket_schema_b
+           }
+         ]},
+        {:ok, acc} ->
+          waypoints = Map.get(waypoint_map, edge_id, [])
+
+          first_waypoint_a =
+            List.first(
+              waypoints,
+              align_to_socket(box_b, socket_b, %{
+                position_x: edge.source_x,
+                position_y: edge.source_y
+              })
+            )
+
+          last_waypoint_a =
+            List.last(
+              waypoints,
+              align_to_socket(box_b, socket_b, %{
+                position_x: edge.target_x,
+                position_y: edge.target_y
+              })
+            )
+
+          relevant_waypoint_a =
+            case bond_a.kind do
+              :source -> first_waypoint_a
+              :target -> last_waypoint_a
+            end
+
+          first_waypoint_b =
+            List.first(
+              waypoints,
+              align_to_socket(box_a, socket_a, %{
+                position_x: edge.source_x,
+                position_y: edge.source_y
+              })
+            )
+
+          last_waypoint_b =
+            List.last(
+              waypoints,
+              align_to_socket(box_a, socket_a, %{
+                position_x: edge.target_x,
+                position_y: edge.target_y
+              })
+            )
+
+          relevant_waypoint_b =
+            case bond_b.kind do
+              :source -> first_waypoint_b
+              :target -> last_waypoint_b
+            end
+
+          with %{position_x: xa, position_y: ya} <-
+                 align_to_socket(box_a, socket_a, relevant_waypoint_a, socket_schema_a),
+               %{position_x: xb, position_y: yb} <-
+                 align_to_socket(box_b, socket_b, relevant_waypoint_b, socket_schema_b) do
+            Edge.change_position(%Edge{id: edge_id}, %{
+              :"#{bond_a.kind}_x" => xa,
+              :"#{bond_a.kind}_y" => ya,
+              :"#{bond_b.kind}_x" => xb,
+              :"#{bond_b.kind}_y" => yb
+            })
+          end
+          |> Repo.update()
+          |> case do
+            {:ok, r} -> {:cont, {:ok, [r | acc]}}
+            e -> {:halt, {e}}
+          end
       end)
     end)
   end
 
-  defp align_to_socket(box, socket, relevant_waypoint) do
+  defp align_to_socket(box, socket, relevant_waypoint, socket_schema \\ nil) do
     box_center_x = box.position_x + box.width / 2
     box_center_y = box.position_y + box.height / 2
     target_x = Symbol.build_coord(box, :x, false, Symbol.unify_coord(:x, socket))
@@ -82,30 +176,39 @@ defmodule RenewCollab.Bonding do
     dir_x = relevant_waypoint.position_x - target_x
     dir_y = relevant_waypoint.position_y - target_y
     dir_len = hypot(dir_x, dir_y)
-    dir_x_norm = dir_x / dir_len
-    dir_y_norm = dir_y / dir_len
+    dir_x_norm = if(dir_len > 0, do: dir_x / dir_len, else: 0)
+    dir_y_norm = if(dir_len > 0, do: dir_y / dir_len, else: 0)
 
     dist =
-      Stream.unfold({target_x, target_y}, fn
-        {x, y} ->
-          d = sdf(:rect, box, {x, y})
+      if socket_schema &&
+           sdf(
+             socket_schema.stencil,
+             box,
+             {relevant_waypoint.position_x, relevant_waypoint.position_y}
+           ) > 0 do
+        Stream.unfold({target_x, target_y}, fn
+          {x, y} ->
+            d = sdf(socket_schema.stencil, box, {x, y})
 
-          if d < 0 do
-            {d,
-             {
-               x + d * dir_x_norm,
-               y + d * dir_y_norm
-             }}
-          else
-            nil
-          end
-      end)
-      |> Stream.take(5)
-      |> Enum.sum()
+            if d < 0 do
+              {d,
+               {
+                 x + d * dir_x_norm,
+                 y + d * dir_y_norm
+               }}
+            else
+              nil
+            end
+        end)
+        |> Stream.take(10)
+        |> Enum.sum()
+      else
+        0
+      end
 
-    {
-      target_x - dir_x_norm * dist,
-      target_y - dir_y_norm * dist
+    %{
+      position_x: target_x - dir_x_norm * dist,
+      position_y: target_y - dir_y_norm * dist
     }
   end
 
@@ -114,8 +217,8 @@ defmodule RenewCollab.Bonding do
     box_center_y = box.position_y + box.height / 2
     rel_x = x - box_center_x
     rel_y = y - box_center_y
-    dist_x = abs(rel_x) - box.width / 2 - 1
-    dist_y = abs(rel_y) - box.height / 2 - 1
+    dist_x = abs(rel_x) - box.width / 2
+    dist_y = abs(rel_y) - box.height / 2
 
     outside_distance = hypot(max(dist_x, 0), max(dist_y, 0))
     inside_distance = min(max(dist_x, dist_y), 0)
@@ -123,7 +226,26 @@ defmodule RenewCollab.Bonding do
     outside_distance + inside_distance
   end
 
-  defp sdf(_, box, {x, y}) do
+  @epsilon 0.00001
+  defp sdf(:ellipse, box, {x, y}) do
+    rx = box.width / 2.0
+    ry = box.height / 2.0
+    box_center_x = box.position_x + rx
+    box_center_y = box.position_y + ry
+
+    rel_x = x - box_center_x
+    rel_y = y - box_center_y
+
+    k1_x = rel_x / rx
+    k1_y = rel_y / ry
+
+    k1 = max(hypot(rel_x / rx, rel_y / ry), @epsilon)
+    k2 = max(hypot(rel_x / (rx * rx), rel_y / (ry * ry)), @epsilon)
+
+    k1 * (k1 - 1.0) / k2
+  end
+
+  defp sdf(d, box, {x, y}) do
     0
   end
 
