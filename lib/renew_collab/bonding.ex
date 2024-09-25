@@ -79,9 +79,55 @@ defmodule RenewCollab.Bonding do
     target_x = Symbol.build_coord(box, :x, false, Symbol.unify_coord(:x, socket))
     target_y = Symbol.build_coord(box, :y, false, Symbol.unify_coord(:y, socket))
 
+    dir_x = relevant_waypoint.position_x - target_x
+    dir_y = relevant_waypoint.position_y - target_y
+    dir_len = hypot(dir_x, dir_y)
+    dir_x_norm = dir_x / dir_len
+    dir_y_norm = dir_y / dir_len
+
+    dist =
+      Stream.unfold({target_x, target_y}, fn
+        {x, y} ->
+          d = sdf(:rect, box, {x, y})
+
+          if d < 0 do
+            {d,
+             {
+               x + d * dir_x_norm,
+               y + d * dir_y_norm
+             }}
+          else
+            nil
+          end
+      end)
+      |> Stream.take(5)
+      |> Enum.sum()
+
     {
-      target_x,
-      target_y
+      target_x - dir_x_norm * dist,
+      target_y - dir_y_norm * dist
     }
+  end
+
+  defp sdf(:rect, box, {x, y}) do
+    box_center_x = box.position_x + box.width / 2
+    box_center_y = box.position_y + box.height / 2
+    rel_x = x - box_center_x
+    rel_y = y - box_center_y
+    dist_x = abs(rel_x) - box.width / 2 - 1
+    dist_y = abs(rel_y) - box.height / 2 - 1
+
+    outside_distance = hypot(max(dist_x, 0), max(dist_y, 0))
+    inside_distance = min(max(dist_x, dist_y), 0)
+
+    outside_distance + inside_distance
+  end
+
+  defp sdf(_, box, {x, y}) do
+    0
+  end
+
+  defp hypot(x, y) do
+    :math.sqrt(x * x + y * y)
   end
 end
