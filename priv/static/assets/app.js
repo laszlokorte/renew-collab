@@ -7014,6 +7014,11 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
             layer_id: rnwLayerId,
             socket_schema_id
           });
+        } else {
+          console.log("remove_layer_socket_schema");
+          this.pushEvent("remove_layer_socket_schema", {
+            layer_id: rnwLayerId
+          });
         }
       });
     },

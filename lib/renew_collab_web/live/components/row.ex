@@ -103,7 +103,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
           <%= unless is_nil(@layer.box) do %>
            <fieldset>
               <legend for={"layer-interface-#{@layer.id}"}>Interface</legend>
-              <%= if @layer.interface do %>
+              <%= if false && @layer.interface do %>
               <span style="display: inline-flex; align-items: baseline;gap: 1ex;  padding: 0.5ex 1ex; background: #333; color: #fff">
                 <span>
                   <%= @layer.interface.socket_schema.name %>
@@ -112,9 +112,9 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
               </span>
               <% else %>
               <select phx-hook="RnwAssignInterface" rnw-layer-id={"#{@layer.id}"} id={"layer-interface-#{@layer.id}"} name="socket_schema_id">
-                <option value="">---</option>
+                <option value="" {if(is_nil(@layer.interface), do: [selected: "selected"], else: [])}>---</option>
                 <%= for {sid, s} <- @socket_schemas do %>
-                <option value={s.id}><%= s.name %></option>
+                <option value={s.id}  {if(@layer.interface && s.id == @layer.interface.socket_schema_id, do: [selected: "selected"], else: [])} ><%= s.name %></option>
                 <% end %>
               </select>
               <% end %>

@@ -1620,13 +1620,17 @@ defmodule RenewCollab.Renew do
         where: s.id == ^layer_id and s.document_id == ^document_id
       )
     )
-    |> Ecto.Multi.insert(:insert_interface, fn %{layer: layer} ->
-      %Interface{}
-      |> Interface.changeset(%{
-        layer_id: layer.id,
-        socket_schema_id: socket_schema_id
-      })
-    end)
+    |> Ecto.Multi.insert(
+      :insert_interface,
+      fn %{layer: layer} ->
+        %Interface{}
+        |> Interface.changeset(%{
+          layer_id: layer.id,
+          socket_schema_id: socket_schema_id
+        })
+      end,
+      on_conflict: {:replace, [:socket_schema_id]}
+    )
     |> Ecto.Multi.put(:document_id, document_id)
     |> Ecto.Multi.append(Versioning.snapshot_multi())
     |> Repo.transaction()
