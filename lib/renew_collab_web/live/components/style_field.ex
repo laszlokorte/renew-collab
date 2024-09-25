@@ -62,9 +62,9 @@ defmodule RenewCollabWeb.HierarchyStyleField do
 
   def options(el, :stroke_cap, :text),
     do: [
+      :square,
       :round,
-      :butt,
-      :square
+      :butt
     ]
 
   def options(el, :smoothness, :text),

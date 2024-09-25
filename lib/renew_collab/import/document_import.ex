@@ -358,13 +358,30 @@ defmodule RenewCollab.Import.DocumentImport do
               Map.get(
                 socket_ids,
                 case connector_class do
+                  "CH.ifa.draw.figures.ChopRoundRectangleConnector" ->
+                    {"simple-rect", "center-socket"}
+
                   "CH.ifa.draw.standard.ChopBoxConnector" ->
                     {"simple-rect", "center-socket"}
 
                   "CH.ifa.draw.figures.ChopEllipseConnector" ->
                     {"simple-ellipse", "center-socket"}
 
-                  _ ->
+                  # TODO: these connectors are not working yet
+                  "CH.ifa.draw.contrib.ChopPolygonConnector" ->
+                    {"simple", "center-socket"}
+
+                  "CH.ifa.draw.figures.ChopPieConnector" ->
+                    {"simple", "center-socket"}
+
+                  "de.renew.diagram.VerticalConnector" ->
+                    {"simple", "center-socket"}
+
+                  "de.renew.diagram.VSplitCenterConnector" ->
+                    {"simple", "center-socket"}
+
+                  other ->
+                    dbg(other)
                     {"simple", "center-socket"}
                 end
               ),

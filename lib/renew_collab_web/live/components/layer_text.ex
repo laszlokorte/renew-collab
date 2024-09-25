@@ -23,7 +23,7 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
             <%= for {{line, format}, li} <- @layer.text.body |> String.split("\n") |> filter_blank_lines(style_or_default(@layer.text, :blank_lines)) |> Enum.map(&format_line(style_or_default(@layer.text, :rich), &1)) |> Enum.with_index() do %>
               <%= if String.trim(line) != "" do %>
               <tspan 
-            {if(style_or_default(@layer.text, :underline), do: ["text-decoration": "underline"], else: [])} {format} {if(li==0 and style_or_default(@layer.text, :rich), do: ["font-weight": "bold"], else: [])} x={@layer.text.position_x} {[dy: if(li>0, do: "1.2em", else: "1em")]}><%= line %></tspan>
+            {if(style_or_default(@layer.text, :underline), do: ["text-decoration": "underline"], else: [])} {format} {if(li==0 and style_or_default(@layer.text, :rich), do: ["font-weight": "bold"], else: [])} x={@layer.text.position_x} {[dy: if(li>0, do: "1.2em", else: "1em")]}><%= line|>String.trim() %></tspan>
               <% else %>
               <tspan fill="transparent" stroke="transparent" text-decoration="none" x={@layer.text.position_x} {[dy: if(li>0, do: "1.2em", else: "1em")]} visibility="hidden">&nbsp;</tspan>
               <% end %>              
@@ -55,7 +55,7 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
             y={@layer.text.position_y}>
             <%= for {{line, format}, li} <- @layer.text.body |> String.split("\n") |> filter_blank_lines(style_or_default(@layer.text, :blank_lines)) |> Enum.map(&format_line(style_or_default(@layer.text, :rich), &1)) |> Enum.with_index() do %>
               <%= if String.trim(line) != "" do %>
-              <tspan {if(style_or_default(@layer.text, :underline), do: ["text-decoration": "underline"], else: [])} {format} {if(li==0 and style_or_default(@layer.text, :rich), do: ["font-weight": "bold"], else: [])} x={@layer.text.position_x} {[dy: if(li>0, do: "1.2em", else: "1em")]}><%= line %></tspan>
+              <tspan {if(style_or_default(@layer.text, :underline), do: ["text-decoration": "underline"], else: [])} {format} {if(li==0 and style_or_default(@layer.text, :rich), do: ["font-weight": "bold"], else: [])} x={@layer.text.position_x} {[dy: if(li>0, do: "1.2em", else: "1em")]}><%= line|>String.trim() %></tspan>
               <% else %>
               <tspan fill="transparent" stroke="transparent" text-decoration="none" visibility="hidden" x={@layer.text.position_x} {[dy: if(li>0, do: "1.2em", else: "1em")]}>&nbsp;</tspan>
               <% end %>              <% end %>

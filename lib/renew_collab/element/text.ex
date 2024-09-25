@@ -7,7 +7,7 @@ defmodule RenewCollab.Element.Text do
   schema "element_text" do
     field :position_x, :float
     field :position_y, :float
-    field :body, :string
+    field :body, :string, default: ""
     belongs_to :layer, RenewCollab.Hierarchy.Layer
     has_one :style, RenewCollab.Style.TextStyle, on_delete: :delete_all
 
@@ -19,7 +19,7 @@ defmodule RenewCollab.Element.Text do
     element_text
     |> cast(attrs, [:position_x, :position_y, :body])
     |> cast_assoc(:style)
-    |> validate_required([:position_x, :position_y, :body])
+    |> validate_required([:position_x, :position_y])
     |> unique_constraint(:element_id)
   end
 

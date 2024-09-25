@@ -5,7 +5,8 @@ defmodule RenewCollab.Repo.Migrations.CreateSnapshotLabel do
     create table(:snapshot_label, primary_key: false) do
       add :id, :binary_id, primary_key: true, null: false
 
-      add :snapshot_id, references(:snapshot, on_delete: :nothing, type: :binary_id), null: false
+      add :snapshot_id, references(:snapshot, on_delete: :delete_all, type: :binary_id),
+        null: false
 
       add :description, :string, null: false
     end

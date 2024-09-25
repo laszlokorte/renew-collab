@@ -7,7 +7,9 @@ defmodule RenewCollab.Sockets do
     Repo.transaction(fn ->
       Repo.delete_all(SocketSchema)
 
-      %SocketSchema{}
+      %SocketSchema{
+        id: "0f59a84e-8569-4272-839f-788ab07eca23"
+      }
       |> SocketSchema.changeset(%{
         name: "simple",
         sockets: [
@@ -22,7 +24,9 @@ defmodule RenewCollab.Sockets do
       })
       |> Repo.insert()
 
-      %SocketSchema{}
+      %SocketSchema{
+        id: "4FDF577B-DB81-462E-971E-FA842F0ABA1E"
+      }
       |> SocketSchema.changeset(%{
         name: "simple-rect",
         stencil: "rect",
@@ -38,7 +42,9 @@ defmodule RenewCollab.Sockets do
       })
       |> Repo.insert()
 
-      %SocketSchema{}
+      %SocketSchema{
+        id: "2C5DE751-2FB8-48DE-99B6-D99648EBDFFC"
+      }
       |> SocketSchema.changeset(%{
         name: "simple-ellipse",
         stencil: "ellipse",
@@ -54,7 +60,9 @@ defmodule RenewCollab.Sockets do
       })
       |> Repo.insert()
 
-      %SocketSchema{}
+      %SocketSchema{
+        id: "11062480-803E-4944-AE74-DF3EF8978187"
+      }
       |> SocketSchema.changeset(%{
         name: "sides",
         sockets: [
@@ -90,7 +98,9 @@ defmodule RenewCollab.Sockets do
       })
       |> Repo.insert()
 
-      %SocketSchema{}
+      %SocketSchema{
+        id: "46BEAB25-389D-4E4B-8E13-5C5B34A8C20A"
+      }
       |> SocketSchema.changeset(%{
         name: "corners",
         sockets: [
@@ -126,7 +136,9 @@ defmodule RenewCollab.Sockets do
       })
       |> Repo.insert()
 
-      %SocketSchema{}
+      %SocketSchema{
+        id: "A1A1BD97-373D-4B78-B218-D20F1C5BDB35"
+      }
       |> SocketSchema.changeset(%{
         name: "corners-and-sides",
         sockets: [
@@ -190,7 +202,9 @@ defmodule RenewCollab.Sockets do
       })
       |> Repo.insert()
 
-      %SocketSchema{}
+      %SocketSchema{
+        id: "5D768A61-6992-4350-864E-DCC4B2219181"
+      }
       |> SocketSchema.changeset(%{
         name: "sides-and-center",
         sockets: [
@@ -233,7 +247,9 @@ defmodule RenewCollab.Sockets do
       })
       |> Repo.insert()
 
-      %SocketSchema{}
+      %SocketSchema{
+        id: "737FD22C-A3C2-4962-B869-CBE867F1F748"
+      }
       |> SocketSchema.changeset(%{
         name: "corners-and-center",
         sockets: [
@@ -276,7 +292,9 @@ defmodule RenewCollab.Sockets do
       })
       |> Repo.insert()
 
-      %SocketSchema{}
+      %SocketSchema{
+        id: "4A513B13-F04E-4E4C-9655-EF510DDAAE29"
+      }
       |> SocketSchema.changeset(%{
         name: "3x3 sockets",
         sockets: [
