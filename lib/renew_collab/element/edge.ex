@@ -38,12 +38,29 @@ defmodule RenewCollab.Element.Edge do
   def changeset(element_edge, attrs) do
     element_edge
     |> cast(attrs, [:source_x, :source_y, :target_x, :target_y, :cyclic])
-    |> cast_assoc(:source_bond)
-    |> cast_assoc(:target_bond)
+    |> cast_assoc(:source_bond, with: &source_bond_changeset/2)
+    |> cast_assoc(:target_bond, with: &target_bond_changeset/2)
     |> cast_assoc(:style)
     |> cast_assoc(:waypoints)
     |> validate_required([:source_x, :source_y, :target_x, :target_y])
     |> unique_constraint(:element_id)
+    |> dbg()
+  end
+
+  defp source_bond_changeset(bond, attrs) do
+    bond
+    |> change()
+    |> put_change(:kind, :source)
+    |> put_change(:element_edge_id, bond.element_edge_id)
+    |> RenewCollab.Connection.Bond.changeset(attrs)
+  end
+
+  defp target_bond_changeset(bond, attrs) do
+    bond
+    |> change()
+    |> put_change(:kind, :target)
+    |> put_change(:element_edge_id, bond.element_edge_id)
+    |> RenewCollab.Connection.Bond.changeset(attrs)
   end
 
   def change_position(element_edge, attrs) do

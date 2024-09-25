@@ -159,7 +159,7 @@ defmodule RenewCollab.Versioning do
                                                                                 snapshot_content:
                                                                                   content
                                                                               } ->
-          func.(Map.get(content, Atom.to_string(key)))
+          func.(Map.get(content, Atom.to_string(key), []))
         end)
       end)
 

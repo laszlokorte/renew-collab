@@ -17,7 +17,7 @@ defmodule RenewCollab.Connection.Bond do
   def changeset(element_connection_bond, attrs) do
     element_connection_bond
     |> cast(attrs, [:element_edge_id, :socket_id, :layer_id, :kind])
-    |> validate_required([:element_edge_id, :socket_id, :layer_id, :kind])
+    |> validate_required([:socket_id, :layer_id, :kind])
     |> unique_constraint([:element_edge_id, :kind])
   end
 end

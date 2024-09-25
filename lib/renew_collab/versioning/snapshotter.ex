@@ -8,6 +8,7 @@ defmodule RenewCollab.Versioning.Snapshotter do
   alias RenewCollab.Connection.Waypoint
   alias RenewCollab.Element.Text
   alias RenewCollab.Element.Box
+  alias RenewCollab.Element.Interface
   alias RenewCollab.Element.Edge
   alias RenewCollab.Style.EdgeStyle
   alias RenewCollab.Style.TextStyle
@@ -74,6 +75,20 @@ defmodule RenewCollab.Versioning.Snapshotter do
         fn
           waypoints ->
             waypoints
+            |> Enum.map(fn row ->
+              row
+              |> Enum.map(&{String.to_atom(elem(&1, 0)), elem(&1, 1)})
+              |> Enum.map(&RenewCollab.Versioning.Utils.restore_json/1)
+              |> Map.new()
+            end)
+        end
+      },
+      {
+        :interfaces,
+        Interface,
+        fn
+          edges ->
+            edges
             |> Enum.map(fn row ->
               row
               |> Enum.map(&{String.to_atom(elem(&1, 0)), elem(&1, 1)})
@@ -287,6 +302,20 @@ defmodule RenewCollab.Versioning.Snapshotter do
              symbol_shape_id: b.symbol_shape_id,
              inserted_at: b.inserted_at,
              updated_at: b.updated_at
+           }
+         )
+       end},
+      {:interfaces,
+       fn document_id ->
+         from(l in Layer,
+           where: l.document_id == ^document_id,
+           join: i in assoc(l, :interface),
+           select: %{
+             id: i.id,
+             layer_id: i.layer_id,
+             socket_schema_id: i.socket_schema_id,
+             inserted_at: i.inserted_at,
+             updated_at: i.updated_at
            }
          )
        end},

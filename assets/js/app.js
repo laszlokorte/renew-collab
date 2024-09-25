@@ -455,15 +455,125 @@ Hooks.RnwSnapshotPin = {
 Hooks.RnwSocket = {
   // Callbacks
   mounted() {
+    this.draftLine = document.createElementNS("http://www.w3.org/2000/svg", 'line')
+    this.draftLine.setAttribute("x1", 100)
+    this.draftLine.setAttribute("y1", 100)
+    this.draftLine.setAttribute("x2", 200)
+    this.draftLine.setAttribute("y2", 200)
+    this.draftLine.setAttribute("stroke", "black")
+    this.draftLine.setAttribute("stroke-dasharray", "5 5")
+
+    const svg = this.el.ownerSVGElement
+    const pt = svg.createSVGPoint();
+    let snapped = false
+
+    function cursorPoint(evt){
+      pt.x = evt.clientX; pt.y = evt.clientY;
+      return pt.matrixTransform(svg.getScreenCTM().inverse());
+    }
+
     this.mouseup = (evt) => {
       evt.preventDefault()
+      
+      if(snapped) {
+        const bboxA = this.el.getBBox()
+        const bboxB = snapped.getBBox()
+
+        const xA = bboxA.x + bboxA.width/2
+        const yA = bboxA.y + bboxA.height/2
+        const xB = bboxB.x + bboxB.width/2
+        const yB = bboxB.y + bboxB.height/2
+
+        console.log("create_edge", {
+          source_x: xA,
+          source_y: yA,
+          target_x: xB,
+          target_y: yB,
+          source_bond: {
+              socket_id:this.el.getAttribute('rnw-socket-id'),
+              layer_id:this.el.getAttribute('rnw-layer-id'),
+          },
+          target_bond: {
+              socket_id:snapped.getAttribute('rnw-socket-id'),
+              layer_id:snapped.getAttribute('rnw-layer-id'),
+          }
+        })
+
+        this.pushEvent("create_edge", {
+          source_x: xA,
+          source_y: yA,
+          target_x: xB,
+          target_y: yB,
+          source_bond: {
+              socket_id:this.el.getAttribute('rnw-socket-id'),
+              layer_id:this.el.getAttribute('rnw-layer-id'),
+          },
+          target_bond: {
+              socket_id:snapped.getAttribute('rnw-socket-id'),
+              layer_id:snapped.getAttribute('rnw-layer-id'),
+          }
+        })
+      }
+
+      if(this.draftLine.parentNode) {
+        this.draftLine.parentNode.removeChild(this.draftLine)
+      }
+      window.removeEventListener('mousemove', this.mousemove)
+      window.removeEventListener('mouseover', this.mouseover)
+      window.removeEventListener('mouseout', this.mouseout)
+      window.removeEventListener('mouseup', this.mouseup)
       this.el.style.fill=null
+      snapped.style.fill=null
+    }
+
+    this.mousemove = (evt) => {
+      evt.preventDefault()
+      if(!snapped) {
+        const p = cursorPoint(evt);
+        this.draftLine.setAttribute("x2", p.x)
+        this.draftLine.setAttribute("y2", p.y)
+      }
+    }
+
+    this.mouseover = (evt) => {
+      evt.preventDefault()
+      if(evt.target.getAttribute('phx-hook') == "RnwSocket" && evt.target !== this.el) {
+        const bbox = evt.target.getBBox()
+        this.draftLine.setAttribute("x2", bbox.x + bbox.width/2)
+        this.draftLine.setAttribute("y2", bbox.y + bbox.height/2)
+        evt.target.style.fill="purple"
+        snapped = evt.target
+      }
+    }
+
+    this.mouseout = (evt) => {
+      evt.preventDefault()
+      if(evt.target.getAttribute('phx-hook') == "RnwSocket" && evt.target !== this.el) {
+        snapped = false
+        evt.target.style.fill=null
+      }
     }
 
     this.el.addEventListener('mousedown', (evt) => {
       evt.preventDefault()
       evt.stopPropagation()
+      snapped = false
       this.el.style.fill="purple"
+
+
+      const bbox = this.el.getBBox()
+      this.draftLine.setAttribute("x1", bbox.x + bbox.width/2)
+      this.draftLine.setAttribute("y1", bbox.y + bbox.height/2)
+      this.draftLine.setAttribute("x2", bbox.x + bbox.width/2)
+      this.draftLine.setAttribute("y2", bbox.y + bbox.height/2)
+
+      this.el.ownerSVGElement.appendChild(this.draftLine)
+
+      window.addEventListener('mousemove', this.mousemove)
+      window.addEventListener('mouseover', this.mouseover)
+      window.addEventListener('mouseout', this.mouseout)
+      window.addEventListener('mouseup', this.mouseup)
+
     })
 
     this.el.addEventListener('click', (evt) => {
@@ -471,14 +581,18 @@ Hooks.RnwSocket = {
       evt.stopPropagation()
     })
 
-    window.addEventListener('mouseup', this.mouseup)
   },
   beforeUpdate() {  },
   updated() { 
 
   },
   destroyed() { 
-
+    if(this.draftLine.parentNode) {
+      this.draftLine.parentNode.removeChild(this.draftLine)
+    }
+    window.removeEventListener('mousemove', this.mousemove)
+    window.removeEventListener('mouseover', this.mouseover)
+    window.removeEventListener('mouseout', this.mouseout)
     window.removeEventListener('mouseup', this.mouseup)
   },
   disconnected() {  },

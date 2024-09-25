@@ -111,10 +111,10 @@ defmodule RenewCollabWeb.LiveDocument do
       <h3>Element Tree</h3>
 
       <div style="display: flex; gap: 1ex; padding: 1ex 0">
-        <button type="button" phx-click="create_group"  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Create Group</button>
-        <button type="button" phx-click="create_text"  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Create Text</button>
-        <button type="button" phx-click="create_box"  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Create Box</button>
-        <button type="button" phx-click="create_edge"  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Create Line</button>
+        <button type="button" phx-click="create_group"  phx-value-example="yes" style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Create Group</button>
+        <button type="button" phx-click="create_text" phx-value-example="yes"  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Create Text</button>
+        <button type="button" phx-click="create_box" phx-value-example="yes"  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Create Box</button>
+        <button type="button" phx-click="create_edge" phx-value-example="yes"  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Create Line</button>
       </div>
 
       <.live_component id={"hierarchy-list"} module={RenewCollabWeb.HierarchyListComponent} socket_schemas={@socket_schemas} document={@document} symbols={@symbols} selection={@selection} symbols={@symbols} />
@@ -127,7 +127,7 @@ defmodule RenewCollabWeb.LiveDocument do
         <button type="button" phx-click="create_snapshot"  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Create Snaphot</button>
         <button type="button" phx-click="prune_snaphots"  style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff">Prune Snaphots</button>
         <div style="width: 45vw">
-          <%= for {day, snaps} <- @snapshots |> Enum.group_by(&DateTime.to_date(&1.inserted_at)) do %>
+          <%= for {day, snaps} <- @snapshots |> Enum.group_by(&DateTime.to_date(&1.inserted_at))|>Enum.reverse do %>
       <h5 style="margin: 0;"><%= day|> Calendar.strftime("%Y-%m-%d")  %></h5>
       <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.2ex">
         <%= for s <- snaps  do %>
@@ -620,7 +620,7 @@ defmodule RenewCollabWeb.LiveDocument do
 
   def handle_event(
         "create_group",
-        %{},
+        %{"example" => "yes"},
         socket
       ) do
     Renew.create_layer(socket.assigns.document.id, %{
@@ -632,7 +632,7 @@ defmodule RenewCollabWeb.LiveDocument do
 
   def handle_event(
         "create_text",
-        %{},
+        %{"example" => "yes"},
         socket
       ) do
     Renew.create_layer(socket.assigns.document.id, %{
@@ -649,7 +649,7 @@ defmodule RenewCollabWeb.LiveDocument do
 
   def handle_event(
         "create_box",
-        %{},
+        %{"example" => "yes"},
         socket
       ) do
     Renew.create_layer(socket.assigns.document.id, %{
@@ -667,7 +667,7 @@ defmodule RenewCollabWeb.LiveDocument do
 
   def handle_event(
         "create_edge",
-        %{},
+        %{"example" => "yes"},
         socket
       ) do
     Renew.create_layer(socket.assigns.document.id, %{
@@ -678,6 +678,19 @@ defmodule RenewCollabWeb.LiveDocument do
         "target_x" => 200,
         "target_y" => 100
       }
+    })
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "create_edge",
+        %{} = params,
+        socket
+      ) do
+    Renew.create_layer(socket.assigns.document.id, %{
+      "semantic_tag" => "CH.ifa.draw.figures.PolyLineFigure",
+      "edge" => params
     })
 
     {:noreply, socket}
