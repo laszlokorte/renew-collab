@@ -1,0 +1,2 @@
+defmodule RenewCollab.Commands.CreateLayerEdgeWaypoint do
+end

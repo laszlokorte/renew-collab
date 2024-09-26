@@ -4,7 +4,7 @@ defmodule RenewCollabWeb.LiveDocument do
 
   alias RenewCollab.Versioning
   alias RenewCollab.Renew
-  alias RenewCollab.Symbol
+  alias RenewCollab.Symbols
   alias RenewCollab.Sockets
 
   def mount(%{"id" => id}, _session, socket) do
@@ -16,12 +16,12 @@ defmodule RenewCollabWeb.LiveDocument do
       |> assign(:socket_schemas, Sockets.all_socket_schemas())
       |> assign(:snapshots, Versioning.document_versions(id))
       |> assign(:undo_redo, Versioning.document_undo_redo(id))
-      |> assign(:hierachy_missing, RenewCollab.RenewHierarchy.find_missing(id))
-      |> assign(:hierachy_invalid, RenewCollab.RenewHierarchy.find_invalids(id))
+      |> assign(:hierachy_missing, RenewCollab.Hierarchy.find_missing(id))
+      |> assign(:hierachy_invalid, RenewCollab.Hierarchy.find_invalids(id))
       |> assign(:selection, nil)
       |> assign(:show_hierarchy, false)
       |> assign(:show_snapshots, false)
-      |> assign(:symbols, Symbol.list_shapes() |> Enum.map(fn s -> {s.id, s} end) |> Map.new())
+      |> assign(:symbols, Symbols.list_shapes() |> Enum.map(fn s -> {s.id, s} end) |> Map.new())
       |> assign(:viewbox, viewbox(document))
 
     RenewCollabWeb.Endpoint.subscribe("redux_document:#{id}")
@@ -213,17 +213,17 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def handle_event("repair_hierarchy", %{}, socket) do
-    RenewCollab.RenewHierarchy.repair_parenthood(socket.assigns.document.id)
+    RenewCollab.Hierarchy.repair_parenthood(socket.assigns.document.id)
 
     {:noreply,
      socket
      |> assign(
        :hierachy_missing,
-       RenewCollab.RenewHierarchy.find_missing(socket.assigns.document.id)
+       RenewCollab.Hierarchy.find_missing(socket.assigns.document.id)
      )
      |> assign(
        :hierachy_invalid,
-       RenewCollab.RenewHierarchy.find_invalids(socket.assigns.document.id)
+       RenewCollab.Hierarchy.find_invalids(socket.assigns.document.id)
      )
      |> assign(:document, Renew.get_document_with_elements!(socket.assigns.document.id))
      |> assign(:snapshots, Versioning.document_versions(socket.assigns.document.id))

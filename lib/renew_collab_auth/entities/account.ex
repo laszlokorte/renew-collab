@@ -1,4 +1,4 @@
-defmodule RenewCollab.Auth.Account do
+defmodule RenewCollabAuth.Entites.Account do
   use Ecto.Schema
   import Ecto.Changeset
 

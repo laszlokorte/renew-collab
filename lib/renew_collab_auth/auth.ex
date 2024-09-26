@@ -1,4 +1,4 @@
-defmodule RenewCollab.Auth do
+defmodule RenewCollabAuth.Auth do
   @moduledoc """
   The Auth context.
   """
@@ -6,7 +6,7 @@ defmodule RenewCollab.Auth do
   import Ecto.Query, warn: false
   alias RenewCollab.Repo
 
-  alias RenewCollab.Auth.Account
+  alias RenewCollabAuth.Entites.Account
 
   def get_account!(id), do: Repo.get!(Account, id)
 
@@ -23,8 +23,8 @@ defmodule RenewCollab.Auth do
   end
 
   def create_account(email, password) do
-    %RenewCollab.Auth.Account{}
-    |> RenewCollab.Auth.Account.changeset(%{
+    %Account{}
+    |> Account.changeset(%{
       "email" => email,
       "password" => password
     })

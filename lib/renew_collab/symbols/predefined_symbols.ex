@@ -17948,7 +17948,9 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
     }
   ]
 
-  defp deterministic_uuid(hash, seed) do
+  defp deterministic_uuid(seed) do
+    hash = :crypto.hash(:sha, "seed-for-reproducible-uuid-#{seed}")
+
     uuid = Base.encode16(hash, case: :lower)
 
     String.slice(uuid, 0, 8) <>
@@ -17963,7 +17965,6 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
   end
 
   def generate_bpmn_symbols() do
-    hash = :crypto.hash(:sha, "seed-for-reproducible uuid")
     # , 
     # (type == "message" or not throwing) and 
     # (pos != "start" or not throwing) and 
@@ -17976,7 +17977,6 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
         "bpmn-#{pos}-#{type}" |> then(&if throwing, do: "#{&1}-throwing", else: &1)
 
       %{
-        "id" => "9c751552-f872-45e0-866f-2d60c4c52ce7",
         "name" => name,
         "paths" =>
           case pos do
@@ -19103,7 +19103,7 @@ defmodule RenewCollab.Symbol.PredefinedSymbols do
     end
     |> Enum.with_index()
     |> Enum.map(fn {symbol, index} ->
-      Map.put(symbol, "id", deterministic_uuid(hash, index))
+      Map.put(symbol, "id", deterministic_uuid(index))
     end)
   end
 

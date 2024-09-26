@@ -213,9 +213,7 @@ defmodule RenewCollabWeb.LiveDocuments do
   end
 
   def handle_event("reset", %{}, socket) do
-    RenewCollab.Sockets.reset()
-    RenewCollab.Symbol.reset()
-    RenewCollab.Renew.reset()
+    RenewCollab.Init.reset()
 
     RenewCollabWeb.Endpoint.broadcast!(
       "documents",

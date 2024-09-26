@@ -117,23 +117,18 @@ defmodule RenewCollab.Versioning do
     Ecto.Multi.new()
     |> Ecto.Multi.put(:document_id, document_id)
     |> Ecto.Multi.append(RenewCollab.Versioning.snapshot_multi())
-    |> Repo.transaction()
-    |> case do
-      {:ok, _} ->
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "redux_document:#{document_id}",
-          {:document_changed, document_id}
-        )
-    end
+    |> run_transaction()
   end
 
   def restore_snapshot(document_id, snapshot_id) do
     multi =
       Ecto.Multi.new()
+      |> Ecto.Multi.put(:document_id, document_id)
       |> Ecto.Multi.one(
         :snapshot,
-        from(s in Snapshot, where: s.id == ^snapshot_id and s.document_id == ^document_id)
+        fn %{document_id: document_id} ->
+          from(s in Snapshot, where: s.id == ^snapshot_id and s.document_id == ^document_id)
+        end
       )
       |> Ecto.Multi.run(
         :snapshot_content,
@@ -143,11 +138,10 @@ defmodule RenewCollab.Versioning do
       )
       |> Ecto.Multi.delete_all(
         :delete_all_layers,
-        fn
-          %{} ->
-            from(l in Layer,
-              where: l.document_id == ^document_id
-            )
+        fn %{document_id: document_id} ->
+          from(l in Layer,
+            where: l.document_id == ^document_id
+          )
         end
       )
 
@@ -166,28 +160,25 @@ defmodule RenewCollab.Versioning do
     multi
     |> Ecto.Multi.insert(
       :new_latest_snapshot,
-      %LatestSnapshot{
-        document_id: document_id,
-        snapshot_id: snapshot_id
-      },
+      fn %{document_id: document_id} ->
+        %LatestSnapshot{
+          document_id: document_id,
+          snapshot_id: snapshot_id
+        }
+      end,
       on_conflict: {:replace, [:snapshot_id]}
     )
-    |> Repo.transaction()
-    |> case do
-      {:ok, _} ->
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "redux_document:#{document_id}",
-          {:document_changed, document_id}
-        )
-    end
+    |> run_transaction()
   end
 
   def create_snapshot_label(document_id, snapshot_id, description) do
     Ecto.Multi.new()
+    |> Ecto.Multi.put(:document_id, document_id)
     |> Ecto.Multi.one(
       :snapshot,
-      from(s in Snapshot, where: s.id == ^snapshot_id and s.document_id == ^document_id)
+      fn %{document_id: document_id} ->
+        from(s in Snapshot, where: s.id == ^snapshot_id and s.document_id == ^document_id)
+      end
     )
     |> Ecto.Multi.insert(
       :new_label,
@@ -201,26 +192,21 @@ defmodule RenewCollab.Versioning do
         }
       end
     )
-    |> Repo.transaction()
-    |> case do
-      {:ok, _} ->
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "redux_document:#{document_id}",
-          {:document_changed, document_id}
-        )
-    end
+    |> run_transaction()
   end
 
   def remove_snapshot_label(document_id, snapshot_id) do
     Ecto.Multi.new()
+    |> Ecto.Multi.put(:document_id, document_id)
     |> Ecto.Multi.one(
       :label,
-      from(s in Snapshot,
-        join: l in assoc(s, :label),
-        where: s.id == ^snapshot_id and s.document_id == ^document_id,
-        select: l
-      )
+      fn %{document_id: document_id} ->
+        from(s in Snapshot,
+          join: l in assoc(s, :label),
+          where: s.id == ^snapshot_id and s.document_id == ^document_id,
+          select: l
+        )
+      end
     )
     |> Ecto.Multi.delete(
       :delete_label,
@@ -230,71 +216,76 @@ defmodule RenewCollab.Versioning do
         label
       end
     )
-    |> Repo.transaction()
-    |> case do
-      {:ok, _} ->
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "redux_document:#{document_id}",
-          {:document_changed, document_id}
-        )
-    end
+    |> run_transaction()
   end
 
   def prune_snaphots(document_id) do
     Ecto.Multi.new()
+    |> Ecto.Multi.put(:document_id, document_id)
     |> Ecto.Multi.insert_all(
       :new_auto_label,
       SnapshotLabel,
-      from(l in LatestSnapshot,
-        where: l.document_id == ^document_id,
-        select: %{
-          id: ^Ecto.UUID.generate(),
-          snapshot_id: l.snapshot_id,
-          description: "(auto)"
-        }
-      ),
+      fn %{document_id: document_id} ->
+        from(l in LatestSnapshot,
+          where: l.document_id == ^document_id,
+          select: %{
+            id: ^Ecto.UUID.generate(),
+            snapshot_id: l.snapshot_id,
+            description: "(auto)"
+          }
+        )
+      end,
       on_conflict: :nothing
     )
     |> Ecto.Multi.update_all(
       :update_predecessors,
-      from(s in Snapshot,
-        where:
-          s.document_id == ^document_id and
-            s.id in subquery(
-              from(l in SnapshotLabel,
-                join: ss in assoc(l, :snapshot),
-                where: ss.document_id == ^document_id,
-                select: l.snapshot_id
-              )
-            ),
-        update: [set: [predecessor_id: s.id]]
-      ),
+      fn %{document_id: document_id} ->
+        from(s in Snapshot,
+          where:
+            s.document_id == ^document_id and
+              s.id in subquery(
+                from(l in SnapshotLabel,
+                  join: ss in assoc(l, :snapshot),
+                  where: ss.document_id == ^document_id,
+                  select: l.snapshot_id
+                )
+              ),
+          update: [set: [predecessor_id: s.id]]
+        )
+      end,
       []
     )
     |> Ecto.Multi.delete_all(
       :delete_label,
-      from(s in Snapshot,
-        where:
-          s.document_id == ^document_id and
-            s.id not in subquery(
-              from(l in SnapshotLabel,
-                join: ss in assoc(l, :snapshot),
-                where: ss.document_id == ^document_id,
-                select: l.snapshot_id
+      fn %{document_id: document_id} ->
+        from(s in Snapshot,
+          where:
+            s.document_id == ^document_id and
+              s.id not in subquery(
+                from(l in SnapshotLabel,
+                  join: ss in assoc(l, :snapshot),
+                  where: ss.document_id == ^document_id,
+                  select: l.snapshot_id
+                )
               )
-            )
-      ),
+        )
+      end,
       []
     )
-    |> Repo.transaction()
+    |> run_transaction()
+  end
+
+  defp run_transaction(multi) do
+    Repo.transaction(multi)
     |> case do
-      {:ok, _} ->
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "redux_document:#{document_id}",
-          {:document_changed, document_id}
-        )
+      {:ok, values} ->
+        with %{document_id: document_id} <- values do
+          Phoenix.PubSub.broadcast(
+            RenewCollab.PubSub,
+            "redux_document:#{document_id}",
+            {:document_changed, document_id}
+          )
+        end
     end
   end
 end

@@ -1,6 +1,6 @@
 defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
   use Phoenix.LiveComponent
-  alias RenewCollab.Symbol
+  alias RenewCollab.Symbols
 
   @impl true
   def render(assigns) do
@@ -19,7 +19,7 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
             <g fill={style_or_default(@layer, :background_color)}  id={"edge-#{@layer.edge.id}-source-tip"} transform={"rotate(#{edge_angle(:source, @layer.edge)} #{@layer.edge.source_x} #{@layer.edge.source_y})"}>
               <%!-- <rect opacity="0.5" fill="red" x={@layer.edge.source_x - 20} y={@layer.edge.source_y - 5} width="20" height="10" /> --%>
                <%= for path <- @symbols[style_or_default(@layer.edge, :source_tip_symbol_shape_id)].paths do %> 
-                  <path stroke={path.stroke_color} fill={path.fill_color} d={Symbol.build_symbol_path(%{
+                  <path stroke={path.stroke_color} fill={path.fill_color} d={Symbols.build_symbol_path(%{
                     position_x: @layer.edge.source_x - (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)),
                     position_y: @layer.edge.source_y - (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)),
                     width: (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0))*2,
@@ -34,7 +34,7 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
               <%!-- <rect opacity="0.5" fill="red" x={@layer.edge.target_x - 20} y={@layer.edge.target_y - 5} width="20" height="10" /> --%>
 
                <%= for path <- @symbols[style_or_default(@layer.edge, :target_tip_symbol_shape_id)].paths do %> 
-                  <path stroke={path.stroke_color} fill={path.fill_color} d={Symbol.build_symbol_path(%{
+                  <path stroke={path.stroke_color} fill={path.fill_color} d={Symbols.build_symbol_path(%{
                     position_x: @layer.edge.target_x - (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)),
                     position_y: @layer.edge.target_y - (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)),
                     width: (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0))*2,

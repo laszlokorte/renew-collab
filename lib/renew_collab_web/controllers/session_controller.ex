@@ -4,7 +4,7 @@ defmodule RenewCollabWeb.SessionController do
   action_fallback RenewCollabWeb.FallbackController
 
   def new(conn, %{"email" => email, "password" => password}) do
-    account = RenewCollab.Auth.get_account_by_email_and_password(email, password)
+    account = RenewCollabAuth.Auth.get_account_by_email_and_password(email, password)
 
     if account do
       render(conn, :show,

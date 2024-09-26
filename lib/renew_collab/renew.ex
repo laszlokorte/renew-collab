@@ -22,10 +22,6 @@ defmodule RenewCollab.Renew do
   alias RenewCollab.Element.Interface
   alias RenewCollab.Versioning
 
-  def reset do
-    Repo.delete_all(Document)
-  end
-
   def list_documents do
     Repo.all(from(Document, order_by: [desc: :inserted_at, desc: :updated_at]))
   end

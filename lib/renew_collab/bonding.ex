@@ -1,7 +1,7 @@
 defmodule RenewCollab.Bonding do
   import Ecto.Query, warn: false
   alias RenewCollab.Repo
-  alias RenewCollab.Symbol
+  alias RenewCollab.Symbols
   alias RenewCollab.Document.Document
   alias RenewCollab.Hierarchy.Layer
   alias RenewCollab.Style.LayerStyle
@@ -170,8 +170,8 @@ defmodule RenewCollab.Bonding do
   defp align_to_socket(box, socket, relevant_waypoint, socket_schema \\ nil) do
     box_center_x = box.position_x + box.width / 2
     box_center_y = box.position_y + box.height / 2
-    target_x = Symbol.build_coord(box, :x, false, Symbol.unify_coord(:x, socket))
-    target_y = Symbol.build_coord(box, :y, false, Symbol.unify_coord(:y, socket))
+    target_x = Symbols.build_coord(box, :x, false, Symbols.unify_coord(:x, socket))
+    target_y = Symbols.build_coord(box, :y, false, Symbols.unify_coord(:y, socket))
 
     dir_x = relevant_waypoint.position_x - target_x
     dir_y = relevant_waypoint.position_y - target_y

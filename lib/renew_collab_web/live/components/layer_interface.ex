@@ -1,6 +1,6 @@
 defmodule RenewCollabWeb.HierarchyLayerInterfaceComponent do
   use Phoenix.LiveComponent
-  alias RenewCollab.Symbol
+  alias RenewCollab.Symbols
 
   @impl true
   def render(assigns) do
@@ -21,8 +21,8 @@ defmodule RenewCollabWeb.HierarchyLayerInterfaceComponent do
           rnw-layer-id={@layer.id} 
           rnw-socket-id={s.id} 
           id={"socket-#{@layer.id}-#{s.id}"} 
-          cx={Symbol.build_coord(@layer.box, :x, false, Symbol.unify_coord(:x, s))} 
-          cy={Symbol.build_coord(@layer.box, :y, false, Symbol.unify_coord(:y, s))} 
+          cx={Symbols.build_coord(@layer.box, :x, false, Symbols.unify_coord(:x, s))} 
+          cy={Symbols.build_coord(@layer.box, :y, false, Symbols.unify_coord(:y, s))} 
           fill="white" 
           stroke="purple"
           opacity="0.4"

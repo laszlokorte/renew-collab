@@ -1,0 +1,2 @@
+defmodule RenewCollab.Commands.RemoveLayerSocketSchema do
+end

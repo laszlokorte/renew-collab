@@ -1,4 +1,4 @@
-defmodule RenewCollab.Symbol do
+defmodule RenewCollab.Symbols do
   @moduledoc """
   The Symbol context.
   """

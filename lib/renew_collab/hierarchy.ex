@@ -1,4 +1,4 @@
-defmodule RenewCollab.RenewHierarchy do
+defmodule RenewCollab.Hierarchy do
   import Ecto.Query, only: [from: 2, union: 2]
 
   alias RenewCollab.Hierarchy.LayerParenthood

@@ -1,6 +1,6 @@
 defmodule RenewCollab.Import.DocumentImport do
   def import(name, content) do
-    symbol_ids = RenewCollab.Symbol.ids_by_name()
+    symbol_ids = RenewCollab.Symbols.ids_by_name()
     socket_ids = RenewCollab.Sockets.ids_by_name()
     socket_schema_ids = RenewCollab.Sockets.schemas_by_name()
 

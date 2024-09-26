@@ -1,0 +1,2 @@
+defmodule RenewCollab.Commands.UpdateLayerSemanticTag do
+end
