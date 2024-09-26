@@ -109,10 +109,10 @@ defmodule RenewCollabWeb.LiveDocuments do
           <% else %>
           <%= for {document, di} <- @documents |> Enum.with_index do %> 
             <tr {if(rem(di, 2) == 0, do: [style: "background-color:#f5f5f5;"], else: [])}>
-              <td><.link style="color: #078" href={~p"/live/document/#{document.id}"}><%= document.name %></.link></td>
+              <td><.link style="color: #078" navigate={~p"/document/#{document.id}"}><%= document.name %></.link></td>
               <td><%= document.inserted_at |> Calendar.strftime("%Y-%m-%d %H:%M") %></td>
               <td><%= document.updated_at |> Calendar.strftime("%Y-%m-%d %H:%M") %></td>
-              <td width="50"><a href={~p"/api/documents/#{document.id}/export"} ><button style="cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff"> Export</button></a></td>
+              <td width="50"><a href={~p"/documents/#{document.id}/export"} ><button style="cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff"> Export</button></a></td>
               <td width="50"><button type="button" phx-click="duplicate" phx-value-id={document.id} style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Duplicate</button></td>
               <td width="50"><button type="button" phx-click="delete" phx-value-id={document.id} style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff">Delete</button></td>
             </tr>

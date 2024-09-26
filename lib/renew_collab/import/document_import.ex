@@ -2,6 +2,7 @@ defmodule RenewCollab.Import.DocumentImport do
   def import(name, content) do
     symbol_ids = RenewCollab.Symbol.ids_by_name()
     socket_ids = RenewCollab.Sockets.ids_by_name()
+    socket_schema_ids = RenewCollab.Sockets.schemas_by_name()
 
     with {:ok, true} <- check_utf8_binary?(content),
          {:ok, %Renewex.Document{root: root, refs: refs}} <- Renewex.parse_document(content),
@@ -87,6 +88,33 @@ defmodule RenewCollab.Import.DocumentImport do
                   "symbol_shape_attributes" => shape_attributes,
                   "symbol_shape_id" => Map.get(symbol_ids, shape_name)
                 },
+                "interface" =>
+                  case class_name do
+                    "de.renew.gui.PlaceFigure" ->
+                      "simple-ellipse"
+
+                    "de.renew.gui.TransitionFigure" ->
+                      "simple-rect"
+
+                    "de.renew.gui.VirtualPlaceFigure" ->
+                      "simple-ellipse"
+
+                    other ->
+                      nil
+                  end
+                  |> case do
+                    nil ->
+                      nil
+
+                    name ->
+                      %{
+                        "socket_schema_id" =>
+                          Map.get(
+                            socket_schema_ids,
+                            name
+                          )
+                      }
+                  end,
                 "style" => style
               }
 

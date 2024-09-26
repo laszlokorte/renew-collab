@@ -48,6 +48,7 @@ defmodule RenewCollab.Hierarchy.Layer do
     |> cast_assoc(:text)
     |> cast_assoc(:edge)
     |> cast_assoc(:style)
+    |> cast_assoc(:interface)
     |> validate_required([:z_index])
   end
 end

@@ -22,7 +22,6 @@ defmodule RenewCollabWeb.Router do
     pipe_through :api
     post "/auth/login", SessionController, :new
     resources "/symbols", SymbolController, only: [:index]
-    post "/install", InstallController, :reset
   end
 
   scope "/api", RenewCollabWeb do
@@ -30,20 +29,30 @@ defmodule RenewCollabWeb.Router do
 
     scope "/documents" do
       post "/import", DocumentController, :import
+      get "/documents/:id/export", DocumentController, :export
     end
 
-    resources "/documents", DocumentController, except: [:new, :edit] do
-      resources "/elements", ElementController, only: [:index, :create, :show]
-    end
+    resources "/documents", DocumentController, except: [:new, :edit]
   end
 
-  get "/api/documents/:id/export", RenewCollabWeb.DocumentController, :export
+  scope "/", RenewCollabWeb do
+    pipe_through [:browser, :require_authenticated_user]
 
-  scope "/live", RenewCollabWeb do
-    pipe_through :browser
+    live_session :require_authenticated_user do
+      # on_mount: [
+      #   {AuthorizationSampleWeb.UserAuth, :ensure_authenticated},
+      #   {AuthorizationSampleWeb.UserAuth, :ensure_authorized}
+      # ] 
 
-    live "/document/:id", LiveDocument
-    live "/documents", LiveDocuments
+      live "/document/:id", LiveDocument
+      live "/documents", LiveDocuments
+    end
+
+    get "/documents/:id/export", DocumentController, :export
+  end
+
+  defp require_authenticated_user(conn, _params) do
+    conn
   end
 
   # Enable LiveDashboard in development

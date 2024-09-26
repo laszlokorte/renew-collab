@@ -24,8 +24,9 @@ defmodule RenewCollabWeb.HierarchyLayerInterfaceComponent do
           cx={Symbol.build_coord(@layer.box, :x, false, Symbol.unify_coord(:x, s))} 
           cy={Symbol.build_coord(@layer.box, :y, false, Symbol.unify_coord(:y, s))} 
           fill="white" 
-          stroke="purple" 
-          r={10}/>
+          stroke="purple"
+          opacity="0.4"
+          r={4}/>
       <% end %>
     </g>
     """

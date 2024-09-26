@@ -34,7 +34,7 @@ defmodule RenewCollabWeb.LiveDocument do
     <div style="position: absolute; top:0;left:0;bottom: 0; right:0;display: grid; width: 100vw; height: 100vh; grid-template-rows: [top-start right-start] auto [top-end left-start ] 1fr [left-end right-end]; grid-template-columns: [left-start top-start]1fr [top-end left-end right-start]auto [right-end];">
       <div style="grid-area: top; padding: 1em; background: #333; color: #fff; display: flex; justify-content: space-between; align-items: stretch;">
         <div>
-          <.link href={~p"/live/documents"} style="color: inherit">Back</.link>
+          <.link navigate={~p"/documents"} style="color: inherit">Back</.link>
         <h2 style="margin: 0;"><%= @document.name %></h2>
 
         </div>
