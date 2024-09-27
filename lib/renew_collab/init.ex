@@ -17,8 +17,8 @@ defmodule RenewCollab.Init do
       |> Enum.reduce(multi, fn shape, m ->
         m
         |> Ecto.Multi.insert(
-          "insert_#{Map.get(shape, "name")}",
-          %Shape{id: Map.get(shape, "id")} |> Shape.changeset(shape)
+          "insert_#{Map.get(shape, :name)}",
+          %Shape{id: Map.get(shape, :id)} |> Shape.changeset(shape)
         )
       end)
 
