@@ -36,7 +36,10 @@ defmodule RenewCollabWeb.Router do
   end
 
   scope "/", RenewCollabWeb do
-    pipe_through [:browser, :require_authenticated_user]
+    pipe_through [:browser]
+
+    get "/", HomeController, :index
+    get "/health", HealthController, :index
 
     live_session :require_authenticated_user do
       # on_mount: [

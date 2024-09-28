@@ -34,6 +34,8 @@ defmodule RenewCollab.MixProject do
     [
       {:phoenix, "~> 1.7.14"},
       {:phoenix_ecto, "~> 4.5"},
+      {:phoenix_html, "~> 3.2"},
+      {:phoenix_view, "~> 2.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:phoenix_live_view, "~> 1.0.0-rc.1", override: true},
