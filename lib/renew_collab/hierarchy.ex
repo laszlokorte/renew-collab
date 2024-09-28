@@ -16,16 +16,16 @@ defmodule RenewCollab.Hierarchy do
 
   def find_missing(doc_id) do
     transitives =
-      from a in "layer_parenthood",
+      from a in LayerParenthood,
         as: :parent_a,
-        join: b in "layer_parenthood",
+        join: b in LayerParenthood,
         on: true,
         as: :parent_b,
         where:
           ^doc_id == a.document_id and
             a.id != b.id and a.document_id == b.document_id and b.ancestor_id == a.descendant_id and
             not exists(
-              from t in "layer_parenthood",
+              from t in LayerParenthood,
                 where:
                   {t.ancestor_id, t.descendant_id, t.depth} ==
                     {parent_as(:parent_a).ancestor_id, parent_as(:parent_b).descendant_id,
@@ -42,7 +42,7 @@ defmodule RenewCollab.Hierarchy do
 
     reflexives =
       from m in "layer",
-        left_join: y in "layer_parenthood",
+        left_join: y in LayerParenthood,
         on: {m.id, m.id, 0} == {y.ancestor_id, y.descendant_id, y.depth},
         where: is_nil(y.id),
         select: %{
@@ -58,8 +58,8 @@ defmodule RenewCollab.Hierarchy do
 
   def find_invalids(doc_id) do
     transitives =
-      from a in "layer_parenthood",
-        join: b in "layer_parenthood",
+      from a in LayerParenthood,
+        join: b in LayerParenthood,
         on: a.descendant_id == b.ancestor_id,
         where:
           (^doc_id == a.document_id or ^doc_id == b.document_id) and
@@ -75,7 +75,7 @@ defmodule RenewCollab.Hierarchy do
         }
 
     symmetrics =
-      from a in "layer_parenthood",
+      from a in LayerParenthood,
         where:
           ^doc_id == a.document_id and
             {a.descendant_id, a.ancestor_id} ==
@@ -85,7 +85,7 @@ defmodule RenewCollab.Hierarchy do
         }
 
     query =
-      from p in "layer_parenthood",
+      from p in LayerParenthood,
         as: :parent_query,
         where:
           ^doc_id == p.document_id and
