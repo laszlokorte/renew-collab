@@ -21,11 +21,6 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
   end
 
   @impl true
-  def handle_event("add-todo", %{"todo" => todo}, %{todos: todos} = state) do
-    {:noreply, state}
-  end
-
-  @impl true
   def handle_message({:document_changed, document_id}, state) do
     {:noreply,
      state

@@ -1,5 +1,5 @@
 defmodule RenewCollab.Raytracer do
-  def nearest(nil, box, {target_x, target_y}, {waypoint_x, waypoint_y}) do
+  def nearest(nil, _box, {target_x, target_y}, {_waypoint_x, _waypoint_y}) do
     %{
       position_x: target_x,
       position_y: target_y

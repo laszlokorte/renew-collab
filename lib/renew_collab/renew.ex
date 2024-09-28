@@ -13,7 +13,6 @@ defmodule RenewCollab.Renew do
   alias RenewCollab.Style.TextStyle
   alias RenewCollab.Connection.Waypoint
   alias RenewCollab.Connection.Hyperlink
-  alias RenewCollab.Connection.SocketSchema
   alias RenewCollab.Connection.Bond
   alias RenewCollab.Hierarchy.LayerParenthood
   alias RenewCollab.Element.Edge
@@ -187,7 +186,7 @@ defmodule RenewCollab.Renew do
     |> Map.delete(fkid)
   end
 
-  defp strip_fk(nil, fkid) do
+  defp strip_fk(nil, _fkid) do
     nil
   end
 
@@ -313,22 +312,21 @@ defmodule RenewCollab.Renew do
 
   def toggle_visible(document_id, layer_id) do
     # Update the record
-    query =
-      Ecto.Multi.new()
-      |> Ecto.Multi.put(:document_id, document_id)
-      |> Ecto.Multi.update_all(
-        :update_visibility,
-        fn %{document_id: document_id} ->
-          from(
-            l in Layer,
-            where: l.id == ^layer_id and l.document_id == ^document_id,
-            update: [set: [hidden: not l.hidden]]
-          )
-        end,
-        []
-      )
-      |> Ecto.Multi.append(Versioning.snapshot_multi())
-      |> run_document_transaction()
+    Ecto.Multi.new()
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.update_all(
+      :update_visibility,
+      fn %{document_id: document_id} ->
+        from(
+          l in Layer,
+          where: l.id == ^layer_id and l.document_id == ^document_id,
+          update: [set: [hidden: not l.hidden]]
+        )
+      end,
+      []
+    )
+    |> Ecto.Multi.append(Versioning.snapshot_multi())
+    |> run_document_transaction()
   end
 
   def run_document_transaction(multi) do
@@ -488,22 +486,6 @@ defmodule RenewCollab.Renew do
     |> Ecto.Multi.append(RenewCollab.Bonding.reposition_multi())
     |> Ecto.Multi.append(Versioning.snapshot_multi())
     |> run_document_transaction()
-  end
-
-  defp align_to_socket(box, socket, relevant_waypoint) do
-    target_x = box.position_x + box.width / 2
-    target_y = box.position_y + box.height / 2
-
-    dir_x = (relevant_waypoint.position_x - target_x) / box.width * 2
-    dir_y = (relevant_waypoint.position_y - target_y) / box.height * 2
-    len = :math.sqrt(dir_x * dir_x + dir_y * dir_y)
-    dir_x_norm = dir_x / len * box.width / 2
-    dir_y_norm = dir_y / len * box.height / 2
-
-    {
-      target_x + dir_x_norm,
-      target_y + dir_y_norm
-    }
   end
 
   def update_layer_text_position(
@@ -868,7 +850,7 @@ defmodule RenewCollab.Renew do
     |> Ecto.Multi.insert(
       :waypoint,
       fn
-        %{edge: {edge, nil, nil, max_sort}} ->
+        %{edge: {edge, nil, nil, _max_sort}} ->
           %Waypoint{}
           |> Waypoint.changeset(%{
             sort: 0,
@@ -878,7 +860,7 @@ defmodule RenewCollab.Renew do
           })
           |> Waypoint.changeset(set_position)
 
-        %{edge: {edge, prev_waypoint, nil, max_sort}} ->
+        %{edge: {edge, prev_waypoint, nil, _max_sort}} ->
           %Waypoint{}
           |> Waypoint.changeset(%{
             sort: prev_waypoint.sort + 1,
@@ -888,7 +870,7 @@ defmodule RenewCollab.Renew do
           })
           |> Waypoint.changeset(set_position)
 
-        %{edge: {edge, nil, next_waypoint, max_sort}} ->
+        %{edge: {edge, nil, next_waypoint, _max_sort}} ->
           %Waypoint{}
           |> Waypoint.changeset(%{
             sort: next_waypoint.sort,
@@ -898,7 +880,7 @@ defmodule RenewCollab.Renew do
           })
           |> Waypoint.changeset(set_position)
 
-        %{edge: {edge, prev_waypoint, next_waypoint, max_sort}} ->
+        %{edge: {edge, prev_waypoint, next_waypoint, _max_sort}} ->
           %Waypoint{}
           |> Waypoint.changeset(%{
             sort: next_waypoint.sort,

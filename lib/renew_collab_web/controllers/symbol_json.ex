@@ -53,7 +53,7 @@ defmodule RenewCollabWeb.SymbolJSON do
       "vertical" => vertical_data(step.vertical),
       "arc" => arc_data(step.arc)
     }
-    |> Enum.filter(fn {k, v} -> not is_nil(v) end)
+    |> Enum.filter(fn {_k, v} -> not is_nil(v) end)
     |> Map.new()
   end
 

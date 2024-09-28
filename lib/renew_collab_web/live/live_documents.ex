@@ -141,9 +141,6 @@ defmodule RenewCollabWeb.LiveDocuments do
     """
   end
 
-  defp blank?(str_or_nil),
-    do: "" == str_or_nil |> to_string() |> String.trim()
-
   def handle_event("duplicate", %{"id" => id}, socket) do
     RenewCollab.Renew.duplicate_document(id)
     {:noreply, socket}
@@ -157,7 +154,7 @@ defmodule RenewCollabWeb.LiveDocuments do
     {:noreply, cancel_upload(socket, :import_file, ref)}
   end
 
-  def handle_event("import_document", params, socket) do
+  def handle_event("import_document", _params, socket) do
     case consume_uploaded_entries(socket, :import_file, fn %{path: path},
                                                            %{client_name: filename} ->
            {:ok, content} = File.read(path)
@@ -172,7 +169,7 @@ defmodule RenewCollabWeb.LiveDocuments do
               hyperlinks: hyperlinks,
               bonds: bonds
             } <- converted_docs do
-          with {:ok, %RenewCollab.Document.Document{} = document} <-
+          with {:ok, %RenewCollab.Document.Document{}} <-
                  RenewCollab.Renew.create_document(
                    %{"name" => doc_name, "kind" => kind, "layers" => layers},
                    hierarchy,
@@ -198,7 +195,7 @@ defmodule RenewCollabWeb.LiveDocuments do
   end
 
   def handle_event("create_document", params, socket) do
-    with {:ok, %RenewCollab.Document.Document{} = document} <-
+    with {:ok, %RenewCollab.Document.Document{}} <-
            RenewCollab.Renew.create_document(
              params
              |> Map.update("name", "", fn
@@ -230,7 +227,7 @@ defmodule RenewCollabWeb.LiveDocuments do
     {:noreply, socket}
   end
 
-  def handle_info(%{topic: @topic, payload: state}, socket) do
+  def handle_info(%{topic: @topic, payload: _state}, socket) do
     {:noreply, socket |> assign(:documents, Renew.list_documents())}
   end
 end

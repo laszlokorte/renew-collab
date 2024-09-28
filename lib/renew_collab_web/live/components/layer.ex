@@ -1,12 +1,11 @@
 defmodule RenewCollabWeb.HierarchyLayerComponent do
   use Phoenix.LiveComponent
-  alias RenewCollab.Symbol
 
   @impl true
   def render(assigns) do
     ~H"""
     <g style={"display: #{if(@layer.hidden, do: "none", else: "initial")}"} {if @selectable, do: ["phx-click": "select_layer"], else: []} phx-value-id={@layer.id}>
-      <g {if(@selection==@layer.id and Enum.any?(@document.layers, &(&1.direct_parent && &1.direct_parent.ancestor_id == @layer.id)), do: [style: "outline: 3px solid #ffdd99;cursor:move; pointer-events: bounding-box", "selected": true], else: [])} phx-hook="RnwGroupDragger" id={"layer-parent-group-#{@layer.id}"} rnw-layer-id={@layer.id} opacity={style_or_default(@layer, :opacity)}>
+      <g {if(@selection==@layer.id and Enum.any?(@document.layers, &(&1.direct_parent && &1.direct_parent.ancestor_id == @layer.id)), do: [style: "outline: 3px solid #ffdd99;cursor:move; pointer-events: bounding-box", selected: true], else: [])} phx-hook="RnwGroupDragger" id={"layer-parent-group-#{@layer.id}"} rnw-layer-id={@layer.id} opacity={style_or_default(@layer, :opacity)}>
         <%= for child <- @document.layers, child.direct_parent, child.direct_parent.ancestor_id == @layer.id do %> 
           <.live_component socket_schemas={@socket_schemas} selection={@selection} selectable={@selection == @layer.id} id={child.id} module={RenewCollabWeb.HierarchyLayerComponent} document={@document} layer={child} selected={@selection == child.id} symbols={@symbols} />
         <% end %>
@@ -42,5 +41,5 @@ defmodule RenewCollabWeb.HierarchyLayerComponent do
     end
   end
 
-  defp default_style(style_key), do: nil
+  defp default_style(_style_key), do: nil
 end

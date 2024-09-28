@@ -51,7 +51,8 @@ defmodule RenewCollabWeb.DocumentController do
   end
 
   def template(conn, %{"id" => id}) do
-    document_params = Renew.get_document_with_elements_as_template!(id)
+    # Renew.get_document_with_elements_as_template!(id)
+    document_params = %{"id" => id}
 
     with {:ok, %Document{} = document} <- Renew.create_document(document_params) do
       RenewCollabWeb.Endpoint.broadcast!(

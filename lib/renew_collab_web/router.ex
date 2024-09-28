@@ -54,9 +54,9 @@ defmodule RenewCollabWeb.Router do
     get "/documents/:id/export", DocumentController, :export
   end
 
-  defp require_authenticated_user(conn, _params) do
-    conn
-  end
+  # defp require_authenticated_user(conn, _params) do
+  #   conn
+  # end
 
   # Enable LiveDashboard in development
   if Application.compile_env(:renew_collab, :dev_routes) do

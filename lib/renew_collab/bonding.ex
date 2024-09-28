@@ -24,10 +24,10 @@ defmodule RenewCollab.Bonding do
       affected_bonds
       |> Enum.group_by(& &1.bond.element_edge_id)
       |> Enum.reduce_while({:ok, []}, fn
-        {edge_id, []}, {:ok, acc} ->
+        {_edge_id, []}, {:ok, acc} ->
           {:cont, {:ok, acc}}
 
-        {edge_id,
+        {_edge_id,
          [
            %{
              bond: bond,
@@ -53,7 +53,12 @@ defmodule RenewCollab.Bonding do
             end
 
           with %{position_x: x, position_y: y} <-
-                 RenewCollab.EdgeRouter.align_to_socket(box, socket, relevant_waypoint) do
+                 RenewCollab.EdgeRouter.align_to_socket(
+                   box,
+                   socket,
+                   relevant_waypoint,
+                   socket_schema
+                 ) do
             Edge.change_position(%Edge{id: bond.element_edge_id}, %{
               :"#{bond.kind}_x" => x,
               :"#{bond.kind}_y" => y

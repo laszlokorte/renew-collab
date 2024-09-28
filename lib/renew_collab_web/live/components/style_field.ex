@@ -35,23 +35,23 @@ defmodule RenewCollabWeb.HierarchyStyleField do
     """
   end
 
-  def default_value(el, attr, :color), do: "transparent"
-  def default_value(el, :opacity, :number), do: 1.0
-  def default_value(el, :border_width, :number), do: 0
-  def default_value(el, :font_size, :number), do: 12
-  def default_value(el, :alignment, :text), do: "left"
-  def default_value(el, :font_family, :text), do: "sans-serif"
-  def default_value(el, :border_dash_array, :text), do: ""
-  def default_value(el, attr, type), do: nil
+  def default_value(_el, _attr, :color), do: "transparent"
+  def default_value(_el, :opacity, :number), do: 1.0
+  def default_value(_el, :border_width, :number), do: 0
+  def default_value(_el, :font_size, :number), do: 12
+  def default_value(_el, :alignment, :text), do: "left"
+  def default_value(_el, :font_family, :text), do: "sans-serif"
+  def default_value(_el, :border_dash_array, :text), do: ""
+  def default_value(_el, _attr, _type), do: nil
 
-  def options(el, :alignment, :text),
+  def options(_el, :alignment, :text),
     do: [
       :left,
       :center,
       :right
     ]
 
-  def options(el, :stroke_join, :text),
+  def options(_el, :stroke_join, :text),
     do: [
       :arcs,
       :bevel,
@@ -60,33 +60,33 @@ defmodule RenewCollabWeb.HierarchyStyleField do
       :round
     ]
 
-  def options(el, :stroke_cap, :text),
+  def options(_el, :stroke_cap, :text),
     do: [
       :square,
       :round,
       :butt
     ]
 
-  def options(el, :smoothness, :text),
+  def options(_el, :smoothness, :text),
     do: [
       :linear,
       :autobezier
     ]
 
-  def options(el, _, :checkbox),
+  def options(_el, _, :checkbox),
     do: [
       true,
       false
     ]
 
-  def options(el, attr, :symbol), do: :symbols
+  def options(_el, _attr, :symbol), do: :symbols
 
-  def options(el, attr, type), do: nil
+  def options(_el, _attr, _type), do: nil
 
-  def attrs(el, :opacity, :number),
+  def attrs(_el, :opacity, :number),
     do: [step: 0.01, min: 0, max: 1, style: "width: 3em; padding: 0.5ex"]
 
-  def attrs(el, :border_width, :number), do: [step: 1, min: 0]
-  def attrs(el, :font_size, :number), do: [step: 1, min: 0]
-  def attrs(el, attr, type), do: []
+  def attrs(_el, :border_width, :number), do: [step: 1, min: 0]
+  def attrs(_el, :font_size, :number), do: [step: 1, min: 0]
+  def attrs(_el, _attr, _type), do: []
 end

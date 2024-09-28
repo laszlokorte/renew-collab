@@ -5,7 +5,6 @@ defmodule RenewCollab.Versioning do
   alias RenewCollab.Versioning.LatestSnapshot
   alias RenewCollab.Versioning.SnapshotLabel
   alias RenewCollab.Repo
-  alias RenewCollab.Renew
   alias RenewCollab.Hierarchy.Layer
 
   def document_versions(document_id) do
@@ -102,8 +101,7 @@ defmodule RenewCollab.Versioning do
       :new_latest_snapshot,
       fn %{
            new_snapshot: new_snapshot
-         } =
-           results ->
+         } ->
         %LatestSnapshot{
           document_id: new_snapshot.document_id,
           snapshot_id: new_snapshot.id
@@ -184,8 +182,7 @@ defmodule RenewCollab.Versioning do
       :new_label,
       fn %{
            snapshot: snapshot
-         } =
-           results ->
+         } ->
         %SnapshotLabel{
           description: description,
           snapshot_id: snapshot.id

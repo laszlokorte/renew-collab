@@ -18,7 +18,7 @@ defmodule RenewCollab.Import.DocumentImport do
       unique_figs =
         figs
         |> Enum.group_by(fn {{_, uid}, _} -> uid end)
-        |> Enum.map(fn {uid, dupls} -> List.last(dupls) end)
+        |> Enum.map(fn {_uid, dupls} -> List.last(dupls) end)
 
       hierarchy = Enum.flat_map(figures, fn fig -> collect_hierarchy(fig, refs_with_ids) end)
 
@@ -99,7 +99,7 @@ defmodule RenewCollab.Import.DocumentImport do
                     "de.renew.gui.VirtualPlaceFigure" ->
                       "simple-ellipse"
 
-                    other ->
+                    _ ->
                       nil
                   end
                   |> case do
@@ -308,9 +308,8 @@ defmodule RenewCollab.Import.DocumentImport do
 
       text_annotations =
         for {{%Renewex.Storable{
-                class_name: class_name,
-                fields: %{fParent: {:ref, text_parent_ref}} = fields
-              }, uuid}, z_index} <- unique_figs,
+                fields: %{fParent: {:ref, text_parent_ref}}
+              }, uuid}, _z_index} <- unique_figs,
             target_id =
               Enum.at(refs_with_ids, text_parent_ref)
               |> elem(1),
@@ -324,8 +323,8 @@ defmodule RenewCollab.Import.DocumentImport do
       virtual_place_links =
         for {{%Renewex.Storable{
                 class_name: class_name,
-                fields: %{place: {:ref, place_ref}} = fields
-              }, uuid}, z_index} <- unique_figs,
+                fields: %{place: {:ref, place_ref}}
+              }, uuid}, _z_index} <- unique_figs,
             Renewex.Hierarchy.is_subtype_of(
               parser.grammar,
               class_name,
@@ -344,8 +343,8 @@ defmodule RenewCollab.Import.DocumentImport do
       virtual_transition_links =
         for {{%Renewex.Storable{
                 class_name: class_name,
-                fields: %{transition: {:ref, transition_ref}} = fields
-              }, uuid}, z_index} <- unique_figs,
+                fields: %{transition: {:ref, transition_ref}}
+              }, uuid}, _z_index} <- unique_figs,
             Renewex.Hierarchy.is_subtype_of(
               parser.grammar,
               class_name,
@@ -365,8 +364,7 @@ defmodule RenewCollab.Import.DocumentImport do
 
       bonds =
         for {{%Renewex.Storable{
-                class_name: class_name,
-                fields: %{start: start_figure, end: end_figure} = fields
+                fields: %{start: start_figure, end: end_figure}
               }, uuid}, _} <- unique_figs,
             {{:ref, ref}, kind} <- [{start_figure, :source}, {end_figure, :target}],
             connector =
@@ -700,7 +698,7 @@ defmodule RenewCollab.Import.DocumentImport do
 
   defp collect_hierarchy({:ref, r}, refs_with_ids, ancestors \\ []) do
     case Enum.at(refs_with_ids, r) do
-      {%Renewex.Storable{class_name: class_name, fields: %{figures: figures}}, own_id} = el ->
+      {%Renewex.Storable{class_name: class_name, fields: %{figures: figures}}, own_id} ->
         figures
         |> fix_hierarchy_order(class_name)
         |> Enum.flat_map(fn fig ->
@@ -723,7 +721,7 @@ defmodule RenewCollab.Import.DocumentImport do
         )
         |> Enum.to_list()
 
-      {%Renewex.Storable{}, child_id} = el ->
+      {%Renewex.Storable{}, child_id} ->
         Enum.map(ancestors, fn
           {parent_id, distance} -> {parent_id, child_id, distance + 1}
         end)

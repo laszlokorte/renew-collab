@@ -53,7 +53,7 @@ defmodule RenewCollabWeb.DocumentJSON do
           %Ecto.Association.NotLoaded{} -> %{}
           _ -> %{items: document.layers |> Enum.map(&element_data(&1))}
         end
-        |> Map.put(:href, url(~p"/api/documents/#{document}/elements"))
+      # |> Map.put(:href, url(~p"/api/documents/#{document}/elements"))
     }
   end
 

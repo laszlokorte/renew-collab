@@ -10,9 +10,6 @@ defmodule RenewCollab.Symbols do
   alias RenewCollab.Symbol.Path
   alias RenewCollab.Symbol.PathSegment
   alias RenewCollab.Symbol.PathStep
-  alias RenewCollab.Symbol.PathStepHorizontal
-  alias RenewCollab.Symbol.PathStepVertical
-  alias RenewCollab.Symbol.PathStepArc
 
   @doc """
   Returns the list of shape.
@@ -68,10 +65,10 @@ defmodule RenewCollab.Symbols do
 
   def build_symbol_path(
         %{
-          position_x: x,
-          position_y: y,
-          width: width,
-          height: height
+          position_x: _x,
+          position_y: _y,
+          width: _width,
+          height: _height
         } = box,
         %RenewCollab.Symbol.Path{
           segments: segments
@@ -255,10 +252,10 @@ defmodule RenewCollab.Symbols do
        when not is_nil(arg_x) and not is_nil(arg_y),
        do: {old_x + arg_x, old_y + arg_y}
 
-  defp svg_move(false, {old_x, old_y}, {nil, arg_y}) when not is_nil(arg_y), do: {old_x, arg_y}
-  defp svg_move(false, {old_x, old_y}, {arg_x, nil}) when not is_nil(arg_x), do: {arg_x, old_y}
+  defp svg_move(false, {old_x, _old_y}, {nil, arg_y}) when not is_nil(arg_y), do: {old_x, arg_y}
+  defp svg_move(false, {_old_x, old_y}, {arg_x, nil}) when not is_nil(arg_x), do: {arg_x, old_y}
 
-  defp svg_move(false, {old_x, old_y}, {arg_x, arg_y})
+  defp svg_move(false, {_old_x, _old_y}, {arg_x, arg_y})
        when not is_nil(arg_x) and not is_nil(arg_y),
        do: {arg_x, arg_y}
 

@@ -68,5 +68,5 @@ defmodule RenewCollabWeb.HierarchyLayerBoxComponent do
   end
 
   defp default_style(:background_color), do: "#70DB93"
-  defp default_style(style_key), do: nil
+  defp default_style(_style_key), do: nil
 end

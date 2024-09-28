@@ -13,7 +13,7 @@ defmodule RenewCollabAuth.Auth do
   def get_account_by_email(email), do: Repo.get_by(Account, email: email)
 
   def get_account_by_email_and_password(email, password) do
-    account = RenewCollab.Auth.get_account_by_email(email)
+    account = RenewCollabAuth.Auth.get_account_by_email(email)
 
     if account && Bcrypt.verify_pass(password, account.password) do
       account

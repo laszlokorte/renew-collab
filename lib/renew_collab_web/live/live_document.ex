@@ -93,7 +93,7 @@ defmodule RenewCollabWeb.LiveDocument do
         <button type="button" phx-click="create_edge" phx-value-example="yes"  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Create Line</button>
       </div>
 
-      <.live_component id={"hierarchy-list"} module={RenewCollabWeb.HierarchyListComponent} socket_schemas={@socket_schemas} document={@document} symbols={@symbols} selection={@selection} symbols={@symbols} />
+      <.live_component id={"hierarchy-list"} module={RenewCollabWeb.HierarchyListComponent} socket_schemas={@socket_schemas} document={@document} symbols={@symbols} selection={@selection} />
     </div>
         <% end %>
 
@@ -329,8 +329,8 @@ defmodule RenewCollabWeb.LiveDocument do
           "layer_id" => layer_id,
           "value" =>
             %{
-              "position_x" => position_x,
-              "position_y" => position_y
+              "position_x" => _position_x,
+              "position_y" => _position_y
             } = new_position
         },
         socket
@@ -385,8 +385,8 @@ defmodule RenewCollabWeb.LiveDocument do
           "waypoint_id" => waypoint_id,
           "value" =>
             %{
-              "position_x" => position_x,
-              "position_y" => position_y
+              "position_x" => _position_x,
+              "position_y" => _position_y
             } = new_position
         },
         socket

@@ -20,11 +20,11 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
                 <option value="">Target</option>
                 <%= for l <- @document.layers do %>
                   <option value={l.id}><%= l.semantic_tag %>/<%= l.id %></option>
-                <%= end %>
+                <% end %>
               </select>
             </form>
           <% end %>
-          <%= end %>
+          <% end %>
         </td>
         <td valign="top" width="20" align="center"><%= if @layer.box do %>☐<% end %></td>
         <td valign="top" width="20" align="center">
@@ -113,7 +113,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
               <% else %>
               <select phx-hook="RnwAssignInterface" rnw-layer-id={"#{@layer.id}"} id={"layer-interface-#{@layer.id}"} name="socket_schema_id">
                 <option value="" {if(is_nil(@layer.interface), do: [selected: "selected"], else: [])}>---</option>
-                <%= for {sid, s} <- @socket_schemas do %>
+                <%= for {_sid, s} <- @socket_schemas do %>
                 <option value={s.id}  {if(@layer.interface && s.id == @layer.interface.socket_schema_id, do: [selected: "selected"], else: [])} ><%= s.name %></option>
                 <% end %>
               </select>
@@ -198,18 +198,18 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
                 <option value="">Layer</option>
                 <%= for l <- @document.layers, not is_nil(l.box) do %>
                   <option value={l.id}><%= l.semantic_tag %>/<%= l.id %></option>
-                <%= end %>
+                <% end %>
               </select>
               <select style="width: 5em"  name="socket_id">
                 <option value="">Socket</option>
 
-                 <%= for {sid, schema} <- @socket_schemas do %>
+                 <%= for {_sid, schema} <- @socket_schemas do %>
                   <optgroup label={schema.name}>
                     <%= for sock <- schema.sockets do %>
                       <option value={sock.id}><%= sock.name %></option>
-                  <%= end %>
+                  <% end %>
                   </optgroup>
-                <%= end %>
+                <% end %>
               </select>
               <button type="submit">Attach</button>
               </form>
@@ -229,18 +229,18 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
                 <option value="">Layer</option>
                 <%= for l <- @document.layers, not is_nil(l.box) do %>
                   <option value={l.id}><%= l.semantic_tag %>/<%= l.id %></option>
-                <%= end %>
+                <% end %>
               </select>
               <select style="width: 5em" name="socket_id">
                 <option value="">Socket</option>
 
-                 <%= for {sid, schema} <- @socket_schemas do %>
+                 <%= for {_sid, schema} <- @socket_schemas do %>
                   <optgroup label={schema.name}>
                     <%= for sock <- schema.sockets do %>
                       <option value={sock.id}><%= sock.name %></option>
-                  <%= end %>
+                  <% end %>
                   </optgroup>
-                <%= end %>
+                <% end %>
               </select>
               <button type="submit">Attach</button>
               </form>

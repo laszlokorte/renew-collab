@@ -81,7 +81,7 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
 
   defp default_style(:smoothness), do: :linear
   defp default_style(:stroke_color), do: :black
-  defp default_style(style_key), do: nil
+  defp default_style(_style_key), do: nil
 
   defp edge_path(edge, :linear) do
     waypoints =

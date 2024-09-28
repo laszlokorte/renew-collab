@@ -1,8 +1,5 @@
 defmodule RenewCollab.EdgeRouter do
   def align_to_socket(box, socket, relevant_waypoint, socket_schema \\ nil) do
-    box_center_x = box.position_x + box.width / 2
-    box_center_y = box.position_y + box.height / 2
-
     target_x =
       RenewCollab.Symbols.build_coord(box, :x, false, RenewCollab.Symbols.unify_coord(:x, socket))
 

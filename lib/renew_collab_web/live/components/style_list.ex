@@ -32,5 +32,5 @@ defmodule RenewCollabWeb.HierarchyStyleList do
 
   defp default_style(:background_color), do: "transparent"
   defp default_style(:border_width), do: 1
-  defp default_style(style_key), do: nil
+  defp default_style(_style_key), do: nil
 end

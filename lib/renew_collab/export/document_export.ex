@@ -257,7 +257,7 @@ defmodule RenewCollab.Export.DocumentExport do
     end
   end
 
-  defp export_attributes(:edge, layer) do
+  defp export_attributes(:edge, _layer) do
     %Storable{
       class_name: "CH.ifa.draw.figures.FigureAttributes",
       fields: %{
@@ -365,11 +365,11 @@ defmodule RenewCollab.Export.DocumentExport do
     {:rgba, r, g, b, round(250 * opacity)}
   end
 
-  defp color_to_rgba("transparent", opacity) do
+  defp color_to_rgba("transparent", _opacity) do
     {:rgba, 255, 199, 158, 0}
   end
 
-  defp color_to_rgba(color, opacity) do
+  defp color_to_rgba(_color, _opacity) do
     {:rgba, 255, 199, 158, 0}
   end
 

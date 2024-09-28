@@ -1,6 +1,5 @@
 defmodule RenewCollabWeb.HierarchyLayerTextComponent do
   use Phoenix.LiveComponent
-  alias RenewCollab.Symbol
 
   @impl true
   def render(assigns) do
@@ -86,7 +85,7 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
   defp default_style(:alignment), do: :left
   defp default_style(:blank_lines), do: false
   defp default_style(:background_color), do: "transparent"
-  defp default_style(style_key), do: nil
+  defp default_style(_style_key), do: nil
 
   defp format_line(true, <<"_", rest::binary>>), do: {rest, ["text-decoration": "underline"]}
   defp format_line(true, <<"\\", rest::binary>>), do: {rest, ["font-style": "italic"]}
