@@ -41,7 +41,7 @@ defmodule RenewCollabWeb.SnapshotListComponent do
                     >
                       📌
                     </button>
-                     <%= s.label %>
+                    <%= s.label %>
                   <% else %>
                     <form
                       phx-hook="RnwSnapshotPin"
@@ -55,7 +55,7 @@ defmodule RenewCollabWeb.SnapshotListComponent do
                       >
                         📌
                       </button>
-                       <input name="description" type="text" placeholder="Description" />
+                      <input name="description" type="text" placeholder="Description" />
                     </form>
                   <% end %>
                 <% else %>
@@ -77,7 +77,7 @@ defmodule RenewCollabWeb.SnapshotListComponent do
                     >
                       📌
                     </button>
-                     <%= s.label %>
+                    <%= s.label %>
                   <% end %>
                 <% end %>
               </li>

@@ -456,6 +456,25 @@ defmodule RenewCollab.Renew do
         Box.change_size(box, new_size)
       end
     )
+    |> Ecto.Multi.update_all(
+      :update_linked_textes,
+      fn %{box: %{position_x: old_x, position_y: old_y}} ->
+        dx = Map.get(new_size, "position_x", old_x) - old_x
+        dy = Map.get(new_size, "position_y", old_y) - old_y
+
+        from(t in Text,
+          update: [inc: [position_x: ^dx, position_y: ^dy]],
+          where:
+            t.layer_id in subquery(
+              from(h in Hyperlink,
+                select: h.source_layer_id,
+                where: h.target_layer_id == ^layer_id
+              )
+            )
+        )
+      end,
+      []
+    )
     |> Ecto.Multi.all(
       :affected_bonds,
       fn %{box: box} ->
