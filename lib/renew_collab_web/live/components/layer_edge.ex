@@ -5,63 +5,188 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
   def render(assigns) do
     ~H"""
     <g>
-    <g 
-    opacity={style_or_default(@layer, :opacity)}
-      stroke={style_or_default(@layer.edge, :stroke_color)}
+      <g
+        opacity={style_or_default(@layer, :opacity)}
+        stroke={style_or_default(@layer.edge, :stroke_color)}
         stroke-width={style_or_default(@layer.edge, :stroke_width)}
         stroke-linejoin={style_or_default(@layer.edge, :stroke_join)}
         stroke-linecap={style_or_default(@layer.edge, :stroke_cap)}
+      >
+        <path
+          stroke-dasharray={style_or_default(@layer.edge, :stroke_dash_array)}
+          d={edge_path(@layer.edge, style_or_default(@layer.edge, :smoothness))}
+          fill="none"
         >
-      <path stroke-dasharray={style_or_default(@layer.edge, :stroke_dash_array)} d={edge_path(@layer.edge, style_or_default(@layer.edge, :smoothness))} fill="none"></path>
-            
-            <%= if style_or_default(@layer.edge, :source_tip_symbol_shape_id) do %>
-            <g fill={style_or_default(@layer, :background_color)}  id={"edge-#{@layer.edge.id}-source-tip"} transform={"rotate(#{edge_angle(:source, @layer.edge)} #{@layer.edge.source_x} #{@layer.edge.source_y})"}>
-              <%!-- <rect opacity="0.5" fill="red" x={@layer.edge.source_x - 20} y={@layer.edge.source_y - 5} width="20" height="10" /> --%>
-               <%= for path <- @symbols[style_or_default(@layer.edge, :source_tip_symbol_shape_id)].paths do %> 
-                  <path stroke={path.stroke_color} fill={path.fill_color} d={RenewexIconset.Builder.build_symbol_path(%{
-                    position_x: @layer.edge.source_x - (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)),
-                    position_y: @layer.edge.source_y - (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)),
-                    width: (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0))*2,
-                    height: (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0))*2,
-                }, path)} fill-rule="evenodd" />
-                <% end %>
-            </g>
+        </path>
+
+        <%= if style_or_default(@layer.edge, :source_tip_symbol_shape_id) do %>
+          <g
+            fill={style_or_default(@layer, :background_color)}
+            id={"edge-#{@layer.edge.id}-source-tip"}
+            transform={"rotate(#{edge_angle(:source, @layer.edge)} #{@layer.edge.source_x} #{@layer.edge.source_y})"}
+          >
+            <%!-- <rect opacity="0.5" fill="red" x={@layer.edge.source_x - 20} y={@layer.edge.source_y - 5} width="20" height="10" /> --%>
+            <%= for path <- @symbols[style_or_default(@layer.edge, :source_tip_symbol_shape_id)].paths do %>
+              <path
+                stroke={path.stroke_color}
+                fill={path.fill_color}
+                d={
+                  RenewexIconset.Builder.build_symbol_path(
+                    %{
+                      position_x:
+                        @layer.edge.source_x -
+                          (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)),
+                      position_y:
+                        @layer.edge.source_y -
+                          (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)),
+                      width:
+                        (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)) * 2,
+                      height:
+                        (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)) * 2
+                    },
+                    path
+                  )
+                }
+                fill-rule="evenodd"
+              />
             <% end %>
+          </g>
+        <% end %>
 
-            <%= if style_or_default(@layer.edge, :target_tip_symbol_shape_id) do %>
-            <g fill={style_or_default(@layer, :background_color)}  id={"edge-#{@layer.edge.id}-target-tip"} transform={"rotate(#{edge_angle(:target, @layer.edge)} #{@layer.edge.target_x} #{@layer.edge.target_y})"}>
-              <%!-- <rect opacity="0.5" fill="red" x={@layer.edge.target_x - 20} y={@layer.edge.target_y - 5} width="20" height="10" /> --%>
+        <%= if style_or_default(@layer.edge, :target_tip_symbol_shape_id) do %>
+          <g
+            fill={style_or_default(@layer, :background_color)}
+            id={"edge-#{@layer.edge.id}-target-tip"}
+            transform={"rotate(#{edge_angle(:target, @layer.edge)} #{@layer.edge.target_x} #{@layer.edge.target_y})"}
+          >
+            <%!-- <rect opacity="0.5" fill="red" x={@layer.edge.target_x - 20} y={@layer.edge.target_y - 5} width="20" height="10" /> --%>
 
-               <%= for path <- @symbols[style_or_default(@layer.edge, :target_tip_symbol_shape_id)].paths do %> 
-                  <path stroke={path.stroke_color} fill={path.fill_color} d={RenewexIconset.Builder.build_symbol_path(%{
-                    position_x: @layer.edge.target_x - (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)),
-                    position_y: @layer.edge.target_y - (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)),
-                    width: (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0))*2,
-                    height: (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0))*2,
-                }, path)}   fill-rule="evenodd" />
-                <% end %>
-            </g>
+            <%= for path <- @symbols[style_or_default(@layer.edge, :target_tip_symbol_shape_id)].paths do %>
+              <path
+                stroke={path.stroke_color}
+                fill={path.fill_color}
+                d={
+                  RenewexIconset.Builder.build_symbol_path(
+                    %{
+                      position_x:
+                        @layer.edge.target_x -
+                          (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)),
+                      position_y:
+                        @layer.edge.target_y -
+                          (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)),
+                      width:
+                        (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)) * 2,
+                      height:
+                        (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)) * 2
+                    },
+                    path
+                  )
+                }
+                fill-rule="evenodd"
+              />
             <% end %>
-
+          </g>
+        <% end %>
       </g>
 
-      <path stroke="transparent" stroke-linejoin="round" stroke-linecap="round"  stroke-width="8" d={edge_path(@layer.edge, style_or_default(@layer.edge, :smoothness))} fill="none" id={"edge-hitarea-#{@layer.edge.id}"}></path>
+      <path
+        stroke="transparent"
+        stroke-linejoin="round"
+        stroke-linecap="round"
+        stroke-width="8"
+        d={edge_path(@layer.edge, style_or_default(@layer.edge, :smoothness))}
+        fill="none"
+        id={"edge-hitarea-#{@layer.edge.id}"}
+      >
+      </path>
 
       <%= if @selected do %>
-        <path stroke="#000" stroke-dasharray="5 5" stroke-linejoin="round" stroke-linecap="round"  opacity="0.6" stroke-width="1" d={edge_path(@layer.edge, :linear)} fill="none" id={"edge-support-#{@layer.edge.id}"}></path>
-        <path stroke="#33aaff" stroke-linejoin="round" stroke-linecap="round"  opacity="0.8" stroke-width="8" d={edge_path(@layer.edge, style_or_default(@layer.edge, :smoothness))} fill="none" id={"edge-select-#{@layer.edge.id}"}></path>
+        <path
+          stroke="#000"
+          stroke-dasharray="5 5"
+          stroke-linejoin="round"
+          stroke-linecap="round"
+          opacity="0.6"
+          stroke-width="1"
+          d={edge_path(@layer.edge, :linear)}
+          fill="none"
+          id={"edge-support-#{@layer.edge.id}"}
+        >
+        </path>
+        <path
+          stroke="#33aaff"
+          stroke-linejoin="round"
+          stroke-linecap="round"
+          opacity="0.8"
+          stroke-width="8"
+          d={edge_path(@layer.edge, style_or_default(@layer.edge, :smoothness))}
+          fill="none"
+          id={"edge-select-#{@layer.edge.id}"}
+        >
+        </path>
 
         <%= for w <- @layer.edge.waypoints do %>
-          <circle stroke="transparent" stroke-width="10" cursor="move" phx-hook="RnwWaypointDragger" rnw-layer-id={"#{@layer.id}"} rnw-waypoint-id={"#{w.id}"} id={"waypoint-#{w.id}"} cx={w.position_x} cy={w.position_y} r="5" fill="#ff4400"></circle>
+          <circle
+            stroke="transparent"
+            stroke-width="10"
+            cursor="move"
+            phx-hook="RnwWaypointDragger"
+            rnw-layer-id={"#{@layer.id}"}
+            rnw-waypoint-id={"#{w.id}"}
+            id={"waypoint-#{w.id}"}
+            cx={w.position_x}
+            cy={w.position_y}
+            r="5"
+            fill="#ff4400"
+          >
+          </circle>
         <% end %>
 
         <%= for [w1,w2] <- [%{id: nil, position_x: @layer.edge.source_x, position_y: @layer.edge.source_y}] |> Enum.concat(@layer.edge.waypoints) |> Enum.chunk_every(2, 1, [%{position_x: @layer.edge.target_x, position_y: @layer.edge.target_y}]) do %>
-          <circle stroke="transparent" stroke-width="10" cursor="move" phx-hook="RnwWaypointCreator" rnw-layer-id={"#{@layer.id}"} rnw-waypoint-id={w1.id} id={"waypoint-after-#{w1.id}"} cx={(w1.position_x+w2.position_x)/2} cy={(w1.position_y+w2.position_y)/2} r="5" fill="#ff8800"></circle>
+          <circle
+            stroke="transparent"
+            stroke-width="10"
+            cursor="move"
+            phx-hook="RnwWaypointCreator"
+            rnw-layer-id={"#{@layer.id}"}
+            rnw-waypoint-id={w1.id}
+            id={"waypoint-after-#{w1.id}"}
+            cx={(w1.position_x + w2.position_x) / 2}
+            cy={(w1.position_y + w2.position_y) / 2}
+            r="5"
+            fill="#ff8800"
+          >
+          </circle>
         <% end %>
 
-        <circle stroke="transparent" stroke-width="10" cursor="move" phx-hook="RnwEdgeDragger" rnw-layer-id={"#{@layer.id}"} rnw-edge-side={"source"} id={"waypoint-#{@layer.edge.id}-source"} cx={@layer.edge.source_x} cy={@layer.edge.source_y} r="5" fill="blue"></circle>
-        <circle stroke="transparent" stroke-width="10" cursor="move" phx-hook="RnwEdgeDragger" rnw-layer-id={"#{@layer.id}"} rnw-edge-side={"target"} id={"waypoint-#{@layer.edge.id}-target"} cx={@layer.edge.target_x} cy={@layer.edge.target_y} r="5" fill="blue"></circle>
-
+        <circle
+          stroke="transparent"
+          stroke-width="10"
+          cursor="move"
+          phx-hook="RnwEdgeDragger"
+          rnw-layer-id={"#{@layer.id}"}
+          rnw-edge-side="source"
+          id={"waypoint-#{@layer.edge.id}-source"}
+          cx={@layer.edge.source_x}
+          cy={@layer.edge.source_y}
+          r="5"
+          fill="blue"
+        >
+        </circle>
+        <circle
+          stroke="transparent"
+          stroke-width="10"
+          cursor="move"
+          phx-hook="RnwEdgeDragger"
+          rnw-layer-id={"#{@layer.id}"}
+          rnw-edge-side="target"
+          id={"waypoint-#{@layer.edge.id}-target"}
+          cx={@layer.edge.target_x}
+          cy={@layer.edge.target_y}
+          r="5"
+          fill="blue"
+        >
+        </circle>
       <% end %>
     </g>
     """

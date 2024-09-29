@@ -31,27 +31,23 @@ defmodule RenewCollab.Renew do
     do:
       Repo.get!(Document, id)
       |> Repo.preload(
-        layers:
-          from(e in Layer,
-            order_by: [asc: :z_index],
-            preload: [
-              direct_parent: [],
-              box: [
-                symbol_shape: []
-              ],
-              text: [style: []],
-              edge: [
-                waypoints: ^from(w in Waypoint, order_by: [asc: :sort]),
-                style: [],
-                source_bond: [],
-                target_bond: []
-              ],
-              style: [],
-              interface: [:socket_schema],
-              outgoing_link: [],
-              incoming_links: []
-            ]
-          )
+        layers: [
+          direct_parent: [],
+          box: [
+            symbol_shape: []
+          ],
+          text: [style: []],
+          edge: [
+            waypoints: [],
+            style: [],
+            source_bond: [],
+            target_bond: []
+          ],
+          style: [],
+          interface: [:socket_schema],
+          outgoing_link: [],
+          incoming_links: []
+        ]
       )
 
   def deep_clone_document!(id) do

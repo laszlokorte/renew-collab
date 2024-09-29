@@ -10,11 +10,11 @@ defmodule RenewCollab.Hierarchy do
     |> Ecto.Multi.put(:document_id, doc_id)
     |> Ecto.Multi.run(
       :invalids,
-      fn repo,
+      fn _,
          %{
            document_id: document_id
          } ->
-        {:ok, Enum.map(find_invalids(doc_id), & &1.id)}
+        {:ok, Enum.map(find_invalids(document_id), & &1.id)}
       end
     )
     |> Ecto.Multi.delete_all(:delete_invalid, fn %{invalids: ids_to_delete} ->
@@ -22,11 +22,11 @@ defmodule RenewCollab.Hierarchy do
     end)
     |> Ecto.Multi.run(
       :missings,
-      fn repo,
+      fn _,
          %{
            document_id: document_id
          } ->
-        {:ok, Enum.map(find_missing(doc_id), &Map.take(&1, @attributes))}
+        {:ok, Enum.map(find_missing(document_id), &Map.take(&1, @attributes))}
       end
     )
     |> Ecto.Multi.insert_all(:insert_missings, LayerParenthood, fn %{missings: rows_to_insert} ->
@@ -109,18 +109,17 @@ defmodule RenewCollab.Hierarchy do
           id: a.id
         }
 
-    query =
-      from p in LayerParenthood,
-        as: :parent_query,
-        where:
-          ^doc_id == p.document_id and
-            ((p.depth == 0 and p.descendant_id != p.ancestor_id) or
-               (p.depth != 0 and p.descendant_id == p.ancestor_id) or
-               (p.depth > 1 and not exists(transitives)) or
-               (p.depth > 0 and exists(symmetrics))),
-        select: %{
-          id: p.id
-        }
+    from p in LayerParenthood,
+      as: :parent_query,
+      where:
+        ^doc_id == p.document_id and
+          ((p.depth == 0 and p.descendant_id != p.ancestor_id) or
+             (p.depth != 0 and p.descendant_id == p.ancestor_id) or
+             (p.depth > 1 and not exists(transitives)) or
+             (p.depth > 0 and exists(symmetrics))),
+      select: %{
+        id: p.id
+      }
   end
 
   def find_invalids(doc_id) do

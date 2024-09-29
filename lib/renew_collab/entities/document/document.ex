@@ -7,7 +7,10 @@ defmodule RenewCollab.Document.Document do
   schema "document" do
     field :name, :string
     field :kind, :string
-    has_many :layers, RenewCollab.Hierarchy.Layer, on_delete: :delete_all
+
+    has_many :layers, RenewCollab.Hierarchy.Layer,
+      on_delete: :delete_all,
+      preload_order: [asc: :z_index]
 
     timestamps(type: :utc_datetime)
   end

@@ -4,35 +4,98 @@ defmodule RenewCollabWeb.HierarchyLayerBoxComponent do
   @impl true
   def render(assigns) do
     ~H"""
-    <g id={"box-#{@layer.box.id}"} stroke-dasharray={style_or_default(@layer, :border_dash_array)} stroke-width={style_or_default(@layer, :border_width)} fill={style_or_default(@layer, :background_color)} stroke={style_or_default(@layer, :border_color)} opacity={style_or_default(@layer, :opacity)} >
+    <g
+      id={"box-#{@layer.box.id}"}
+      stroke-dasharray={style_or_default(@layer, :border_dash_array)}
+      stroke-width={style_or_default(@layer, :border_width)}
+      fill={style_or_default(@layer, :background_color)}
+      stroke={style_or_default(@layer, :border_color)}
+      opacity={style_or_default(@layer, :opacity)}
+    >
       <%= if @layer.box.symbol_shape_id do %>
-       <%= case @layer.box.symbol_shape.name do %>
-        <% "rect-round" -> %>
-              <rect  id={"roundrect-#{@layer.box.id}"} rx={(@layer.box.symbol_shape_attributes["rx"]||0) / 2}  ry={(@layer.box.symbol_shape_attributes["ry"]||0) /2} x={@layer.box.position_x} y={@layer.box.position_y} width={@layer.box.width} height={@layer.box.height}></rect>
-        <% "pie" -> %>
-              
-            <path  id={"pie-#{@layer.box.id}"} d={pie_path(@layer.box, @layer.box.symbol_shape_attributes["start_angle"], @layer.box.symbol_shape_attributes["end_angle"])} fill-rule="evenodd" />
-        <% _ -> %>
-        <g id={"symbol-#{@layer.box.id}-#{@layer.box.symbol_shape_id}"}>
-          
-            <%= for path <- @symbols[@layer.box.symbol_shape_id].paths do %> 
-              <path stroke-linejoin="bevel" stroke={path.stroke_color} fill={path.fill_color} d={RenewexIconset.Builder.build_symbol_path(@layer.box, path)} 
-        fill-rule="evenodd" />
-            <% end %>
-        </g>
-          <% end %>
-     
+        <%= case @layer.box.symbol_shape.name do %>
+          <% "rect-round" -> %>
+            <rect
+              id={"roundrect-#{@layer.box.id}"}
+              rx={(@layer.box.symbol_shape_attributes["rx"] || 0) / 2}
+              ry={(@layer.box.symbol_shape_attributes["ry"] || 0) / 2}
+              x={@layer.box.position_x}
+              y={@layer.box.position_y}
+              width={@layer.box.width}
+              height={@layer.box.height}
+            >
+            </rect>
+          <% "pie" -> %>
+            <path
+              id={"pie-#{@layer.box.id}"}
+              d={
+                pie_path(
+                  @layer.box,
+                  @layer.box.symbol_shape_attributes["start_angle"],
+                  @layer.box.symbol_shape_attributes["end_angle"]
+                )
+              }
+              fill-rule="evenodd"
+            />
+          <% _ -> %>
+            <g id={"symbol-#{@layer.box.id}-#{@layer.box.symbol_shape_id}"}>
+              <%= for path <- @symbols[@layer.box.symbol_shape_id].paths do %>
+                <path
+                  stroke-linejoin="bevel"
+                  stroke={path.stroke_color}
+                  fill={path.fill_color}
+                  d={RenewexIconset.Builder.build_symbol_path(@layer.box, path)}
+                  fill-rule="evenodd"
+                />
+              <% end %>
+            </g>
+        <% end %>
       <% else %>
-            <rect  id={"fallback-#{@layer.box.id}"} x={@layer.box.position_x} y={@layer.box.position_y} width={@layer.box.width} height={@layer.box.height}></rect>
+        <rect
+          id={"fallback-#{@layer.box.id}"}
+          x={@layer.box.position_x}
+          y={@layer.box.position_y}
+          width={@layer.box.width}
+          height={@layer.box.height}
+        >
+        </rect>
       <% end %>
 
       <%= if @selected do %>
-       <g>
-          <rect cursor="move" phx-hook="RnwBoxDragger" rnw-layer-id={@layer.id} stroke="#33aaff" stroke-linejoin="round" stroke-linecap="round" opacity="0.8" stroke-width="4" fill="#33aaff" fill-opacity="0.4" id={"box-select-#{@layer.box.id}"} x={@layer.box.position_x} y={@layer.box.position_y} width={@layer.box.width} height={@layer.box.height}></rect>
+        <g>
+          <rect
+            cursor="move"
+            phx-hook="RnwBoxDragger"
+            rnw-layer-id={@layer.id}
+            stroke="#33aaff"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+            opacity="0.8"
+            stroke-width="4"
+            fill="#33aaff"
+            fill-opacity="0.4"
+            id={"box-select-#{@layer.box.id}"}
+            x={@layer.box.position_x}
+            y={@layer.box.position_y}
+            width={@layer.box.width}
+            height={@layer.box.height}
+          >
+          </rect>
 
-        <circle stroke="transparent" stroke-width="10" cursor="move" phx-hook="RnwBoxResizeDragger" rnw-layer-id={"#{@layer.id}"} id={"box-resize-#{@layer.box.id}"} cx={@layer.box.position_x + @layer.box.width + 5} cy={@layer.box.position_y + @layer.box.height + 5} r="5" fill="green"></circle>
-
-       </g>
+          <circle
+            stroke="transparent"
+            stroke-width="10"
+            cursor="move"
+            phx-hook="RnwBoxResizeDragger"
+            rnw-layer-id={"#{@layer.id}"}
+            id={"box-resize-#{@layer.box.id}"}
+            cx={@layer.box.position_x + @layer.box.width + 5}
+            cy={@layer.box.position_y + @layer.box.height + 5}
+            r="5"
+            fill="green"
+          >
+          </circle>
+        </g>
       <% end %>
     </g>
     """

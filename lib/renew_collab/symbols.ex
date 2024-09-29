@@ -7,9 +7,6 @@ defmodule RenewCollab.Symbols do
   alias RenewCollab.Repo
 
   alias RenewCollab.Symbol.Shape
-  alias RenewCollab.Symbol.Path
-  alias RenewCollab.Symbol.PathSegment
-  alias RenewCollab.Symbol.PathStep
 
   @doc """
   Returns the list of shape.
@@ -23,27 +20,15 @@ defmodule RenewCollab.Symbols do
   def list_shapes do
     Repo.all(Shape, order_by: [asc: :name])
     |> Repo.preload(
-      paths:
-        from(p in Path,
-          order_by: [asc: :sort],
-          preload: [
-            segments:
-              ^from(s in PathSegment,
-                order_by: [asc: :sort],
-                preload: [
-                  steps:
-                    ^from(s in PathStep,
-                      order_by: [asc: :sort],
-                      preload: [
-                        :horizontal,
-                        :vertical,
-                        :arc
-                      ]
-                    )
-                ]
-              )
+      paths: [
+        segments: [
+          steps: [
+            :horizontal,
+            :vertical,
+            :arc
           ]
-        )
+        ]
+      ]
     )
   end
 

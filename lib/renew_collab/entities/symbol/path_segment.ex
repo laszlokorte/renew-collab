@@ -28,7 +28,10 @@ defmodule RenewCollab.Symbol.PathSegment do
       default: :height
 
     belongs_to :path, RenewCollab.Symbol.Path
-    has_many :steps, RenewCollab.Symbol.PathStep, on_delete: :delete_all
+
+    has_many :steps, RenewCollab.Symbol.PathStep,
+      on_delete: :delete_all,
+      preload_order: [asc: :sort]
 
     timestamps(type: :utc_datetime)
   end

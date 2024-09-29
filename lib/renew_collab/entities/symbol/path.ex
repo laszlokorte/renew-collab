@@ -9,7 +9,10 @@ defmodule RenewCollab.Symbol.Path do
     field :fill_color, :string
     field :stroke_color, :string
     belongs_to :shape, RenewCollab.Symbol.Shape
-    has_many :segments, RenewCollab.Symbol.PathSegment, on_delete: :delete_all
+
+    has_many :segments, RenewCollab.Symbol.PathSegment,
+      on_delete: :delete_all,
+      preload_order: [asc: :sort]
 
     timestamps(type: :utc_datetime)
   end

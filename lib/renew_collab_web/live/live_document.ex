@@ -35,74 +35,151 @@ defmodule RenewCollabWeb.LiveDocument do
       <div style="grid-area: top; padding: 1em; background: #333; color: #fff; display: flex; justify-content: space-between; align-items: stretch;">
         <div>
           <.link navigate={~p"/documents"} style="color: inherit">Back</.link>
-        <h2 style="margin: 0;"><%= @document.name %></h2>
-
+          <h2 style="margin: 0;"><%= @document.name %></h2>
         </div>
-        
-        <.live_component  id={"undo_redo"} module={RenewCollabWeb.UndoRedoComponent} undo_redo={@undo_redo} />
 
+        <.live_component
+          id="undo_redo"
+          module={RenewCollabWeb.UndoRedoComponent}
+          undo_redo={@undo_redo}
+        />
       </div>
       <div style="grid-area: left; width: 100%; height: 100%; overflow: auto; box-sizing: border-box; padding: 0 2em">
-      <svg   phx-click="select_layer" phx-value-id={""} preserveAspectRatio="xMidYMin meet" id={"document-#{@document.id}"} viewBox={@viewbox} style="display: block; width: 100%" width="1000" height="1000">
-        <%= for layer <- @document.layers, layer.direct_parent == nil do %> 
-          <.live_component selectable={true} id={layer.id} module={RenewCollabWeb.HierarchyLayerComponent} socket_schemas={@socket_schemas} document={@document} layer={layer} selection={@selection} selected={@selection == layer.id} symbols={@symbols} />
-        <% end %>
-      </svg>
-    </div>
+        <svg
+          phx-click="select_layer"
+          phx-value-id=""
+          preserveAspectRatio="xMidYMin meet"
+          id={"document-#{@document.id}"}
+          viewBox={@viewbox}
+          style="display: block; width: 100%"
+          width="1000"
+          height="1000"
+        >
+          <%= for layer <- @document.layers, layer.direct_parent == nil do %>
+            <.live_component
+              selectable={true}
+              id={layer.id}
+              module={RenewCollabWeb.HierarchyLayerComponent}
+              socket_schemas={@socket_schemas}
+              document={@document}
+              layer={layer}
+              selection={@selection}
+              selected={@selection == layer.id}
+              symbols={@symbols}
+            />
+          <% end %>
+        </svg>
+      </div>
 
       <div style="grid-area: right;width: 100%; height: 100%; overflow: auto; box-sizing: border-box; padding: 0 2em; background: #eee">
         <p>
-          <button phx-click="update-viewbox"  style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff">Refit Camera</button>
+          <button
+            phx-click="update-viewbox"
+            style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff"
+          >
+            Refit Camera
+          </button>
         </p>
-        <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-hierarchy">Hierarchy</h2>
-          <%= if @show_hierarchy do %>
+        <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-hierarchy">
+          Hierarchy
+        </h2>
+        <%= if @show_hierarchy do %>
           <div>
             <div style="width: 45vw;">
-          <h3>Health</h3>
-          <dl style="display: grid; grid-template-columns: auto auto; justify-content: start; gap: 1ex 1em">
-            <dt style="margin: 0">Missing Parenthoods</dt>
-            <dd style="margin: 0"><details>
-            <summary style="cursor: pointer"><%= Enum.count(@hierachy_missing)%></summary>
-            <ul>
-            <%= for i <- @hierachy_missing do %>
-              <li><%= i.ancestor_id %>/<%= i.descendant_id %>/<%= i.depth %></li>              
-              <% end %>
-          </ul>
-          </details></dd>
-            <dt style="margin: 0">Invalid Parenthoods</dt>
-            <dd style="margin: 0">
-          <details>
-            <summary style="cursor: pointer"><%= Enum.count(@hierachy_invalid)%></summary>
-            <ul>
-            <%= for id <- @hierachy_invalid do %>
-              <li><%= id %></li>
-            <% end %>
-          </ul>
-          </details></dd>
-          <dt></dt>
-          <dd style="margin: 0"><button type="button" phx-click="repair_hierarchy"  style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff">Repair</button></dd>
-          </dl>
+              <h3>Health</h3>
+              <dl style="display: grid; grid-template-columns: auto auto; justify-content: start; gap: 1ex 1em">
+                <dt style="margin: 0">Missing Parenthoods</dt>
+                <dd style="margin: 0">
+                  <details>
+                    <summary style="cursor: pointer"><%= Enum.count(@hierachy_missing) %></summary>
+                    <ul>
+                      <%= for i <- @hierachy_missing do %>
+                        <li><%= i.ancestor_id %>/<%= i.descendant_id %>/<%= i.depth %></li>
+                      <% end %>
+                    </ul>
+                  </details>
+                </dd>
+                <dt style="margin: 0">Invalid Parenthoods</dt>
+                <dd style="margin: 0">
+                  <details>
+                    <summary style="cursor: pointer"><%= Enum.count(@hierachy_invalid) %></summary>
+                    <ul>
+                      <%= for id <- @hierachy_invalid do %>
+                        <li><%= id %></li>
+                      <% end %>
+                    </ul>
+                  </details>
+                </dd>
+                <dt></dt>
+                <dd style="margin: 0">
+                  <button
+                    type="button"
+                    phx-click="repair_hierarchy"
+                    style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff"
+                  >
+                    Repair
+                  </button>
+                </dd>
+              </dl>
+            </div>
+            <h3>Element Tree</h3>
 
-        </div>
-      <h3>Element Tree</h3>
+            <div style="display: flex; gap: 1ex; padding: 1ex 0">
+              <button
+                type="button"
+                phx-click="create_group"
+                phx-value-example="yes"
+                style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+              >
+                Create Group
+              </button>
+              <button
+                type="button"
+                phx-click="create_text"
+                phx-value-example="yes"
+                style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+              >
+                Create Text
+              </button>
+              <button
+                type="button"
+                phx-click="create_box"
+                phx-value-example="yes"
+                style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+              >
+                Create Box
+              </button>
+              <button
+                type="button"
+                phx-click="create_edge"
+                phx-value-example="yes"
+                style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+              >
+                Create Line
+              </button>
+            </div>
 
-      <div style="display: flex; gap: 1ex; padding: 1ex 0">
-        <button type="button" phx-click="create_group"  phx-value-example="yes" style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Create Group</button>
-        <button type="button" phx-click="create_text" phx-value-example="yes"  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Create Text</button>
-        <button type="button" phx-click="create_box" phx-value-example="yes"  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Create Box</button>
-        <button type="button" phx-click="create_edge" phx-value-example="yes"  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff">Create Line</button>
-      </div>
-
-      <.live_component id={"hierarchy-list"} module={RenewCollabWeb.HierarchyListComponent} socket_schemas={@socket_schemas} document={@document} symbols={@symbols} selection={@selection} />
-    </div>
+            <.live_component
+              id="hierarchy-list"
+              module={RenewCollabWeb.HierarchyListComponent}
+              socket_schemas={@socket_schemas}
+              document={@document}
+              symbols={@symbols}
+              selection={@selection}
+            />
+          </div>
         <% end %>
 
-
-      <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-snapshots">Snapshots</h2>
-      <%= if @show_snapshots do %>
-      <.live_component id={"snapshot-list"} module={RenewCollabWeb.SnapshotListComponent} snapshots={@snapshots} />
-      
-      <% end %>
+        <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-snapshots">
+          Snapshots
+        </h2>
+        <%= if @show_snapshots do %>
+          <.live_component
+            id="snapshot-list"
+            module={RenewCollabWeb.SnapshotListComponent}
+            snapshots={@snapshots}
+          />
+        <% end %>
       </div>
     </div>
     """

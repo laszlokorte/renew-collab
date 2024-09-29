@@ -29,7 +29,9 @@ defmodule RenewCollab.Element.Edge do
 
     has_one :style, RenewCollab.Style.EdgeStyle, on_delete: :delete_all
 
-    has_many :waypoints, RenewCollab.Connection.Waypoint, on_delete: :delete_all
+    has_many :waypoints, RenewCollab.Connection.Waypoint,
+      on_delete: :delete_all,
+      preload_order: [asc: :sort]
 
     timestamps(type: :utc_datetime)
   end

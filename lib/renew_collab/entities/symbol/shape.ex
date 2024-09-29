@@ -6,7 +6,7 @@ defmodule RenewCollab.Symbol.Shape do
   @foreign_key_type :binary_id
   schema "symbol_shape" do
     field :name, :string
-    has_many :paths, RenewCollab.Symbol.Path, on_delete: :delete_all
+    has_many :paths, RenewCollab.Symbol.Path, on_delete: :delete_all, preload_order: [asc: :sort]
 
     timestamps(type: :utc_datetime)
   end
