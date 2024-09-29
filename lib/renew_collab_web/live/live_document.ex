@@ -65,7 +65,7 @@ defmodule RenewCollabWeb.LiveDocument do
             <summary style="cursor: pointer"><%= Enum.count(@hierachy_missing)%></summary>
             <ul>
             <%= for i <- @hierachy_missing do %>
-              <li><%= i.id %></li>
+              <li><%= i.ancestor_id %>/<%= i.descendant_id %>/<%= i.depth %></li>              
               <% end %>
           </ul>
           </details></dd>
@@ -74,9 +74,9 @@ defmodule RenewCollabWeb.LiveDocument do
           <details>
             <summary style="cursor: pointer"><%= Enum.count(@hierachy_invalid)%></summary>
             <ul>
-            <%= for i <- @hierachy_invalid do %>
-              <li><%= i.id %></li>
-              <% end %>
+            <%= for id <- @hierachy_invalid do %>
+              <li><%= id %></li>
+            <% end %>
           </ul>
           </details></dd>
           <dt></dt>

@@ -51,7 +51,10 @@ defmodule RenewCollab.MixProject do
       {:corsica, "~> 2.0"},
       {:live_state, "~> 0.7"},
       {:bcrypt_elixir, "~> 3.0"},
-      {:renewex, "~> 0.14.0"}
+      {:renewex, "~> 0.14.0"},
+      {:renewex_iconset, "~> 0.1.0"},
+      {:renewex_routing, "~> 0.1.0"},
+      {:renewex_converter, "~> 0.4.0"}
     ]
   end
 

@@ -726,15 +726,17 @@ export const Hooks = {
         const dy = p.y - y
 
 
-        console.log("update_box_size")
-        const bbox = this.el.getBBox()
-        this.pushEvent("update_box_size", {
-          value: {
-            position_x: bbox.x + dx,
-            position_y: bbox.y + dy
-          },
-          layer_id: rnwLayerId,
-        })
+        if(Math.hypot(dx, dy) >= 1){
+          console.log("update_box_size")
+            const bbox = this.el.getBBox()
+            this.pushEvent("update_box_size", {
+              value: {
+                position_x: bbox.x + dx,
+                position_y: bbox.y + dy
+              },
+              layer_id: rnwLayerId,
+            })
+            }
       }
 
       this.el.addEventListener('click', function(e) {
@@ -799,16 +801,19 @@ export const Hooks = {
 
         const p = cursorPoint(evt)
 
-
-        console.log("update_box_size")
-        const bbox = this.el.previousElementSibling.getBBox()
-        this.pushEvent("update_box_size", {
-          value: {
-            width: Math.max(3, p.x - bbox.x - offsetX),
-            height: Math.max(3, p.y - bbox.y - offsetY)
-          },
-          layer_id: rnwLayerId,
-        })
+        const dx = p.x - x
+        const dy = p.y - y
+        if(Math.hypot(dx, dy) >= 1){
+          console.log("update_box_size")
+          const bbox = this.el.previousElementSibling.getBBox()
+          this.pushEvent("update_box_size", {
+            value: {
+              width: Math.max(3, p.x - bbox.x - offsetX),
+              height: Math.max(3, p.y - bbox.y - offsetY)
+            },
+            layer_id: rnwLayerId,
+          })
+        }
       }
 
 

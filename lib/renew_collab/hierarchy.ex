@@ -3,18 +3,39 @@ defmodule RenewCollab.Hierarchy do
 
   alias RenewCollab.Hierarchy.LayerParenthood
 
-  def repair_parenthood(doc_id) do
-    RenewCollab.Repo.transaction(fn _ ->
-      ids_to_delete = Enum.map(find_invalids(doc_id), & &1.id)
-      RenewCollab.Repo.delete_all(from p in LayerParenthood, where: p.id in ^ids_to_delete)
+  @attributes [:document_id, :ancestor_id, :descendant_id, :depth]
 
-      attributes = [:document_id, :ancestor_id, :descendant_id, :depth]
-      rows_to_insert = Enum.map(find_missing(doc_id), &Map.take(&1, attributes))
-      RenewCollab.Repo.insert_all(LayerParenthood, rows_to_insert)
+  def repair_parenthood(doc_id) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.put(:document_id, doc_id)
+    |> Ecto.Multi.run(
+      :invalids,
+      fn repo,
+         %{
+           document_id: document_id
+         } ->
+        {:ok, Enum.map(find_invalids(doc_id), & &1.id)}
+      end
+    )
+    |> Ecto.Multi.delete_all(:delete_invalid, fn %{invalids: ids_to_delete} ->
+      from(p in LayerParenthood, where: p.id in ^ids_to_delete)
     end)
+    |> Ecto.Multi.run(
+      :missings,
+      fn repo,
+         %{
+           document_id: document_id
+         } ->
+        {:ok, Enum.map(find_missing(doc_id), &Map.take(&1, @attributes))}
+      end
+    )
+    |> Ecto.Multi.insert_all(:insert_missings, LayerParenthood, fn %{missings: rows_to_insert} ->
+      rows_to_insert
+    end)
+    |> RenewCollab.Repo.transaction()
   end
 
-  def find_missing(doc_id) do
+  def find_missing_query(doc_id) do
     transitives =
       from a in LayerParenthood,
         as: :parent_a,
@@ -37,7 +58,7 @@ defmodule RenewCollab.Hierarchy do
           ancestor_id: a.ancestor_id,
           descendant_id: b.descendant_id,
           depth: a.depth + b.depth,
-          reason: "transitivity"
+          reason: :transitivity
         }
 
     reflexives =
@@ -50,13 +71,17 @@ defmodule RenewCollab.Hierarchy do
           ancestor_id: m.id,
           descendant_id: m.id,
           depth: 0,
-          reason: "reflexivity"
+          reason: :reflexivity
         }
 
-    RenewCollab.Repo.all(union(transitives, ^reflexives))
+    union(transitives, ^reflexives)
   end
 
-  def find_invalids(doc_id) do
+  def find_missing(doc_id) do
+    RenewCollab.Repo.all(find_missing_query(doc_id))
+  end
+
+  def find_invalids_query(doc_id) do
     transitives =
       from a in LayerParenthood,
         join: b in LayerParenthood,
@@ -96,7 +121,9 @@ defmodule RenewCollab.Hierarchy do
         select: %{
           id: p.id
         }
+  end
 
-    RenewCollab.Repo.all(query)
+  def find_invalids(doc_id) do
+    RenewCollab.Repo.all(find_invalids_query(doc_id))
   end
 end

@@ -1,6 +1,5 @@
 defmodule RenewCollabWeb.HierarchyLayerBoxComponent do
   use Phoenix.LiveComponent
-  alias RenewCollab.Symbols
 
   @impl true
   def render(assigns) do
@@ -17,7 +16,7 @@ defmodule RenewCollabWeb.HierarchyLayerBoxComponent do
         <g id={"symbol-#{@layer.box.id}-#{@layer.box.symbol_shape_id}"}>
           
             <%= for path <- @symbols[@layer.box.symbol_shape_id].paths do %> 
-              <path stroke-linejoin="bevel" stroke={path.stroke_color} fill={path.fill_color} d={Symbols.build_symbol_path(@layer.box, path)} 
+              <path stroke-linejoin="bevel" stroke={path.stroke_color} fill={path.fill_color} d={RenewexIconset.Builder.build_symbol_path(@layer.box, path)} 
         fill-rule="evenodd" />
             <% end %>
         </g>
