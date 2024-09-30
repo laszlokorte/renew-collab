@@ -8,6 +8,10 @@ defmodule RenewCollabAuth.Auth do
 
   alias RenewCollabAuth.Entites.Account
 
+  def get_accounts(), do: Repo.all(Account)
+
+  def count_accounts(), do: Repo.one!(from(a in Account, select: count(a.id)))
+
   def get_account!(id), do: Repo.get!(Account, id)
 
   def get_account_by_email(email), do: Repo.get_by(Account, email: email)
@@ -22,12 +26,24 @@ defmodule RenewCollabAuth.Auth do
     end
   end
 
-  def create_account(email, password) do
+  def change_account(%Account{} = post, attrs \\ %{}) do
+    Account.changeset(post, attrs)
+  end
+
+  def create_account(params) do
     %Account{}
-    |> Account.changeset(%{
+    |> Account.changeset(params)
+    |> RenewCollab.Repo.insert()
+  end
+
+  def create_account(email, password) do
+    create_account(%{
       "email" => email,
       "password" => password
     })
-    |> RenewCollab.Repo.insert()
+  end
+
+  def delete_account(%Account{} = account) do
+    Repo.delete(account)
   end
 end

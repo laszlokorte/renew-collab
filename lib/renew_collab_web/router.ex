@@ -40,6 +40,9 @@ defmodule RenewCollabWeb.Router do
 
     get "/", HomeController, :index
     get "/health", HealthController, :index
+    get "/accounts", AccountsController, :index
+    post "/accounts", AccountsController, :create
+    delete "/accounts/:id", AccountsController, :delete
 
     live_session :require_authenticated_user do
       # on_mount: [

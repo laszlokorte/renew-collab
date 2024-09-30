@@ -25,6 +25,10 @@ defmodule RenewCollab.Renew do
     Repo.all(from(Document, order_by: [desc: :inserted_at, desc: :updated_at]))
   end
 
+  def count_documents do
+    Repo.one!(from(d in Document, select: count(d.id)))
+  end
+
   def get_document!(id), do: Repo.get!(Document, id)
 
   def get_document_with_elements!(id),

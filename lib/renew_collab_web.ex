@@ -83,7 +83,7 @@ defmodule RenewCollabWeb do
       # HTML escaping functionality
       import Phoenix.HTML
       # Core UI components and translation
-      # import RenewCollabWeb.CoreComponents
+      import RenewCollabWeb.CoreComponents
       # import RenewCollabWeb.Gettext
 
       # Shortcut for generating JS commands
