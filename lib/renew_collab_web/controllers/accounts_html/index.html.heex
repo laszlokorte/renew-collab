@@ -3,24 +3,24 @@
 
 <table>
   <caption>List of Accounts</caption>
-  
+
   <thead>
     <tr>
       <th>Login</th>
-      
+
       <th>Password</th>
-      
+
       <th>Actions</th>
     </tr>
   </thead>
-  
+
   <tbody>
     <%= for a <- @accounts do %>
       <tr>
         <td><%= a.email %></td>
-        
+
         <td>****</td>
-        
+
         <td>
           <.link href={~p"/accounts/#{a}"} method="delete" data-confirm="Are you sure?">
             Delete
@@ -32,4 +32,4 @@
 </table>
 
 <h3>New Account</h3>
- <.account_form changeset={@new} action={~p"/accounts"} />
+<.account_form changeset={@new} action={~p"/accounts"} />

@@ -33,6 +33,24 @@ defmodule RenewCollab.Versioning do
     |> Repo.preload(successors: [], predecessor: [])
   end
 
+  def compress(binary) do
+    z = :zlib.open()
+    :zlib.deflateInit(z)
+    compressed = :zlib.deflate(z, binary)
+    :zlib.close(z)
+
+    compressed
+  end
+
+  def decompress(binary) do
+    z = :zlib.open()
+    :zlib.inflateInit(z)
+    decompressed = :zlib.inflate(z, binary)
+    :zlib.close(z)
+
+    decompressed
+  end
+
   def snapshot_multi() do
     queries = RenewCollab.Versioning.Snapshotter.queries()
 
@@ -68,7 +86,7 @@ defmodule RenewCollab.Versioning do
       )
 
     queries
-    |> Enum.reduce(multi, fn {key, query}, acc ->
+    |> Enum.reduce(multi, fn {key, {_, query}}, acc ->
       acc
       |> Ecto.Multi.all(key, fn %{document_id: document_id} ->
         query.(document_id)
@@ -144,14 +162,15 @@ defmodule RenewCollab.Versioning do
       )
 
     multi =
-      RenewCollab.Versioning.Snapshotter.insertions()
-      |> Enum.reduce(multi, fn {key, schema, func}, m ->
+      RenewCollab.Versioning.Snapshotter.queries()
+      |> Enum.reduce(multi, fn {key, {schema, _}}, m ->
         m
         |> Ecto.Multi.insert_all(String.to_atom("restore_#{key}"), schema, fn %{
                                                                                 snapshot_content:
                                                                                   content
                                                                               } ->
-          func.(Map.get(content, Atom.to_string(key), []))
+          dbg(Map.get(content, key, []))
+          Map.get(content, key, [])
         end)
       end)
 
@@ -279,7 +298,7 @@ defmodule RenewCollab.Versioning do
         with %{document_id: document_id} <- values do
           Phoenix.PubSub.broadcast(
             RenewCollab.PubSub,
-            "redux_document:#{document_id}",
+            "document:#{document_id}",
             {:document_changed, document_id}
           )
         end

@@ -187,6 +187,71 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
           fill="blue"
         >
         </circle>
+        <%= if @layer.edge.target_bond do %>
+          <circle
+            stroke="transparent"
+            stroke-width="10"
+            cursor="pointer"
+            rnw-layer-id={"#{@layer.id}"}
+            rnw-edge-side="target"
+            id={"detach-#{@layer.edge.id}-target"}
+            cx={@layer.edge.target_x + 15}
+            cy={@layer.edge.target_y}
+            r="5"
+            fill="darkred"
+            phx-click="detach-bond"
+            phx-value-id={@layer.edge.target_bond.id}
+          >
+          </circle>
+        <% else %>
+          <circle
+            stroke="transparent"
+            stroke-width="10"
+            cursor="alias"
+            rnw-layer-id={"#{@layer.id}"}
+            rnw-edge-side="target"
+            phx-hook="RnwEdgeAttacher"
+            id={"attach-#{@layer.edge.id}-target"}
+            cx={@layer.edge.target_x - 15}
+            cy={@layer.edge.target_y}
+            r="5"
+            fill="cyan"
+          >
+          </circle>
+        <% end %>
+
+        <%= if @layer.edge.source_bond do %>
+          <circle
+            stroke="transparent"
+            stroke-width="10"
+            cursor="pointer"
+            rnw-layer-id={"#{@layer.id}"}
+            rnw-edge-side="source"
+            id={"detach-#{@layer.edge.id}-source"}
+            cx={@layer.edge.source_x + 15}
+            cy={@layer.edge.source_y}
+            r="5"
+            fill="darkred"
+            phx-click="detach-bond"
+            phx-value-id={@layer.edge.source_bond.id}
+          >
+          </circle>
+        <% else %>
+          <circle
+            stroke="transparent"
+            stroke-width="10"
+            cursor="alias"
+            rnw-layer-id={"#{@layer.id}"}
+            rnw-edge-side="source"
+            phx-hook="RnwEdgeAttacher"
+            id={"attach-#{@layer.edge.id}-source"}
+            cx={@layer.edge.source_x - 15}
+            cy={@layer.edge.source_y}
+            r="5"
+            fill="cyan"
+          >
+          </circle>
+        <% end %>
       <% end %>
     </g>
     """

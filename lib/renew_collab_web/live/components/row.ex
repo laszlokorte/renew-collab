@@ -180,6 +180,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
               value={@layer.semantic_tag}
               style="width: 100%; box-sizing: border-box"
               rnw-layer-id={"#{@layer.id}"}
+              list="all-semantic-tags"
             />
           </fieldset>
         <% else %>

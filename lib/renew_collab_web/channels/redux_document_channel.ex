@@ -9,15 +9,21 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
 
   @impl true
   def init("redux_document:" <> documet_id, _params, _socket) do
-    Phoenix.PubSub.subscribe(RenewCollab.PubSub, "redux_document:#{documet_id}")
+    try do
+      doc = RenewCollab.Renew.get_document_with_elements!(documet_id)
+      Phoenix.PubSub.subscribe(RenewCollab.PubSub, "document:#{documet_id}")
 
-    {:ok,
-     %{
-       document:
-         RenewCollabWeb.DocumentJSON.show(%{
-           document: RenewCollab.Renew.get_document_with_elements!(documet_id)
-         })
-     }}
+      {:ok,
+       %{
+         document:
+           RenewCollabWeb.DocumentJSON.show(%{
+             document: doc
+           })
+       }}
+    catch
+      e ->
+        {:error, :not_found}
+    end
   end
 
   @impl true

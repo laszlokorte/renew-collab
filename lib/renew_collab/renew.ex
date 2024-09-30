@@ -336,7 +336,7 @@ defmodule RenewCollab.Renew do
         with %{document_id: document_id} <- values do
           Phoenix.PubSub.broadcast(
             RenewCollab.PubSub,
-            "redux_document:#{document_id}",
+            "document:#{document_id}",
             {:document_changed, document_id}
           )
         end

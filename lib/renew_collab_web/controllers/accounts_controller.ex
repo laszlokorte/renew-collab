@@ -10,7 +10,7 @@ defmodule RenewCollabWeb.AccountsController do
 
   def create(conn, %{"account" => account_params}) do
     case RenewCollabAuth.Auth.create_account(account_params) do
-      {:ok, post} ->
+      {:ok, _} ->
         conn
         |> put_flash(:info, "Account created successfully.")
         |> redirect(to: ~p"/accounts")

@@ -7,6 +7,12 @@ defmodule RenewCollabWeb.LiveDocument do
   alias RenewCollab.Symbols
   alias RenewCollab.Sockets
 
+  @renew_grammar Renewex.Grammar.new(11)
+
+  def renew_grammar do
+    @renew_grammar
+  end
+
   def mount(%{"id" => id}, _session, socket) do
     document = Renew.get_document_with_elements!(id)
 
@@ -21,10 +27,12 @@ defmodule RenewCollabWeb.LiveDocument do
       |> assign(:selection, nil)
       |> assign(:show_hierarchy, false)
       |> assign(:show_snapshots, false)
+      |> assign(:show_health, false)
+      |> assign(:show_meta, false)
       |> assign(:symbols, Symbols.list_shapes() |> Enum.map(fn s -> {s.id, s} end) |> Map.new())
       |> assign(:viewbox, viewbox(document))
 
-    RenewCollabWeb.Endpoint.subscribe("redux_document:#{id}")
+    RenewCollabWeb.Endpoint.subscribe("document:#{id}")
 
     {:ok, socket}
   end
@@ -45,6 +53,11 @@ defmodule RenewCollabWeb.LiveDocument do
         />
       </div>
       <div style="grid-area: left; width: 100%; height: 100%; overflow: auto; box-sizing: border-box; padding: 0 2em">
+        <datalist id="all-semantic-tags">
+          <%= for {class_name, _} <- renew_grammar().hierarchy do %>
+            <option><%= class_name %></option>
+          <% end %>
+        </datalist>
         <svg
           phx-click="select_layer"
           phx-value-id=""
@@ -80,50 +93,58 @@ defmodule RenewCollabWeb.LiveDocument do
             Refit Camera
           </button>
         </p>
+
+        <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-meta">
+          Document
+        </h2>
+        <%= if @show_meta do %>
+          <div style="width: 45vw;">
+            <dl style="display: grid; grid-template-columns: auto 1fr;gap:1ex; align-items: baseline">
+              <dt style="margin: 0; text-align: right;">Document Id</dt>
+              <dd style="margin: 0;">
+                <input
+                  readonly
+                  disabled
+                  type="text"
+                  value={@document.id}
+                  style="padding: 1ex; box-sizing:border-box; width: 100%;"
+                />
+              </dd>
+              <dt style="margin: 0; text-align: right;">Document Name</dt>
+              <dd style="margin: 0;">
+                <input
+                  type="text"
+                  value={@document.name}
+                  style="padding: 1ex; box-sizing:border-box; width: 100%;"
+                />
+              </dd>
+              <dt style="margin: 0; text-align: right;">Kind</dt>
+              <dd style="margin: 0;">
+                <input
+                  type="text"
+                  value={@document.kind}
+                  style="padding: 1ex; box-sizing:border-box; width: 100%;"
+                  list="all-semantic-tags"
+                />
+              </dd>
+              <dt style="margin: 0; text-align: right;"></dt>
+              <dd style="margin: 0;">
+                <button
+                  style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff"
+                  type="submit"
+                >
+                  Save
+                </button>
+              </dd>
+            </dl>
+          </div>
+        <% end %>
+
         <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-hierarchy">
           Hierarchy
         </h2>
         <%= if @show_hierarchy do %>
-          <div>
-            <div style="width: 45vw;">
-              <h3>Health</h3>
-              <dl style="display: grid; grid-template-columns: auto auto; justify-content: start; gap: 1ex 1em">
-                <dt style="margin: 0">Missing Parenthoods</dt>
-                <dd style="margin: 0">
-                  <details>
-                    <summary style="cursor: pointer"><%= Enum.count(@hierachy_missing) %></summary>
-                    <ul>
-                      <%= for i <- @hierachy_missing do %>
-                        <li><%= i.ancestor_id %>/<%= i.descendant_id %>/<%= i.depth %></li>
-                      <% end %>
-                    </ul>
-                  </details>
-                </dd>
-                <dt style="margin: 0">Invalid Parenthoods</dt>
-                <dd style="margin: 0">
-                  <details>
-                    <summary style="cursor: pointer"><%= Enum.count(@hierachy_invalid) %></summary>
-                    <ul>
-                      <%= for id <- @hierachy_invalid do %>
-                        <li><%= id %></li>
-                      <% end %>
-                    </ul>
-                  </details>
-                </dd>
-                <dt></dt>
-                <dd style="margin: 0">
-                  <button
-                    type="button"
-                    phx-click="repair_hierarchy"
-                    style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff"
-                  >
-                    Repair
-                  </button>
-                </dd>
-              </dl>
-            </div>
-            <h3>Element Tree</h3>
-
+          <div style="width: 45vw;">
             <div style="display: flex; gap: 1ex; padding: 1ex 0">
               <button
                 type="button"
@@ -179,6 +200,48 @@ defmodule RenewCollabWeb.LiveDocument do
             module={RenewCollabWeb.SnapshotListComponent}
             snapshots={@snapshots}
           />
+        <% end %>
+
+        <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-health">
+          Health
+        </h2>
+        <%= if @show_health do %>
+          <div style="width: 45vw;">
+            <dl style="display: grid; grid-template-columns: auto auto; justify-content: start; gap: 1ex 1em">
+              <dt style="margin: 0">Missing Parenthoods</dt>
+              <dd style="margin: 0">
+                <details>
+                  <summary style="cursor: pointer"><%= Enum.count(@hierachy_missing) %></summary>
+                  <ul>
+                    <%= for i <- @hierachy_missing do %>
+                      <li><%= i.ancestor_id %>/<%= i.descendant_id %>/<%= i.depth %></li>
+                    <% end %>
+                  </ul>
+                </details>
+              </dd>
+              <dt style="margin: 0">Invalid Parenthoods</dt>
+              <dd style="margin: 0">
+                <details>
+                  <summary style="cursor: pointer"><%= Enum.count(@hierachy_invalid) %></summary>
+                  <ul>
+                    <%= for id <- @hierachy_invalid do %>
+                      <li><%= id %></li>
+                    <% end %>
+                  </ul>
+                </details>
+              </dd>
+              <dt></dt>
+              <dd style="margin: 0">
+                <button
+                  type="button"
+                  phx-click="repair_hierarchy"
+                  style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff"
+                >
+                  Repair
+                </button>
+              </dd>
+            </dl>
+          </div>
         <% end %>
       </div>
     </div>
@@ -275,6 +338,14 @@ defmodule RenewCollabWeb.LiveDocument do
 
   def handle_event("toggle-snapshots", %{}, socket) do
     {:noreply, socket |> update(:show_snapshots, &(not &1))}
+  end
+
+  def handle_event("toggle-meta", %{}, socket) do
+    {:noreply, socket |> update(:show_meta, &(not &1))}
+  end
+
+  def handle_event("toggle-health", %{}, socket) do
+    {:noreply, socket |> update(:show_health, &(not &1))}
   end
 
   def handle_event("update-viewbox", %{}, socket) do

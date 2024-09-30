@@ -46,7 +46,6 @@ defmodule RenewCollab.Element.Edge do
     |> cast_assoc(:waypoints)
     |> validate_required([:source_x, :source_y, :target_x, :target_y])
     |> unique_constraint(:element_id)
-    |> dbg()
   end
 
   defp source_bond_changeset(bond, attrs) do
