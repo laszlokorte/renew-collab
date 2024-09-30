@@ -18,4 +18,29 @@ defmodule RenewCollab.Connection.Hyperlink do
     |> validate_required([:source_layer_id, :target_layer_id])
     |> unique_constraint(:source_layer_id)
   end
+
+  defmodule Snapshotter do
+    alias RenewCollab.Connection.Hyperlink
+    @behaviour RenewCollab.Versioning.SnapshotterBehavior
+
+    def storage_key(), do: :hyperlinks
+    def schema(), do: Hyperlink
+
+    def query(document_id) do
+      import Ecto.Query, warn: false
+
+      from(h in Hyperlink,
+        join: s in assoc(h, :source_layer),
+        join: t in assoc(h, :target_layer),
+        where: s.document_id == ^document_id and t.document_id == ^document_id,
+        select: %{
+          id: h.id,
+          source_layer_id: h.source_layer_id,
+          target_layer_id: h.target_layer_id,
+          inserted_at: h.inserted_at,
+          updated_at: h.updated_at
+        }
+      )
+    end
+  end
 end

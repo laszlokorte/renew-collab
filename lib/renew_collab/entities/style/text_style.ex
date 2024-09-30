@@ -46,4 +46,38 @@ defmodule RenewCollab.Style.TextStyle do
     ])
     |> unique_constraint(:element_text_id)
   end
+
+  defmodule Snapshotter do
+    alias RenewCollab.Style.TextStyle
+    alias RenewCollab.Hierarchy.Layer
+    @behaviour RenewCollab.Versioning.SnapshotterBehavior
+
+    def storage_key(), do: :text_styles
+    def schema(), do: TextStyle
+
+    def query(document_id) do
+      import Ecto.Query, warn: false
+
+      from(l in Layer,
+        where: l.document_id == ^document_id,
+        join: t in assoc(l, :text),
+        join: s in assoc(t, :style),
+        select: %{
+          id: s.id,
+          italic: s.italic,
+          underline: s.underline,
+          rich: s.rich,
+          blank_lines: s.blank_lines,
+          alignment: s.alignment,
+          font_size: s.font_size,
+          font_family: s.font_family,
+          bold: s.bold,
+          text_color: s.text_color,
+          text_id: s.text_id,
+          inserted_at: s.inserted_at,
+          updated_at: s.updated_at
+        }
+      )
+    end
+  end
 end

@@ -20,4 +20,32 @@ defmodule RenewCollab.Connection.Bond do
     |> validate_required([:socket_id, :layer_id, :kind])
     |> unique_constraint([:element_edge_id, :kind])
   end
+
+  defmodule Snapshotter do
+    alias RenewCollab.Connection.Bond
+    alias RenewCollab.Hierarchy.Layer
+    @behaviour RenewCollab.Versioning.SnapshotterBehavior
+
+    def storage_key(), do: :bonds
+    def schema(), do: Bond
+
+    def query(document_id) do
+      import Ecto.Query, warn: false
+
+      from(b in Bond,
+        join: e in assoc(b, :element_edge),
+        join: l in assoc(e, :layer),
+        where: l.document_id == ^document_id,
+        select: %{
+          id: b.id,
+          element_edge_id: b.element_edge_id,
+          layer_id: b.layer_id,
+          socket_id: b.socket_id,
+          kind: b.kind,
+          inserted_at: b.inserted_at,
+          updated_at: b.updated_at
+        }
+      )
+    end
+  end
 end

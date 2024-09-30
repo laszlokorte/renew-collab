@@ -28,4 +28,33 @@ defmodule RenewCollab.Style.LayerStyle do
     # |> validate_required([:opacity, :background_color, :border_color, :border_width])
     |> unique_constraint(:element_id)
   end
+
+  defmodule Snapshotter do
+    alias RenewCollab.Style.LayerStyle
+    alias RenewCollab.Hierarchy.Layer
+    @behaviour RenewCollab.Versioning.SnapshotterBehavior
+
+    def storage_key(), do: :layer_styles
+    def schema(), do: LayerStyle
+
+    def query(document_id) do
+      import Ecto.Query, warn: false
+
+      from(l in Layer,
+        where: l.document_id == ^document_id,
+        join: s in assoc(l, :style),
+        select: %{
+          id: s.id,
+          opacity: s.opacity,
+          background_color: s.background_color,
+          border_color: s.border_color,
+          border_width: s.border_width,
+          border_dash_array: s.border_dash_array,
+          layer_id: s.layer_id,
+          inserted_at: s.inserted_at,
+          updated_at: s.updated_at
+        }
+      )
+    end
+  end
 end

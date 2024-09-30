@@ -79,6 +79,7 @@ defmodule RenewCollabWeb.HierarchyLayerBoxComponent do
             y={@layer.box.position_y}
             width={@layer.box.width}
             height={@layer.box.height}
+            stroke-dasharray="1"
           >
           </rect>
 

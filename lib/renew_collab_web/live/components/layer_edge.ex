@@ -159,44 +159,14 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
           </circle>
         <% end %>
 
-        <circle
-          stroke="transparent"
-          stroke-width="10"
-          cursor="move"
-          phx-hook="RnwEdgeDragger"
-          rnw-layer-id={"#{@layer.id}"}
-          rnw-edge-side="source"
-          id={"waypoint-#{@layer.edge.id}-source"}
-          cx={@layer.edge.source_x}
-          cy={@layer.edge.source_y}
-          r="5"
-          fill="blue"
-        >
-        </circle>
-        <circle
-          stroke="transparent"
-          stroke-width="10"
-          cursor="move"
-          phx-hook="RnwEdgeDragger"
-          rnw-layer-id={"#{@layer.id}"}
-          rnw-edge-side="target"
-          id={"waypoint-#{@layer.edge.id}-target"}
-          cx={@layer.edge.target_x}
-          cy={@layer.edge.target_y}
-          r="5"
-          fill="blue"
-        >
-        </circle>
         <%= if @layer.edge.target_bond do %>
           <circle
-            stroke="transparent"
-            stroke-width="10"
             cursor="pointer"
             rnw-layer-id={"#{@layer.id}"}
             rnw-edge-side="target"
             id={"detach-#{@layer.edge.id}-target"}
-            cx={@layer.edge.target_x + 15}
-            cy={@layer.edge.target_y}
+            cx={@layer.edge.target_x - 10 * :math.cos(edge_angle(:target, @layer.edge) / 180 * 3.14)}
+            cy={@layer.edge.target_y - 10 * :math.sin(edge_angle(:target, @layer.edge) / 180 * 3.14)}
             r="5"
             fill="darkred"
             phx-click="detach-bond"
@@ -207,13 +177,26 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
           <circle
             stroke="transparent"
             stroke-width="10"
+            cursor="move"
+            phx-hook="RnwEdgeDragger"
+            rnw-layer-id={"#{@layer.id}"}
+            rnw-edge-side="target"
+            id={"waypoint-#{@layer.edge.id}-target"}
+            cx={@layer.edge.target_x}
+            cy={@layer.edge.target_y}
+            r="5"
+            fill="blue"
+          >
+          </circle>
+          <circle
             cursor="alias"
             rnw-layer-id={"#{@layer.id}"}
+            rnw-edge-id={"#{@layer.edge.id}"}
             rnw-edge-side="target"
             phx-hook="RnwEdgeAttacher"
             id={"attach-#{@layer.edge.id}-target"}
-            cx={@layer.edge.target_x - 15}
-            cy={@layer.edge.target_y}
+            cx={@layer.edge.target_x - 10 * :math.cos(edge_angle(:target, @layer.edge) / 180 * 3.14)}
+            cy={@layer.edge.target_y - 10 * :math.sin(edge_angle(:target, @layer.edge) / 180 * 3.14)}
             r="5"
             fill="cyan"
           >
@@ -222,14 +205,12 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
 
         <%= if @layer.edge.source_bond do %>
           <circle
-            stroke="transparent"
-            stroke-width="10"
             cursor="pointer"
             rnw-layer-id={"#{@layer.id}"}
             rnw-edge-side="source"
             id={"detach-#{@layer.edge.id}-source"}
-            cx={@layer.edge.source_x + 15}
-            cy={@layer.edge.source_y}
+            cx={@layer.edge.source_x - 10 * :math.cos(edge_angle(:source, @layer.edge) / 180 * 3.14)}
+            cy={@layer.edge.source_y - 10 * :math.sin(edge_angle(:source, @layer.edge) / 180 * 3.14)}
             r="5"
             fill="darkred"
             phx-click="detach-bond"
@@ -240,13 +221,27 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
           <circle
             stroke="transparent"
             stroke-width="10"
+            cursor="move"
+            phx-hook="RnwEdgeDragger"
+            rnw-layer-id={"#{@layer.id}"}
+            rnw-edge-side="source"
+            id={"waypoint-#{@layer.edge.id}-source"}
+            cx={@layer.edge.source_x}
+            cy={@layer.edge.source_y}
+            r="5"
+            fill="blue"
+          >
+          </circle>
+
+          <circle
             cursor="alias"
             rnw-layer-id={"#{@layer.id}"}
+            rnw-edge-id={"#{@layer.edge.id}"}
             rnw-edge-side="source"
             phx-hook="RnwEdgeAttacher"
             id={"attach-#{@layer.edge.id}-source"}
-            cx={@layer.edge.source_x - 15}
-            cy={@layer.edge.source_y}
+            cx={@layer.edge.source_x - 10 * :math.cos(edge_angle(:source, @layer.edge) / 180 * 3.14)}
+            cy={@layer.edge.source_y - 10 * :math.sin(edge_angle(:source, @layer.edge) / 180 * 3.14)}
             r="5"
             fill="cyan"
           >

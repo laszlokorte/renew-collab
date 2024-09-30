@@ -30,4 +30,31 @@ defmodule RenewCollab.Element.Text do
       :position_y
     ])
   end
+
+  defmodule Snapshotter do
+    alias RenewCollab.Hierarchy.Layer
+    alias RenewCollab.Element.Text
+    @behaviour RenewCollab.Versioning.SnapshotterBehavior
+
+    def storage_key(), do: :textes
+    def schema(), do: Text
+
+    def query(document_id) do
+      import Ecto.Query, warn: false
+
+      from(l in Layer,
+        where: l.document_id == ^document_id,
+        join: t in assoc(l, :text),
+        select: %{
+          id: t.id,
+          layer_id: t.layer_id,
+          position_x: t.position_x,
+          position_y: t.position_y,
+          body: t.body,
+          inserted_at: t.inserted_at,
+          updated_at: t.updated_at
+        }
+      )
+    end
+  end
 end

@@ -40,4 +40,39 @@ defmodule RenewCollab.Style.EdgeStyle do
     # |> validate_required([:stroke_width, :stroke_color, :stroke_join, :stroke_cap, :stroke_dash_array, :source_tip, :target_tip, :smoothness])
     |> unique_constraint(:element_connection_id)
   end
+
+  defmodule Snapshotter do
+    alias RenewCollab.Style.EdgeStyle
+    alias RenewCollab.Hierarchy.Layer
+    @behaviour RenewCollab.Versioning.SnapshotterBehavior
+
+    def storage_key(), do: :edge_styles
+    def schema(), do: EdgeStyle
+
+    def query(document_id) do
+      import Ecto.Query, warn: false
+
+      from(l in Layer,
+        where: l.document_id == ^document_id,
+        join: e in assoc(l, :edge),
+        join: s in assoc(e, :style),
+        select: %{
+          id: s.id,
+          stroke_width: s.stroke_width,
+          stroke_color: s.stroke_color,
+          stroke_join: s.stroke_join,
+          stroke_cap: s.stroke_cap,
+          stroke_dash_array: s.stroke_dash_array,
+          source_tip: s.source_tip,
+          target_tip: s.target_tip,
+          smoothness: s.smoothness,
+          source_tip_symbol_shape_id: s.source_tip_symbol_shape_id,
+          target_tip_symbol_shape_id: s.target_tip_symbol_shape_id,
+          edge_id: s.edge_id,
+          inserted_at: s.inserted_at,
+          updated_at: s.updated_at
+        }
+      )
+    end
+  end
 end

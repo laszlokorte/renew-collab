@@ -24,35 +24,41 @@ defmodule RenewCollab.Versioning do
   end
 
   def document_undo_redo(document_id) do
-    from(s in Snapshot,
-      join: l in LatestSnapshot,
-      on: l.snapshot_id == s.id,
-      where: s.document_id == ^document_id
+    Ecto.Multi.new()
+    |> Ecto.Multi.one(
+      :undo,
+      from(s in Snapshot,
+        join: l in LatestSnapshot,
+        on: l.snapshot_id == s.id,
+        left_join: p in Snapshot,
+        on: s.predecessor_id == p.id and p.id != s.id,
+        where: s.document_id == ^document_id,
+        select: p.id
+      )
     )
-    |> Repo.one()
-    |> Repo.preload(successors: [], predecessor: [])
-  end
-
-  def compress(binary) do
-    z = :zlib.open()
-    :zlib.deflateInit(z)
-    compressed = :zlib.deflate(z, binary)
-    :zlib.close(z)
-
-    compressed
-  end
-
-  def decompress(binary) do
-    z = :zlib.open()
-    :zlib.inflateInit(z)
-    decompressed = :zlib.inflate(z, binary)
-    :zlib.close(z)
-
-    decompressed
+    |> Ecto.Multi.all(
+      :redos,
+      from(s in Snapshot,
+        join: l in LatestSnapshot,
+        on: l.snapshot_id == s.id,
+        join: suc in Snapshot,
+        on: s.id == suc.predecessor_id,
+        where: s.document_id == ^document_id and suc.id != suc.predecessor_id,
+        select: suc.id
+      )
+    )
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{undo: undo_id, redos: redo_ids}} ->
+        %{
+          predecessor_id: undo_id,
+          successors: redo_ids
+        }
+    end
   end
 
   def snapshot_multi() do
-    queries = RenewCollab.Versioning.Snapshotter.queries()
+    snapshotters = RenewCollab.Versioning.Snapshotters.snapshotters()
 
     multi =
       Ecto.Multi.new()
@@ -85,11 +91,11 @@ defmodule RenewCollab.Versioning do
         end
       )
 
-    queries
-    |> Enum.reduce(multi, fn {key, {_, query}}, acc ->
+    snapshotters
+    |> Enum.reduce(multi, fn snap, acc ->
       acc
-      |> Ecto.Multi.all(key, fn %{document_id: document_id} ->
-        query.(document_id)
+      |> Ecto.Multi.all(snap.storage_key(), fn %{document_id: document_id} ->
+        snap.query(document_id)
       end)
     end)
     |> Ecto.Multi.insert_or_update(
@@ -107,7 +113,8 @@ defmodule RenewCollab.Versioning do
           id: new_id,
           predecessor_id: predecessor_id,
           content:
-            Keyword.keys(queries)
+            snapshotters
+            |> Enum.map(& &1.storage_key())
             |> Enum.map(&{&1, Map.get(results, &1)})
             |> Map.new()
         })
@@ -162,14 +169,16 @@ defmodule RenewCollab.Versioning do
       )
 
     multi =
-      RenewCollab.Versioning.Snapshotter.queries()
-      |> Enum.reduce(multi, fn {key, {schema, _}}, m ->
+      RenewCollab.Versioning.Snapshotters.snapshotters()
+      |> Enum.reduce(multi, fn snap, m ->
+        key = snap.storage_key()
+        schema = snap.schema()
+
         m
         |> Ecto.Multi.insert_all(String.to_atom("restore_#{key}"), schema, fn %{
                                                                                 snapshot_content:
                                                                                   content
                                                                               } ->
-          dbg(Map.get(content, key, []))
           Map.get(content, key, [])
         end)
       end)

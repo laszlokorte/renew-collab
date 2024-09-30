@@ -51,4 +51,29 @@ defmodule RenewCollab.Hierarchy.Layer do
     |> cast_assoc(:interface)
     |> validate_required([:z_index])
   end
+
+  defmodule Snapshotter do
+    alias RenewCollab.Hierarchy.Layer
+    @behaviour RenewCollab.Versioning.SnapshotterBehavior
+
+    def storage_key(), do: :layers
+    def schema(), do: Layer
+
+    def query(document_id) do
+      import Ecto.Query, warn: false
+
+      from(l in Layer,
+        where: l.document_id == ^document_id,
+        select: %{
+          id: l.id,
+          z_index: l.z_index,
+          semantic_tag: l.semantic_tag,
+          hidden: l.hidden,
+          document_id: l.document_id,
+          inserted_at: l.inserted_at,
+          updated_at: l.updated_at
+        }
+      )
+    end
+  end
 end

@@ -1,5 +1,5 @@
-defmodule RenewCollab.Versioning.CompressedBinary do
-  @behaviour Ecto.Type
+defmodule RenewCollab.Versioning.CompressedMap do
+  use Ecto.Type
 
   # The type stored in the database is still :binary (compressed data)
   def type, do: :binary
@@ -33,16 +33,4 @@ defmodule RenewCollab.Versioning.CompressedBinary do
   end
 
   def dump(_), do: :error
-
-  def equal?(value1, value2) when is_binary(value1) and is_binary(value2) do
-    case {load(value1), load(value2)} do
-      # Compare decompressed data
-      {{:ok, data1}, {:ok, data2}} -> data1 == data2
-      _ -> false
-    end
-  end
-
-  def equal?(value1, value2) do
-    value1 == value2
-  end
 end

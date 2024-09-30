@@ -99,44 +99,48 @@ defmodule RenewCollabWeb.LiveDocument do
         </h2>
         <%= if @show_meta do %>
           <div style="width: 45vw;">
-            <dl style="display: grid; grid-template-columns: auto 1fr;gap:1ex; align-items: baseline">
-              <dt style="margin: 0; text-align: right;">Document Id</dt>
-              <dd style="margin: 0;">
-                <input
-                  readonly
-                  disabled
-                  type="text"
-                  value={@document.id}
-                  style="padding: 1ex; box-sizing:border-box; width: 100%;"
-                />
-              </dd>
-              <dt style="margin: 0; text-align: right;">Document Name</dt>
-              <dd style="margin: 0;">
-                <input
-                  type="text"
-                  value={@document.name}
-                  style="padding: 1ex; box-sizing:border-box; width: 100%;"
-                />
-              </dd>
-              <dt style="margin: 0; text-align: right;">Kind</dt>
-              <dd style="margin: 0;">
-                <input
-                  type="text"
-                  value={@document.kind}
-                  style="padding: 1ex; box-sizing:border-box; width: 100%;"
-                  list="all-semantic-tags"
-                />
-              </dd>
-              <dt style="margin: 0; text-align: right;"></dt>
-              <dd style="margin: 0;">
-                <button
-                  style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff"
-                  type="submit"
-                >
-                  Save
-                </button>
-              </dd>
-            </dl>
+            <form id={"document-rename-#{@document.id}"} phx-hook="RnwDocumentRename">
+              <dl style="display: grid; grid-template-columns: auto 1fr;gap:1ex; align-items: baseline">
+                <dt style="margin: 0; text-align: right;">Document Id</dt>
+                <dd style="margin: 0;">
+                  <input
+                    readonly
+                    disabled
+                    type="text"
+                    value={@document.id}
+                    style="padding: 1ex; box-sizing:border-box; width: 100%;"
+                  />
+                </dd>
+                <dt style="margin: 0; text-align: right;">Document Name</dt>
+                <dd style="margin: 0;">
+                  <input
+                    type="text"
+                    name="name"
+                    value={@document.name}
+                    style="padding: 1ex; box-sizing:border-box; width: 100%;"
+                  />
+                </dd>
+                <dt style="margin: 0; text-align: right;">Kind</dt>
+                <dd style="margin: 0;">
+                  <input
+                    type="text"
+                    name="kind"
+                    value={@document.kind}
+                    style="padding: 1ex; box-sizing:border-box; width: 100%;"
+                    list="all-semantic-tags"
+                  />
+                </dd>
+                <dt style="margin: 0; text-align: right;"></dt>
+                <dd style="margin: 0;">
+                  <button
+                    style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff"
+                    type="submit"
+                  >
+                    Save
+                  </button>
+                </dd>
+              </dl>
+            </form>
           </div>
         <% end %>
 
@@ -914,6 +918,19 @@ defmodule RenewCollabWeb.LiveDocument do
         socket
       ) do
     Versioning.prune_snaphots(socket.assigns.document.id)
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "update_document_meta",
+        params,
+        socket
+      ) do
+    Renew.update_document_meta(
+      socket.assigns.document.id,
+      params
+    )
 
     {:noreply, socket}
   end

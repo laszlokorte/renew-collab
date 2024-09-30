@@ -73,4 +73,33 @@ defmodule RenewCollab.Element.Edge do
       :target_y
     ])
   end
+
+  defmodule Snapshotter do
+    alias RenewCollab.Element.Edge
+    alias RenewCollab.Hierarchy.Layer
+    @behaviour RenewCollab.Versioning.SnapshotterBehavior
+
+    def storage_key(), do: :edges
+    def schema(), do: Edge
+
+    def query(document_id) do
+      import Ecto.Query, warn: false
+
+      from(l in Layer,
+        where: l.document_id == ^document_id,
+        join: e in assoc(l, :edge),
+        select: %{
+          id: e.id,
+          layer_id: e.layer_id,
+          source_x: e.source_x,
+          source_y: e.source_y,
+          target_x: e.target_x,
+          target_y: e.target_y,
+          cyclic: e.cyclic,
+          inserted_at: e.inserted_at,
+          updated_at: e.updated_at
+        }
+      )
+    end
+  end
 end

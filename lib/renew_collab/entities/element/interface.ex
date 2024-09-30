@@ -23,4 +23,29 @@ defmodule RenewCollab.Element.Interface do
     |> validate_required([:socket_schema_id])
     |> unique_constraint(:layer_id)
   end
+
+  defmodule Snapshotter do
+    alias RenewCollab.Element.Interface
+    alias RenewCollab.Hierarchy.Layer
+    @behaviour RenewCollab.Versioning.SnapshotterBehavior
+
+    def storage_key(), do: :interfaces
+    def schema(), do: Interface
+
+    def query(document_id) do
+      import Ecto.Query, warn: false
+
+      from(l in Layer,
+        where: l.document_id == ^document_id,
+        join: i in assoc(l, :interface),
+        select: %{
+          id: i.id,
+          layer_id: i.layer_id,
+          socket_schema_id: i.socket_schema_id,
+          inserted_at: i.inserted_at,
+          updated_at: i.updated_at
+        }
+      )
+    end
+  end
 end

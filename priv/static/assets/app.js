@@ -7796,6 +7796,146 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
       },
       reconnected() {
       }
+    },
+    RnwDocumentRename: {
+      // Callbacks
+      mounted() {
+        this.el.addEventListener("submit", (evt) => {
+          evt.preventDefault();
+          const rnwDocumentId = this.el.getAttribute("rnw-document-id");
+          const {
+            name,
+            kind
+          } = Object.fromEntries(new FormData(evt.currentTarget));
+          console.log("update_document_meta");
+          this.pushEvent("update_document_meta", {
+            name,
+            kind
+          });
+        });
+      },
+      beforeUpdate() {
+      },
+      updated() {
+      },
+      destroyed() {
+      },
+      disconnected() {
+      },
+      reconnected() {
+      }
+    },
+    RnwEdgeAttacher: {
+      // Callbacks
+      mounted() {
+        this.draftLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        this.draftLine.setAttribute("x1", 100);
+        this.draftLine.setAttribute("y1", 100);
+        this.draftLine.setAttribute("x2", 200);
+        this.draftLine.setAttribute("y2", 200);
+        this.draftLine.setAttribute("pointer-events", "none");
+        this.draftLine.setAttribute("stroke", "red");
+        this.draftLine.setAttribute("stroke-dasharray", "5 5");
+        const svg = this.el.ownerSVGElement;
+        const pt = svg.createSVGPoint();
+        let snapped = false;
+        function cursorPoint(evt) {
+          pt.x = evt.clientX;
+          pt.y = evt.clientY;
+          return pt.matrixTransform(svg.getScreenCTM().inverse());
+        }
+        this.mouseup = (evt) => {
+          evt.preventDefault();
+          if (snapped) {
+            const bboxA = this.el.getBBox();
+            const bboxB = snapped.getBBox();
+            const xA = bboxA.x + bboxA.width / 2;
+            const yA = bboxA.y + bboxA.height / 2;
+            const xB = bboxB.x + bboxB.width / 2;
+            const yB = bboxB.y + bboxB.height / 2;
+            this.pushEvent("create_edge_bond", {
+              edge_id: this.el.getAttribute("rnw-edge-id"),
+              kind: this.el.getAttribute("rnw-edge-side"),
+              layer_id: snapped.getAttribute("rnw-layer-id"),
+              socket_id: snapped.getAttribute("rnw-socket-id")
+            });
+            snapped.style.fill = null;
+          }
+          if (this.draftLine.parentNode) {
+            this.draftLine.parentNode.removeChild(this.draftLine);
+          }
+          window.removeEventListener("mousemove", this.mousemove);
+          window.removeEventListener("mouseover", this.mouseover);
+          window.removeEventListener("mouseout", this.mouseout);
+          window.removeEventListener("mouseup", this.mouseup);
+          this.el.style.fill = null;
+        };
+        this.mousemove = (evt) => {
+          evt.preventDefault();
+          if (!snapped) {
+            const p = cursorPoint(evt);
+            this.draftLine.setAttribute("x2", p.x);
+            this.draftLine.setAttribute("y2", p.y);
+            this.draftLine.setAttribute("stroke", "red");
+          }
+        };
+        this.mouseover = (evt) => {
+          evt.preventDefault();
+          if (evt.target.getAttribute("phx-hook") == "RnwSocket" && evt.target !== this.el) {
+            const bbox = evt.target.getBBox();
+            this.draftLine.setAttribute("x2", bbox.x + bbox.width / 2);
+            this.draftLine.setAttribute("y2", bbox.y + bbox.height / 2);
+            evt.target.style.fill = "purple";
+            snapped = evt.target;
+            this.draftLine.setAttribute("stroke", "green");
+          }
+        };
+        this.mouseout = (evt) => {
+          evt.preventDefault();
+          if (evt.target.getAttribute("phx-hook") == "RnwSocket" && evt.target !== this.el) {
+            snapped = false;
+            this.draftLine.setAttribute("stroke", "red");
+            evt.target.style.fill = null;
+          }
+        };
+        this.el.addEventListener("mousedown", (evt) => {
+          evt.preventDefault();
+          evt.stopPropagation();
+          snapped = false;
+          this.el.style.fill = "purple";
+          const bbox = this.el.getBBox();
+          this.draftLine.setAttribute("x1", bbox.x + bbox.width / 2);
+          this.draftLine.setAttribute("y1", bbox.y + bbox.height / 2);
+          this.draftLine.setAttribute("x2", bbox.x + bbox.width / 2);
+          this.draftLine.setAttribute("y2", bbox.y + bbox.height / 2);
+          this.el.ownerSVGElement.appendChild(this.draftLine);
+          window.addEventListener("mousemove", this.mousemove);
+          window.addEventListener("mouseover", this.mouseover);
+          window.addEventListener("mouseout", this.mouseout);
+          window.addEventListener("mouseup", this.mouseup);
+        });
+        this.el.addEventListener("click", (evt) => {
+          evt.preventDefault();
+          evt.stopPropagation();
+        });
+      },
+      beforeUpdate() {
+      },
+      updated() {
+      },
+      destroyed() {
+        if (this.draftLine.parentNode) {
+          this.draftLine.parentNode.removeChild(this.draftLine);
+        }
+        window.removeEventListener("mousemove", this.mousemove);
+        window.removeEventListener("mouseover", this.mouseover);
+        window.removeEventListener("mouseout", this.mouseout);
+        window.removeEventListener("mouseup", this.mouseup);
+      },
+      disconnected() {
+      },
+      reconnected() {
+      }
     }
   };
 

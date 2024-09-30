@@ -339,6 +339,8 @@ defmodule RenewCollab.Renew do
             "document:#{document_id}",
             {:document_changed, document_id}
           )
+
+          {:ok, %{document_id: document_id}}
         end
     end
   end
@@ -1469,5 +1471,22 @@ defmodule RenewCollab.Renew do
     end)
     |> Ecto.Multi.append(Versioning.snapshot_multi())
     |> run_document_transaction()
+  end
+
+  def update_document_meta(document_id, meta) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.update(:update_meta, fn %{document_id: document_id} ->
+      %Document{id: document_id} |> Document.changeset(meta)
+    end)
+    |> run_document_transaction()
+    |> case do
+      {:ok, %{document_id: document_id}} ->
+        RenewCollabWeb.Endpoint.broadcast!(
+          "documents",
+          "document:renamed",
+          %{"id" => document_id}
+        )
+    end
   end
 end

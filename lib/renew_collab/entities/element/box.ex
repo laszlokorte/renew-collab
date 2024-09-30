@@ -40,4 +40,34 @@ defmodule RenewCollab.Element.Box do
       :height
     ])
   end
+
+  defmodule Snapshotter do
+    alias RenewCollab.Element.Box
+    alias RenewCollab.Hierarchy.Layer
+    @behaviour RenewCollab.Versioning.SnapshotterBehavior
+
+    def storage_key(), do: :boxes
+    def schema(), do: Box
+
+    def query(document_id) do
+      import Ecto.Query, warn: false
+
+      from(l in Layer,
+        where: l.document_id == ^document_id,
+        join: b in assoc(l, :box),
+        select: %{
+          id: b.id,
+          layer_id: b.layer_id,
+          position_x: b.position_x,
+          position_y: b.position_y,
+          width: b.width,
+          height: b.height,
+          symbol_shape_attributes: b.symbol_shape_attributes,
+          symbol_shape_id: b.symbol_shape_id,
+          inserted_at: b.inserted_at,
+          updated_at: b.updated_at
+        }
+      )
+    end
+  end
 end
