@@ -37,9 +37,7 @@ defmodule RenewCollab.Renew do
       |> Repo.preload(
         layers: [
           direct_parent: [],
-          box: [
-            symbol_shape: []
-          ],
+          box: [],
           text: [style: []],
           edge: [
             waypoints: [],
@@ -54,143 +52,7 @@ defmodule RenewCollab.Renew do
         ]
       )
 
-  def deep_clone_document!(id) do
-    Repo.transaction(fn ->
-      doc = get_document_with_elements!(id)
-
-      new_layers_ids =
-        doc.layers
-        |> Enum.map(fn layer -> {layer.id, Ecto.UUID.generate()} end)
-        |> Map.new()
-
-      document_data =
-        doc
-        |> strip_id
-        |> Map.update(:layers, [], fn layers ->
-          layers
-          |> Enum.map(fn layer ->
-            layer
-            |> Map.from_struct()
-            |> Map.update(:id, nil, &Map.get(new_layers_ids, &1))
-            |> Map.update(:box, nil, &strip_id/1)
-            |> Map.update(:box, nil, &strip_fk(&1, :layer_id))
-            |> Map.update(:interface, nil, &strip_id/1)
-            |> Map.update(:interface, nil, &strip_fk(&1, :layer_id))
-            |> Map.update(:interface, nil, &strip_fk(&1, :sockets))
-            |> Map.update(:text, nil, &strip_id(&1, [:style]))
-            |> Map.update(:text, nil, &strip_fk(&1, :layer_id))
-            |> Map.update(:edge, nil, &strip_id(&1, [:style]))
-            |> Map.update(:edge, nil, &strip_fk(&1, :layer_id))
-            |> Map.update(:edge, nil, fn
-              nil ->
-                nil
-
-              edge ->
-                %{
-                  edge
-                  | waypoints:
-                      edge.waypoints |> strip_id() |> Enum.map(&Map.delete(&1, :edge_id)),
-                    source_bond: nil,
-                    target_bond: nil
-                }
-            end)
-            |> Map.update(:style, nil, &strip_id/1)
-            |> Map.update(:style, nil, &strip_fk(&1, :layer_id))
-          end)
-        end)
-
-      new_parenthoods =
-        from(p in LayerParenthood, where: p.document_id == ^id, select: p)
-        |> Repo.all()
-        |> Enum.map(fn %{depth: d, ancestor_id: anc, descendant_id: dec} ->
-          {
-            Map.get(new_layers_ids, anc),
-            Map.get(new_layers_ids, dec),
-            d
-          }
-        end)
-
-      hyperlinks =
-        from(h in Hyperlink,
-          join: s in assoc(h, :source_layer),
-          join: t in assoc(h, :target_layer),
-          where: s.document_id == ^id and t.document_id == ^id,
-          select: h
-        )
-        |> Repo.all()
-        |> Enum.map(fn hyperlink ->
-          Map.new()
-          |> Map.put(:source_layer_id, Map.get(new_layers_ids, hyperlink.source_layer_id))
-          |> Map.put(:target_layer_id, Map.get(new_layers_ids, hyperlink.target_layer_id))
-        end)
-
-      new_bonds =
-        from(b in Bond,
-          join: e in assoc(b, :element_edge),
-          join: l in assoc(e, :layer),
-          where: l.document_id == ^id,
-          select: %{
-            edge_layer_id: l.id,
-            layer_id: b.layer_id,
-            socket_id: b.socket_id,
-            kind: b.kind
-          }
-        )
-        |> Repo.all()
-        |> Enum.map(fn bond ->
-          bond
-          |> Map.update(:edge_layer_id, nil, &Map.get(new_layers_ids, &1))
-          |> Map.update(:layer_id, nil, &Map.get(new_layers_ids, &1))
-        end)
-
-      {document_data, new_parenthoods, hyperlinks, new_bonds}
-    end)
-  end
-
-  def duplicate_document(id) do
-    {:ok, {doc_params, parenthoods, hyperlinks, bonds}} = deep_clone_document!(id)
-
-    create_document(
-      doc_params
-      |> Map.update(:name, "Untitled", &"#{String.trim_trailing(&1, "(Copy)")} (Copy)"),
-      parenthoods,
-      hyperlinks,
-      bonds
-    )
-  end
-
-  defp strip_id(struct, path \\ [])
-
-  defp strip_id(%{} = struct, []) do
-    struct
-    |> Map.from_struct()
-    |> Map.delete(:id)
-  end
-
-  defp strip_id(%{} = struct, [key | rest]) do
-    struct
-    |> Map.from_struct()
-    |> Map.delete(:id)
-    |> Map.update(key, nil, &strip_id(&1, rest))
-  end
-
-  defp strip_id([_ | _] = list, keys) do
-    Enum.map(list, &strip_id(&1, keys))
-  end
-
-  defp strip_id([] = list, _), do: list
-  defp strip_id(nil, _), do: nil
-
-  defp strip_fk(%{} = map, fkid) do
-    map
-    |> Map.delete(fkid)
-  end
-
-  defp strip_fk(nil, _fkid) do
-    nil
-  end
-
-  def create_document(attrs \\ %{}, parenthoods \\ [], hyperlinks \\ [], bonds \\ []) do
+  def create_document_multi(attrs \\ %{}, parenthoods \\ [], hyperlinks \\ [], bonds \\ []) do
     now = DateTime.utc_now() |> DateTime.truncate(:second)
 
     Ecto.Multi.new()
@@ -281,6 +143,10 @@ defmodule RenewCollab.Renew do
       {:ok, inserted_document.id}
     end)
     |> Ecto.Multi.append(Versioning.snapshot_multi())
+  end
+
+  def create_document(attrs \\ %{}, parenthoods \\ [], hyperlinks \\ [], bonds \\ []) do
+    create_document_multi(attrs, parenthoods, hyperlinks, bonds)
     |> Repo.transaction()
     |> case do
       {:ok, %{insert_document: inserted_document}} ->

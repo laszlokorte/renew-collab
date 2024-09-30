@@ -13,7 +13,7 @@ defmodule RenewCollabWeb.HierarchyLayerBoxComponent do
       opacity={style_or_default(@layer, :opacity)}
     >
       <%= if @layer.box.symbol_shape_id do %>
-        <%= case @layer.box.symbol_shape.name do %>
+        <%= case @symbols[@layer.box.symbol_shape_id].name do %>
           <% "rect-round" -> %>
             <rect
               id={"roundrect-#{@layer.box.id}"}

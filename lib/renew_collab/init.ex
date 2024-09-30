@@ -31,6 +31,25 @@ defmodule RenewCollab.Init do
           )
         end))
     )
+    |> then(
+      &(RenewCollab.Blueprints.all()
+        |> Enum.with_index()
+        |> Enum.reduce(&1, fn {{doc_params, parenthoods, hyperlinks, bonds}, i}, m ->
+          m
+          |> Ecto.Multi.run(
+            "insert_blueprint_#{i}",
+            fn rep, %{} ->
+              RenewCollab.Renew.create_document_multi(
+                doc_params,
+                parenthoods,
+                hyperlinks,
+                bonds
+              )
+              |> rep.transaction()
+            end
+          )
+        end))
+    )
     |> Repo.transaction()
   end
 end
