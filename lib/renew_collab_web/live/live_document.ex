@@ -19,6 +19,7 @@ defmodule RenewCollabWeb.LiveDocument do
     socket =
       socket
       |> assign(:document, document)
+      |> assign(:other_documents, Renew.list_documents())
       |> assign(:socket_schemas, Sockets.all_socket_schemas())
       |> assign(:snapshots, Versioning.document_versions(id))
       |> assign(:undo_redo, Versioning.document_undo_redo(id))
@@ -182,6 +183,14 @@ defmodule RenewCollabWeb.LiveDocument do
               >
                 Create Line
               </button>
+              <form target="" phx-change="insert_document">
+                <select name="document_id">
+                  <option value="" selected>Insert Other Documents</option>
+                  <%= for doc <- @other_documents do %>
+                    <option value={doc.id}><%= doc.name %></option>
+                  <% end %>
+                </select>
+              </form>
             </div>
 
             <.live_component
@@ -930,6 +939,20 @@ defmodule RenewCollabWeb.LiveDocument do
     Renew.update_document_meta(
       socket.assigns.document.id,
       params
+    )
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "insert_document",
+        %{"document_id" => document_id},
+        socket
+      ) do
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "document:#{socket.assigns.document.id}",
+      {:document_changed, socket.assigns.document.id}
     )
 
     {:noreply, socket}

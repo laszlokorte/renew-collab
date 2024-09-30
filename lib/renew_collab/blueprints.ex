@@ -230,7 +230,7 @@ defmodule RenewCollab.Blueprints do
              height: 95.60922241210938
            },
            z_index: 0,
-           semantic_tag: "CH.ifa.draw.figures.RectangleFigure"
+           semantic_tag: "de.renew.gui.TransitionFigure"
          }
        ]
      },
@@ -257,7 +257,7 @@ defmodule RenewCollab.Blueprints do
              height: 100.0
            },
            z_index: 0,
-           semantic_tag: "CH.ifa.draw.figures.RectangleFigure"
+           semantic_tag: "de.renew.gui.VirtualPlaceFigure"
          }
        ]
      },
