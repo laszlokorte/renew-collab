@@ -79,7 +79,7 @@ defmodule RenewCollabWeb.HierarchyLayerComponent do
 
   defp style_or_default(%{:style => style}, style_key) do
     with %{^style_key => value} <- style do
-      value
+      value || default_style(style_key)
     else
       _ -> default_style(style_key)
     end

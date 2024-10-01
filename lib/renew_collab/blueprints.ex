@@ -212,7 +212,7 @@ defmodule RenewCollab.Blueprints do
      ]},
     {%{
        name: "Transition",
-       kind: "de.renew.gui.TransitionFigure",
+       kind: "CH.ifa.draw.standard.StandardDrawing",
        layers: [
          %{
            hidden: false,

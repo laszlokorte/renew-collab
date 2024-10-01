@@ -222,9 +222,9 @@ defmodule RenewCollab.Export.DocumentExport do
                 fOriginX: round(layer.text.position_x),
                 fOriginY: round(layer.text.position_y),
                 text: layer.text.body,
-                fCurrentFontName: layer.text.style.font_family,
+                fCurrentFontName: style_or_default(layer.text, :font_family),
                 fCurrentFontStyle: export_font_style(layer.text.style),
-                fCurrentFontSize: round(layer.text.style.font_size),
+                fCurrentFontSize: round(style_or_default(layer.text, :font_size)),
                 fIsReadOnly: 0,
                 fParent: nil,
                 fLocator: nil,
@@ -240,21 +240,25 @@ defmodule RenewCollab.Export.DocumentExport do
   end
 
   defp export_attributes(:box, layer) do
-    with style <- layer.style,
-         true <- not is_nil(style) do
-      %Storable{
-        class_name: "CH.ifa.draw.figures.FigureAttributes",
-        fields: %{
-          attributes: [
-            {"FillColor", "Color", color_to_rgba(style.background_color, style.opacity)},
-            {"FrameColor", "Color", color_to_rgba(style.border_color, style.opacity)},
-            {"LineWidth", "Int", round(Integer.parse(style.border_width) |> elem(0))}
-          ]
-        }
+    %Storable{
+      class_name: "CH.ifa.draw.figures.FigureAttributes",
+      fields: %{
+        attributes: [
+          {"FillColor", "Color",
+           color_to_rgba(
+             style_or_default(layer, :background_color),
+             style_or_default(layer, :opacity)
+           )},
+          {"FrameColor", "Color",
+           color_to_rgba(
+             style_or_default(layer, :border_color),
+             style_or_default(layer, :opacity)
+           )},
+          {"LineWidth", "Int",
+           round(Integer.parse(style_or_default(layer, :border_width)) |> elem(0))}
+        ]
       }
-    else
-      _ -> nil
-    end
+    }
   end
 
   defp export_attributes(:edge, _layer) do
@@ -276,17 +280,28 @@ defmodule RenewCollab.Export.DocumentExport do
         fields: %{
           attributes: [
             {"TextAlignment", "Int",
-             case layer.text.style.alignment do
+             case style_or_default(layer.text, :alignment) do
                :left -> 0
                :center -> 1
                :right -> 2
              end},
             {"TextColor", "Color",
-             color_to_rgba(layer.text.style.text_color, layer.style.opacity)},
+             color_to_rgba(
+               style_or_default(layer.text, :text_color),
+               style_or_default(layer, :opacity)
+             )},
             {"FillColor", "Color",
-             color_to_rgba(layer.style.background_color, layer.style.opacity)},
-            {"FrameColor", "Color", color_to_rgba(layer.style.border_color, layer.style.opacity)},
-            {"LineWidth", "Int", round(Integer.parse(layer.style.border_width) |> elem(0))}
+             color_to_rgba(
+               style_or_default(layer, :background_color),
+               style_or_default(layer, :opacity)
+             )},
+            {"FrameColor", "Color",
+             color_to_rgba(
+               style_or_default(layer, :border_color),
+               style_or_default(layer, :opacity)
+             )},
+            {"LineWidth", "Int",
+             round(Integer.parse(style_or_default(layer, :border_width)) |> elem(0))}
           ]
         }
       }
@@ -303,7 +318,7 @@ defmodule RenewCollab.Export.DocumentExport do
     {r, ""} = Integer.parse(rr, 16)
     {g, ""} = Integer.parse(gg, 16)
     {b, ""} = Integer.parse(bb, 16)
-    {:rgba, r, g, b, round(255 * opacity)}
+    {:rgba, r, g, b, round(255 * dbg(opacity))}
   end
 
   defp color_to_rgba(
@@ -394,4 +409,21 @@ defmodule RenewCollab.Export.DocumentExport do
       "triangle-nw" -> 7
     end
   end
+
+  defp style_or_default(%{:style => nil}, style_key) do
+    default_style(style_key)
+  end
+
+  defp style_or_default(%{:style => style}, style_key) do
+    with %{^style_key => value} <- style do
+      value || default_style(style_key)
+    else
+      _ -> default_style(style_key)
+    end
+  end
+
+  defp default_style(:background_color), do: "#70DB93"
+  defp default_style(:opacity), do: 1.0
+  defp default_style(:border_width), do: "1"
+  defp default_style(_style_key), do: nil
 end
