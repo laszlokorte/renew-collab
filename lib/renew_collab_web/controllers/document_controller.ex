@@ -29,12 +29,12 @@ defmodule RenewCollabWeb.DocumentController do
   end
 
   def show(conn, %{"id" => id}) do
-    document = Renew.get_document_with_elements!(id)
+    document = Renew.get_document_with_elements(id)
     render(conn, :show, document: document)
   end
 
   def export(conn, %{"id" => id}) do
-    document = Renew.get_document_with_elements!(id)
+    document = Renew.get_document_with_elements(id)
 
     {:ok, output} = RenewCollab.Export.DocumentExport.export(document)
 
@@ -51,7 +51,7 @@ defmodule RenewCollabWeb.DocumentController do
   end
 
   def inspect(conn, %{"id" => id}) do
-    {:ok, document} = RenewCollab.Clone.deep_clone_document!(id)
+    {:ok, document} = RenewCollab.Clone.deep_clone_document(id)
 
     conn
     |> put_resp_header(

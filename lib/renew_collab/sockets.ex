@@ -16,9 +16,12 @@ defmodule RenewCollab.Sockets do
   end
 
   def all_socket_schemas do
-    from(p in SocketSchema, order_by: [asc: p.name])
+    from(p in SocketSchema,
+      left_join: s in assoc(p, :sockets),
+      order_by: [asc: p.name],
+      preload: [sockets: s]
+    )
     |> Repo.all()
-    |> Repo.preload(:sockets)
     |> Enum.map(&{&1.id, &1})
     |> Map.new()
   end

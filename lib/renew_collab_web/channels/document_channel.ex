@@ -54,7 +54,7 @@ defmodule RenewCollabWeb.DocumentChannel do
 
   # Add authorization logic here as required.
   defp authorized?(documet_id, _payload) do
-    with %RenewCollab.Document.Document{} <- RenewCollab.Renew.get_document!(documet_id) do
+    with %RenewCollab.Document.Document{} <- RenewCollab.Renew.get_document(documet_id) do
       true
     else
       _ -> false

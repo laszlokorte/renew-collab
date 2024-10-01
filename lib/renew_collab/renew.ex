@@ -26,38 +26,54 @@ defmodule RenewCollab.Renew do
   end
 
   def count_documents do
-    Repo.one!(from(d in Document, select: count(d.id)))
+    Repo.one(from(d in Document, select: count(d.id)))
   end
 
   def get_document!(id), do: Repo.get!(Document, id)
 
-  def get_document_with_elements!(id),
-    do:
-      Repo.get!(Document, id)
-      |> Repo.preload(
-        layers: [
-          direct_parent: [],
-          box: [
-            symbol_shape: []
-          ],
-          text: [style: []],
-          edge: [
-            waypoints: [],
-            style: [],
-            source_bond: [],
-            target_bond: []
-          ],
-          style: [],
-          interface: [:socket_schema],
-          outgoing_link: [],
-          incoming_links: []
+  def get_document(id), do: Repo.get!(Document, id)
+
+  def get_document_with_elements(id) do
+    Repo.one(
+      from(d in Document,
+        where: d.id == ^id,
+        left_join: l in assoc(d, :layers),
+        left_join: dp in assoc(l, :direct_parent),
+        left_join: b in assoc(l, :box),
+        left_join: ss in assoc(b, :symbol_shape),
+        left_join: t in assoc(l, :text),
+        left_join: e in assoc(l, :edge),
+        left_join: sb in assoc(e, :source_bond),
+        left_join: tb in assoc(e, :target_bond),
+        left_join: w in assoc(e, :waypoints),
+        left_join: ls in assoc(l, :style),
+        left_join: ts in assoc(t, :style),
+        left_join: es in assoc(e, :style),
+        left_join: i in assoc(l, :interface),
+        left_join: il in assoc(l, :outgoing_link),
+        left_join: ol in assoc(l, :incoming_links),
+        preload: [
+          layers:
+            {l,
+             [
+               direct_parent: dp,
+               box: {b, [symbol_shape: ss]},
+               text: {t, [style: ts]},
+               edge: {e, [style: es, waypoints: w, source_bond: sb, target_bond: tb]},
+               style: ls,
+               interface: i,
+               outgoing_link: ol,
+               incoming_links: il
+             ]}
         ]
       )
+    )
+  end
 
   def insert_into_document(target_document_id, source_document_id) do
     Ecto.Multi.new()
     |> Ecto.Multi.run(:source_document, fn _, %{} ->
-      RenewCollab.Clone.deep_clone_document!(source_document_id)
+      RenewCollab.Clone.deep_clone_document(source_document_id)
     end)
     |> Ecto.Multi.merge(fn %{source_document: {%{layers: layers}, parenthoods, hyperlinks, bonds}} ->
       Ecto.Multi.new()

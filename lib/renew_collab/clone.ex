@@ -17,21 +17,33 @@ defmodule RenewCollab.Clone do
   alias RenewCollab.Element.Interface
   alias RenewCollab.Versioning
 
-  def deep_clone_document!(id) do
+  def deep_clone_document(id) do
     Repo.transaction(fn ->
       doc =
-        Repo.get!(Document, id)
-        |> Repo.preload(
-          layers: [
-            box: [],
-            text: [style: []],
-            edge: [
-              waypoints: [],
-              style: []
-            ],
-            style: [],
-            interface: []
-          ]
+        Repo.one(
+          from(d in Document,
+            where: d.id == ^id,
+            left_join: l in assoc(d, :layers),
+            left_join: b in assoc(l, :box),
+            left_join: t in assoc(l, :text),
+            left_join: e in assoc(l, :edge),
+            left_join: w in assoc(e, :waypoints),
+            left_join: ls in assoc(l, :style),
+            left_join: ts in assoc(t, :style),
+            left_join: es in assoc(e, :style),
+            left_join: i in assoc(l, :interface),
+            preload: [
+              layers:
+                {l,
+                 [
+                   box: b,
+                   text: {t, [style: ts]},
+                   edge: {e, [style: es, waypoints: w]},
+                   style: ls,
+                   interface: i
+                 ]}
+            ]
+          )
         )
 
       new_layers_ids =
@@ -105,15 +117,15 @@ defmodule RenewCollab.Clone do
   end
 
   def duplicate_document(id) do
-    {:ok, {doc_params, parenthoods, hyperlinks, bonds}} = deep_clone_document!(id)
-
-    RenewCollab.Renew.create_document(
-      doc_params
-      |> Map.update(:name, "Untitled", &"#{String.trim_trailing(&1, "(Copy)")} (Copy)"),
-      parenthoods,
-      hyperlinks,
-      bonds
-    )
+    with {:ok, {doc_params, parenthoods, hyperlinks, bonds}} <- deep_clone_document(id) do
+      RenewCollab.Renew.create_document(
+        doc_params
+        |> Map.update(:name, "Untitled", &"#{String.trim_trailing(&1, "(Copy)")} (Copy)"),
+        parenthoods,
+        hyperlinks,
+        bonds
+      )
+    end
   end
 
   defp deep_strip(value) when is_struct(value) do

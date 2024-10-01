@@ -14,7 +14,7 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def mount(%{"id" => id}, _session, socket) do
-    document = Renew.get_document_with_elements!(id)
+    document = Renew.get_document_with_elements(id)
 
     socket =
       socket
@@ -393,7 +393,7 @@ defmodule RenewCollabWeb.LiveDocument do
        :hierachy_invalid,
        RenewCollab.Hierarchy.find_invalids(socket.assigns.document.id)
      )
-     |> assign(:document, Renew.get_document_with_elements!(socket.assigns.document.id))
+     |> assign(:document, Renew.get_document_with_elements(socket.assigns.document.id))
      |> assign(:snapshots, Versioning.document_versions(socket.assigns.document.id))
      |> assign(:undo_redo, Versioning.document_undo_redo(socket.assigns.document.id))}
   end
@@ -970,7 +970,7 @@ defmodule RenewCollabWeb.LiveDocument do
        socket
        |> assign(
          :document,
-         Renew.get_document_with_elements!(document_id)
+         Renew.get_document_with_elements(document_id)
        )
        |> assign(:snapshots, Versioning.document_versions(document_id))
        |> assign(:undo_redo, Versioning.document_undo_redo(document_id))}
