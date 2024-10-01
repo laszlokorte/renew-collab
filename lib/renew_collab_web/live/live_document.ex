@@ -184,9 +184,9 @@ defmodule RenewCollabWeb.LiveDocument do
                 Create Line
               </button>
               <form target="" phx-change="insert_document">
-                <select name="document_id">
-                  <option value="" selected>Insert Other Documents</option>
-                  <%= for doc <- @other_documents do %>
+                <select name="document_id" onchange="this.value=''">
+                  <option value="" selected>Insert Other Document</option>
+                  <%= for doc <- @other_documents, doc.id != @document.id do %>
                     <option value={doc.id}><%= doc.name %></option>
                   <% end %>
                 </select>
@@ -949,11 +949,10 @@ defmodule RenewCollabWeb.LiveDocument do
         %{"document_id" => document_id},
         socket
       ) do
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "document:#{socket.assigns.document.id}",
-      {:document_changed, socket.assigns.document.id}
-    )
+    case document_id do
+      "" -> nil
+      id -> Renew.insert_into_document(socket.assigns.document.id, id)
+    end
 
     {:noreply, socket}
   end

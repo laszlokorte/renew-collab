@@ -257,7 +257,7 @@ defmodule RenewCollab.Blueprints do
              height: 100.0
            },
            z_index: 0,
-           semantic_tag: "de.renew.gui.VirtualPlaceFigure"
+           semantic_tag: "de.renew.gui.PlaceFigure"
          }
        ]
      },
