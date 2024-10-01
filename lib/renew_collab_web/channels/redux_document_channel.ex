@@ -20,9 +20,9 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
              document: doc
            })
        }}
-    catch
-      e ->
-        {:error, :not_found}
+    rescue
+      _ ->
+        {:error, %{reason: "not found"}}
     end
   end
 
