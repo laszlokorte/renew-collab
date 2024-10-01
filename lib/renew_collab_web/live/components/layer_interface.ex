@@ -88,7 +88,7 @@ defmodule RenewCollabWeb.HierarchyLayerInterfaceComponent do
             pointer-events="all"
             rnw-layer-id={@layer.id}
             rnw-socket-id={s.id}
-            r={10}
+            r={6}
           />
         </g>
       <% end %>

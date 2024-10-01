@@ -134,6 +134,8 @@ defmodule RenewCollabWeb.DocumentJSON do
               "source_y" => v.source_y,
               "target_x" => v.target_x,
               "target_y" => v.target_y,
+              "source_bond" => bond_data(v.source_bond),
+              "target_bond" => bond_data(v.target_bond),
               "cyclic" => v.cyclic,
               "waypoints" =>
                 case v.waypoints do
@@ -196,5 +198,24 @@ defmodule RenewCollabWeb.DocumentJSON do
             }
         end
     }
+  end
+
+  def bond_data(bond) do
+    case bond do
+      nil ->
+        nil
+
+      %Ecto.Association.NotLoaded{} ->
+        nil
+
+      %RenewCollab.Connection.Bond{
+        socket_id: socket_id,
+        layer_id: layer_id
+      } ->
+        %{
+          socket_id: socket_id,
+          layer_id: layer_id
+        }
+    end
   end
 end
