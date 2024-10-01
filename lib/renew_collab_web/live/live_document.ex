@@ -111,6 +111,13 @@ defmodule RenewCollabWeb.LiveDocument do
                     value={@document.id}
                     style="padding: 1ex; box-sizing:border-box; width: 100%;"
                   />
+                  <.link
+                    target="_blank"
+                    style="color: #078"
+                    navigate={~p"/documents/#{@document.id}/inspect"}
+                  >
+                    Inspect
+                  </.link>
                 </dd>
                 <dt style="margin: 0; text-align: right;">Document Name</dt>
                 <dd style="margin: 0;">

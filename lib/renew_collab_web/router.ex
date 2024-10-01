@@ -57,6 +57,7 @@ defmodule RenewCollabWeb.Router do
     end
 
     get "/documents/:id/export", DocumentController, :export
+    get "/documents/:id/inspect", DocumentController, :inspect
   end
 
   # defp require_authenticated_user(conn, _params) do

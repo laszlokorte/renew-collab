@@ -50,6 +50,17 @@ defmodule RenewCollabWeb.DocumentController do
     |> text(output)
   end
 
+  def inspect(conn, %{"id" => id}) do
+    {:ok, document} = RenewCollab.Clone.deep_clone_document!(id)
+
+    conn
+    |> put_resp_header(
+      "content-type",
+      "text/plain"
+    )
+    |> text(Kernel.inspect(document, pretty: true, limit: :infinity))
+  end
+
   def template(conn, %{"id" => id}) do
     # Renew.get_document_with_elements_as_template!(id)
     document_params = %{"id" => id}

@@ -563,7 +563,7 @@ export const Hooks = {
 
       this.mouseover = (evt) => {
         evt.preventDefault()
-        if (evt.target.getAttribute('phx-hook') == "RnwSocket" && evt.target !== this.el) {
+        if (evt.target.hasAttribute('rnw-socket-id') && evt.target !== this.el) {
           const bbox = evt.target.getBBox()
           this.draftLine.setAttribute("x2", bbox.x + bbox.width / 2)
           this.draftLine.setAttribute("y2", bbox.y + bbox.height / 2)
@@ -574,7 +574,7 @@ export const Hooks = {
 
       this.mouseout = (evt) => {
         evt.preventDefault()
-        if (evt.target.getAttribute('phx-hook') == "RnwSocket" && evt.target !== this.el) {
+        if (evt.target.hasAttribute('rnw-socket-id') && evt.target !== this.el) {
           snapped = false
           evt.target.style.fill = null
         }
@@ -1362,7 +1362,7 @@ export const Hooks = {
 
       this.mouseover = (evt) => {
         evt.preventDefault()
-        if (evt.target.getAttribute('phx-hook') == "RnwSocket" && evt.target !== this.el) {
+        if (evt.target.hasAttribute('rnw-socket-id') && evt.target !== this.el) {
           const bbox = evt.target.getBBox()
           this.draftLine.setAttribute("x2", bbox.x + bbox.width / 2)
           this.draftLine.setAttribute("y2", bbox.y + bbox.height / 2)
@@ -1374,7 +1374,7 @@ export const Hooks = {
 
       this.mouseout = (evt) => {
         evt.preventDefault()
-        if (evt.target.getAttribute('phx-hook') == "RnwSocket" && evt.target !== this.el) {
+        if (evt.target.hasAttribute('rnw-socket-id') && evt.target !== this.el) {
           snapped = false
           this.draftLine.setAttribute("stroke", "red")
           evt.target.style.fill = null
