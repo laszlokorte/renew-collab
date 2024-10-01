@@ -14,6 +14,8 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         {:error, %{reason: "not found"}}
 
       doc ->
+        Phoenix.PubSub.subscribe(RenewCollab.PubSub, "document:#{documet_id}")
+
         {:ok,
          %{
            document:
