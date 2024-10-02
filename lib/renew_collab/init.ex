@@ -3,6 +3,7 @@ defmodule RenewCollab.Init do
   alias RenewCollab.Symbol.Shape
   alias RenewCollab.Connection.SocketSchema
   alias RenewCollab.Repo
+  alias RenewCollab.Versioning
   import Ecto.Query, warn: false
 
   def reset do
@@ -46,6 +47,7 @@ defmodule RenewCollab.Init do
                 bonds: bonds
               })
               |> RenewCollab.Commands.CreateDocument.multi()
+              |> Ecto.Multi.append(Versioning.snapshot_multi())
               |> rep.transaction()
             end
           )

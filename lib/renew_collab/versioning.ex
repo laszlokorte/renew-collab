@@ -22,7 +22,7 @@ defmodule RenewCollab.Versioning do
       )
 
     RenewCollab.SimpleCache.cache(
-      "document-versions-#{document_id}",
+      {:versions, document_id},
       fn ->
         query |> Repo.all()
       end,
@@ -57,7 +57,7 @@ defmodule RenewCollab.Versioning do
       )
 
     RenewCollab.SimpleCache.cache(
-      "document-undo-redo-#{document_id}",
+      {:undo_redo, document_id},
       fn ->
         multi
         |> Repo.transaction()
@@ -191,9 +191,9 @@ defmodule RenewCollab.Versioning do
     |> case do
       {:ok, values} ->
         with %{document_id: document_id} <- values do
-          RenewCollab.SimpleCache.delete("document-#{document_id}")
-          RenewCollab.SimpleCache.delete("document-undo-redo-#{document_id}")
-          RenewCollab.SimpleCache.delete("document-versions-#{document_id}")
+          RenewCollab.SimpleCache.delete({:document, document_id})
+          RenewCollab.SimpleCache.delete({:undo_redo, document_id})
+          RenewCollab.SimpleCache.delete({:versions, document_id})
 
           Phoenix.PubSub.broadcast(
             RenewCollab.PubSub,

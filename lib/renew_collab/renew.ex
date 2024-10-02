@@ -62,7 +62,7 @@ defmodule RenewCollab.Renew do
         ]
       )
 
-    RenewCollab.SimpleCache.cache("document-#{id}", fn -> Repo.one(query) end, 600)
+    RenewCollab.SimpleCache.cache({:document, id}, fn -> Repo.one(query) end, 600)
   end
 
   def run_document_transaction(multi) do
@@ -70,9 +70,11 @@ defmodule RenewCollab.Renew do
     |> case do
       {:ok, values} ->
         with %{document_id: document_id} <- values do
-          RenewCollab.SimpleCache.delete("document-#{document_id}")
-          RenewCollab.SimpleCache.delete("document-undo-redo-#{document_id}")
-          RenewCollab.SimpleCache.delete("document-versions-#{document_id}")
+          RenewCollab.SimpleCache.delete({:document, document_id})
+          RenewCollab.SimpleCache.delete({:undo_redo, document_id})
+          RenewCollab.SimpleCache.delete({:verions, document_id})
+          RenewCollab.SimpleCache.delete({:hierarchy_missing, document_id})
+          RenewCollab.SimpleCache.delete({:hierarchy_invalids, document_id})
 
           Phoenix.PubSub.broadcast(
             RenewCollab.PubSub,
@@ -150,9 +152,11 @@ defmodule RenewCollab.Renew do
     |> case do
       {:ok, %{document_id: document_id}} ->
         RenewCollab.SimpleCache.delete(:all_documents)
-        RenewCollab.SimpleCache.delete("document-#{document_id}")
-        RenewCollab.SimpleCache.delete("document-undo-redo-#{document_id}")
-        RenewCollab.SimpleCache.delete("document-versions-#{document_id}")
+        RenewCollab.SimpleCache.delete({:document, document_id})
+        RenewCollab.SimpleCache.delete({:undo_redo, document_id})
+        RenewCollab.SimpleCache.delete({:verions, document_id})
+        RenewCollab.SimpleCache.delete({:hierarchy_missing, document_id})
+        RenewCollab.SimpleCache.delete({:hierarchy_invalids, document_id})
 
         RenewCollabWeb.Endpoint.broadcast!(
           "documents",
