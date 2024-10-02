@@ -418,7 +418,7 @@ defmodule RenewCollabWeb.LiveDocument do
     Renew.update_layer_style(
       socket.assigns.document.id,
       layer_id,
-      Renew.layer_style_key(style_attr),
+      style_attr,
       color
     )
 
@@ -438,7 +438,7 @@ defmodule RenewCollabWeb.LiveDocument do
     Renew.update_layer_edge_style(
       socket.assigns.document.id,
       layer_id,
-      Renew.layer_edge_style_key(style_attr),
+      style_attr,
       color
     )
 
@@ -458,7 +458,7 @@ defmodule RenewCollabWeb.LiveDocument do
     Renew.update_layer_text_style(
       socket.assigns.document.id,
       layer_id,
-      Renew.layer_text_style_key(style_attr),
+      style_attr,
       color
     )
 
