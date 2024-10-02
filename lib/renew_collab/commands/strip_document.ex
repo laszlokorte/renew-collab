@@ -1,17 +1,24 @@
-defmodule RenewCollab.Clone do
+defmodule RenewCollab.Commands.StripDocument do
   import Ecto.Query, warn: false
 
   alias RenewCollab.Document.Document
+  alias RenewCollab.Document.TransientDocument
   alias RenewCollab.Hierarchy.LayerParenthood
   alias RenewCollab.Connection.Hyperlink
   alias RenewCollab.Connection.Bond
 
-  def deep_clone_document_multi(id) do
+  defstruct [:document_id]
+
+  def new(%{document_id: document_id}) do
+    %__MODULE__{document_id: document_id}
+  end
+
+  def multi(%__MODULE__{document_id: document_id}) do
     Ecto.Multi.new()
     |> Ecto.Multi.one(
       :original_document,
       from(d in Document,
-        where: d.id == ^id,
+        where: d.id == ^document_id,
         left_join: l in assoc(d, :layers),
         left_join: b in assoc(l, :box),
         left_join: t in assoc(l, :text),
@@ -45,7 +52,7 @@ defmodule RenewCollab.Clone do
       from(h in Hyperlink,
         join: s in assoc(h, :source_layer),
         join: t in assoc(h, :target_layer),
-        where: s.document_id == ^id and t.document_id == ^doc_id,
+        where: s.document_id == ^doc_id and t.document_id == ^doc_id,
         select: h
       )
     end)
@@ -134,14 +141,20 @@ defmodule RenewCollab.Clone do
          |> Map.update(:layer_id, nil, &Map.get(new_layer_ids, &1))
        end)}
     end)
-    |> Ecto.Multi.run(:cloned, fn _,
-                                  %{
-                                    new_document_content: new_document_content,
-                                    new_parenthoods: new_parenthoods,
-                                    new_hyperlinks: new_hyperlinks,
-                                    new_bonds: new_bonds
-                                  } ->
-      {:ok, {new_document_content, new_parenthoods, new_hyperlinks, new_bonds}}
+    |> Ecto.Multi.run(:stripped_document, fn _,
+                                             %{
+                                               new_document_content: content,
+                                               new_parenthoods: parenthoods,
+                                               new_hyperlinks: hyperlinks,
+                                               new_bonds: bonds
+                                             } ->
+      {:ok,
+       %TransientDocument{
+         content: content,
+         parenthoods: parenthoods,
+         hyperlinks: hyperlinks,
+         bonds: bonds
+       }}
     end)
   end
 

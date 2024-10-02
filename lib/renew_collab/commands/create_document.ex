@@ -6,29 +6,28 @@ defmodule RenewCollab.Commands.CreateDocument do
   alias RenewCollab.Connection.Bond
   alias RenewCollab.Element.Edge
 
-  defstruct attrs: %{}, parenthoods: [], hyperlinks: [], bonds: []
+  defstruct [:doc]
 
-  def new(%{attrs: attrs, parenthoods: parenthoods, hyperlinks: hyperlinks, bonds: bonds}) do
+  def new(%{doc: %RenewCollab.Document.TransientDocument{} = doc}) do
     %__MODULE__{
-      attrs: attrs,
-      parenthoods: parenthoods,
-      hyperlinks: hyperlinks,
-      bonds: bonds
+      doc: doc
     }
   end
 
   def multi(%__MODULE__{
-        attrs: attrs,
-        parenthoods: parenthoods,
-        hyperlinks: hyperlinks,
-        bonds: bonds
+        doc: %RenewCollab.Document.TransientDocument{
+          content: content,
+          parenthoods: parenthoods,
+          hyperlinks: hyperlinks,
+          bonds: bonds
+        }
       }) do
     now = DateTime.utc_now() |> DateTime.truncate(:second)
 
     Ecto.Multi.new()
     |> Ecto.Multi.insert(
       :insert_document,
-      %Document{} |> Document.changeset(attrs)
+      %Document{} |> Document.changeset(content)
     )
     |> Ecto.Multi.insert_all(
       :insert_parenthoods,

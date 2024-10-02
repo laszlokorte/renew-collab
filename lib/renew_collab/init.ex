@@ -35,17 +35,12 @@ defmodule RenewCollab.Init do
     |> then(
       &(RenewCollab.Blueprints.all()
         |> Enum.with_index()
-        |> Enum.reduce(&1, fn {{doc_params, parenthoods, hyperlinks, bonds}, i}, m ->
+        |> Enum.reduce(&1, fn {transient_doc, i}, m ->
           m
           |> Ecto.Multi.run(
             {:insert_blueprint, i},
             fn rep, %{} ->
-              RenewCollab.Commands.CreateDocument.new(%{
-                attrs: doc_params,
-                parenthoods: parenthoods,
-                hyperlinks: hyperlinks,
-                bonds: bonds
-              })
+              RenewCollab.Commands.CreateDocument.new(%{doc: transient_doc})
               |> RenewCollab.Commands.CreateDocument.multi()
               |> Ecto.Multi.append(Versioning.snapshot_multi())
               |> rep.transaction()

@@ -83,6 +83,6 @@ defmodule RenewCollab.SimpleCache do
 
   @impl true
   def handle_call(:size, _from, state) do
-    {:reply, {:ok, Map.size(state)}, state}
+    {:reply, {:ok, Kernel.map_size(state)}, state}
   end
 end

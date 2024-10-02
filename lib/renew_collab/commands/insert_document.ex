@@ -16,7 +16,8 @@ defmodule RenewCollab.Commands.InsertDocument do
         source_document_id: source_document_id,
         target_document_id: target_document_id
       }) do
-    RenewCollab.Clone.deep_clone_document_multi(source_document_id)
+    RenewCollab.Commands.StripDocument.new(%{document_id: source_document_id})
+    |> RenewCollab.Commands.StripDocument.multi()
     |> Ecto.Multi.put(:document_id, target_document_id)
     |> Ecto.Multi.run(:now, fn _, %{} ->
       {:ok, DateTime.utc_now() |> DateTime.truncate(:second)}
@@ -24,7 +25,8 @@ defmodule RenewCollab.Commands.InsertDocument do
     |> Ecto.Multi.merge(fn %{
                              now: now,
                              document_id: document_id,
-                             cloned: {%{layers: layers}, parenthoods, hyperlinks, bonds}
+                             stripped_document:
+                               {%{layers: layers}, parenthoods, hyperlinks, bonds}
                            } ->
       insert_into_document_multi(
         document_id,

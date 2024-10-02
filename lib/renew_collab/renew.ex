@@ -8,6 +8,7 @@ defmodule RenewCollab.Renew do
   alias RenewCollab.Commands
 
   alias RenewCollab.Document.Document
+  alias RenewCollab.Document.TransientDocument
   alias RenewCollab.Versioning
 
   def list_documents do
@@ -72,7 +73,7 @@ defmodule RenewCollab.Renew do
         with %{document_id: document_id} <- values do
           RenewCollab.SimpleCache.delete({:document, document_id})
           RenewCollab.SimpleCache.delete({:undo_redo, document_id})
-          RenewCollab.SimpleCache.delete({:verions, document_id})
+          RenewCollab.SimpleCache.delete({:versions, document_id})
           RenewCollab.SimpleCache.delete({:hierarchy_missing, document_id})
           RenewCollab.SimpleCache.delete({:hierarchy_invalids, document_id})
 
@@ -105,10 +106,12 @@ defmodule RenewCollab.Renew do
 
   def create_document(attrs \\ %{}, parenthoods \\ [], hyperlinks \\ [], bonds \\ []) do
     Commands.CreateDocument.new(%{
-      attrs: attrs,
-      parenthoods: parenthoods,
-      hyperlinks: hyperlinks,
-      bonds: bonds
+      doc: %TransientDocument{
+        content: attrs,
+        parenthoods: parenthoods,
+        hyperlinks: hyperlinks,
+        bonds: bonds
+      }
     })
     |> run_document_command()
     |> case do
@@ -154,7 +157,7 @@ defmodule RenewCollab.Renew do
         RenewCollab.SimpleCache.delete(:all_documents)
         RenewCollab.SimpleCache.delete({:document, document_id})
         RenewCollab.SimpleCache.delete({:undo_redo, document_id})
-        RenewCollab.SimpleCache.delete({:verions, document_id})
+        RenewCollab.SimpleCache.delete({:versions, document_id})
         RenewCollab.SimpleCache.delete({:hierarchy_missing, document_id})
         RenewCollab.SimpleCache.delete({:hierarchy_invalids, document_id})
 

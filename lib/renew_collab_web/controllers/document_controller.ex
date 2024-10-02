@@ -51,14 +51,18 @@ defmodule RenewCollabWeb.DocumentController do
   end
 
   def inspect(conn, %{"id" => id}) do
-    {:ok, document} = Renew.get_document_with_elements(id)
-
-    conn
-    |> put_resp_header(
-      "content-type",
-      "text/plain"
-    )
-    |> text(Kernel.inspect(document, pretty: true, limit: :infinity))
+    RenewCollab.Commands.StripDocument.new(%{document_id: id})
+    |> RenewCollab.Commands.StripDocument.multi()
+    |> RenewCollab.Repo.transaction()
+    |> case do
+      {:ok, %{stripped_document: document}} ->
+        conn
+        |> put_resp_header(
+          "content-type",
+          "text/plain"
+        )
+        |> text(Kernel.inspect(document, pretty: true, limit: :infinity))
+    end
   end
 
   def import(conn, %{
