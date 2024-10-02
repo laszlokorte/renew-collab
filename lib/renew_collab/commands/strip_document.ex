@@ -42,6 +42,10 @@ defmodule RenewCollab.Commands.StripDocument do
         ]
       )
     )
+    |> Ecto.Multi.run(:original_id, fn
+      _, %{original_document: %{id: doc_id}} -> {:ok, doc_id}
+      _, %{original_document: nil} -> {:error, :not_found}
+    end)
     |> Ecto.Multi.all(
       :original_parenthoods,
       fn %{original_document: %{id: doc_id}} ->
