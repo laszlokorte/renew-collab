@@ -1,5 +1,6 @@
 defmodule RenewCollab.Commands.InsertDocument do
   import Ecto.Query, warn: false
+  alias RenewCollab.Document.TransientDocument
   alias RenewCollab.Hierarchy.Layer
   alias RenewCollab.Hierarchy.LayerParenthood
   alias RenewCollab.Connection.Hyperlink
@@ -25,16 +26,12 @@ defmodule RenewCollab.Commands.InsertDocument do
     |> Ecto.Multi.merge(fn %{
                              now: now,
                              document_id: document_id,
-                             stripped_document:
-                               {%{layers: layers}, parenthoods, hyperlinks, bonds}
+                             stripped_document: %TransientDocument{} = stripped_document
                            } ->
       insert_into_document_multi(
         document_id,
         now,
-        layers,
-        parenthoods,
-        hyperlinks,
-        bonds
+        stripped_document
       )
     end)
   end
@@ -42,10 +39,12 @@ defmodule RenewCollab.Commands.InsertDocument do
   defp insert_into_document_multi(
          document_id,
          now,
-         layers,
-         parenthoods,
-         hyperlinks,
-         bonds
+         %TransientDocument{
+           content: %{layers: layers},
+           parenthoods: parenthoods,
+           hyperlinks: hyperlinks,
+           bonds: bonds
+         }
        ) do
     layers
     |> Enum.with_index()
