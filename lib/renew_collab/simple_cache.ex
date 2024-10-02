@@ -21,9 +21,15 @@ defmodule RenewCollab.SimpleCache do
     end
   end
 
-  def delete(key), do: GenServer.call(__MODULE__, {:delete, key})
+  def delete(key), do: GenServer.cast(__MODULE__, {:delete, key})
 
-  def clear(), do: GenServer.call(__MODULE__, :clear)
+  def clear(), do: GenServer.cast(__MODULE__, :clear)
+
+  def size() do
+    with {:ok, entries} <- GenServer.call(__MODULE__, :size) do
+      entries
+    end
+  end
 
   @impl true
   def init(_opts), do: {:ok, %{}}
@@ -32,6 +38,16 @@ defmodule RenewCollab.SimpleCache do
   def handle_cast({:put, key, value}, state) do
     cached = struct(__MODULE__, value: value, updated_at: Time.utc_now())
     {:noreply, Map.put(state, key, cached)}
+  end
+
+  @impl true
+  def handle_cast({:delete, key}, state) do
+    {:noreply, Map.delete(state, key)}
+  end
+
+  @impl true
+  def handle_cast(:clear, _state) do
+    {:noreply, Map.new()}
   end
 
   @impl true
@@ -63,5 +79,10 @@ defmodule RenewCollab.SimpleCache do
   @impl true
   def handle_call(:clear, _from, _state) do
     {:reply, :ok, Map.new()}
+  end
+
+  @impl true
+  def handle_call(:size, _from, state) do
+    {:reply, {:ok, Map.size(state)}, state}
   end
 end

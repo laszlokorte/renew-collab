@@ -8,7 +8,8 @@ defmodule RenewCollabWeb.HealthController do
       number_of_accounts: RenewCollabAuth.Auth.count_accounts(),
       number_of_documents: RenewCollab.Renew.count_documents(),
       hierarchy_missing_count: RenewCollab.Hierarchy.count_missing_global(),
-      hierarchy_invalid_count: RenewCollab.Hierarchy.count_invalids_global()
+      hierarchy_invalid_count: RenewCollab.Hierarchy.count_invalids_global(),
+      cache_size: RenewCollab.SimpleCache.size()
     )
   end
 end
