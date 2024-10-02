@@ -5,6 +5,7 @@ defmodule RenewCollab.Renew do
 
   import Ecto.Query, warn: false
   alias RenewCollab.Repo
+  alias RenewCollab.Commands
 
   alias RenewCollab.Document.Document
   alias RenewCollab.Hierarchy.Layer
@@ -35,9 +36,7 @@ defmodule RenewCollab.Renew do
     Repo.one(from(d in Document, select: count(d.id)))
   end
 
-  def get_document!(id), do: Repo.get!(Document, id)
-
-  def get_document(id), do: Repo.get!(Document, id)
+  def get_document(id), do: Repo.get(Document, id)
 
   def get_document_with_elements(id) do
     query =
@@ -78,218 +77,30 @@ defmodule RenewCollab.Renew do
     RenewCollab.SimpleCache.cache("document-#{id}", fn -> Repo.one(query) end, 600)
   end
 
-  def insert_into_document(target_document_id, source_document_id) do
-    Ecto.Multi.new()
-    |> Ecto.Multi.run(:source_document, fn _, %{} ->
-      RenewCollab.Clone.deep_clone_document(source_document_id)
-    end)
-    |> Ecto.Multi.merge(fn %{source_document: {%{layers: layers}, parenthoods, hyperlinks, bonds}} ->
-      Ecto.Multi.new()
-      |> Ecto.Multi.put(:document_id, target_document_id)
-      |> Ecto.Multi.append(
-        insert_into_document_multi(
-          layers,
-          parenthoods,
-          hyperlinks,
-          bonds
-        )
-      )
-    end)
-    |> Ecto.Multi.append(Versioning.snapshot_multi())
+  def run_document_command(command, snapshot \\ true)
+
+  def run_document_command(%{__struct__: module} = command, snapshot) do
+    apply(module, :multi, [command])
+    |> then(&if(snapshot, do: Ecto.Multi.append(&1, Versioning.snapshot_multi()), else: &1))
     |> run_document_transaction()
   end
 
-  def insert_into_document_multi(layers \\ [], parenthoods \\ [], hyperlinks \\ [], bonds \\ []) do
-    now = DateTime.utc_now() |> DateTime.truncate(:second)
-
-    layers
-    |> Enum.with_index()
-    |> Enum.reduce(Ecto.Multi.new(), fn {layer, i}, mul ->
-      mul
-      |> Ecto.Multi.insert(
-        "insert_layer_#{i}",
-        fn %{document_id: document_id} ->
-          %Layer{document_id: document_id} |> Layer.changeset(layer)
-        end
-      )
-    end)
-    |> Ecto.Multi.insert_all(
-      :insert_parenthoods,
-      LayerParenthood,
-      fn %{document_id: document_id} ->
-        Enum.map(
-          parenthoods,
-          fn {ancestor_id, descendant_id, depth} ->
-            %{
-              depth: depth,
-              ancestor_id: ancestor_id,
-              descendant_id: descendant_id,
-              document_id: document_id
-            }
-          end
-        )
-      end,
-      on_conflict: {:replace, [:depth, :ancestor_id, :descendant_id]}
-    )
-    |> Ecto.Multi.insert_all(
-      :insert_hyperlinks,
-      Hyperlink,
-      fn _ ->
-        hyperlinks
-        |> Enum.map(fn %{
-                         source_layer_id: source_layer_id,
-                         target_layer_id: target_layer_id
-                       } ->
-          %{
-            source_layer_id: source_layer_id,
-            target_layer_id: target_layer_id,
-            inserted_at: now,
-            updated_at: now
-          }
-        end)
-      end
-    )
-    |> Ecto.Multi.all(
-      :layer_edge_ids,
-      fn %{document_id: document_id} ->
-        from(e in Edge,
-          join: l in assoc(e, :layer),
-          where: l.document_id == ^document_id,
-          select: {l.id, e.id}
-        )
-      end
-    )
-    |> then(fn multi ->
-      bonds
-      |> Enum.chunk_every(500)
-      |> Enum.with_index()
-      |> Enum.reduce(multi, fn {bond_chunk, chunk_index}, multi ->
-        Ecto.Multi.insert_all(
-          multi,
-          :"insert_bonds_#{chunk_index}",
-          Bond,
-          fn %{layer_edge_ids: layer_edge_ids} ->
-            layer_edge_map = Map.new(layer_edge_ids)
-
-            bond_chunk
-            |> Enum.map(fn
-              %{
-                edge_layer_id: edge_layer_id,
-                layer_id: layer_id,
-                socket_id: socket_id,
-                kind: kind
-              } ->
-                %{
-                  element_edge_id: Map.get(layer_edge_map, edge_layer_id),
-                  layer_id: layer_id,
-                  socket_id: socket_id,
-                  kind: kind,
-                  inserted_at: now,
-                  updated_at: now
-                }
-            end)
-          end
-        )
-      end)
-    end)
-  end
-
-  def create_document_multi(attrs \\ %{}, parenthoods \\ [], hyperlinks \\ [], bonds \\ []) do
-    now = DateTime.utc_now() |> DateTime.truncate(:second)
-
-    Ecto.Multi.new()
-    |> Ecto.Multi.insert(
-      :insert_document,
-      %Document{} |> Document.changeset(attrs)
-    )
-    |> Ecto.Multi.insert_all(
-      :insert_parenthoods,
-      LayerParenthood,
-      fn %{insert_document: new_document} ->
-        Enum.map(
-          parenthoods,
-          fn {ancestor_id, descendant_id, depth} ->
-            %{
-              depth: depth,
-              ancestor_id: ancestor_id,
-              descendant_id: descendant_id,
-              document_id: new_document.id
-            }
-          end
-        )
-      end,
-      on_conflict: {:replace, [:depth, :ancestor_id, :descendant_id]}
-    )
-    |> Ecto.Multi.insert_all(
-      :insert_hyperlinks,
-      Hyperlink,
-      fn _ ->
-        hyperlinks
-        |> Enum.map(fn %{
-                         source_layer_id: source_layer_id,
-                         target_layer_id: target_layer_id
-                       } ->
-          %{
-            source_layer_id: source_layer_id,
-            target_layer_id: target_layer_id,
-            inserted_at: now,
-            updated_at: now
-          }
-        end)
-      end
-    )
-    |> Ecto.Multi.all(
-      :layer_edge_ids,
-      fn %{insert_document: new_document} ->
-        from(e in Edge,
-          join: l in assoc(e, :layer),
-          where: l.document_id == ^new_document.id,
-          select: {l.id, e.id}
-        )
-      end
-    )
-    |> then(fn multi ->
-      bonds
-      |> Enum.chunk_every(500)
-      |> Enum.with_index()
-      |> Enum.reduce(multi, fn {bond_chunk, chunk_index}, multi ->
-        Ecto.Multi.insert_all(
-          multi,
-          :"insert_bonds_#{chunk_index}",
-          Bond,
-          fn %{layer_edge_ids: layer_edge_ids} ->
-            layer_edge_map = Map.new(layer_edge_ids)
-
-            bond_chunk
-            |> Enum.map(fn
-              %{
-                edge_layer_id: edge_layer_id,
-                layer_id: layer_id,
-                socket_id: socket_id,
-                kind: kind
-              } ->
-                %{
-                  element_edge_id: Map.get(layer_edge_map, edge_layer_id),
-                  layer_id: layer_id,
-                  socket_id: socket_id,
-                  kind: kind,
-                  inserted_at: now,
-                  updated_at: now
-                }
-            end)
-          end
-        )
-      end)
-    end)
-    |> Ecto.Multi.run(:document_id, fn _, %{insert_document: inserted_document} ->
-      {:ok, inserted_document.id}
-    end)
-    |> Ecto.Multi.append(Versioning.snapshot_multi())
+  def insert_into_document(target_document_id, source_document_id) do
+    Commands.InsertDocument.new(%{
+      target_document_id: target_document_id,
+      source_document_id: source_document_id
+    })
+    |> run_document_command()
   end
 
   def create_document(attrs \\ %{}, parenthoods \\ [], hyperlinks \\ [], bonds \\ []) do
-    create_document_multi(attrs, parenthoods, hyperlinks, bonds)
-    |> Repo.transaction()
+    Commands.CreateDocument.new(%{
+      attrs: attrs,
+      parenthoods: parenthoods,
+      hyperlinks: hyperlinks,
+      bonds: bonds
+    })
+    |> run_document_command()
     |> case do
       {:ok, %{insert_document: inserted_document}} ->
         RenewCollab.SimpleCache.delete(:all_documents)
@@ -304,21 +115,22 @@ defmodule RenewCollab.Renew do
     end
   end
 
-  def delete_document(%Document{} = document) do
-    Ecto.Multi.new()
-    |> Ecto.Multi.delete(:document, document)
-    |> Repo.transaction()
+  def delete_document(document_id) do
+    Commands.DeleteDocument.new(%{
+      document_id: document_id
+    })
+    |> run_document_command(false)
     |> case do
-      {:ok, _} ->
+      {:ok, %{document_id: document_id}} ->
         RenewCollab.SimpleCache.delete(:all_documents)
-        RenewCollab.SimpleCache.delete("document-#{document.id}")
-        RenewCollab.SimpleCache.delete("document-undo-redo-#{document.id}")
-        RenewCollab.SimpleCache.delete("document-versions-#{document.id}")
+        RenewCollab.SimpleCache.delete("document-#{document_id}")
+        RenewCollab.SimpleCache.delete("document-undo-redo-#{document_id}")
+        RenewCollab.SimpleCache.delete("document-versions-#{document_id}")
 
         RenewCollabWeb.Endpoint.broadcast!(
           "documents",
           "document:deleted",
-          %{"id" => document.id}
+          %{"id" => document_id}
         )
 
         :ok
@@ -359,7 +171,7 @@ defmodule RenewCollab.Renew do
             {:document_changed, document_id}
           )
 
-          {:ok, %{document_id: document_id}}
+          {:ok, values}
         end
     end
   end

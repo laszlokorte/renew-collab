@@ -1,42 +1,56 @@
-defmodule RenewCollab.Commands.CreateDocument do
+defmodule RenewCollab.Commands.InsertDocument do
   alias __MODULE__
 
   import Ecto.Query, warn: false
-  alias RenewCollab.Document.Document
   alias RenewCollab.Hierarchy.Layer
   alias RenewCollab.Hierarchy.LayerParenthood
-  alias RenewCollab.Connection.Hyperlink
-  alias RenewCollab.Connection.Bond
-  alias RenewCollab.Element.Edge
 
-  defstruct attrs: %{}, parenthoods: [], hyperlinks: [], bonds: []
+  defstruct [:source_document_id, :target_document_id]
 
-  def new(%{attrs: attrs, parenthoods: parenthoods, hyperlinks: hyperlinks, bonds: bonds}) do
-    %__MODULE__{
-      attrs: attrs,
-      parenthoods: parenthoods,
-      hyperlinks: hyperlinks,
-      bonds: bonds
-    }
+  def new(%{target_document_id: target_document_id, source_document_id: source_document_id}) do
+    %__MODULE__{target_document_id: target_document_id, source_document_id: source_document_id}
   end
 
   def multi(%__MODULE__{
-        attrs: attrs,
-        parenthoods: parenthoods,
-        hyperlinks: hyperlinks,
-        bonds: bonds
+        source_document_id: source_document_id,
+        target_document_id: target_document_id
       }) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.run(:source_document, fn _, %{} ->
+      RenewCollab.Clone.deep_clone_document(source_document_id)
+    end)
+    |> Ecto.Multi.merge(fn %{source_document: {%{layers: layers}, parenthoods, hyperlinks, bonds}} ->
+      Ecto.Multi.new()
+      |> Ecto.Multi.put(:document_id, target_document_id)
+      |> Ecto.Multi.append(
+        insert_into_document_multi(
+          layers,
+          parenthoods,
+          hyperlinks,
+          bonds
+        )
+      )
+    end)
+  end
+
+  def insert_into_document_multi(layers \\ [], parenthoods \\ [], hyperlinks \\ [], bonds \\ []) do
     now = DateTime.utc_now() |> DateTime.truncate(:second)
 
-    Ecto.Multi.new()
-    |> Ecto.Multi.insert(
-      :insert_document,
-      %Document{} |> Document.changeset(attrs)
-    )
+    layers
+    |> Enum.with_index()
+    |> Enum.reduce(Ecto.Multi.new(), fn {layer, i}, mul ->
+      mul
+      |> Ecto.Multi.insert(
+        "insert_layer_#{i}",
+        fn %{document_id: document_id} ->
+          %Layer{document_id: document_id} |> Layer.changeset(layer)
+        end
+      )
+    end)
     |> Ecto.Multi.insert_all(
       :insert_parenthoods,
       LayerParenthood,
-      fn %{insert_document: new_document} ->
+      fn %{document_id: document_id} ->
         Enum.map(
           parenthoods,
           fn {ancestor_id, descendant_id, depth} ->
@@ -44,7 +58,7 @@ defmodule RenewCollab.Commands.CreateDocument do
               depth: depth,
               ancestor_id: ancestor_id,
               descendant_id: descendant_id,
-              document_id: new_document.id
+              document_id: document_id
             }
           end
         )
@@ -71,10 +85,10 @@ defmodule RenewCollab.Commands.CreateDocument do
     )
     |> Ecto.Multi.all(
       :layer_edge_ids,
-      fn %{insert_document: new_document} ->
+      fn %{document_id: document_id} ->
         from(e in Edge,
           join: l in assoc(e, :layer),
-          where: l.document_id == ^new_document.id,
+          where: l.document_id == ^document_id,
           select: {l.id, e.id}
         )
       end
@@ -111,9 +125,6 @@ defmodule RenewCollab.Commands.CreateDocument do
           end
         )
       end)
-    end)
-    |> Ecto.Multi.run(:document_id, fn _, %{insert_document: inserted_document} ->
-      {:ok, inserted_document.id}
     end)
   end
 end

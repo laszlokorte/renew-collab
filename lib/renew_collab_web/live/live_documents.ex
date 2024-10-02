@@ -290,7 +290,7 @@ defmodule RenewCollabWeb.LiveDocuments do
   end
 
   def handle_event("delete", %{"id" => id}, socket) do
-    Renew.delete_document(%RenewCollab.Document.Document{id: id})
+    Renew.delete_document(id)
 
     {:noreply, socket}
   end
