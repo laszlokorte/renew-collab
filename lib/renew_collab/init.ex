@@ -51,5 +51,9 @@ defmodule RenewCollab.Init do
         end))
     )
     |> Repo.transaction()
+    |> case do
+      {:ok, _} ->
+        RenewCollab.SimpleCache.clear()
+    end
   end
 end

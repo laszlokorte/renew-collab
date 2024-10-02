@@ -8,53 +8,70 @@ defmodule RenewCollab.Versioning do
   alias RenewCollab.Hierarchy.Layer
 
   def document_versions(document_id) do
-    from(s in Snapshot,
-      where: s.document_id == ^document_id,
-      left_join: l in assoc(s, :latest),
-      left_join: lb in assoc(s, :label),
-      select: %{
-        id: s.id,
-        inserted_at: s.inserted_at,
-        is_latest: not is_nil(l.id),
-        label: lb.description
-      },
-      order_by: [desc: s.inserted_at]
+    query =
+      from(s in Snapshot,
+        where: s.document_id == ^document_id,
+        left_join: l in assoc(s, :latest),
+        left_join: lb in assoc(s, :label),
+        select: %{
+          id: s.id,
+          inserted_at: s.inserted_at,
+          is_latest: not is_nil(l.id),
+          label: lb.description
+        },
+        order_by: [desc: s.inserted_at]
+      )
+
+    RenewCollab.SimpleCache.cache(
+      "document-versions-#{document_id}",
+      fn ->
+        query |> Repo.all()
+      end,
+      600
     )
-    |> Repo.all()
   end
 
   def document_undo_redo(document_id) do
-    Ecto.Multi.new()
-    |> Ecto.Multi.one(
-      :undo,
-      from(s in Snapshot,
-        join: l in LatestSnapshot,
-        on: l.snapshot_id == s.id,
-        left_join: p in Snapshot,
-        on: s.predecessor_id == p.id and p.id != s.id,
-        where: s.document_id == ^document_id,
-        select: p.id
+    multi =
+      Ecto.Multi.new()
+      |> Ecto.Multi.one(
+        :undo,
+        from(s in Snapshot,
+          join: l in LatestSnapshot,
+          on: l.snapshot_id == s.id,
+          left_join: p in Snapshot,
+          on: s.predecessor_id == p.id and p.id != s.id,
+          where: s.document_id == ^document_id,
+          select: p.id
+        )
       )
-    )
-    |> Ecto.Multi.all(
-      :redos,
-      from(s in Snapshot,
-        join: l in LatestSnapshot,
-        on: l.snapshot_id == s.id,
-        join: suc in Snapshot,
-        on: s.id == suc.predecessor_id,
-        where: s.document_id == ^document_id and suc.id != suc.predecessor_id,
-        select: suc.id
+      |> Ecto.Multi.all(
+        :redos,
+        from(s in Snapshot,
+          join: l in LatestSnapshot,
+          on: l.snapshot_id == s.id,
+          join: suc in Snapshot,
+          on: s.id == suc.predecessor_id,
+          where: s.document_id == ^document_id and suc.id != suc.predecessor_id,
+          select: suc.id
+        )
       )
+
+    RenewCollab.SimpleCache.cache(
+      "document-undo-redo-#{document_id}",
+      fn ->
+        multi
+        |> Repo.transaction()
+        |> case do
+          {:ok, %{undo: undo_id, redos: redo_ids}} ->
+            %{
+              predecessor_id: undo_id,
+              successors: redo_ids
+            }
+        end
+      end,
+      600
     )
-    |> Repo.transaction()
-    |> case do
-      {:ok, %{undo: undo_id, redos: redo_ids}} ->
-        %{
-          predecessor_id: undo_id,
-          successors: redo_ids
-        }
-    end
   end
 
   def snapshot_multi() do
@@ -305,6 +322,10 @@ defmodule RenewCollab.Versioning do
     |> case do
       {:ok, values} ->
         with %{document_id: document_id} <- values do
+          RenewCollab.SimpleCache.delete("document-#{document_id}")
+          RenewCollab.SimpleCache.delete("document-undo-redo-#{document_id}")
+          RenewCollab.SimpleCache.delete("document-versions-#{document_id}")
+
           Phoenix.PubSub.broadcast(
             RenewCollab.PubSub,
             "document:#{document_id}",

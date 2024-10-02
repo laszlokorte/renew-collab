@@ -22,7 +22,13 @@ defmodule RenewCollab.Renew do
   alias RenewCollab.Versioning
 
   def list_documents do
-    Repo.all(from(Document, order_by: [desc: :inserted_at, desc: :updated_at]))
+    RenewCollab.SimpleCache.cache(
+      :all_documents,
+      fn ->
+        Repo.all(from(Document, order_by: [desc: :inserted_at, desc: :updated_at]))
+      end,
+      600
+    )
   end
 
   def count_documents do
@@ -34,7 +40,7 @@ defmodule RenewCollab.Renew do
   def get_document(id), do: Repo.get!(Document, id)
 
   def get_document_with_elements(id) do
-    Repo.one(
+    query =
       from(d in Document,
         where: d.id == ^id,
         left_join: l in assoc(d, :layers),
@@ -52,6 +58,7 @@ defmodule RenewCollab.Renew do
         left_join: i in assoc(l, :interface),
         left_join: il in assoc(l, :outgoing_link),
         left_join: ol in assoc(l, :incoming_links),
+        order_by: [asc: l.z_index, asc: w.sort],
         preload: [
           layers:
             {l,
@@ -67,7 +74,8 @@ defmodule RenewCollab.Renew do
              ]}
         ]
       )
-    )
+
+    RenewCollab.SimpleCache.cache("document-#{id}", fn -> Repo.one(query) end, 600)
   end
 
   def insert_into_document(target_document_id, source_document_id) do
@@ -284,6 +292,8 @@ defmodule RenewCollab.Renew do
     |> Repo.transaction()
     |> case do
       {:ok, %{insert_document: inserted_document}} ->
+        RenewCollab.SimpleCache.delete(:all_documents)
+
         RenewCollabWeb.Endpoint.broadcast!(
           "documents",
           "documents:new",
@@ -300,6 +310,11 @@ defmodule RenewCollab.Renew do
     |> Repo.transaction()
     |> case do
       {:ok, _} ->
+        RenewCollab.SimpleCache.delete(:all_documents)
+        RenewCollab.SimpleCache.delete("document-#{document.id}")
+        RenewCollab.SimpleCache.delete("document-undo-redo-#{document.id}")
+        RenewCollab.SimpleCache.delete("document-versions-#{document.id}")
+
         RenewCollabWeb.Endpoint.broadcast!(
           "documents",
           "document:deleted",
@@ -334,6 +349,10 @@ defmodule RenewCollab.Renew do
     |> case do
       {:ok, values} ->
         with %{document_id: document_id} <- values do
+          RenewCollab.SimpleCache.delete("document-#{document_id}")
+          RenewCollab.SimpleCache.delete("document-undo-redo-#{document_id}")
+          RenewCollab.SimpleCache.delete("document-versions-#{document_id}")
+
           Phoenix.PubSub.broadcast(
             RenewCollab.PubSub,
             "document:#{document_id}",
@@ -1482,6 +1501,8 @@ defmodule RenewCollab.Renew do
     |> run_document_transaction()
     |> case do
       {:ok, %{document_id: document_id}} ->
+        RenewCollab.SimpleCache.delete(:all_documents)
+
         RenewCollabWeb.Endpoint.broadcast!(
           "documents",
           "document:renamed",

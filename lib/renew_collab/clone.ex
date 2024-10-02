@@ -32,6 +32,7 @@ defmodule RenewCollab.Clone do
             left_join: ts in assoc(t, :style),
             left_join: es in assoc(e, :style),
             left_join: i in assoc(l, :interface),
+            order_by: [asc: l.z_index, asc: w.sort],
             preload: [
               layers:
                 {l,

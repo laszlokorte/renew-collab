@@ -14,28 +14,29 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def mount(%{"id" => id}, _session, socket) do
-    document = Renew.get_document_with_elements(id)
+    with document when not is_nil(document) <- Renew.get_document_with_elements(id) do
+      socket =
+        socket
+        |> assign(:document, document)
+        |> assign(:other_documents, Renew.list_documents())
+        |> assign(:socket_schemas, Sockets.all_socket_schemas())
+        |> assign(:snapshots, Versioning.document_versions(id))
+        |> assign(:undo_redo, Versioning.document_undo_redo(id))
+        |> assign(:hierachy_missing, RenewCollab.Hierarchy.find_missing(id))
+        |> assign(:hierachy_invalid, RenewCollab.Hierarchy.find_invalids(id))
+        |> assign(:selection, nil)
+        |> assign(:show_hierarchy, false)
+        |> assign(:show_snapshots, false)
+        |> assign(:show_health, false)
+        |> assign(:show_meta, false)
+        |> assign(:symbols, Symbols.list_shapes() |> Enum.map(fn s -> {s.id, s} end) |> Map.new())
+        |> assign(:viewbox, viewbox(document))
 
-    socket =
-      socket
-      |> assign(:document, document)
-      |> assign(:other_documents, Renew.list_documents())
-      |> assign(:socket_schemas, Sockets.all_socket_schemas())
-      |> assign(:snapshots, Versioning.document_versions(id))
-      |> assign(:undo_redo, Versioning.document_undo_redo(id))
-      |> assign(:hierachy_missing, RenewCollab.Hierarchy.find_missing(id))
-      |> assign(:hierachy_invalid, RenewCollab.Hierarchy.find_invalids(id))
-      |> assign(:selection, nil)
-      |> assign(:show_hierarchy, false)
-      |> assign(:show_snapshots, false)
-      |> assign(:show_health, false)
-      |> assign(:show_meta, false)
-      |> assign(:symbols, Symbols.list_shapes() |> Enum.map(fn s -> {s.id, s} end) |> Map.new())
-      |> assign(:viewbox, viewbox(document))
-
-    RenewCollabWeb.Endpoint.subscribe("document:#{id}")
-
-    {:ok, socket}
+      RenewCollabWeb.Endpoint.subscribe("document:#{id}")
+      {:ok, socket}
+    else
+      _ -> {:ok, redirect(socket, to: "/documents")}
+    end
   end
 
   def render(assigns) do

@@ -690,11 +690,8 @@ defmodule RenewCollab.Import.DocumentImport do
     end
   end
 
-  defp fix_hierarchy_order(refs, "de.renew.netcomponents.NetComponentFigure") do
-    refs |> Enum.sort_by(fn {:ref, ref_index} -> ref_index end)
-  end
-
-  defp fix_hierarchy_order(refs, _), do: refs
+  defp fix_hierarchy_order(refs, _),
+    do: refs |> Enum.sort_by(fn {:ref, ref_index} -> ref_index end)
 
   defp collect_hierarchy({:ref, r}, refs_with_ids, ancestors \\ []) do
     case Enum.at(refs_with_ids, r) do

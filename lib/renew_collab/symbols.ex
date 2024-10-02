@@ -18,39 +18,51 @@ defmodule RenewCollab.Symbols do
 
   """
   def list_shapes do
-    Repo.all(
-      from(s in Shape,
-        order_by: [asc: :name],
-        left_join: p in assoc(s, :paths),
-        left_join: sgm in assoc(p, :segments),
-        left_join: stp in assoc(sgm, :steps),
-        left_join: h in assoc(stp, :horizontal),
-        left_join: v in assoc(stp, :vertical),
-        left_join: a in assoc(stp, :arc),
-        preload: [
-          paths:
-            {p,
-             [
-               segments:
-                 {sgm,
-                  [
-                    steps:
-                      {stp,
-                       [
-                         horizontal: h,
-                         vertical: v,
-                         arc: a
-                       ]}
-                  ]}
-             ]}
-        ]
-      )
+    RenewCollab.SimpleCache.cache(
+      :symbol_list_shapes,
+      fn ->
+        Repo.all(
+          from(s in Shape,
+            order_by: [asc: :name],
+            left_join: p in assoc(s, :paths),
+            left_join: sgm in assoc(p, :segments),
+            left_join: stp in assoc(sgm, :steps),
+            left_join: h in assoc(stp, :horizontal),
+            left_join: v in assoc(stp, :vertical),
+            left_join: a in assoc(stp, :arc),
+            preload: [
+              paths:
+                {p,
+                 [
+                   segments:
+                     {sgm,
+                      [
+                        steps:
+                          {stp,
+                           [
+                             horizontal: h,
+                             vertical: v,
+                             arc: a
+                           ]}
+                      ]}
+                 ]}
+            ]
+          )
+        )
+      end,
+      :infinity
     )
   end
 
   def ids_by_name do
-    from(p in Shape, select: {p.name, p.id})
-    |> Repo.all()
-    |> Map.new()
+    RenewCollab.SimpleCache.cache(
+      :symbol_ids_by_name,
+      fn ->
+        from(p in Shape, select: {p.name, p.id})
+        |> Repo.all()
+        |> Map.new()
+      end,
+      :infinity
+    )
   end
 end
