@@ -61,7 +61,7 @@ defmodule RenewCollab.SimpleCache do
   end
 
   @impl true
-  def handle_call(:clear, _from, state) do
+  def handle_call(:clear, _from, _state) do
     {:reply, :ok, Map.new()}
   end
 end

@@ -39,12 +39,13 @@ defmodule RenewCollab.Init do
           |> Ecto.Multi.run(
             "insert_blueprint_#{i}",
             fn rep, %{} ->
-              RenewCollab.Renew.create_document_multi(
-                doc_params,
-                parenthoods,
-                hyperlinks,
-                bonds
-              )
+              RenewCollab.Commands.CreateDocument.new(%{
+                doc_params: doc_params,
+                parenthoods: parenthoods,
+                hyperlinks: hyperlinks,
+                bonds: bonds
+              })
+              |> RenewCollab.Commands.CreateDocument.multi()
               |> rep.transaction()
             end
           )

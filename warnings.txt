@@ -1,0 +1,7 @@
+     warning: variable "k" is unused (if the variable is not meant to be used, prefix it with an underscore)
+     Ôöé
+ 160 Ôöé   defp deep_strip_filter({k, _v}), do: true
+     Ôöé                           ~
+     Ôöé
+     ÔööÔöÇ lib/renew_collab/clone.ex:160:27: RenewCollab.Clone.deep_strip_filter/1
+

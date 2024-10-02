@@ -1,7 +1,7 @@
 defmodule RenewCollab.Commands.ToggleVisible do
-  alias __MODULE__
-
   import Ecto.Query, warn: false
+
+  alias RenewCollab.Hierarchy.Layer
 
   defstruct [:document_id, :layer_id]
 

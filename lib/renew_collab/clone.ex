@@ -3,19 +3,9 @@ defmodule RenewCollab.Clone do
   alias RenewCollab.Repo
 
   alias RenewCollab.Document.Document
-  alias RenewCollab.Hierarchy.Layer
-  alias RenewCollab.Style.LayerStyle
-  alias RenewCollab.Style.EdgeStyle
-  alias RenewCollab.Style.TextStyle
-  alias RenewCollab.Connection.Waypoint
+  alias RenewCollab.Hierarchy.LayerParenthood
   alias RenewCollab.Connection.Hyperlink
   alias RenewCollab.Connection.Bond
-  alias RenewCollab.Hierarchy.LayerParenthood
-  alias RenewCollab.Element.Edge
-  alias RenewCollab.Element.Box
-  alias RenewCollab.Element.Text
-  alias RenewCollab.Element.Interface
-  alias RenewCollab.Versioning
 
   def deep_clone_document(id) do
     Repo.transaction(fn ->
@@ -167,5 +157,5 @@ defmodule RenewCollab.Clone do
     do: not String.ends_with?(Atom.to_string(key), "_id")
 
   defp deep_strip_filter({key, _}) when is_binary(key), do: not String.ends_with?(key, "_id")
-  defp deep_strip_filter({k, v}), do: true
+  defp deep_strip_filter({_, _}), do: true
 end

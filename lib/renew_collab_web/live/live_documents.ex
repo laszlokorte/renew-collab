@@ -223,41 +223,38 @@ defmodule RenewCollabWeb.LiveDocuments do
   end
 
   def handle_event("import_document", _params, socket) do
-    case consume_uploaded_entries(socket, :import_file, fn %{path: path},
-                                                           %{client_name: filename} ->
-           {:ok, content} = File.read(path)
-           RenewCollab.Import.DocumentImport.import(filename, content)
-         end) do
-      [_ | _] = converted_docs ->
-        for %RenewCollab.Import.Converted{
+    consume_uploaded_entries(socket, :import_file, fn %{path: path}, %{client_name: filename} ->
+      {:ok, content} = File.read(path)
+
+      with {:ok,
+            %RenewCollab.Import.Converted{
               name: doc_name,
               kind: kind,
               layers: layers,
               hierarchy: hierarchy,
               hyperlinks: hyperlinks,
               bonds: bonds
-            } <- converted_docs do
-          with {:ok, %RenewCollab.Document.Document{}} <-
-                 RenewCollab.Renew.create_document(
-                   %{"name" => doc_name, "kind" => kind, "layers" => layers},
-                   hierarchy,
-                   hyperlinks,
-                   bonds
-                 ) do
-          else
-            _ ->
-              with {:ok, %RenewCollab.Document.Document{} = document} <-
-                     RenewCollab.Renew.create_document(%{"name" => doc_name, "kind" => "error"}) do
-                RenewCollabWeb.Endpoint.broadcast!(
-                  "documents",
-                  "document:new",
-                  Map.take(document, [:name, :kind, :id])
-                  |> Map.put("href", url(~p"/api/documents/#{document}"))
-                )
-              end
+            }} = RenewCollab.Import.DocumentImport.import(filename, content),
+           {:ok, %RenewCollab.Document.Document{}} <-
+             RenewCollab.Renew.create_document(
+               %{"name" => doc_name, "kind" => kind, "layers" => layers},
+               hierarchy,
+               hyperlinks,
+               bonds
+             ) do
+      else
+        _ ->
+          with {:ok, %RenewCollab.Document.Document{} = document} <-
+                 RenewCollab.Renew.create_document(%{"name" => filename, "kind" => "error"}) do
+            RenewCollabWeb.Endpoint.broadcast!(
+              "documents",
+              "document:new",
+              Map.take(document, [:name, :kind, :id])
+              |> Map.put("href", url(~p"/api/documents/#{document}"))
+            )
           end
-        end
-    end
+      end
+    end)
 
     {:noreply, socket}
   end

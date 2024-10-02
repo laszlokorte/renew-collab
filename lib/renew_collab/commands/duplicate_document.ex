@@ -1,8 +1,14 @@
 defmodule RenewCollab.Commands.DuplicateDocument do
-  alias __MODULE__
+  # alias __MODULE__
 
-  import Ecto.Query, warn: false
-  alias RenewCollab.Document.Document
+  # import Ecto.Query, warn: false
 
-  defstruct [:document_id]
+  # defstruct []
+
+  # def new(%{}) do
+  #   %__MODULE__{}
+  # end
+
+  # def multi(%__MODULE__{}) do
+  # end
 end

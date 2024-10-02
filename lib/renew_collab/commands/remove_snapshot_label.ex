@@ -1,14 +1,14 @@
 defmodule RenewCollab.Commands.RemoveSnapshotLabel do
-  alias __MODULE__
+  # alias __MODULE__
 
-  import Ecto.Query, warn: false
+  # import Ecto.Query, warn: false
 
-  defstruct []
+  # defstruct []
 
-  def new(%{}) do
-    %__MODULE__{}
-  end
+  # def new(%{}) do
+  #   %__MODULE__{}
+  # end
 
-  def multi(%__MODULE__{}) do
-  end
+  # def multi(%__MODULE__{}) do
+  # end
 end

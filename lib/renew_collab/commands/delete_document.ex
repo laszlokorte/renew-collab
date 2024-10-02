@@ -1,6 +1,4 @@
 defmodule RenewCollab.Commands.DeleteDocument do
-  alias __MODULE__
-
   import Ecto.Query, warn: false
   alias RenewCollab.Document.Document
 

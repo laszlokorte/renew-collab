@@ -23,7 +23,6 @@ defmodule RenewCollab.Connection.Bond do
 
   defmodule Snapshotter do
     alias RenewCollab.Connection.Bond
-    alias RenewCollab.Hierarchy.Layer
     @behaviour RenewCollab.Versioning.SnapshotterBehavior
 
     def storage_key(), do: :bonds

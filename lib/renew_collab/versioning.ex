@@ -192,10 +192,9 @@ defmodule RenewCollab.Versioning do
         schema = snap.schema()
 
         m
-        |> Ecto.Multi.insert_all(String.to_atom("restore_#{key}"), schema, fn %{
-                                                                                snapshot_content:
-                                                                                  content
-                                                                              } ->
+        |> Ecto.Multi.insert_all({:restore, key}, schema, fn %{
+                                                               snapshot_content: content
+                                                             } ->
           Map.get(content, key, [])
         end)
       end)

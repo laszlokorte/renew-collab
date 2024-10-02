@@ -11,7 +11,7 @@ defmodule RenewCollabWeb.LoginController do
     )
   end
 
-  def login(conn, %{"login_attempt" => login}) do
+  def login(conn, %{"login_attempt" => _login}) do
     # render(conn, :index, changeset: RenewCollabAuth.Entites.LoginAttempt.changeset(%RenewCollabAuth.Entites.LoginAttempt{}, login))
     conn
     |> put_flash(:info, "Login successful")

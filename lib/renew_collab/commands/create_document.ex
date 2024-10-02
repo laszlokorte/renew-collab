@@ -1,9 +1,6 @@
 defmodule RenewCollab.Commands.CreateDocument do
-  alias __MODULE__
-
   import Ecto.Query, warn: false
   alias RenewCollab.Document.Document
-  alias RenewCollab.Hierarchy.Layer
   alias RenewCollab.Hierarchy.LayerParenthood
   alias RenewCollab.Connection.Hyperlink
   alias RenewCollab.Connection.Bond
@@ -86,7 +83,7 @@ defmodule RenewCollab.Commands.CreateDocument do
       |> Enum.reduce(multi, fn {bond_chunk, chunk_index}, multi ->
         Ecto.Multi.insert_all(
           multi,
-          :"insert_bonds_#{chunk_index}",
+          {:insert_bonds, chunk_index},
           Bond,
           fn %{layer_edge_ids: layer_edge_ids} ->
             layer_edge_map = Map.new(layer_edge_ids)
