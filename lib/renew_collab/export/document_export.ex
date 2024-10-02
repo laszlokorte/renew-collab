@@ -193,6 +193,49 @@ defmodule RenewCollab.Export.DocumentExport do
           }
         ]
 
+      Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "de.renew.gui.fs.FSFigure") ->
+        if is_nil(layer.text.style) do
+          [
+            %Storable{
+              class_name: layer.semantic_tag,
+              fields: %{
+                attributes: export_attributes(:text, layer),
+                fOriginX: round(layer.text.position_x),
+                fOriginY: round(layer.text.position_y),
+                text: layer.text.body,
+                fCurrentFontName: "SansSerif",
+                fCurrentFontStyle: 0,
+                fCurrentFontSize: 12,
+                fIsReadOnly: 0,
+                fParent: nil,
+                fLocator: nil,
+                fType: 0,
+                paths: [""]
+              }
+            }
+          ]
+        else
+          [
+            %Storable{
+              class_name: layer.semantic_tag,
+              fields: %{
+                attributes: export_attributes(:text, layer),
+                fOriginX: round(layer.text.position_x),
+                fOriginY: round(layer.text.position_y),
+                text: layer.text.body,
+                fCurrentFontName: style_or_default(layer.text, :font_family),
+                fCurrentFontStyle: export_font_style(layer.text.style),
+                fCurrentFontSize: round(style_or_default(layer.text, :font_size)),
+                fIsReadOnly: 0,
+                fParent: nil,
+                fLocator: nil,
+                fType: 0,
+                paths: [""]
+              }
+            }
+          ]
+        end
+
       Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "CH.ifa.draw.figures.TextFigure") ->
         if is_nil(layer.text.style) do
           [
