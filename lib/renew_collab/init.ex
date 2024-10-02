@@ -15,7 +15,7 @@ defmodule RenewCollab.Init do
         |> Enum.reduce(&1, fn shape, m ->
           m
           |> Ecto.Multi.insert(
-            "insert_#{Map.get(shape, :name)}",
+            {:insert_shape, Map.get(shape, :name)},
             %Shape{id: Map.get(shape, :id)} |> Shape.changeset(shape)
           )
         end))
@@ -25,7 +25,7 @@ defmodule RenewCollab.Init do
         |> Enum.reduce(&1, fn socket_schema, m ->
           m
           |> Ecto.Multi.insert(
-            "insert_#{Map.get(socket_schema, :name)}",
+            {:insert_socke_schema, Map.get(socket_schema, :name)},
             %SocketSchema{id: Map.get(socket_schema, :id)}
             |> SocketSchema.changeset(socket_schema)
           )
@@ -37,10 +37,10 @@ defmodule RenewCollab.Init do
         |> Enum.reduce(&1, fn {{doc_params, parenthoods, hyperlinks, bonds}, i}, m ->
           m
           |> Ecto.Multi.run(
-            "insert_blueprint_#{i}",
+            {:insert_blueprint, i},
             fn rep, %{} ->
               RenewCollab.Commands.CreateDocument.new(%{
-                doc_params: doc_params,
+                attrs: doc_params,
                 parenthoods: parenthoods,
                 hyperlinks: hyperlinks,
                 bonds: bonds
