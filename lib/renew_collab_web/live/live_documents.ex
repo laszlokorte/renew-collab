@@ -210,7 +210,7 @@ defmodule RenewCollabWeb.LiveDocuments do
   end
 
   def handle_event("duplicate", %{"id" => id}, socket) do
-    RenewCollab.Clone.duplicate_document(id)
+    RenewCollab.Renew.duplicate_document(id)
     {:noreply, socket}
   end
 

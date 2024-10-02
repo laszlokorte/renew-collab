@@ -1,14 +1,43 @@
 defmodule RenewCollab.Commands.LinkLayer do
-  # alias __MODULE__
+  import Ecto.Query, warn: false
+  alias RenewCollab.Hierarchy.Layer
+  alias RenewCollab.Connection.Hyperlink
 
-  # import Ecto.Query, warn: false
+  defstruct [:document_id, :layer_id, :target_layer_id]
 
-  # defstruct []
+  def new(%{
+        document_id: document_id,
+        layer_id: layer_id,
+        target_layer_id: target_layer_id
+      }) do
+    %__MODULE__{
+      document_id: document_id,
+      layer_id: layer_id,
+      target_layer_id: target_layer_id
+    }
+  end
 
-  # def new(%{}) do
-  #   %__MODULE__{}
-  # end
-
-  # def multi(%__MODULE__{}) do
-  # end
+  def multi(%__MODULE__{
+        document_id: document_id,
+        layer_id: layer_id,
+        target_layer_id: target_layer_id
+      }) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.one(
+      :layer,
+      fn %{document_id: document_id} ->
+        from(s in Layer,
+          where: s.id == ^layer_id and s.document_id == ^document_id
+        )
+      end
+    )
+    |> Ecto.Multi.insert(:insert_hyperlink, fn %{layer: layer} ->
+      %Hyperlink{}
+      |> Hyperlink.changeset(%{
+        source_layer_id: layer.id,
+        target_layer_id: target_layer_id
+      })
+    end)
+  end
 end

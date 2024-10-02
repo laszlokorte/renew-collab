@@ -1,14 +1,34 @@
 defmodule RenewCollab.Commands.RemoveSnapshotLabel do
-  # alias __MODULE__
+  import Ecto.Query, warn: false
 
-  # import Ecto.Query, warn: false
+  alias RenewCollab.Versioning.Snapshot
 
-  # defstruct []
+  defstruct [:document_id, :snapshot_id]
 
-  # def new(%{}) do
-  #   %__MODULE__{}
-  # end
+  def new(%{document_id: document_id, snapshot_id: snapshot_id}) do
+    %__MODULE__{document_id: document_id, snapshot_id: snapshot_id}
+  end
 
-  # def multi(%__MODULE__{}) do
-  # end
+  def multi(%__MODULE__{document_id: document_id, snapshot_id: snapshot_id}) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.one(
+      :label,
+      fn %{document_id: document_id} ->
+        from(s in Snapshot,
+          join: l in assoc(s, :label),
+          where: s.id == ^snapshot_id and s.document_id == ^document_id,
+          select: l
+        )
+      end
+    )
+    |> Ecto.Multi.delete(
+      :delete_label,
+      fn %{
+           label: label
+         } ->
+        label
+      end
+    )
+  end
 end

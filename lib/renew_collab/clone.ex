@@ -1,94 +1,61 @@
 defmodule RenewCollab.Clone do
   import Ecto.Query, warn: false
-  alias RenewCollab.Repo
 
   alias RenewCollab.Document.Document
   alias RenewCollab.Hierarchy.LayerParenthood
   alias RenewCollab.Connection.Hyperlink
   alias RenewCollab.Connection.Bond
 
-  def deep_clone_document(id) do
-    Repo.transaction(fn ->
-      doc =
-        Repo.one(
-          from(d in Document,
-            where: d.id == ^id,
-            left_join: l in assoc(d, :layers),
-            left_join: b in assoc(l, :box),
-            left_join: t in assoc(l, :text),
-            left_join: e in assoc(l, :edge),
-            left_join: w in assoc(e, :waypoints),
-            left_join: ls in assoc(l, :style),
-            left_join: ts in assoc(t, :style),
-            left_join: es in assoc(e, :style),
-            left_join: i in assoc(l, :interface),
-            order_by: [asc: l.z_index, asc: w.sort],
-            preload: [
-              layers:
-                {l,
-                 [
-                   box: b,
-                   text: {t, [style: ts]},
-                   edge: {e, [style: es, waypoints: w]},
-                   style: ls,
-                   interface: i
-                 ]}
-            ]
-          )
-        )
-
-      new_layers_ids =
-        doc.layers
-        |> Enum.map(fn layer -> {layer.id, Ecto.UUID.generate()} end)
-        |> Map.new()
-
-      document_data =
-        doc
-        |> Map.from_struct()
-        |> Map.delete(:id)
-        |> Map.delete(:__meta__)
-        |> Map.delete(:inserted_at)
-        |> Map.delete(:updated_at)
-        |> Map.update(:layers, [], fn layers ->
-          layers
-          |> Enum.map(fn %{id: old_id} = layer ->
-            layer
-            |> Map.from_struct()
-            |> deep_strip()
-            |> Map.put(:id, Map.get(new_layers_ids, old_id))
-          end)
-        end)
-
-      new_parenthoods =
-        from(p in LayerParenthood, where: p.document_id == ^id, select: p)
-        |> Repo.all()
-        |> Enum.map(fn %{depth: d, ancestor_id: anc, descendant_id: dec} ->
-          {
-            Map.get(new_layers_ids, anc),
-            Map.get(new_layers_ids, dec),
-            d
-          }
-        end)
-
-      hyperlinks =
-        from(h in Hyperlink,
-          join: s in assoc(h, :source_layer),
-          join: t in assoc(h, :target_layer),
-          where: s.document_id == ^id and t.document_id == ^id,
-          select: h
-        )
-        |> Repo.all()
-        |> Enum.map(fn hyperlink ->
-          Map.new()
-          |> Map.put(:source_layer_id, Map.get(new_layers_ids, hyperlink.source_layer_id))
-          |> Map.put(:target_layer_id, Map.get(new_layers_ids, hyperlink.target_layer_id))
-        end)
-
-      new_bonds =
+  def deep_clone_document_multi(id) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.one(
+      :original_document,
+      from(d in Document,
+        where: d.id == ^id,
+        left_join: l in assoc(d, :layers),
+        left_join: b in assoc(l, :box),
+        left_join: t in assoc(l, :text),
+        left_join: e in assoc(l, :edge),
+        left_join: w in assoc(e, :waypoints),
+        left_join: ls in assoc(l, :style),
+        left_join: ts in assoc(t, :style),
+        left_join: es in assoc(e, :style),
+        left_join: i in assoc(l, :interface),
+        order_by: [asc: l.z_index, asc: w.sort],
+        preload: [
+          layers:
+            {l,
+             [
+               box: b,
+               text: {t, [style: ts]},
+               edge: {e, [style: es, waypoints: w]},
+               style: ls,
+               interface: i
+             ]}
+        ]
+      )
+    )
+    |> Ecto.Multi.all(
+      :original_parenthoods,
+      fn %{original_document: %{id: doc_id}} ->
+        from(p in LayerParenthood, where: p.document_id == ^doc_id, select: p)
+      end
+    )
+    |> Ecto.Multi.all(:original_hyperlinks, fn %{original_document: %{id: doc_id}} ->
+      from(h in Hyperlink,
+        join: s in assoc(h, :source_layer),
+        join: t in assoc(h, :target_layer),
+        where: s.document_id == ^id and t.document_id == ^doc_id,
+        select: h
+      )
+    end)
+    |> Ecto.Multi.all(
+      :original_bonds,
+      fn %{original_document: %{id: doc_id}} ->
         from(b in Bond,
           join: e in assoc(b, :element_edge),
           join: l in assoc(e, :layer),
-          where: l.document_id == ^id,
+          where: l.document_id == ^doc_id,
           select: %{
             edge_layer_id: l.id,
             layer_id: b.layer_id,
@@ -96,27 +63,86 @@ defmodule RenewCollab.Clone do
             kind: b.kind
           }
         )
-        |> Repo.all()
-        |> Enum.map(fn bond ->
-          bond
-          |> Map.update(:edge_layer_id, nil, &Map.get(new_layers_ids, &1))
-          |> Map.update(:layer_id, nil, &Map.get(new_layers_ids, &1))
-        end)
-
-      {document_data, new_parenthoods, hyperlinks, new_bonds}
+      end
+    )
+    |> Ecto.Multi.run(:new_layer_ids, fn _, %{original_document: %{layers: layers}} ->
+      {:ok,
+       layers
+       |> Enum.map(fn layer -> {layer.id, Ecto.UUID.generate()} end)
+       |> Map.new()}
     end)
-  end
-
-  def duplicate_document(id) do
-    with {:ok, {doc_params, parenthoods, hyperlinks, bonds}} <- deep_clone_document(id) do
-      RenewCollab.Renew.create_document(
-        doc_params
-        |> Map.update(:name, "Untitled", &"#{String.trim_trailing(&1, "(Copy)")} (Copy)"),
-        parenthoods,
-        hyperlinks,
-        bonds
-      )
-    end
+    |> Ecto.Multi.run(:new_document_content, fn _,
+                                                %{
+                                                  new_layer_ids: new_layer_ids,
+                                                  original_document: original_document
+                                                } ->
+      {:ok,
+       original_document
+       |> Map.from_struct()
+       |> Map.delete(:id)
+       |> Map.delete(:__meta__)
+       |> Map.delete(:inserted_at)
+       |> Map.delete(:updated_at)
+       |> Map.update(:layers, [], fn layers ->
+         layers
+         |> Enum.map(fn %{id: old_id} = layer ->
+           layer
+           |> Map.from_struct()
+           |> deep_strip()
+           |> Map.put(:id, Map.get(new_layer_ids, old_id))
+         end)
+       end)}
+    end)
+    |> Ecto.Multi.run(:new_parenthoods, fn _,
+                                           %{
+                                             original_parenthoods: original_parenthoods,
+                                             new_layer_ids: new_layer_ids
+                                           } ->
+      {:ok,
+       original_parenthoods
+       |> Enum.map(fn %{depth: d, ancestor_id: anc, descendant_id: dec} ->
+         {
+           Map.get(new_layer_ids, anc),
+           Map.get(new_layer_ids, dec),
+           d
+         }
+       end)}
+    end)
+    |> Ecto.Multi.run(:new_hyperlinks, fn _,
+                                          %{
+                                            original_hyperlinks: original_hyperlinks,
+                                            new_layer_ids: new_layer_ids
+                                          } ->
+      {:ok,
+       original_hyperlinks
+       |> Enum.map(fn hyperlink ->
+         Map.new()
+         |> Map.put(:source_layer_id, Map.get(new_layer_ids, hyperlink.source_layer_id))
+         |> Map.put(:target_layer_id, Map.get(new_layer_ids, hyperlink.target_layer_id))
+       end)}
+    end)
+    |> Ecto.Multi.run(:new_bonds, fn _,
+                                     %{
+                                       original_bonds: original_bonds,
+                                       new_layer_ids: new_layer_ids
+                                     } ->
+      {:ok,
+       original_bonds
+       |> Enum.map(fn bond ->
+         bond
+         |> Map.update(:edge_layer_id, nil, &Map.get(new_layer_ids, &1))
+         |> Map.update(:layer_id, nil, &Map.get(new_layer_ids, &1))
+       end)}
+    end)
+    |> Ecto.Multi.run(:cloned, fn _,
+                                  %{
+                                    new_document_content: new_document_content,
+                                    new_parenthoods: new_parenthoods,
+                                    new_hyperlinks: new_hyperlinks,
+                                    new_bonds: new_bonds
+                                  } ->
+      {:ok, {new_document_content, new_parenthoods, new_hyperlinks, new_bonds}}
+    end)
   end
 
   defp deep_strip(value) when is_struct(value) do

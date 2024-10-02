@@ -1,14 +1,40 @@
 defmodule RenewCollab.Commands.UpdateLayerZIndex do
-  # alias __MODULE__
+  import Ecto.Query, warn: false
 
-  # import Ecto.Query, warn: false
+  alias RenewCollab.Hierarchy.Layer
 
-  # defstruct []
+  defstruct [:document_id, :layer_id, :z_index]
 
-  # def new(%{}) do
-  #   %__MODULE__{}
-  # end
+  def new(%{
+        document_id: document_id,
+        layer_id: layer_id,
+        z_index: z_index
+      }) do
+    %__MODULE__{
+      document_id: document_id,
+      layer_id: layer_id,
+      z_index: z_index
+    }
+  end
 
-  # def multi(%__MODULE__{}) do
-  # end
+  def multi(%__MODULE__{
+        document_id: document_id,
+        layer_id: layer_id,
+        z_index: z_index
+      }) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.one(
+      :layer,
+      from(l in Layer, where: l.id == ^layer_id, select: l)
+    )
+    |> Ecto.Multi.update(
+      :z_index,
+      fn %{layer: layer} ->
+        Layer.changeset(layer, %{
+          z_index: z_index
+        })
+      end
+    )
+  end
 end

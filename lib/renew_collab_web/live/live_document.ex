@@ -688,7 +688,7 @@ defmodule RenewCollabWeb.LiveDocument do
       socket.assigns.document.id,
       layer_id,
       target_layer_id,
-      Renew.parse_hierarchy_position(order, relative)
+      RenewCollab.Commands.MoveLayer.parse_hierarchy_position(order, relative)
     )
 
     {:noreply, socket}

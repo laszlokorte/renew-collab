@@ -51,7 +51,7 @@ defmodule RenewCollabWeb.DocumentController do
   end
 
   def inspect(conn, %{"id" => id}) do
-    {:ok, document} = RenewCollab.Clone.deep_clone_document(id)
+    {:ok, document} = Renew.get_document_with_elements(id)
 
     conn
     |> put_resp_header(
