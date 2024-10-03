@@ -18,18 +18,34 @@ defmodule RenewCollabWeb.LiveDocument do
       socket =
         socket
         |> assign(:document, document)
-        |> assign(:other_documents, Renew.list_documents())
-        |> assign(:socket_schemas, Sockets.all_socket_schemas())
-        |> assign(:snapshots, Versioning.document_versions(id))
-        |> assign(:undo_redo, Versioning.document_undo_redo(id))
-        |> assign(:hierachy_missing, RenewCollab.Hierarchy.find_missing(id))
-        |> assign(:hierachy_invalid, RenewCollab.Hierarchy.find_invalids(id))
+        |> assign_async(
+          [
+            :symbols,
+            :socket_schemas,
+            :undo_redo,
+            :other_documents,
+            :snapshots,
+            :hierachy_missing,
+            :hierachy_invalid
+          ],
+          fn ->
+            {:ok,
+             %{
+               undo_redo: Versioning.document_undo_redo(id),
+               other_documents: Renew.list_documents(),
+               snapshots: Versioning.document_versions(id),
+               socket_schemas: Sockets.all_socket_schemas(),
+               symbols: Symbols.list_shapes() |> Enum.map(fn s -> {s.id, s} end) |> Map.new(),
+               hierachy_missing: RenewCollab.Hierarchy.find_missing(id),
+               hierachy_invalid: RenewCollab.Hierarchy.find_invalids(id)
+             }}
+          end
+        )
         |> assign(:selection, nil)
         |> assign(:show_hierarchy, false)
         |> assign(:show_snapshots, false)
         |> assign(:show_health, false)
         |> assign(:show_meta, false)
-        |> assign(:symbols, Symbols.list_shapes() |> Enum.map(fn s -> {s.id, s} end) |> Map.new())
         |> assign(:viewbox, viewbox(document))
 
       RenewCollabWeb.Endpoint.subscribe("document:#{id}")
@@ -48,11 +64,14 @@ defmodule RenewCollabWeb.LiveDocument do
           <h2 style="margin: 0;"><%= @document.name %></h2>
         </div>
 
-        <.live_component
-          id="undo_redo"
-          module={RenewCollabWeb.UndoRedoComponent}
-          undo_redo={@undo_redo}
-        />
+        <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: undo_redo} <- @undo_redo do %>
+          <.live_component
+            id="undo_redo"
+            module={RenewCollabWeb.UndoRedoComponent}
+            undo_redo={undo_redo}
+          />
+          <% else _ -> %>
+        <% end %>
       </div>
       <div style="grid-area: left; width: 100%; height: 100%; overflow: auto; box-sizing: border-box; padding: 0 2em">
         <datalist id="all-semantic-tags">
@@ -192,12 +211,16 @@ defmodule RenewCollabWeb.LiveDocument do
                 Create Line
               </button>
               <form target="" phx-change="insert_document">
-                <select name="document_id" onchange="this.value=''">
-                  <option value="" selected>Insert Other Document</option>
-                  <%= for doc <- @other_documents, doc.id != @document.id do %>
-                    <option value={doc.id}><%= doc.name %></option>
-                  <% end %>
-                </select>
+                <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: other_documents} <- @other_documents do %>
+                  <select name="document_id" onchange="this.value=''">
+                    <option value="" selected>Insert Other Document</option>
+                    <%= for doc <- other_documents, doc.id != @document.id do %>
+                      <option value={doc.id}><%= doc.name %></option>
+                    <% end %>
+                  </select>
+                  <% else _ -> %>
+                    Loading...
+                <% end %>
               </form>
             </div>
 
@@ -216,11 +239,15 @@ defmodule RenewCollabWeb.LiveDocument do
           Snapshots
         </h2>
         <%= if @show_snapshots do %>
-          <.live_component
-            id="snapshot-list"
-            module={RenewCollabWeb.SnapshotListComponent}
-            snapshots={@snapshots}
-          />
+          <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: snapshots} <- @snapshots do %>
+            <.live_component
+              id="snapshot-list"
+              module={RenewCollabWeb.SnapshotListComponent}
+              snapshots={snapshots}
+            />
+            <% else _ -> %>
+              <p>Loading</p>
+          <% end %>
         <% end %>
 
         <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-health">
@@ -231,25 +258,33 @@ defmodule RenewCollabWeb.LiveDocument do
             <dl style="display: grid; grid-template-columns: auto auto; justify-content: start; gap: 1ex 1em">
               <dt style="margin: 0">Missing Parenthoods</dt>
               <dd style="margin: 0">
-                <details>
-                  <summary style="cursor: pointer"><%= Enum.count(@hierachy_missing) %></summary>
-                  <ul>
-                    <%= for i <- @hierachy_missing do %>
-                      <li><%= i.ancestor_id %>/<%= i.descendant_id %>/<%= i.depth %></li>
-                    <% end %>
-                  </ul>
-                </details>
+                <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: hierachy_missing} <- @hierachy_missing do %>
+                  <details>
+                    <summary style="cursor: pointer"><%= Enum.count(hierachy_missing) %></summary>
+                    <ul>
+                      <%= for i <- hierachy_missing do %>
+                        <li><%= i.ancestor_id %>/<%= i.descendant_id %>/<%= i.depth %></li>
+                      <% end %>
+                    </ul>
+                  </details>
+                  <% else _ -> %>
+                    Loading
+                <% end %>
               </dd>
               <dt style="margin: 0">Invalid Parenthoods</dt>
               <dd style="margin: 0">
-                <details>
-                  <summary style="cursor: pointer"><%= Enum.count(@hierachy_invalid) %></summary>
-                  <ul>
-                    <%= for id <- @hierachy_invalid do %>
-                      <li><%= id %></li>
-                    <% end %>
-                  </ul>
-                </details>
+                <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: hierachy_invalid} <- @hierachy_invalid do %>
+                  <details>
+                    <summary style="cursor: pointer"><%= Enum.count(hierachy_invalid) %></summary>
+                    <ul>
+                      <%= for id <- hierachy_invalid do %>
+                        <li><%= id %></li>
+                      <% end %>
+                    </ul>
+                  </details>
+                  <% else _ -> %>
+                    Loading
+                <% end %>
               </dd>
               <dt></dt>
               <dd style="margin: 0">
@@ -386,17 +421,19 @@ defmodule RenewCollabWeb.LiveDocument do
 
     {:noreply,
      socket
-     |> assign(
-       :hierachy_missing,
-       RenewCollab.Hierarchy.find_missing(socket.assigns.document.id)
-     )
-     |> assign(
-       :hierachy_invalid,
-       RenewCollab.Hierarchy.find_invalids(socket.assigns.document.id)
-     )
-     |> assign(:document, Renew.get_document_with_elements(socket.assigns.document.id))
-     |> assign(:snapshots, Versioning.document_versions(socket.assigns.document.id))
-     |> assign(:undo_redo, Versioning.document_undo_redo(socket.assigns.document.id))}
+     |> assign_async(
+       [
+         :hierachy_missing,
+         :hierachy_invalid
+       ],
+       fn ->
+         {:ok,
+          %{
+            hierachy_missing: RenewCollab.Hierarchy.find_missing(socket.assigns.document.id),
+            hierachy_invalid: RenewCollab.Hierarchy.find_invalids(socket.assigns.document.id)
+          }}
+       end
+     )}
   end
 
   def handle_event("select_layer", %{"id" => id}, socket) do
@@ -969,12 +1006,25 @@ defmodule RenewCollabWeb.LiveDocument do
     if document_id == socket.assigns.document.id do
       {:noreply,
        socket
-       |> assign(
-         :document,
-         Renew.get_document_with_elements(document_id)
+       |> assign_async(
+         [:undo_redo],
+         fn ->
+           {:ok,
+            %{
+              undo_redo: Versioning.document_undo_redo(document_id)
+            }}
+         end
        )
-       |> assign(:snapshots, Versioning.document_versions(document_id))
-       |> assign(:undo_redo, Versioning.document_undo_redo(document_id))}
+       |> assign_async(
+         [:snapshots],
+         fn ->
+           {:ok,
+            %{
+              snapshots: Versioning.document_versions(document_id)
+            }}
+         end
+       )
+       |> assign(:document, Renew.get_document_with_elements(document_id))}
     end
   end
 

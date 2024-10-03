@@ -13,6 +13,8 @@ defmodule RenewCollabAuth.Auth do
 
   def count_accounts(), do: Repo.one!(from(a in Account, select: count(a.id)))
 
+  def count_sessions(), do: Repo.one!(from(a in SessionToken, select: count(a.id)))
+
   def get_account!(id), do: Repo.get!(Account, id)
 
   def get_account_by_email(email), do: Repo.get_by(Account, email: email)

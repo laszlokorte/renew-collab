@@ -44,8 +44,8 @@ defmodule RenewCollab.Renew do
         left_join: ts in assoc(t, :style),
         left_join: es in assoc(e, :style),
         left_join: i in assoc(l, :interface),
-        left_join: il in assoc(l, :outgoing_link),
-        left_join: ol in assoc(l, :incoming_links),
+        left_join: ol in assoc(l, :outgoing_link),
+        left_join: il in assoc(l, :incoming_links),
         order_by: [asc: l.z_index, asc: w.sort],
         preload: [
           layers:

@@ -251,27 +251,31 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
                   </button>
                 </span>
               <% else %>
-                <select
-                  phx-hook="RnwAssignInterface"
-                  rnw-layer-id={"#{@layer.id}"}
-                  id={"layer-interface-#{@layer.id}"}
-                  name="socket_schema_id"
-                >
-                  <option
-                    value=""
-                    {if(is_nil(@layer.interface), do: [selected: "selected"], else: [])}
+                <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: socket_schemas} <- @socket_schemas do %>
+                  <select
+                    phx-hook="RnwAssignInterface"
+                    rnw-layer-id={"#{@layer.id}"}
+                    id={"layer-interface-#{@layer.id}"}
+                    name="socket_schema_id"
                   >
-                    ---
-                  </option>
-                  <%= for {_sid, s} <- @socket_schemas do %>
                     <option
-                      value={s.id}
-                      {if(@layer.interface && s.id == @layer.interface.socket_schema_id, do: [selected: "selected"], else: [])}
+                      value=""
+                      {if(is_nil(@layer.interface), do: [selected: "selected"], else: [])}
                     >
-                      <%= s.name %>
+                      ---
                     </option>
-                  <% end %>
-                </select>
+                    <%= for {_sid, s} <- socket_schemas do %>
+                      <option
+                        value={s.id}
+                        {if(@layer.interface && s.id == @layer.interface.socket_schema_id, do: [selected: "selected"], else: [])}
+                      >
+                        <%= s.name %>
+                      </option>
+                    <% end %>
+                  </select>
+                  <% else _ -> %>
+                    Loading
+                <% end %>
               <% end %>
             </fieldset>
             <fieldset>
@@ -284,22 +288,26 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
                 <dl style="display: grid; grid-template-columns: max-content 1fr; gap: 0.5em">
                   <dt>Symbol</dt>
                   <dd style="margin: 0">
-                    <select name="shape_id">
-                      <option
-                        {if(is_nil(@layer.box.symbol_shape_id), do: [selected: "selected"], else: [])}
-                        value=""
-                      >
-                        ---
-                      </option>
-                      <%= for {id, symbol} <- @symbols |> Enum.sort_by(&(elem(&1, 1).name)) do %>
+                    <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: symbols} <- @symbols do %>
+                      <select name="shape_id">
                         <option
-                          value={id}
-                          {if(id == @layer.box.symbol_shape_id, do: [selected: "selected"], else: [])}
+                          {if(is_nil(@layer.box.symbol_shape_id), do: [selected: "selected"], else: [])}
+                          value=""
                         >
-                          <%= symbol.name %>
+                          ---
                         </option>
-                      <% end %>
-                    </select>
+                        <%= for {id, symbol} <- symbols |> Enum.sort_by(&(elem(&1, 1).name)) do %>
+                          <option
+                            value={id}
+                            {if(id == @layer.box.symbol_shape_id, do: [selected: "selected"], else: [])}
+                          >
+                            <%= symbol.name %>
+                          </option>
+                        <% end %>
+                      </select>
+                      <% else _ -> %>
+                        Loading...
+                    <% end %>
                   </dd>
                   <dt>
                     Attributes
@@ -465,17 +473,21 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
                           <option value={l.id}><%= l.semantic_tag %>/<%= l.id %></option>
                         <% end %>
                       </select>
-                      <select style="width: 5em" name="socket_id">
-                        <option value="">Socket</option>
+                      <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: socket_schemas} <- @socket_schemas do %>
+                        <select style="width: 5em" name="socket_id">
+                          <option value="">Socket</option>
 
-                        <%= for {_sid, schema} <- @socket_schemas do %>
-                          <optgroup label={schema.name}>
-                            <%= for sock <- schema.sockets do %>
-                              <option value={sock.id}><%= sock.name %></option>
-                            <% end %>
-                          </optgroup>
-                        <% end %>
-                      </select>
+                          <%= for {_sid, schema} <- socket_schemas do %>
+                            <optgroup label={schema.name}>
+                              <%= for sock <- schema.sockets do %>
+                                <option value={sock.id}><%= sock.name %></option>
+                              <% end %>
+                            </optgroup>
+                          <% end %>
+                        </select>
+                        <% else _ -> %>
+                          Loading
+                      <% end %>
                       <button type="submit">Attach</button>
                     </form>
                   <% end %>
@@ -512,17 +524,21 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
                           <option value={l.id}><%= l.semantic_tag %>/<%= l.id %></option>
                         <% end %>
                       </select>
-                      <select style="width: 5em" name="socket_id">
-                        <option value="">Socket</option>
+                      <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: socket_schemas} <- @socket_schemas do %>
+                        <select style="width: 5em" name="socket_id">
+                          <option value="">Socket</option>
 
-                        <%= for {_sid, schema} <- @socket_schemas do %>
-                          <optgroup label={schema.name}>
-                            <%= for sock <- schema.sockets do %>
-                              <option value={sock.id}><%= sock.name %></option>
-                            <% end %>
-                          </optgroup>
-                        <% end %>
-                      </select>
+                          <%= for {_sid, schema} <- socket_schemas do %>
+                            <optgroup label={schema.name}>
+                              <%= for sock <- schema.sockets do %>
+                                <option value={sock.id}><%= sock.name %></option>
+                              <% end %>
+                            </optgroup>
+                          <% end %>
+                        </select>
+                        <% else _ -> %>
+                          Loading
+                      <% end %>
                       <button type="submit">Attach</button>
                     </form>
                   <% end %>

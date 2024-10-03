@@ -7,20 +7,24 @@ defmodule RenewCollabWeb.HierarchyStyleField do
     <div style="display: flex; align-items: stretch; gap: 0.5ex">
       <%= case options(@element, @attr, @type) do %>
         <% :symbols -> %>
-          <select
-            {attrs(@element, @attr, @type)}
-            phx-hook="RenewStyleAttribute"
-            id={"layer-style-#{@layer.id}-#{@element}-#{@attr}"}
-            rnw-layer-id={"#{@layer.id}"}
-            rnw-element={@element}
-            rnw-style={@attr}
-            style="padding: 0.5ex; "
-          >
-            <option value="">None</option>
-            <%= for {sid, s} <- @symbols, s.name |> String.starts_with?("arrow") do %>
-              <option selected={@value == sid} value={sid}><%= s.name %></option>
-            <% end %>
-          </select>
+          <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: symbols} <- @symbols do %>
+            <select
+              {attrs(@element, @attr, @type)}
+              phx-hook="RenewStyleAttribute"
+              id={"layer-style-#{@layer.id}-#{@element}-#{@attr}"}
+              rnw-layer-id={"#{@layer.id}"}
+              rnw-element={@element}
+              rnw-style={@attr}
+              style="padding: 0.5ex; "
+            >
+              <option value="">None</option>
+              <%= for {sid, s} <- symbols, s.name |> String.starts_with?("arrow") do %>
+                <option selected={@value == sid} value={sid}><%= s.name %></option>
+              <% end %>
+            </select>
+            <% else _ -> %>
+              Loading...
+          <% end %>
         <% [true, false] -> %>
           <input
             {attrs(@element, @attr, @type)}

@@ -13,42 +13,45 @@ defmodule RenewCollabWeb.HierarchyLayerBoxComponent do
       opacity={style_or_default(@layer, :opacity)}
     >
       <%= if @layer.box.symbol_shape_id do %>
-        <%= case @symbols[@layer.box.symbol_shape_id].name do %>
-          <% "rect-round" -> %>
-            <rect
-              id={"roundrect-#{@layer.box.id}"}
-              rx={(@layer.box.symbol_shape_attributes["rx"] || 0) / 2}
-              ry={(@layer.box.symbol_shape_attributes["ry"] || 0) / 2}
-              x={@layer.box.position_x}
-              y={@layer.box.position_y}
-              width={@layer.box.width}
-              height={@layer.box.height}
-            >
-            </rect>
-          <% "pie" -> %>
-            <path
-              id={"pie-#{@layer.box.id}"}
-              d={
-                pie_path(
-                  @layer.box,
-                  @layer.box.symbol_shape_attributes["start_angle"],
-                  @layer.box.symbol_shape_attributes["end_angle"]
-                )
-              }
-              fill-rule="evenodd"
-            />
-          <% _ -> %>
-            <g id={"symbol-#{@layer.box.id}-#{@layer.box.symbol_shape_id}"}>
-              <%= for path <- @symbols[@layer.box.symbol_shape_id].paths do %>
-                <path
-                  stroke-linejoin="bevel"
-                  stroke={path.stroke_color}
-                  fill={path.fill_color}
-                  d={RenewexIconset.Builder.build_symbol_path(@layer.box, path)}
-                  fill-rule="evenodd"
-                />
-              <% end %>
-            </g>
+        <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: symbols} <- @symbols do %>
+          <%= case symbols[@layer.box.symbol_shape_id].name do %>
+            <% "rect-round" -> %>
+              <rect
+                id={"roundrect-#{@layer.box.id}"}
+                rx={(@layer.box.symbol_shape_attributes["rx"] || 0) / 2}
+                ry={(@layer.box.symbol_shape_attributes["ry"] || 0) / 2}
+                x={@layer.box.position_x}
+                y={@layer.box.position_y}
+                width={@layer.box.width}
+                height={@layer.box.height}
+              >
+              </rect>
+            <% "pie" -> %>
+              <path
+                id={"pie-#{@layer.box.id}"}
+                d={
+                  pie_path(
+                    @layer.box,
+                    @layer.box.symbol_shape_attributes["start_angle"],
+                    @layer.box.symbol_shape_attributes["end_angle"]
+                  )
+                }
+                fill-rule="evenodd"
+              />
+            <% _ -> %>
+              <g id={"symbol-#{@layer.box.id}-#{@layer.box.symbol_shape_id}"}>
+                <%= for path <- symbols[@layer.box.symbol_shape_id].paths do %>
+                  <path
+                    stroke-linejoin="bevel"
+                    stroke={path.stroke_color}
+                    fill={path.fill_color}
+                    d={RenewexIconset.Builder.build_symbol_path(@layer.box, path)}
+                    fill-rule="evenodd"
+                  />
+                <% end %>
+              </g>
+          <% end %>
+          <% else _ -> %>
         <% end %>
       <% else %>
         <rect
