@@ -79,13 +79,15 @@ defmodule RenewCollab.Bonding do
                box: box_a,
                edge: edge,
                socket: socket_a,
-               socket_schema: socket_schema_a
+               socket_schema: socket_schema_a,
+               bond: %{kind: :source}
              },
              %{
                box: box_b,
                edge: edge,
                socket: socket_b,
-               socket_schema: socket_schema_b
+               socket_schema: socket_schema_b,
+               bond: %{kind: :target}
              }
            ]},
           {:ok, acc} ->

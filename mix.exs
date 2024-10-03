@@ -53,7 +53,7 @@ defmodule RenewCollab.MixProject do
       {:pbkdf2_elixir, "~> 2.2"},
       {:renewex, "~> 0.14.0"},
       {:renewex_iconset, "~> 0.2.0"},
-      {:renewex_routing, "~> 0.1.0"},
+      {:renewex_routing, "~> 0.2.0"},
       {:renewex_converter, "~> 0.4.0"}
     ]
   end

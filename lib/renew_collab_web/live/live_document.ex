@@ -417,7 +417,8 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def handle_event("repair_hierarchy", %{}, socket) do
-    RenewCollab.Hierarchy.repair_parenthood(socket.assigns.document.id)
+    document_id = socket.assigns.document.id
+    RenewCollab.Hierarchy.repair_parenthood(document_id)
 
     {:noreply,
      socket
@@ -429,8 +430,8 @@ defmodule RenewCollabWeb.LiveDocument do
        fn ->
          {:ok,
           %{
-            hierachy_missing: RenewCollab.Hierarchy.find_missing(socket.assigns.document.id),
-            hierachy_invalid: RenewCollab.Hierarchy.find_invalids(socket.assigns.document.id)
+            hierachy_missing: RenewCollab.Hierarchy.find_missing(document_id),
+            hierachy_invalid: RenewCollab.Hierarchy.find_invalids(document_id)
           }}
        end
      )}

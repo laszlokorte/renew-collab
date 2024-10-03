@@ -5,34 +5,36 @@ defmodule RenewCollabWeb.HierarchyLayerInterfaceComponent do
   def render(assigns) do
     ~H"""
     <g>
-      <%= case @socket_schema.stencil do %>
-        <% :ellipse -> %>
-          <ellipse
-            stroke-width="3"
-            pointer-events="none"
-            stroke-opacity="0.5"
-            fill-opacity="0.1"
-            cx={@layer.box.position_x + @layer.box.width / 2}
-            cy={@layer.box.position_y + @layer.box.height / 2}
-            fill="purple"
-            stroke="purple"
-            rx={@layer.box.width / 2}
-            ry={@layer.box.height / 2}
-          />
-        <% :rect -> %>
-          <rect
-            stroke-width="3"
-            pointer-events="none"
-            stroke-opacity="0.5"
-            fill-opacity="0.1"
-            x={@layer.box.position_x}
-            y={@layer.box.position_y}
-            fill="purple"
-            stroke="purple"
-            width={@layer.box.width}
-            height={@layer.box.height}
-          />
-        <% _ -> %>
+      <%= if @selected do %>
+        <%= case @socket_schema.stencil do %>
+          <% :ellipse -> %>
+            <ellipse
+              stroke-width="3"
+              pointer-events="none"
+              stroke-opacity="0.5"
+              fill-opacity="0.1"
+              cx={@layer.box.position_x + @layer.box.width / 2}
+              cy={@layer.box.position_y + @layer.box.height / 2}
+              fill="purple"
+              stroke="purple"
+              rx={@layer.box.width / 2}
+              ry={@layer.box.height / 2}
+            />
+          <% :rect -> %>
+            <rect
+              stroke-width="3"
+              pointer-events="none"
+              stroke-opacity="0.5"
+              fill-opacity="0.1"
+              x={@layer.box.position_x}
+              y={@layer.box.position_y}
+              fill="purple"
+              stroke="purple"
+              width={@layer.box.width}
+              height={@layer.box.height}
+            />
+          <% _ -> %>
+        <% end %>
       <% end %>
 
       <%= for s <- @socket_schema.sockets do %>
