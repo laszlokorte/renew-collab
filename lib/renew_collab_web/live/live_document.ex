@@ -503,6 +503,23 @@ defmodule RenewCollabWeb.LiveDocument do
     {:noreply, socket}
   end
 
+  def handle_event(
+        "update_text_size_hint",
+        %{
+          "layer_id" => layer_id,
+          "box" => box
+        },
+        socket
+      ) do
+    Renew.update_layer_text_size_hint(
+      socket.assigns.document.id,
+      layer_id,
+      box
+    )
+
+    {:noreply, socket}
+  end
+
   def handle_event("update_text_body", %{"layer_id" => layer_id, "value" => new_body}, socket) do
     Renew.update_layer_text_body(
       socket.assigns.document.id,

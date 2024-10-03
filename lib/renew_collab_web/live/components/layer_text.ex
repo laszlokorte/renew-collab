@@ -13,6 +13,16 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
         fill={style_or_default(@layer, :background_color)}
         stroke={style_or_default(@layer, :border_color)}
       >
+        <%= if @layer.text.size_hint do %>
+          <rect
+            id={"#{@layer.text.id}-outline-box-hinted"}
+            x={@layer.text.size_hint.position_x}
+            y={@layer.text.size_hint.position_y}
+            width={@layer.text.size_hint.width}
+            height={@layer.text.size_hint.height}
+          >
+          </rect>
+        <% end %>
         <rect
           id={"#{@layer.text.id}-outline-box"}
           phx-update="ignore"

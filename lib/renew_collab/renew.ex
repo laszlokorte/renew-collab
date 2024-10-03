@@ -43,6 +43,7 @@ defmodule RenewCollab.Renew do
         left_join: ls in assoc(l, :style),
         left_join: ts in assoc(t, :style),
         left_join: es in assoc(e, :style),
+        left_join: sh in assoc(t, :size_hint),
         left_join: i in assoc(l, :interface),
         left_join: ol in assoc(l, :outgoing_link),
         left_join: il in assoc(l, :incoming_links),
@@ -53,7 +54,7 @@ defmodule RenewCollab.Renew do
              [
                direct_parent: dp,
                box: {b, [symbol_shape: ss]},
-               text: {t, [style: ts]},
+               text: {t, [style: ts, size_hint: sh]},
                edge: {e, [style: es, waypoints: w, source_bond: sb, target_bond: tb]},
                style: ls,
                interface: i,
@@ -202,6 +203,15 @@ defmodule RenewCollab.Renew do
       layer_id: layer_id,
       style_attr: style_attr,
       value: value
+    })
+    |> run_document_command()
+  end
+
+  def update_layer_text_size_hint(document_id, layer_id, box) do
+    Commands.UpdateLayerTextSizeHint.new(%{
+      document_id: document_id,
+      layer_id: layer_id,
+      box: box
     })
     |> run_document_command()
   end

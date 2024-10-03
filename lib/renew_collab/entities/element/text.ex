@@ -10,6 +10,7 @@ defmodule RenewCollab.Element.Text do
     field :body, :string, default: ""
     belongs_to :layer, RenewCollab.Hierarchy.Layer
     has_one :style, RenewCollab.Style.TextStyle, on_delete: :delete_all
+    has_one :size_hint, RenewCollab.Style.TextSizeHint, on_delete: :delete_all
 
     timestamps(type: :utc_datetime)
   end
