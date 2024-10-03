@@ -50,7 +50,7 @@ defmodule RenewCollab.MixProject do
       {:bandit, "~> 1.5"},
       {:corsica, "~> 2.0"},
       {:live_state, "~> 0.7"},
-      {:bcrypt_elixir, "~> 3.0"},
+      {:pbkdf2_elixir, "~> 2.2"},
       {:renewex, "~> 0.14.0"},
       {:renewex_iconset, "~> 0.2.0"},
       {:renewex_routing, "~> 0.1.0"},

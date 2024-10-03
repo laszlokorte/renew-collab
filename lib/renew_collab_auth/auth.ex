@@ -7,6 +7,7 @@ defmodule RenewCollabAuth.Auth do
   alias RenewCollab.Repo
 
   alias RenewCollabAuth.Entites.Account
+  alias RenewCollabAuth.Entites.SessionToken
 
   def get_accounts(), do: Repo.all(Account)
 
@@ -19,7 +20,7 @@ defmodule RenewCollabAuth.Auth do
   def get_account_by_email_and_password(email, password) do
     account = RenewCollabAuth.Auth.get_account_by_email(email)
 
-    if account && Bcrypt.verify_pass(password, account.password) do
+    if account && Account.valid_password?(password, account.password) do
       account
     else
       nil
@@ -45,5 +46,21 @@ defmodule RenewCollabAuth.Auth do
 
   def delete_account(%Account{} = account) do
     Repo.delete(account)
+  end
+
+  def generate_account_session_token(user) do
+    {token, session_token} = SessionToken.build_session_token(user)
+    Repo.insert!(session_token)
+    token
+  end
+
+  def delete_account_session_token(token) do
+    Repo.delete_all(SessionToken.by_token_and_context_query(token, "session"))
+    :ok
+  end
+
+  def get_account_by_session_token(token) do
+    {:ok, query} = SessionToken.verify_session_token_query(token)
+    Repo.one(query)
   end
 end

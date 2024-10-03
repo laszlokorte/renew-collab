@@ -17,8 +17,34 @@ defmodule RenewCollabAuth.Entites.Account do
     |> cast(attrs, [:email, :password])
     |> validate_required([:email, :password])
     |> unique_constraint(:email)
-    |> prepare_changes(fn changeset ->
-      update_change(changeset, :password, &Bcrypt.hash_pwd_salt(&1))
-    end)
+    |> maybe_hash_password(attrs)
+  end
+
+  defp maybe_hash_password(changeset, opts) do
+    hash_password? = Keyword.get(opts, :hash_password, true)
+    password = get_change(changeset, :new_password)
+
+    if hash_password? && password && changeset.valid? do
+      changeset
+      # Hashing could be done with `Ecto.Changeset.prepare_changes/2`, but that
+      # would keep the database transaction open longer and hurt performance.
+      |> put_change(:password, Pbkdf2.hash_pwd_salt(password))
+      |> delete_change(:new_password)
+    else
+      changeset
+    end
+  end
+
+  def valid_password?(
+        %RenewCollabAuth.Entites.Account{password: hashed_password},
+        entered_pasword
+      )
+      when is_binary(hashed_password) and byte_size(entered_pasword) > 0 do
+    Argon2.verify_pass(entered_pasword, hashed_password)
+  end
+
+  def valid_password?(_, _) do
+    Argon2.no_user_verify()
+    false
   end
 end
