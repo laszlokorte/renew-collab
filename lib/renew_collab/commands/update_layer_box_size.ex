@@ -5,6 +5,7 @@ defmodule RenewCollab.Commands.UpdateLayerBoxSize do
   alias RenewCollab.Element.Text
   alias RenewCollab.Hierarchy.Layer
   alias RenewCollab.Connection.Hyperlink
+  alias RenewCollab.Style.TextSizeHint
 
   defstruct [:document_id, :layer_id, :new_size]
 
@@ -37,12 +38,15 @@ defmodule RenewCollab.Commands.UpdateLayerBoxSize do
         Box.change_size(box, new_size)
       end
     )
+    |> Ecto.Multi.run(:delta, fn _, %{box: %{position_x: old_x, position_y: old_y}} ->
+      dx = Map.get(new_size, "position_x", old_x) - old_x
+      dy = Map.get(new_size, "position_y", old_y) - old_y
+
+      {:ok, {dx, dy}}
+    end)
     |> Ecto.Multi.update_all(
       :update_linked_textes,
-      fn %{box: %{position_x: old_x, position_y: old_y}} ->
-        dx = Map.get(new_size, "position_x", old_x) - old_x
-        dy = Map.get(new_size, "position_y", old_y) - old_y
-
+      fn %{delta: {dx, dy}} ->
         from(t in Text,
           update: [inc: [position_x: ^dx, position_y: ^dy]],
           where:
@@ -52,6 +56,28 @@ defmodule RenewCollab.Commands.UpdateLayerBoxSize do
                 where: h.target_layer_id == ^layer_id
               )
             )
+        )
+      end,
+      []
+    )
+    |> Ecto.Multi.update_all(
+      :delete_size_hint,
+      fn %{delta: {dx, dy}} ->
+        from(h in TextSizeHint,
+          where:
+            h.text_id in subquery(
+              from(t in Text,
+                select: t.id,
+                where:
+                  t.layer_id in subquery(
+                    from(h in Hyperlink,
+                      select: h.source_layer_id,
+                      where: h.target_layer_id == ^layer_id
+                    )
+                  )
+              )
+            ),
+          update: [inc: [position_x: ^dx, position_y: ^dy]]
         )
       end,
       []

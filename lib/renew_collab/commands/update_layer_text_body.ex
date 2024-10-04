@@ -3,6 +3,7 @@ defmodule RenewCollab.Commands.UpdateLayerTextBody do
 
   alias RenewCollab.Hierarchy.Layer
   alias RenewCollab.Element.Text
+  alias RenewCollab.Style.TextSizeHint
 
   defstruct [:document_id, :layer_id, :new_body]
 
@@ -22,6 +23,13 @@ defmodule RenewCollab.Commands.UpdateLayerTextBody do
       fn %{text: text} ->
         Text.changeset(text, %{body: new_body})
       end
+    )
+    |> Ecto.Multi.delete_all(
+      :delete_size_hint,
+      fn %{text: text} ->
+        from(h in TextSizeHint, where: h.text_id == ^text.id)
+      end,
+      []
     )
   end
 end

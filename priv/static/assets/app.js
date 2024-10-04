@@ -6614,12 +6614,18 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
   // js/renew_hooks.js
   function renewTextAlignment(el) {
     const bbox = el.getBBox();
+    let serverKnows = false;
     if (el.previousElementSibling.hasAttribute("data-background-box")) {
-      const sibling = el.previousElementSibling.firstElementChild;
-      sibling.setAttribute("x", bbox.x);
-      sibling.setAttribute("y", bbox.y);
-      sibling.setAttribute("width", bbox.width);
-      sibling.setAttribute("height", bbox.height);
+      const sibling = el.previousElementSibling.querySelector("[data-client-adjusted]");
+      if (sibling) {
+        sibling.setAttribute("x", bbox.x);
+        sibling.setAttribute("y", bbox.y);
+        sibling.setAttribute("width", bbox.width);
+        sibling.setAttribute("height", bbox.height);
+      }
+      if (el.previousElementSibling.querySelector("[data-hinted]")) {
+        serverKnows = true;
+      }
     }
     const origX = parseFloat(el.getAttribute("x"));
     const align = el.getAttribute("data-text-anchor");
@@ -6634,17 +6640,34 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
     }
     el.setAttribute("text-anchor", align);
     el.setAttribute("x", origX + weight * bbox.width);
+    if (!serverKnows) {
+      return bbox;
+    }
   }
   var Hooks2 = {
     ResizeRenewText: {
       // Callbacks
       mounted() {
-        renewTextAlignment(this.el);
+        const rnwLayerId = this.el.getAttribute("rnw-layer-id");
+        const tellServer = renewTextAlignment(this.el);
+        if (tellServer && rnwLayerId) {
+          this.pushEvent("update_text_size_hint", {
+            layer_id: rnwLayerId,
+            box: { position_x: tellServer.x, position_y: tellServer.y, width: tellServer.width, height: tellServer.height }
+          });
+        }
       },
       beforeUpdate() {
       },
       updated() {
-        renewTextAlignment(this.el);
+        const rnwLayerId = this.el.getAttribute("rnw-layer-id");
+        const tellServer = renewTextAlignment(this.el);
+        if (tellServer && rnwLayerId) {
+          this.pushEvent("update_text_size_hint", {
+            layer_id: rnwLayerId,
+            box: { position_x: tellServer.x, position_y: tellServer.y, width: tellServer.width, height: tellServer.height }
+          });
+        }
       },
       destroyed() {
       },

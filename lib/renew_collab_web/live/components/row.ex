@@ -232,7 +232,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
               </form>
             </fieldset>
           <% end %>
-          <%= unless is_nil(@layer.box) do %>
+          <%= unless is_nil(@layer.box) and is_nil(@layer.text) do %>
             <fieldset>
               <legend for={"layer-interface-#{@layer.id}"}>Interface</legend>
               <%= if false && @layer.interface do %>
@@ -278,6 +278,8 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
                 <% end %>
               <% end %>
             </fieldset>
+          <% end %>
+          <%= unless is_nil(@layer.box) do %>
             <fieldset>
               <legend>Shape</legend>
               <form

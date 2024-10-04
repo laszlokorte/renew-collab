@@ -1,6 +1,7 @@
 defmodule RenewCollab.Commands.UpdateLayerTextPosition do
   import Ecto.Query, warn: false
 
+  alias RenewCollab.Style.TextSizeHint
   alias RenewCollab.Hierarchy.Layer
   alias RenewCollab.Element.Text
 
@@ -34,6 +35,13 @@ defmodule RenewCollab.Commands.UpdateLayerTextPosition do
       fn %{text: text} ->
         Text.change_position(text, new_position)
       end
+    )
+    |> Ecto.Multi.delete_all(
+      :delete_size_hint,
+      fn %{text: text} ->
+        from(h in TextSizeHint, where: h.text_id == ^text.id)
+      end,
+      []
     )
   end
 end

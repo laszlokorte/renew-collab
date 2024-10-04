@@ -15,15 +15,18 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
       >
         <%= if @layer.text.size_hint do %>
           <rect
+            data-hinted
             id={"#{@layer.text.id}-outline-box-hinted"}
             x={@layer.text.size_hint.position_x}
             y={@layer.text.size_hint.position_y}
             width={@layer.text.size_hint.width}
             height={@layer.text.size_hint.height}
+            fill="pink"
           >
           </rect>
         <% end %>
         <rect
+          data-client-adjusted
           id={"#{@layer.text.id}-outline-box"}
           phx-update="ignore"
           x={@layer.text.position_x}
@@ -44,6 +47,7 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
         font-family={style_or_default(@layer.text, :font_family)}
         id={"text-#{@layer.text.id}"}
         phx-hook="ResizeRenewText"
+        rnw-layer-id={@layer.id}
         x={@layer.text.position_x}
         y={@layer.text.position_y}
       >
@@ -82,6 +86,7 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
         >
           <g data-background-box id={"#{@layer.text.id}-outline-box-selection-container"}>
             <rect
+              data-client-adjusted
               fill="#33aaff"
               fill-opacity="0.3"
               opacity="0.8"

@@ -38,6 +38,20 @@ defmodule RenewCollabWeb.HierarchyLayerComponent do
             selected={@selected}
             symbols={@symbols}
           />
+
+          <%= if @layer.interface do %>
+            <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: socket_schemas} <- @socket_schemas do %>
+              <.live_component
+                id={"interface-#{@layer.id}"}
+                module={RenewCollabWeb.HierarchyLayerInterfaceComponent}
+                layer={@layer}
+                socket_schema={Map.get(socket_schemas, @layer.interface.socket_schema_id)}
+                selected={@selected}
+                symbols={@symbols}
+              />
+              <% else _ -> %>
+            <% end %>
+          <% end %>
         <% end %>
         <%= if @layer.box do %>
           <.live_component

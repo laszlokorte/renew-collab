@@ -8,6 +8,7 @@ defmodule RenewCollab.Commands.MoveLayerRelative do
   alias RenewCollab.Connection.Hyperlink
   alias RenewCollab.Connection.Waypoint
   alias RenewCollab.Connection.Bond
+  alias RenewCollab.Style.TextSizeHint
 
   defstruct [:document_id, :layer_id, :dx, :dy]
 
@@ -84,6 +85,22 @@ defmodule RenewCollab.Commands.MoveLayerRelative do
             where: t.layer_id in ^combined_layer_ids,
             update: [inc: [position_x: ^dx, position_y: ^dy]]
           )
+      end,
+      []
+    )
+    |> Ecto.Multi.update_all(
+      :delete_size_hint,
+      fn %{combined_layer_ids: combined_layer_ids} ->
+        from(h in TextSizeHint,
+          where:
+            h.text_id in subquery(
+              from(t in Text,
+                where: t.layer_id in ^combined_layer_ids,
+                select: t.id
+              )
+            ),
+          update: [inc: [position_x: ^dx, position_y: ^dy]]
+        )
       end,
       []
     )

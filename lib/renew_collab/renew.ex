@@ -213,7 +213,7 @@ defmodule RenewCollab.Renew do
       layer_id: layer_id,
       box: box
     })
-    |> run_document_command()
+    |> run_document_command(false)
   end
 
   def update_layer_text_body(

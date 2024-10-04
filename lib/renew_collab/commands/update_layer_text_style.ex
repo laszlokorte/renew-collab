@@ -2,6 +2,7 @@ defmodule RenewCollab.Commands.UpdateLayerTextStyle do
   import Ecto.Query, warn: false
   alias RenewCollab.Hierarchy.Layer
   alias RenewCollab.Style.TextStyle
+  alias RenewCollab.Style.TextSizeHint
 
   defstruct [:document_id, :layer_id, :style_attr, :value]
 
@@ -33,6 +34,13 @@ defmodule RenewCollab.Commands.UpdateLayerTextStyle do
         |> TextStyle.changeset(%{style_attr => value})
       end,
       on_conflict: {:replace, [style_attr]}
+    )
+    |> Ecto.Multi.delete_all(
+      :delete_size_hint,
+      fn %{text: text} ->
+        from(h in TextSizeHint, where: h.text_id == ^text.id)
+      end,
+      []
     )
   end
 

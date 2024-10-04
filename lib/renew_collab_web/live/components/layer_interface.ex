@@ -5,94 +5,100 @@ defmodule RenewCollabWeb.HierarchyLayerInterfaceComponent do
   def render(assigns) do
     ~H"""
     <g>
-      <%= if @selected do %>
-        <%= case @socket_schema.stencil do %>
-          <% :ellipse -> %>
-            <ellipse
-              stroke-width="3"
-              pointer-events="none"
-              stroke-opacity="0.5"
-              fill-opacity="0.1"
-              cx={@layer.box.position_x + @layer.box.width / 2}
-              cy={@layer.box.position_y + @layer.box.height / 2}
-              fill="purple"
-              stroke="purple"
-              rx={@layer.box.width / 2}
-              ry={@layer.box.height / 2}
-            />
-          <% :rect -> %>
-            <rect
-              stroke-width="3"
-              pointer-events="none"
-              stroke-opacity="0.5"
-              fill-opacity="0.1"
-              x={@layer.box.position_x}
-              y={@layer.box.position_y}
-              fill="purple"
-              stroke="purple"
-              width={@layer.box.width}
-              height={@layer.box.height}
-            />
-          <% _ -> %>
+      <%= with box <- @layer.box,
+            hint <-  @layer.text && @layer.text.size_hint,
+            bounds <- box || hint do %>
+        <%= if bounds do %>
+          <%= if @selected do %>
+            <%= case @socket_schema.stencil do %>
+              <% :ellipse -> %>
+                <ellipse
+                  stroke-width="3"
+                  pointer-events="none"
+                  stroke-opacity="0.5"
+                  fill-opacity="0.1"
+                  cx={bounds.position_x + bounds.width / 2}
+                  cy={bounds.position_y + bounds.height / 2}
+                  fill="purple"
+                  stroke="purple"
+                  rx={bounds.width / 2}
+                  ry={bounds.height / 2}
+                />
+              <% :rect -> %>
+                <rect
+                  stroke-width="3"
+                  pointer-events="none"
+                  stroke-opacity="0.5"
+                  fill-opacity="0.1"
+                  x={bounds.position_x}
+                  y={bounds.position_y}
+                  fill="purple"
+                  stroke="purple"
+                  width={bounds.width}
+                  height={bounds.height}
+                />
+              <% _ -> %>
+            <% end %>
+          <% end %>
+
+          <%= for s <- @socket_schema.sockets do %>
+            <g
+              phx-hook="RnwSocket"
+              cursor="alias"
+              rnw-layer-id={@layer.id}
+              rnw-socket-id={s.id}
+              pointer-events="all"
+              fill="transparent"
+              id={"socket-#{@layer.id}-#{s.id}"}
+            >
+              <circle
+                cx={
+                  RenewexIconset.Position.build_coord(
+                    bounds,
+                    :x,
+                    false,
+                    RenewexIconset.Position.unify_coord(:x, s)
+                  )
+                }
+                cy={
+                  RenewexIconset.Position.build_coord(
+                    bounds,
+                    :y,
+                    false,
+                    RenewexIconset.Position.unify_coord(:y, s)
+                  )
+                }
+                fill="white"
+                stroke="purple"
+                opacity="0.4"
+                r={4}
+              />
+
+              <circle
+                cx={
+                  RenewexIconset.Position.build_coord(
+                    bounds,
+                    :x,
+                    false,
+                    RenewexIconset.Position.unify_coord(:x, s)
+                  )
+                }
+                cy={
+                  RenewexIconset.Position.build_coord(
+                    bounds,
+                    :y,
+                    false,
+                    RenewexIconset.Position.unify_coord(:y, s)
+                  )
+                }
+                pointer-events="all"
+                rnw-layer-id={@layer.id}
+                rnw-socket-id={s.id}
+                r={6}
+              />
+            </g>
+          <% end %>
         <% end %>
-      <% end %>
-
-      <%= for s <- @socket_schema.sockets do %>
-        <g
-          phx-hook="RnwSocket"
-          cursor="alias"
-          rnw-layer-id={@layer.id}
-          rnw-socket-id={s.id}
-          pointer-events="all"
-          fill="transparent"
-          id={"socket-#{@layer.id}-#{s.id}"}
-        >
-          <circle
-            cx={
-              RenewexIconset.Position.build_coord(
-                @layer.box,
-                :x,
-                false,
-                RenewexIconset.Position.unify_coord(:x, s)
-              )
-            }
-            cy={
-              RenewexIconset.Position.build_coord(
-                @layer.box,
-                :y,
-                false,
-                RenewexIconset.Position.unify_coord(:y, s)
-              )
-            }
-            fill="white"
-            stroke="purple"
-            opacity="0.4"
-            r={4}
-          />
-
-          <circle
-            cx={
-              RenewexIconset.Position.build_coord(
-                @layer.box,
-                :x,
-                false,
-                RenewexIconset.Position.unify_coord(:x, s)
-              )
-            }
-            cy={
-              RenewexIconset.Position.build_coord(
-                @layer.box,
-                :y,
-                false,
-                RenewexIconset.Position.unify_coord(:y, s)
-              )
-            }
-            pointer-events="all"
-            rnw-layer-id={@layer.id}
-            rnw-socket-id={s.id}
-            r={6}
-          />
-        </g>
       <% end %>
     </g>
     """
