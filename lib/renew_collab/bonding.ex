@@ -1,10 +1,34 @@
 defmodule RenewCollab.Bonding do
   import Ecto.Query, warn: false
   alias RenewCollab.Connection.Waypoint
+  alias RenewCollab.Connection.Bond
   alias RenewCollab.Element.Edge
 
   def reposition_multi() do
     Ecto.Multi.new()
+    |> Ecto.Multi.all(
+      :affected_bonds,
+      fn %{affected_bond_ids: affected_bond_ids} ->
+        from(bond in Bond,
+          join: l in assoc(bond, :layer),
+          left_join: box in assoc(l, :box),
+          left_join: text in assoc(l, :text),
+          left_join: size_hint in assoc(text, :size_hint),
+          join: edge in assoc(bond, :element_edge),
+          join: socket in assoc(bond, :socket),
+          join: socket_schema in assoc(socket, :socket_schema),
+          where: bond.id in ^affected_bond_ids,
+          select: %{
+            bond: bond,
+            box: box,
+            size_hint: size_hint,
+            edge: edge,
+            socket: socket,
+            socket_schema: socket_schema
+          }
+        )
+      end
+    )
     |> Ecto.Multi.all(
       :affected_waypoints,
       fn %{affected_bonds: affected_bonds} ->
@@ -26,7 +50,11 @@ defmodule RenewCollab.Bonding do
         affected_bonds
         |> Enum.group_by(& &1.bond.element_edge_id)
         |> Enum.map(fn {edge_id, bonds} ->
-          {edge_id, Enum.sort_by(bonds, & &1.bond.kind)}
+          {edge_id,
+           bonds
+           |> Enum.map(&Map.put(&1, :bounds, &1.box || &1.size_hint))
+           |> Enum.filter(& &1.bounds)
+           |> Enum.sort_by(& &1.bond.kind)}
         end)
         |> Enum.reduce_while({:ok, []}, fn
           {_edge_id, []}, {:ok, acc} ->
@@ -36,7 +64,7 @@ defmodule RenewCollab.Bonding do
            [
              %{
                bond: bond,
-               box: box,
+               bounds: bounds,
                edge: edge,
                socket: socket,
                socket_schema: socket_schema
@@ -47,7 +75,7 @@ defmodule RenewCollab.Bonding do
               RenewexRouting.align_edge_to_socket(
                 if(bond.kind == :source,
                   do: %RenewexRouting.Target{
-                    box: box,
+                    box: bounds,
                     socket: socket,
                     stencil: Map.get(socket_schema, :stencil, nil)
                   },
@@ -56,7 +84,7 @@ defmodule RenewCollab.Bonding do
                 if(
                   bond.kind == :target,
                   do: %RenewexRouting.Target{
-                    box: box,
+                    box: bounds,
                     socket: socket,
                     stencil: Map.get(socket_schema, :stencil, nil)
                   },
@@ -76,14 +104,14 @@ defmodule RenewCollab.Bonding do
           {edge_id,
            [
              %{
-               box: box_a,
+               bounds: bounds_a,
                edge: edge,
                socket: socket_a,
                socket_schema: socket_schema_a,
                bond: %{kind: :source}
              },
              %{
-               box: box_b,
+               bounds: bounds_b,
                edge: edge,
                socket: socket_b,
                socket_schema: socket_schema_b,
@@ -94,12 +122,12 @@ defmodule RenewCollab.Bonding do
             %{update: new_positions} =
               RenewexRouting.align_edge_to_socket(
                 %RenewexRouting.Target{
-                  box: box_a,
+                  box: bounds_a,
                   socket: socket_a,
                   stencil: Map.get(socket_schema_a, :stencil, nil)
                 },
                 %RenewexRouting.Target{
-                  box: box_b,
+                  box: bounds_b,
                   socket: socket_b,
                   stencil: Map.get(socket_schema_b, :stencil, nil)
                 },

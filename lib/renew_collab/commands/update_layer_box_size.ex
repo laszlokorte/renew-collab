@@ -83,25 +83,14 @@ defmodule RenewCollab.Commands.UpdateLayerBoxSize do
       []
     )
     |> Ecto.Multi.all(
-      :affected_bonds,
+      :affected_bond_ids,
       fn %{box: box} ->
         from(own_box in Box,
           join: own_layer in assoc(own_box, :layer),
           join: edge in assoc(own_layer, :attached_edges),
           join: bond in assoc(edge, :bonds),
-          join: layer in assoc(bond, :layer),
-          join: box in assoc(layer, :box),
-          join: socket in assoc(bond, :socket),
-          join: socket_schema in assoc(socket, :socket_schema),
           where: own_box.id == ^box.id,
-          group_by: bond.id,
-          select: %{
-            bond: bond,
-            box: box,
-            socket: socket,
-            edge: edge,
-            socket_schema: socket_schema
-          }
+          select: bond.id
         )
       end
     )

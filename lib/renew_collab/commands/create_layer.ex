@@ -47,23 +47,12 @@ defmodule RenewCollab.Commands.CreateLayer do
       end
     )
     |> Ecto.Multi.all(
-      :affected_bonds,
+      :affected_bond_ids,
       fn %{layer: layer} ->
         from(edge in Edge,
           join: bond in assoc(edge, :bonds),
-          join: layer in assoc(bond, :layer),
-          join: box in assoc(layer, :box),
-          join: socket in assoc(bond, :socket),
-          join: socket_schema in assoc(socket, :socket_schema),
           where: edge.layer_id == ^layer.id,
-          group_by: bond.id,
-          select: %{
-            bond: bond,
-            box: box,
-            socket: socket,
-            edge: edge,
-            socket_schema: socket_schema
-          }
+          select: bond.id
         )
       end
     )

@@ -40,23 +40,11 @@ defmodule RenewCollab.Commands.CreateEdgeBond do
       })
     )
     |> Ecto.Multi.all(
-      :affected_bonds,
-      fn %{new_bond: bond} ->
+      :affected_bond_ids,
+      fn %{new_bond: new_bond} ->
         from(bond in Bond,
-          join: l in assoc(bond, :layer),
-          join: box in assoc(l, :box),
-          join: edge in assoc(bond, :element_edge),
-          join: socket in assoc(bond, :socket),
-          join: socket_schema in assoc(socket, :socket_schema),
-          where: bond.element_edge_id == ^bond.element_edge_id,
-          group_by: bond.id,
-          select: %{
-            bond: bond,
-            box: box,
-            edge: edge,
-            socket: socket,
-            socket_schema: socket_schema
-          }
+          where: bond.element_edge_id == ^new_bond.element_edge_id,
+          select: bond.id
         )
       end
     )

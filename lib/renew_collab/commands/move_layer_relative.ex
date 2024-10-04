@@ -2,6 +2,7 @@ defmodule RenewCollab.Commands.MoveLayerRelative do
   import Ecto.Query, warn: false
 
   alias RenewCollab.Hierarchy.LayerParenthood
+  alias RenewCollab.Hierarchy.Layer
   alias RenewCollab.Element.Box
   alias RenewCollab.Element.Text
   alias RenewCollab.Element.Edge
@@ -130,25 +131,14 @@ defmodule RenewCollab.Commands.MoveLayerRelative do
       []
     )
     |> Ecto.Multi.all(
-      :affected_bonds,
+      :affected_bond_ids,
       fn %{combined_layer_ids: combined_layer_ids} ->
-        from(own_box in Box,
-          join: own_layer in assoc(own_box, :layer),
+        from(own_layer in Layer,
           join: edge in assoc(own_layer, :attached_edges),
           join: bond in assoc(edge, :bonds),
-          join: layer in assoc(bond, :layer),
-          join: box in assoc(layer, :box),
-          join: socket in assoc(bond, :socket),
-          join: socket_schema in assoc(socket, :socket_schema),
           where: own_layer.id in ^combined_layer_ids or edge.layer_id in ^combined_layer_ids,
           group_by: bond.id,
-          select: %{
-            bond: bond,
-            box: box,
-            socket: socket,
-            edge: edge,
-            socket_schema: socket_schema
-          }
+          select: bond.id
         )
       end
     )

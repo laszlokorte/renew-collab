@@ -153,23 +153,11 @@ defmodule RenewCollab.Commands.CreateLayerEdgeWaypoint do
       end
     )
     |> Ecto.Multi.all(
-      :affected_bonds,
+      :affected_bond_ids,
       fn %{waypoint: waypoint} ->
         from(bond in Bond,
-          join: l in assoc(bond, :layer),
-          join: box in assoc(l, :box),
-          join: edge in assoc(bond, :element_edge),
-          join: socket in assoc(bond, :socket),
-          join: socket_schema in assoc(socket, :socket_schema),
           where: bond.element_edge_id == ^waypoint.edge_id,
-          group_by: bond.id,
-          select: %{
-            bond: bond,
-            box: box,
-            edge: edge,
-            socket: socket,
-            socket_schema: socket_schema
-          }
+          select: bond.id
         )
       end
     )

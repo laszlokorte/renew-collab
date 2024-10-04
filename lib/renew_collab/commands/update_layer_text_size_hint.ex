@@ -3,6 +3,7 @@ defmodule RenewCollab.Commands.UpdateLayerTextSizeHint do
 
   alias RenewCollab.Hierarchy.Layer
   alias RenewCollab.Style.TextSizeHint
+  alias RenewCollab.Element.Text
 
   defstruct [:document_id, :layer_id, :box]
 
@@ -25,5 +26,18 @@ defmodule RenewCollab.Commands.UpdateLayerTextSizeHint do
       end,
       on_conflict: {:replace, [:position_x, :position_y, :width, :height]}
     )
+    |> Ecto.Multi.all(
+      :affected_bond_ids,
+      fn %{text: text} ->
+        from(own_text in Text,
+          join: own_layer in assoc(own_text, :layer),
+          join: edge in assoc(own_layer, :attached_edges),
+          join: bond in assoc(edge, :bonds),
+          where: own_text.id == ^text.id,
+          select: bond.id
+        )
+      end
+    )
+    |> Ecto.Multi.append(RenewCollab.Bonding.reposition_multi())
   end
 end

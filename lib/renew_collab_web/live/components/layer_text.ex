@@ -21,7 +21,8 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
             y={@layer.text.size_hint.position_y}
             width={@layer.text.size_hint.width}
             height={@layer.text.size_hint.height}
-            fill="pink"
+            fill="none"
+            stroke="none"
           >
           </rect>
         <% end %>
