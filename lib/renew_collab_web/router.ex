@@ -65,14 +65,12 @@ defmodule RenewCollabWeb.Router do
   end
 
   scope "/", RenewCollabWeb do
-    pipe_through [:browser]
+    pipe_through [:browser, :authenticated]
 
-    live_session :require_authenticated_user do
-      # on_mount: [
-      #   {AuthorizationSampleWeb.UserAuth, :ensure_authenticated},
-      #   {AuthorizationSampleWeb.UserAuth, :ensure_authorized}
-      # ] 
-
+    live_session :require_authenticated_user,
+      on_mount: [
+        {RenewCollabWeb.Auth, :ensure_authenticated}
+      ] do
       live "/document/:id", LiveDocument
       live "/documents", LiveDocuments
     end
