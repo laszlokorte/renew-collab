@@ -88,33 +88,7 @@ defmodule RenewCollab.Import.DocumentImport do
                   "symbol_shape_attributes" => shape_attributes,
                   "symbol_shape_id" => Map.get(symbol_ids, shape_name)
                 },
-                "interface" =>
-                  case class_name do
-                    "de.renew.gui.PlaceFigure" ->
-                      "simple-ellipse"
-
-                    "de.renew.gui.TransitionFigure" ->
-                      "simple-rect"
-
-                    "de.renew.gui.VirtualPlaceFigure" ->
-                      "simple-ellipse"
-
-                    _ ->
-                      nil
-                  end
-                  |> case do
-                    nil ->
-                      nil
-
-                    name ->
-                      %{
-                        "socket_schema_id" =>
-                          Map.get(
-                            socket_schema_ids,
-                            name
-                          )
-                      }
-                  end,
+                "interface" => convert_interface(socket_schema_ids, class_name),
                 "style" => style
               }
 
@@ -175,7 +149,8 @@ defmodule RenewCollab.Import.DocumentImport do
                     "text_color" => convert_color(Map.get(attrs, "TextColor", "black")),
                     "rich" => is_rich_text(parser.grammar, class_name)
                   }
-                }
+                },
+                "interface" => convert_interface(socket_schema_ids, class_name)
               }
 
             {{%Renewex.Storable{
@@ -523,6 +498,41 @@ defmodule RenewCollab.Import.DocumentImport do
 
   defp is_rich_text(grammar, class_name),
     do: Renewex.Hierarchy.is_subtype_of(grammar, class_name, "de.renew.gui.fs.ConceptFigure")
+
+  defp convert_interface(socket_schema_ids, class_name) do
+    case class_name do
+      "de.renew.gui.PlaceFigure" ->
+        "simple-ellipse"
+
+      "de.renew.gui.TransitionFigure" ->
+        "simple-rect"
+
+      "de.renew.gui.VirtualPlaceFigure" ->
+        "simple-ellipse"
+
+      "de.renew.gui.fs.ConceptFigure" ->
+        "sides"
+
+      "fs.ConceptFigure" ->
+        "sides"
+
+      _ ->
+        nil
+    end
+    |> case do
+      nil ->
+        nil
+
+      name ->
+        %{
+          "socket_schema_id" =>
+            Map.get(
+              socket_schema_ids,
+              name
+            )
+        }
+    end
+  end
 
   defp convert_shape(grammar, class_name, fields, attrs) do
     cond do

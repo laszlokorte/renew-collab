@@ -1,6 +1,8 @@
 defmodule RenewCollabWeb.Router do
   use RenewCollabWeb, :router
 
+  import RenewCollabWeb.Auth
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -8,6 +10,7 @@ defmodule RenewCollabWeb.Router do
     plug :put_root_layout, html: {RenewCollabWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :fetch_current_account
   end
 
   pipeline :api do
@@ -15,7 +18,11 @@ defmodule RenewCollabWeb.Router do
   end
 
   pipeline :authenticated do
-    plug RenewCollabWeb.Plug.Authenticate
+    plug :require_authenticated_account
+  end
+
+  pipeline :not_authenticated do
+    plug :redirect_if_account_is_authenticated
   end
 
   scope "/api", RenewCollabWeb do
@@ -36,15 +43,29 @@ defmodule RenewCollabWeb.Router do
   end
 
   scope "/", RenewCollabWeb do
-    pipe_through [:browser]
+    pipe_through [:browser, :not_authenticated]
+
+    get "/login", LoginController, :index
+    post "/login", LoginController, :login
+  end
+
+  scope "/", RenewCollabWeb do
+    pipe_through [:browser, :authenticated]
+
+    delete "/logout", LoginController, :delete
 
     get "/", HomeController, :index
     get "/health", HealthController, :index
     get "/accounts", AccountsController, :index
     post "/accounts", AccountsController, :create
     delete "/accounts/:id", AccountsController, :delete
-    get "/login", LoginController, :index
-    post "/login", LoginController, :login
+
+    get "/documents/:id/export", DocumentController, :export
+    get "/documents/:id/inspect", DocumentController, :inspect
+  end
+
+  scope "/", RenewCollabWeb do
+    pipe_through [:browser]
 
     live_session :require_authenticated_user do
       # on_mount: [
@@ -55,14 +76,7 @@ defmodule RenewCollabWeb.Router do
       live "/document/:id", LiveDocument
       live "/documents", LiveDocuments
     end
-
-    get "/documents/:id/export", DocumentController, :export
-    get "/documents/:id/inspect", DocumentController, :inspect
   end
-
-  # defp require_authenticated_user(conn, _params) do
-  #   conn
-  # end
 
   # Enable LiveDashboard in development
   if Application.compile_env(:renew_collab, :dev_routes) do

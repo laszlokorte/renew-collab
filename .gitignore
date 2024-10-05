@@ -33,3 +33,5 @@ deploy.sh
 dev.sh
 env.sh
 mkpass.sh
+dev_stderr.txt
+dev_stdout.txt

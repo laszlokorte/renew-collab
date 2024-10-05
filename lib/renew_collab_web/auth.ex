@@ -48,7 +48,7 @@ defmodule RenewCollabWeb.Auth do
     conn
     |> renew_session()
     |> delete_resp_cookie(@remember_me_cookie)
-    |> redirect(to: ~p"/")
+    |> redirect(to: ~p"/login")
   end
 
   def fetch_current_account(conn, _opts) do
@@ -58,16 +58,28 @@ defmodule RenewCollabWeb.Auth do
   end
 
   defp ensure_account_token(conn) do
-    if token = get_session(conn, :account_token) do
+    if token = get_auth_header(conn) do
       {token, conn}
     else
-      conn = fetch_cookies(conn, signed: [@remember_me_cookie])
-
-      if token = conn.cookies[@remember_me_cookie] do
-        {token, put_token_in_session(conn, token)}
+      if token = get_session(conn, :account_token) do
+        {token, conn}
       else
-        {nil, conn}
+        conn = fetch_cookies(conn, signed: [@remember_me_cookie])
+
+        if token = conn.cookies[@remember_me_cookie] do
+          {token, put_token_in_session(conn, token)}
+        else
+          {nil, conn}
+        end
       end
+    end
+  end
+
+  defp get_auth_header(conn) do
+    with ["Bearer " <> token] <- get_req_header(conn, "authorization") do
+      token
+    else
+      _ -> nil
     end
   end
 

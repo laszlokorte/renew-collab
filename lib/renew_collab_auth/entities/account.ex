@@ -41,10 +41,12 @@ defmodule RenewCollabAuth.Entites.Account do
         entered_pasword
       )
       when is_binary(hashed_password) and byte_size(entered_pasword) > 0 do
+    dbg(hashed_password)
     Pbkdf2.verify_pass(entered_pasword, hashed_password)
   end
 
   def valid_password?(_, _) do
+    dbg("x")
     Pbkdf2.no_user_verify()
     false
   end

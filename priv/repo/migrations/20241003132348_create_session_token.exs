@@ -2,8 +2,9 @@ defmodule RenewCollab.Repo.Migrations.CreateSessionToken do
   use Ecto.Migration
 
   def change do
-    create table(:session_token) do
-      add :account_id, references(:account, on_delete: :delete_all), null: false
+    create table(:session_token, primary_key: false) do
+      add :id, :binary_id, primary_key: true, null: false
+      add :account_id, references(:account, on_delete: :delete_all, type: :binary_id), null: false
       add :token, :binary, null: false
       add :context, :string, null: false
       add :sent_to, :string

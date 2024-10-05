@@ -22,7 +22,7 @@ defmodule RenewCollabAuth.Auth do
   def get_account_by_email_and_password(email, password) do
     account = RenewCollabAuth.Auth.get_account_by_email(email)
 
-    if account && Account.valid_password?(password, account.password) do
+    if account && Account.valid_password?(account, password) do
       account
     else
       nil
@@ -42,7 +42,7 @@ defmodule RenewCollabAuth.Auth do
   def create_account(email, password) do
     create_account(%{
       "email" => email,
-      "password" => password
+      "new_password" => password
     })
   end
 
