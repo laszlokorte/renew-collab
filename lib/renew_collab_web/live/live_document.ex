@@ -43,6 +43,7 @@ defmodule RenewCollabWeb.LiveDocument do
         )
         |> assign(:selection, nil)
         |> assign(:show_hierarchy, false)
+        |> assign(:show_selected, true)
         |> assign(:show_snapshots, false)
         |> assign(:show_health, false)
         |> assign(:show_meta, false)
@@ -170,6 +171,24 @@ defmodule RenewCollabWeb.LiveDocument do
               </dl>
             </form>
           </div>
+        <% end %>
+
+        <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-selected">
+          Selected
+        </h2>
+        <%= if @show_selected do %>
+          <%= with selected_layer <- Enum.find(@document.layers, &(&1.id == @selection)) do %>
+            <%= if selected_layer != nil do %>
+              <.live_component
+                id="layer-properties"
+                module={RenewCollabWeb.LayerPropertiesComponent}
+                socket_schemas={@socket_schemas}
+                document={@document}
+                symbols={@symbols}
+                layer={selected_layer}
+              />
+            <% end %>
+          <% end %>
         <% end %>
 
         <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-hierarchy">
@@ -390,6 +409,10 @@ defmodule RenewCollabWeb.LiveDocument do
 
   def handle_event("toggle-hierarchy", %{}, socket) do
     {:noreply, socket |> update(:show_hierarchy, &(not &1))}
+  end
+
+  def handle_event("toggle-selected", %{}, socket) do
+    {:noreply, socket |> update(:show_selected, &(not &1))}
   end
 
   def handle_event("toggle-snapshots", %{}, socket) do
