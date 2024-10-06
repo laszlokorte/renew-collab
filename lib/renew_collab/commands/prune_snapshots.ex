@@ -53,12 +53,12 @@ defmodule RenewCollab.Commands.PruneSnapshots do
       :delete_label,
       fn %{document_id: document_id} ->
         from(s in Snapshot,
+          as: :s,
           where:
             s.document_id == ^document_id and
               s.id not in subquery(
                 from(l in SnapshotLabel,
-                  join: ss in assoc(l, :snapshot),
-                  where: ss.document_id == ^document_id,
+                  where: l.snapshot_id == parent_as(:s).id,
                   select: l.snapshot_id
                 )
               )
