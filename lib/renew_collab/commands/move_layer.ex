@@ -110,14 +110,18 @@ defmodule RenewCollab.Commands.MoveLayer do
 
         _ ->
           from(p in LayerParenthood,
-            as: :p,
             where:
               p.id in subquery(
-                from(ok in LayerParenthood,
-                  where:
-                    ok.ancestor_id == ^layer_id and ok.depth < parent_as(:p).depth and
-                      parent_as(:p).descendant_id == ok.descendant_id,
-                  select: parent_as(:p).id
+                from(
+                  copied in subquery(
+                    from(ok in LayerParenthood,
+                      left_join: bad in LayerParenthood,
+                      on: bad.descendant_id == ok.descendant_id,
+                      where: ok.ancestor_id == ^layer_id and ok.depth < bad.depth,
+                      select: bad.id
+                    )
+                  ),
+                  select: copied.id
                 )
               )
           )
