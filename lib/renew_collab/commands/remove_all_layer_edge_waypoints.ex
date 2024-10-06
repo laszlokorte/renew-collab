@@ -31,8 +31,7 @@ defmodule RenewCollab.Commands.RemoveAllLayerEdgeWaypoints do
       fn
         %{edge: edge} ->
           from(w in Waypoint,
-            where: w.edge_id == ^edge.id,
-            select: w
+            where: w.edge_id == ^edge.id
           )
       end
     )
