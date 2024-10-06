@@ -136,7 +136,9 @@ defmodule RenewCollab.Commands.MoveLayerRelative do
         from(own_layer in Layer,
           join: edge in assoc(own_layer, :attached_edges),
           join: bond in assoc(edge, :bonds),
-          where: own_layer.id in ^combined_layer_ids or edge.layer_id in ^combined_layer_ids,
+          where:
+            (own_layer.id in ^combined_layer_ids and edge.layer_id not in ^combined_layer_ids) or
+              (own_layer.id not in ^combined_layer_ids and edge.layer_id in ^combined_layer_ids),
           group_by: bond.id,
           select: bond.id
         )
