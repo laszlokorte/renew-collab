@@ -35,15 +35,7 @@ defmodule RenewCollab.Commands.PruneSnapshots do
       :update_predecessors,
       fn %{document_id: document_id} ->
         from(s in Snapshot,
-          where:
-            s.document_id == ^document_id and
-              s.id in subquery(
-                from(l in SnapshotLabel,
-                  join: ss in assoc(l, :snapshot),
-                  where: ss.document_id == ^document_id,
-                  select: l.snapshot_id
-                )
-              ),
+          where: s.document_id == ^document_id,
           update: [set: [predecessor_id: s.id]]
         )
       end,

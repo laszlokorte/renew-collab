@@ -54,7 +54,7 @@ defmodule RenewCollab.Commands.CreateLayerEdgeWaypoint do
           left_join: w3 in assoc(e, :waypoints),
           where: l.id == ^layer_id,
           order_by: [asc: w2.sort],
-          group_by: e.id,
+          group_by: [w2.id, e.id],
           limit: 1,
           select: {e, nil, w2, max(w3.sort)}
         )
@@ -68,7 +68,7 @@ defmodule RenewCollab.Commands.CreateLayerEdgeWaypoint do
           left_join: w3 in assoc(e, :waypoints),
           where: l.id == ^layer_id,
           order_by: [asc: w2.sort],
-          group_by: e.id,
+          group_by: [w2.id, e.id],
           limit: 1,
           select: {e, w, w2, max(w3.sort)}
         )
