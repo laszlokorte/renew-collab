@@ -81,7 +81,7 @@ defmodule RenewCollab.Commands.MoveLayer do
 
       %{target: %{parent_id: target_parent_id}, document_id: document_id} ->
         # SELECT low.child_id,
-        # high.parent_id, 
+        # high.parent_id,
         # low.depth + high.depth + 1
         # FROM site_closure low, site_closure high
         # WHERE low.parent_id = 3 AND high.child_id=5;
@@ -103,17 +103,20 @@ defmodule RenewCollab.Commands.MoveLayer do
       :delete_old_parents,
       fn
         # DELETE FROM site_closure WHERE id IN (
-        # SELECT bad.id FROM site_closure ok 
+        # SELECT bad.id FROM site_closure ok
         # LEFT JOIN site_closure bad ON bad.child_id=ok.child_id
         # WHERE ok.parent_id=3 and ok.depth < bad.depth
         # );
 
         _ ->
           from(p in LayerParenthood,
+            as: :parent,
             where:
               p.id in subquery(
                 from(ok in LayerParenthood,
+                  as: :ok,
                   left_join: bad in LayerParenthood,
+                  as: :bad,
                   on: bad.descendant_id == ok.descendant_id,
                   where: ok.ancestor_id == ^layer_id and ok.depth < bad.depth,
                   select: bad.id
@@ -128,7 +131,7 @@ defmodule RenewCollab.Commands.MoveLayer do
       fn
         # INSERT INTO site_closure(child_id, parent_id, depth)
         # SELECT low.child_id,
-        # high.parent_id, 
+        # high.parent_id,
         # low.depth + high.depth + 1
         # FROM site_closure low, site_closure high
         # WHERE low.parent_id = 3 AND high.child_id=5;
