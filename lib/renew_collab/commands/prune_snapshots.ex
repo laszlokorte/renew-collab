@@ -21,16 +21,15 @@ defmodule RenewCollab.Commands.PruneSnapshots do
         from(l in LatestSnapshot,
           where: l.document_id == ^document_id,
           join: s in assoc(l, :snapshot),
-          left_join: lbl in assoc(l, :label),
-          where: is_nil(lbl),
+          left_join: lbl in assoc(s, :label),
+          where: is_nil(lbl.id),
           select: %{
             id: ^Ecto.UUID.generate(),
             snapshot_id: l.snapshot_id,
             description: "(auto)"
           }
         )
-      end,
-      on_conflict: :nothing
+      end
     )
     |> Ecto.Multi.update_all(
       :update_predecessors,

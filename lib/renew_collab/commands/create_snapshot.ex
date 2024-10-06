@@ -56,7 +56,14 @@ defmodule RenewCollab.Commands.CreateSnapshot do
         snap.query(document_id)
       end)
     end)
-    |> Ecto.Multi.insert_or_update(
+    |> Ecto.Multi.delete_all(
+      :delete_current_latest,
+      fn %{document_id: document_id} ->
+        from(l in LatestSnapshot, where: l.document_id == ^document_id)
+      end,
+      []
+    )
+    |> Ecto.Multi.insert(
       :new_snapshot,
       fn %{
            document_id: document_id,
@@ -77,17 +84,19 @@ defmodule RenewCollab.Commands.CreateSnapshot do
             |> Map.new()
         })
       end,
-      on_conflict: {:replace, [:content, :updated_at]},
-      returning: [:id]
+      on_conflict: {:replace, [:id, :content, :updated_at]}
     )
     |> Ecto.Multi.insert(
       :new_latest_snapshot,
       fn %{
-           new_snapshot: new_snapshot
+           document_id: document_id,
+           ids: %{
+             new_id: new_id
+           }
          } ->
         %LatestSnapshot{
-          document_id: new_snapshot.document_id,
-          snapshot_id: new_snapshot.id
+          document_id: document_id,
+          snapshot_id: new_id
         }
       end,
       on_conflict: {:replace, [:snapshot_id]}
