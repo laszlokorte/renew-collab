@@ -30,7 +30,7 @@ defmodule RenewCollab.Symbols do
             left_join: h in assoc(stp, :horizontal),
             left_join: v in assoc(stp, :vertical),
             left_join: a in assoc(stp, :arc),
-            order_by: [asc: sgm.sort, asc: stp.sort],
+            order_by: [asc: p.sort, asc: sgm.sort, asc: stp.sort],
             preload: [
               paths:
                 {p,
