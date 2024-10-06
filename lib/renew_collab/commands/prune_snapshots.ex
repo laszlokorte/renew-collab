@@ -20,6 +20,9 @@ defmodule RenewCollab.Commands.PruneSnapshots do
       fn %{document_id: document_id} ->
         from(l in LatestSnapshot,
           where: l.document_id == ^document_id,
+          join: s in assoc(l, :snapshot),
+          left_join: lbl in assoc(l, :label),
+          where: is_nil(lbl),
           select: %{
             id: ^Ecto.UUID.generate(),
             snapshot_id: l.snapshot_id,
