@@ -26,6 +26,7 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
           >
           </rect>
         <% end %>
+
         <rect
           data-client-adjusted
           id={"#{@layer.text.id}-outline-box"}

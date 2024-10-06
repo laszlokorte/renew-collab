@@ -18,6 +18,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
           👁
         <% end %>
       </td>
+
       <td valign="top" width="20">
         <%= if @layer.outgoing_link do %>
           <span
@@ -29,34 +30,76 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
           </span>
         <% end %>
       </td>
-      <td valign="top" width="20" align="center">
+
+      <td
+        valign="top"
+        width="20"
+        align="center"
+        {[style: "cursor: pointer;", "phx-click": "select_layer"]}
+        phx-value-id={@layer.id}
+      >
         <%= if @layer.box do %>
           ☐
         <% end %>
       </td>
-      <td valign="top" width="20" align="center">
+
+      <td
+        valign="top"
+        width="20"
+        align="center"
+        {[style: "cursor: pointer;", "phx-click": "select_layer"]}
+        phx-value-id={@layer.id}
+      >
         <%= if @layer.text do %>
           T
         <% end %>
       </td>
-      <td valign="top" width="20" align="center">
-        <%= if not (is_nil(@layer.edge) or is_nil(@layer.edge.style)) do %>
-          <%= if @layer.edge.style.source_tip_symbol_shape_id do %>
-            &lt;
+
+      <td
+        valign="top"
+        width="20"
+        align="center"
+        {[style: "cursor: pointer;", "phx-click": "select_layer"]}
+        phx-value-id={@layer.id}
+      >
+        <%= if @layer.edge && @layer.edge.style do %>
+          <%= case {@layer.edge.style.source_tip_symbol_shape_id, @layer.edge.style.target_tip_symbol_shape_id} do %>
+            <% {nil, nil} -> %>
+              -
+            <% {_, nil} -> %>
+              🠈
+            <% {nil, _} -> %>
+              🠊
+            <% {_, _} -> %>
+              🡘
           <% end %>
-        <% end %>
-        <%= if @layer.edge do %>
-          &mdash;
-        <% end %>
-        <%= if not (is_nil(@layer.edge) or is_nil(@layer.edge.style)) do %>
-          <%= if @layer.edge.style.target_tip_symbol_shape_id do %>
-            &gt;
+        <% else %>
+          <%= if @layer.edge do %>
+            -
           <% end %>
         <% end %>
       </td>
-      <td valign="top" width="20" align="right" style="white-space: nowrap; word-wrap: none">
-        <%= @layer.z_index %>
+
+      <td valign="top" width="20" align="center" style="white-space: nowrap; word-wrap: none">
+        <%= if @selected do %>
+          <input
+            style="width: 3em"
+            style="padding:0.5ex"
+            type="number"
+            step="1"
+            min="0"
+            phx-hook="RenewZIndex"
+            id={"layer-zindex-#{@layer.id}"}
+            rnw-layer-id={"#{@layer.id}"}
+            value={@layer.z_index}
+            size="2"
+            width="30"
+          />
+        <% else %>
+          <%= @layer.z_index %>
+        <% end %>
       </td>
+
       <td valign="top" style={"padding-left: #{0.2+ 2*@depth}em"}>
         <div
           draggable="true"
@@ -74,6 +117,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
             style="grid-row: 1 / span 1; grid-column: 1/span 1; min-height: 1em"
           >
           </div>
+
           <div
             phx-hook="RenewDropper"
             id={"dropper-#{@layer.id}-above-outside"}
@@ -83,6 +127,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
             style="grid-row: 2 / span 1; grid-column: 1/span 1; min-height: 1em"
           >
           </div>
+
           <div
             phx-hook="RenewDropper"
             id={"dropper-#{@layer.id}-below-inside"}
@@ -92,6 +137,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
             style="grid-row: 1 / span 1; grid-column: 2/span 1; min-width: 1em"
           >
           </div>
+
           <div
             phx-hook="RenewDropper"
             id={"dropper-#{@layer.id}-above-inside"}
@@ -101,19 +147,19 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
             style="grid-row: 2 / span 1; grid-column: 2/span 1; min-width: 1em"
           >
           </div>
+
           <div style="pointer-events: none; grid-row: 1 / span 2; grid-column: 1/span 1; grid-column: 1/span 2; text-align: center; align-self: center;">
             ☰
           </div>
         </div>
       </td>
+
       <td
         valign="top"
         {[style: "cursor: pointer;padding-left: #{0.2+ 2*@depth}em", "phx-click": "select_layer"]}
         phx-value-id={@layer.id}
       >
-        <small><code><%= @layer.id %></code></small>
-        <br />
-
+        <small><code><%= @layer.id %></code></small> <br />
         <small><code><%= @layer.semantic_tag %></code></small>
       </td>
     </tr>

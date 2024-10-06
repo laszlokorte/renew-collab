@@ -9,17 +9,25 @@ defmodule RenewCollabWeb.HierarchyListComponent do
         <thead>
           <tr>
             <td width="20" align="center" style="padding: 5px">Vis</td>
+
             <td width="20" align="center" style="padding: 5px">Link</td>
+
             <td width="20" align="center" style="padding: 5px">Box</td>
+
             <td width="20" align="center" style="padding: 5px">Text</td>
+
             <td width="20" align="center" style="padding: 5px">Edge</td>
+
             <td width="20" align="right" style="padding: 5px">Ord.</td>
+
             <td width="20" align="right" style="padding: 5px"></td>
+
             <td>
               ID/Type
             </td>
           </tr>
         </thead>
+
         <tbody>
           <%= layer_hierarchy(assigns, 0, nil) %>
         </tbody>
@@ -42,8 +50,7 @@ defmodule RenewCollabWeb.HierarchyListComponent do
         layer={layer}
         selected={@selection == layer.id}
         depth={@depth}
-      />
-      <%= layer_hierarchy(assigns, @depth + 1, layer.id) %>
+      /> <%= layer_hierarchy(assigns, @depth + 1, layer.id) %>
     <% end %>
     """
   end
@@ -62,8 +69,7 @@ defmodule RenewCollabWeb.HierarchyListComponent do
         layer={layer}
         selected={@selection == layer.id}
         depth={@depth}
-      />
-      <%= layer_hierarchy(assigns, @depth + 1, layer.id) %>
+      /> <%= layer_hierarchy(assigns, @depth + 1, layer.id) %>
     <% end %>
     """
   end

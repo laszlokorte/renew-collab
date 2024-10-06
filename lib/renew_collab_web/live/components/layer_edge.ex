@@ -118,6 +118,7 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
           id={"edge-support-#{@layer.edge.id}"}
         >
         </path>
+
         <path
           stroke="#33aaff"
           stroke-linejoin="round"
@@ -193,6 +194,7 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
             fill="blue"
           >
           </circle>
+
           <circle
             cursor="alias"
             rnw-layer-id={"#{@layer.id}"}

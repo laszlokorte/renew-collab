@@ -32,16 +32,17 @@ defmodule RenewCollabWeb.LiveDocuments do
         <h1 style="margin: 0; font-size: 1.3em; display: flex; align-items: center; gap: 1ex">
           <img src="/favicon.svg" style="width: 1.5em; height: 1.5em" /> Renew Web Editor
         </h1>
-
         <.link style="color: white; align-self: center;" navigate={~p"/"}>Dashboard</.link>
       </header>
 
       <div style="padding: 1em 1em 0; display: flex; align-items: start; gap: 1em">
         <fieldset style="margin-bottom: 1em">
           <p>Create a new Empty Document</p>
+
           <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
             New Empty Document
           </legend>
+
           <.form for={@create_form} phx-submit="create_document" phx-change="validate">
             <div style="display: flex; align-items: stretch; gap: 0.1em">
               <input
@@ -65,9 +66,11 @@ defmodule RenewCollabWeb.LiveDocuments do
           <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
             Import Renew (.rnw) Files
           </legend>
+
           <p>
             Select up to 10 Renew files from your computer:
           </p>
+
           <.form for={@import_form} phx-submit="import_document" phx-change="validate">
             <.live_file_input
               upload={@uploads.import_file}
@@ -88,8 +91,12 @@ defmodule RenewCollabWeb.LiveDocuments do
                     </button>
                     <%= entry.client_name %>
                   </dt>
-                  <dd><%!-- entry.progress will update automatically for in-flight entries --%>
-                    <progress value={entry.progress} max="100"><%= entry.progress %>%</progress></dd>
+
+                  <dd>
+                    <%!-- entry.progress will update automatically for in-flight entries --%>
+                    <progress value={entry.progress} max="100"><%= entry.progress %>%</progress>
+                  </dd>
+
                   <dd style="grid-column: 1 / span 3;">
                     <ul>
                       <%= for err <- upload_errors(@uploads.import_file, entry) do %>
@@ -121,17 +128,22 @@ defmodule RenewCollabWeb.LiveDocuments do
 
       <div style="padding: 1em">
         <h2 style="margin: 0;">Documents</h2>
+
         <table style="width: 100%;" cellpadding="5">
           <thead>
             <tr>
               <th style="border-bottom: 1px solid #333;" align="left" width="1000">Name</th>
+
               <th style="border-bottom: 1px solid #333;" align="left" width="200">Created</th>
+
               <th style="border-bottom: 1px solid #333;" align="left" width="200">Last Updated</th>
+
               <th style="border-bottom: 1px solid #333;" align="left" width="100" colspan="3">
                 Actions
               </th>
             </tr>
           </thead>
+
           <tbody>
             <%= if Enum.empty?(@documents) do %>
               <tr>
@@ -149,8 +161,11 @@ defmodule RenewCollabWeb.LiveDocuments do
                       <%= document.name %>
                     </.link>
                   </td>
+
                   <td><%= document.inserted_at |> Calendar.strftime("%Y-%m-%d %H:%M") %></td>
+
                   <td><%= document.updated_at |> Calendar.strftime("%Y-%m-%d %H:%M") %></td>
+
                   <td width="50">
                     <a href={~p"/documents/#{document.id}/export"}>
                       <button style="cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff">
@@ -158,6 +173,7 @@ defmodule RenewCollabWeb.LiveDocuments do
                       </button>
                     </a>
                   </td>
+
                   <td width="50">
                     <button
                       type="button"
@@ -168,6 +184,7 @@ defmodule RenewCollabWeb.LiveDocuments do
                       Duplicate
                     </button>
                   </td>
+
                   <td width="50">
                     <button
                       type="button"
@@ -184,6 +201,7 @@ defmodule RenewCollabWeb.LiveDocuments do
           </tbody>
         </table>
       </div>
+
       <div style="padding: 1em">
         <details>
           <summary>
@@ -192,9 +210,11 @@ defmodule RenewCollabWeb.LiveDocuments do
 
           <fieldset>
             <legend>Reset</legend>
+
             <p>
               Clear all Documents and reset database content.
             </p>
+
             <button
               type="button"
               phx-click="reset"

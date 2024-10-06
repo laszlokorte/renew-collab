@@ -15,10 +15,11 @@ defmodule RenewCollabWeb.HierarchyStyleList do
             |> Enum.join(" ") %>
           </label>
           <br />
-          <small style="display: block; max-width: 10em; overflow: hidden; text-overflow: ellipsis;">
+          <small style="display: block; max-width: 10em; overflow: hidden; text-overflow: ellipsis; font-family: monospace">
             <%= style_or_default(@element, attr) %>
           </small>
         </dt>
+
         <dd>
           <.live_component
             symbols={@symbols}
@@ -50,5 +51,10 @@ defmodule RenewCollabWeb.HierarchyStyleList do
 
   defp default_style(:background_color), do: "transparent"
   defp default_style(:border_width), do: 1
+  defp default_style(:opacity), do: 1.0
+  defp default_style(:font_size), do: 12
+  defp default_style(:alignment), do: "left"
+  defp default_style(:font_family), do: "sans-serif"
+  defp default_style(:border_dash_array), do: ""
   defp default_style(_style_key), do: nil
 end

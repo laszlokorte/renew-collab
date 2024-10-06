@@ -38,7 +38,6 @@ defmodule RenewCollabWeb.HierarchyLayerComponent do
             selected={@selected}
             symbols={@symbols}
           />
-
           <%= if @layer.interface do %>
             <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: socket_schemas} <- @socket_schemas do %>
               <.live_component
@@ -53,6 +52,7 @@ defmodule RenewCollabWeb.HierarchyLayerComponent do
             <% end %>
           <% end %>
         <% end %>
+
         <%= if @layer.box do %>
           <.live_component
             id={"box-#{@layer.id}"}
@@ -61,7 +61,6 @@ defmodule RenewCollabWeb.HierarchyLayerComponent do
             selected={@selected}
             symbols={@symbols}
           />
-
           <%= if @layer.interface do %>
             <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: socket_schemas} <- @socket_schemas do %>
               <.live_component
@@ -76,6 +75,7 @@ defmodule RenewCollabWeb.HierarchyLayerComponent do
             <% end %>
           <% end %>
         <% end %>
+
         <%= if @layer.edge do %>
           <.live_component
             id={"edge-#{@layer.id}"}

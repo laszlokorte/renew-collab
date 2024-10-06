@@ -43,7 +43,7 @@ defmodule RenewCollabWeb.LiveDocument do
         )
         |> assign(:selection, nil)
         |> assign(:show_hierarchy, false)
-        |> assign(:show_selected, true)
+        |> assign(:show_selected, false)
         |> assign(:show_snapshots, false)
         |> assign(:show_health, false)
         |> assign(:show_meta, false)
@@ -74,12 +74,14 @@ defmodule RenewCollabWeb.LiveDocument do
           <% else _ -> %>
         <% end %>
       </div>
+
       <div style="grid-area: left; width: 100%; height: 100%; overflow: auto; box-sizing: border-box; padding: 0 2em">
         <datalist id="all-semantic-tags">
           <%= for {class_name, _} <- renew_grammar().hierarchy do %>
             <option><%= class_name %></option>
           <% end %>
         </datalist>
+
         <svg
           phx-click="select_layer"
           phx-value-id=""
@@ -119,11 +121,13 @@ defmodule RenewCollabWeb.LiveDocument do
         <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-meta">
           Document
         </h2>
+
         <%= if @show_meta do %>
           <div style="width: 45vw;">
             <form id={"document-rename-#{@document.id}"} phx-hook="RnwDocumentRename">
               <dl style="display: grid; grid-template-columns: auto 1fr;gap:1ex; align-items: baseline">
                 <dt style="margin: 0; text-align: right;">Document Id</dt>
+
                 <dd style="margin: 0;">
                   <input
                     readonly
@@ -140,7 +144,9 @@ defmodule RenewCollabWeb.LiveDocument do
                     Inspect
                   </.link>
                 </dd>
+
                 <dt style="margin: 0; text-align: right;">Document Name</dt>
+
                 <dd style="margin: 0;">
                   <input
                     type="text"
@@ -149,7 +155,9 @@ defmodule RenewCollabWeb.LiveDocument do
                     style="padding: 1ex; box-sizing:border-box; width: 100%;"
                   />
                 </dd>
+
                 <dt style="margin: 0; text-align: right;">Kind</dt>
+
                 <dd style="margin: 0;">
                   <input
                     type="text"
@@ -159,7 +167,9 @@ defmodule RenewCollabWeb.LiveDocument do
                     list="all-semantic-tags"
                   />
                 </dd>
+
                 <dt style="margin: 0; text-align: right;"></dt>
+
                 <dd style="margin: 0;">
                   <button
                     style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff"
@@ -176,9 +186,10 @@ defmodule RenewCollabWeb.LiveDocument do
         <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-selected">
           Selected
         </h2>
+
         <%= if @show_selected do %>
-          <%= with selected_layer <- Enum.find(@document.layers, &(&1.id == @selection)) do %>
-            <%= if selected_layer != nil do %>
+          <div style="width: 45vw;">
+            <%= with selected_layer when selected_layer != nil <- Enum.find(@document.layers, &(&1.id == @selection)) do %>
               <.live_component
                 id="layer-properties"
                 module={RenewCollabWeb.LayerPropertiesComponent}
@@ -188,12 +199,13 @@ defmodule RenewCollabWeb.LiveDocument do
                 layer={selected_layer}
               />
             <% end %>
-          <% end %>
+          </div>
         <% end %>
 
         <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-hierarchy">
           Hierarchy
         </h2>
+
         <%= if @show_hierarchy do %>
           <div style="width: 45vw;">
             <div style="display: flex; gap: 1ex; padding: 1ex 0">
@@ -205,6 +217,7 @@ defmodule RenewCollabWeb.LiveDocument do
               >
                 Create Group
               </button>
+
               <button
                 type="button"
                 phx-click="create_text"
@@ -213,6 +226,7 @@ defmodule RenewCollabWeb.LiveDocument do
               >
                 Create Text
               </button>
+
               <button
                 type="button"
                 phx-click="create_box"
@@ -221,6 +235,7 @@ defmodule RenewCollabWeb.LiveDocument do
               >
                 Create Box
               </button>
+
               <button
                 type="button"
                 phx-click="create_edge"
@@ -229,10 +244,12 @@ defmodule RenewCollabWeb.LiveDocument do
               >
                 Create Line
               </button>
+
               <form target="" phx-change="insert_document">
                 <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: other_documents} <- @other_documents do %>
                   <select name="document_id" onchange="this.value=''">
                     <option value="" selected>Insert Other Document</option>
+
                     <%= for doc <- other_documents, doc.id != @document.id do %>
                       <option value={doc.id}><%= doc.name %></option>
                     <% end %>
@@ -257,6 +274,7 @@ defmodule RenewCollabWeb.LiveDocument do
         <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-snapshots">
           Snapshots
         </h2>
+
         <%= if @show_snapshots do %>
           <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: snapshots} <- @snapshots do %>
             <.live_component
@@ -272,14 +290,17 @@ defmodule RenewCollabWeb.LiveDocument do
         <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-health">
           Health
         </h2>
+
         <%= if @show_health do %>
           <div style="width: 45vw;">
             <dl style="display: grid; grid-template-columns: auto auto; justify-content: start; gap: 1ex 1em">
               <dt style="margin: 0">Missing Parenthoods</dt>
+
               <dd style="margin: 0">
                 <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: hierachy_missing} <- @hierachy_missing do %>
                   <details>
                     <summary style="cursor: pointer"><%= Enum.count(hierachy_missing) %></summary>
+
                     <ul>
                       <%= for i <- hierachy_missing do %>
                         <li><%= i.ancestor_id %>/<%= i.descendant_id %>/<%= i.depth %></li>
@@ -290,11 +311,14 @@ defmodule RenewCollabWeb.LiveDocument do
                     Loading
                 <% end %>
               </dd>
+
               <dt style="margin: 0">Invalid Parenthoods</dt>
+
               <dd style="margin: 0">
                 <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: hierachy_invalid} <- @hierachy_invalid do %>
                   <details>
                     <summary style="cursor: pointer"><%= Enum.count(hierachy_invalid) %></summary>
+
                     <ul>
                       <%= for id <- hierachy_invalid do %>
                         <li><%= id %></li>
@@ -305,7 +329,9 @@ defmodule RenewCollabWeb.LiveDocument do
                     Loading
                 <% end %>
               </dd>
+
               <dt></dt>
+
               <dd style="margin: 0">
                 <button
                   type="button"

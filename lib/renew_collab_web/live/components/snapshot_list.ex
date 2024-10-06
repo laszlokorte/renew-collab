@@ -12,6 +12,7 @@ defmodule RenewCollabWeb.SnapshotListComponent do
       >
         Create Snaphot
       </button>
+
       <button
         type="button"
         phx-click="prune_snaphots"
@@ -19,6 +20,7 @@ defmodule RenewCollabWeb.SnapshotListComponent do
       >
         Prune Snaphots
       </button>
+
       <div style="width: 45vw">
         <%= for {day, snaps} <- @snapshots |> Enum.group_by(&DateTime.to_date(&1.inserted_at))|>Enum.reverse do %>
           <h5 style="margin: 0;"><%= day |> Calendar.strftime("%Y-%m-%d") %></h5>

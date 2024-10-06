@@ -18,6 +18,7 @@ defmodule RenewCollabWeb.HierarchyStyleField do
               style="padding: 0.5ex; "
             >
               <option value="">None</option>
+
               <%= for {sid, s} <- symbols, s.name |> String.starts_with?("arrow") do %>
                 <option selected={@value == sid} value={sid}><%= s.name %></option>
               <% end %>
@@ -64,6 +65,7 @@ defmodule RenewCollabWeb.HierarchyStyleField do
             type={@type}
           />
       <% end %>
+
       <%= unless is_nil(default_value(@element, @attr, @type)) do %>
         <button
           style="text-align: center; align-self: center; cursor: pointer; border: none; background: #333; color: #fff; width: 1.8em; height: 1.8em; display: grid; place-content: center; place-items: center; border-radius: 100%; font-weight: bold;"

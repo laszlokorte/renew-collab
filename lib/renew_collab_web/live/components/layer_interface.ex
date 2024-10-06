@@ -73,7 +73,6 @@ defmodule RenewCollabWeb.HierarchyLayerInterfaceComponent do
                 opacity="0.4"
                 r={4}
               />
-
               <circle
                 cx={
                   RenewexIconset.Position.build_coord(

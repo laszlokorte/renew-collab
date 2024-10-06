@@ -1,26 +1,41 @@
 <.link navigate={~p"/"}>Back</.link>
-
 <h2>Health Status</h2>
 
 <dl>
   <dt>Installed Icons</dt>
+
   <dd><%= @installed_symbols |> Enum.count() %></dd>
+
   <dt>Installed Socket Schemas</dt>
+
   <dd><%= @installed_socke_schema |> Enum.count() %></dd>
+
   <dt>Accounts</dt>
+
   <dd><%= @number_of_accounts %></dd>
+
   <dt>Active Sessions</dt>
+
   <dd><%= @number_of_sessions %></dd>
+
   <dt>Documents</dt>
+
   <dd><%= @number_of_documents %></dd>
+
   <dt>SimpleCache Entries</dt>
+
   <dd><%= @cache_size %></dd>
+
   <dt>Hierarchy</dt>
+
   <dd>
     <dl>
       <dt>Missing Edges</dt>
+
       <dd><%= @hierarchy_missing_count %></dd>
+
       <dt>Invalid Edges</dt>
+
       <dd><%= @hierarchy_invalid_count %></dd>
     </dl>
   </dd>

@@ -28,8 +28,10 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
         <br />
       </div>
 
-      <fieldset>
-        <legend><label for={"semantic-tag-#{@layer.id}"}>Semantic Tag</label></legend>
+      <fieldset style="margin: 1em 0; padding: 1.5ex; border: 1px solid #777">
+        <legend style="background: #333; color: #fff; display: inline-block; padding: 0.2ex 1ex;">
+          <label for={"semantic-tag-#{@layer.id}"}>Semantic Tag</label>
+        </legend>
 
         <input
           phx-hook="RenewSemanticTag"
@@ -42,84 +44,11 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
         />
       </fieldset>
 
-      <%= if @layer.outgoing_link do %>
-        <button phx-click="unlink_layer" phx-value-id={@layer.id} type="button">unlink</button>
-      <% else %>
-        <form phx-hook="RnwLinkLayer" rnw-layer-id={"#{@layer.id}"} id={"link-layer-#{@layer.id}"}>
-          <select style="width: 5em" name="target">
-            <option value="">Target</option>
-
-            <%= for l <- @document.layers do %>
-              <option value={l.id}><%= l.semantic_tag %>/<%= l.id %></option>
-            <% end %>
-          </select>
-        </form>
-      <% end %>
-
-      <input
-        style="width: 3em"
-        style="padding:0.5ex"
-        type="number"
-        step="1"
-        min="0"
-        phx-hook="RenewZIndex"
-        id={"layer-zindex-#{@layer.id}"}
-        rnw-layer-id={"#{@layer.id}"}
-        value={@layer.z_index}
-        size="2"
-        width="30"
-      />
-      <%= unless is_nil(@layer.box) do %>
-        <fieldset>
-          <legend>Box Size</legend>
-
-          <form
-            phx-hook="RenewBoxSize"
-            id={"layer-box-size-#{@layer.id}"}
-            rnw-layer-id={"#{@layer.id}"}
-          >
-            <dl style="display: grid; grid-template-columns: max-content 1fr; gap: 0.5em">
-              <dt>X</dt>
-
-              <dd style="margin: 0">
-                <input
-                  style="padding:0.5ex"
-                  type="number"
-                  name="position_x"
-                  value={@layer.box.position_x}
-                />
-              </dd>
-
-              <dt>Y</dt>
-
-              <dd style="margin: 0">
-                <input
-                  style="padding:0.5ex"
-                  type="number"
-                  name="position_y"
-                  value={@layer.box.position_y}
-                />
-              </dd>
-
-              <dt>Width</dt>
-
-              <dd style="margin: 0">
-                <input style="padding:0.5ex" type="number" name="width" value={@layer.box.width} />
-              </dd>
-
-              <dt>Height</dt>
-
-              <dd style="margin: 0">
-                <input style="padding:0.5ex" type="number" name="height" value={@layer.box.height} />
-              </dd>
-            </dl>
-          </form>
-        </fieldset>
-      <% end %>
-
       <%= unless is_nil(@layer.box) and is_nil(@layer.text) do %>
-        <fieldset>
-          <legend for={"layer-interface-#{@layer.id}"}>Interface</legend>
+        <fieldset style="margin: 1em 0; padding: 1.5ex; border: 1px solid #777">
+          <legend style="background: #333; color: #fff; display: inline-block; padding: 0.2ex 1ex;">
+            Interface
+          </legend>
 
           <%= if false && @layer.interface do %>
             <span style="display: inline-flex; align-items: baseline;gap: 1ex;  padding: 0.5ex 1ex; background: #333; color: #fff">
@@ -166,8 +95,10 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
       <% end %>
 
       <%= unless is_nil(@layer.box) do %>
-        <fieldset>
-          <legend>Shape</legend>
+        <fieldset style="margin: 1em 0; padding: 1.5ex; border: 1px solid #777">
+          <legend style="background: #333; color: #fff; display: inline-block; padding: 0.2ex 1ex;">
+            Shape
+          </legend>
 
           <form
             phx-hook="RenewBoxShape"
@@ -215,9 +146,112 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
         </fieldset>
       <% end %>
 
+      <fieldset style="margin: 1em 0; padding: 1.5ex; border: 1px solid #777">
+        <legend style="background: #333; color: #fff; display: inline-block; padding: 0.2ex 1ex;">
+          Hyperlinks
+        </legend>
+
+        <dl style="display: grid; justify-content: start; grid-template-columns: auto auto auto">
+          <dt>Outgoing</dt>
+
+          <%= if @layer.outgoing_link do %>
+            <dd>
+              <span
+                style="cursor: pointer"
+                phx-click="select_layer"
+                phx-value-id={@layer.outgoing_link.target_layer_id}
+              >
+                🔗
+              </span>
+            </dd>
+            <dd>
+              <button phx-click="unlink_layer" phx-value-id={@layer.id} type="button">unlink</button>
+            </dd>
+          <% else %>
+            <dd>
+              <form
+                phx-hook="RnwLinkLayer"
+                rnw-layer-id={"#{@layer.id}"}
+                id={"link-layer-#{@layer.id}"}
+              >
+                <select style="width: 5em" name="target">
+                  <option value="">Target</option>
+
+                  <%= for l <- @document.layers do %>
+                    <option value={l.id}><%= l.semantic_tag %>/<%= l.id %></option>
+                  <% end %>
+                </select>
+              </form>
+            </dd>
+          <% end %>
+
+          <dt style="grid-column: 1 / span 1">Incoming</dt>
+
+          <dd>
+            <%= for i <- @layer.incoming_links do %>
+              <span style="cursor: pointer" phx-click="select_layer" phx-value-id={i.source_layer_id}>
+                🔗
+              </span>
+            <% end %>
+          </dd>
+        </dl>
+      </fieldset>
+
+      <%= unless is_nil(@layer.box) do %>
+        <fieldset style="margin: 1em 0; padding: 1.5ex; border: 1px solid #777">
+          <legend style="background: #333; color: #fff; display: inline-block; padding: 0.2ex 1ex;">
+            Box Size
+          </legend>
+
+          <form
+            phx-hook="RenewBoxSize"
+            id={"layer-box-size-#{@layer.id}"}
+            rnw-layer-id={"#{@layer.id}"}
+          >
+            <dl style="display: grid; grid-template-columns: max-content 1fr; gap: 0.5em">
+              <dt>X</dt>
+
+              <dd style="margin: 0">
+                <input
+                  style="padding:0.5ex"
+                  type="number"
+                  name="position_x"
+                  value={@layer.box.position_x}
+                />
+              </dd>
+
+              <dt>Y</dt>
+
+              <dd style="margin: 0">
+                <input
+                  style="padding:0.5ex"
+                  type="number"
+                  name="position_y"
+                  value={@layer.box.position_y}
+                />
+              </dd>
+
+              <dt>Width</dt>
+
+              <dd style="margin: 0">
+                <input style="padding:0.5ex" type="number" name="width" value={@layer.box.width} />
+              </dd>
+
+              <dt>Height</dt>
+
+              <dd style="margin: 0">
+                <input style="padding:0.5ex" type="number" name="height" value={@layer.box.height} />
+              </dd>
+            </dl>
+          </form>
+        </fieldset>
+      <% end %>
+
       <%= unless is_nil(@layer.edge) do %>
-        <fieldset>
-          <legend>Edge Path</legend>
+        <fieldset style="margin: 1em 0; padding: 1.5ex; border: 1px solid #777">
+          <legend style="background: #333; color: #fff; display: inline-block; padding: 0.2ex 1ex;">
+            Edge Path
+          </legend>
 
           <form
             phx-hook="RenewEdgePosition"
@@ -344,8 +378,10 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
           </ul>
         </fieldset>
 
-        <fieldset>
-          <legend>Bonds</legend>
+        <fieldset style="margin: 1em 0; padding: 1.5ex; border: 1px solid #777">
+          <legend style="background: #333; color: #fff; display: inline-block; padding: 0.2ex 1ex;">
+            Bonds
+          </legend>
 
           <dl>
             <dt>Source Bond</dt>
@@ -460,8 +496,10 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
       <% end %>
 
       <%= unless is_nil(@layer.text) do %>
-        <fieldset>
-          <legend>Text Position</legend>
+        <fieldset style="margin: 1em 0; padding: 1.5ex; border: 1px solid #777">
+          <legend style="background: #333; color: #fff; display: inline-block; padding: 0.2ex 1ex;">
+            Text Position
+          </legend>
 
           <form
             phx-hook="RenewTextPosition"
@@ -496,8 +534,10 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
       <% end %>
 
       <%= unless is_nil(@layer.text) do %>
-        <fieldset>
-          <legend>Text</legend>
+        <fieldset style="margin: 1em 0; padding: 1.5ex; border: 1px solid #777">
+          <legend style="background: #333; color: #fff; display: inline-block; padding: 0.2ex 1ex;">
+            Text
+          </legend>
           <textarea
             rows="5"
             cols="30"
@@ -508,8 +548,10 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
         </fieldset>
       <% end %>
 
-      <fieldset>
-        <legend>Layer Style</legend>
+      <fieldset style="margin: 1em 0; padding: 1.5ex; border: 1px solid #777">
+        <legend style="background: #333; color: #fff; display: inline-block; padding: 0.2ex 1ex;">
+          Layer Style
+        </legend>
 
         <.live_component
           id={"layer-styles-#{@layer.id}"}
@@ -529,8 +571,10 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
       </fieldset>
 
       <%= unless is_nil(@layer.edge) do %>
-        <fieldset>
-          <legend>Edge Style</legend>
+        <fieldset style="margin: 1em 0; padding: 1.5ex; border: 1px solid #777">
+          <legend style="background: #333; color: #fff; display: inline-block; padding: 0.2ex 1ex;">
+            Edge Style
+          </legend>
 
           <.live_component
             id={"edge-styles-#{@layer.id}"}
@@ -554,8 +598,10 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
       <% end %>
 
       <%= unless is_nil(@layer.text) do %>
-        <fieldset>
-          <legend>Text Style</legend>
+        <fieldset style="margin: 1em 0; padding: 1.5ex; border: 1px solid #777">
+          <legend style="background: #333; color: #fff; display: inline-block; padding: 0.2ex 1ex;">
+            Text Style
+          </legend>
 
           <.live_component
             id={"text-styles-#{@layer.id}"}
