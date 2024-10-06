@@ -8,7 +8,7 @@ defmodule RenewCollab.Repo.Migrations.CreateSnapshot do
       add :document_id, references(:document, on_delete: :delete_all, type: :binary_id),
         null: false
 
-      add :content, :map
+      add :content, :binary
 
       timestamps(type: :utc_datetime)
     end
