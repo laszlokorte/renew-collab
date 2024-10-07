@@ -5,16 +5,18 @@ defmodule RenewCollab.Commander do
   def run_document_command(command, snapshot \\ true)
 
   def run_document_command(%{__struct__: module} = command, snapshot) do
-    auto_snapshot = apply(module, :auto_snapshot, [command])
+    spawn(fn ->
+      auto_snapshot = apply(module, :auto_snapshot, [command])
 
-    apply(module, :multi, [command])
-    |> then(
-      &if(auto_snapshot and snapshot,
-        do: Ecto.Multi.append(&1, Versioning.snapshot_multi()),
-        else: &1
+      apply(module, :multi, [command])
+      |> then(
+        &if(auto_snapshot and snapshot,
+          do: Ecto.Multi.append(&1, Versioning.snapshot_multi()),
+          else: &1
+        )
       )
-    )
-    |> run_document_transaction(apply(module, :tags, [command]))
+      |> run_document_transaction(apply(module, :tags, [command]))
+    end)
   end
 
   defp run_document_transaction(multi, tags) do

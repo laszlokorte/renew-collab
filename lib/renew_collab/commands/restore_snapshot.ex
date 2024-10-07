@@ -4,6 +4,7 @@ defmodule RenewCollab.Commands.RestoreSnapshot do
   alias RenewCollab.Hierarchy.Layer
   alias RenewCollab.Versioning.Snapshot
   alias RenewCollab.Versioning.LatestSnapshot
+  alias RenewCollab.Versioning.SnapshotContent
 
   defstruct [:document_id, :snapshot_id]
 
@@ -23,12 +24,16 @@ defmodule RenewCollab.Commands.RestoreSnapshot do
       |> Ecto.Multi.one(
         :snapshot,
         fn %{document_id: document_id} ->
-          from(s in Snapshot, where: s.id == ^snapshot_id and s.document_id == ^document_id)
+          from(s in Snapshot,
+            join: c in assoc(s, :content),
+            preload: [content: c],
+            where: s.id == ^snapshot_id and s.document_id == ^document_id
+          )
         end
       )
       |> Ecto.Multi.run(
         :snapshot_content,
-        fn _, %{snapshot: %Snapshot{content: content}} ->
+        fn _, %{snapshot: %Snapshot{content: %SnapshotContent{content: content}}} ->
           {:ok, content}
         end
       )

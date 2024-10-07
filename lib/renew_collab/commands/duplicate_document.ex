@@ -9,7 +9,7 @@ defmodule RenewCollab.Commands.DuplicateDocument do
     %__MODULE__{document_id: document_id}
   end
 
-  def tags(%__MODULE__{document_id: document_id}), do: [:document_collection]
+  def tags(%__MODULE__{}), do: [:document_collection]
 
   def auto_snapshot(%__MODULE__{}), do: true
 

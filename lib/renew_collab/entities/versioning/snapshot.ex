@@ -5,7 +5,6 @@ defmodule RenewCollab.Versioning.Snapshot do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "snapshot" do
-    field :content, RenewCollab.Versioning.CompressedMap
     belongs_to :document, RenewCollab.Document.Document
     belongs_to :predecessor, RenewCollab.Versioning.Snapshot, foreign_key: :predecessor_id
 
@@ -15,6 +14,7 @@ defmodule RenewCollab.Versioning.Snapshot do
 
     has_one :latest, RenewCollab.Versioning.LatestSnapshot
     has_one :label, RenewCollab.Versioning.SnapshotLabel
+    has_one :content, RenewCollab.Versioning.SnapshotContent
 
     timestamps(type: :utc_datetime)
   end
@@ -22,7 +22,8 @@ defmodule RenewCollab.Versioning.Snapshot do
   @doc false
   def changeset(path, attrs) do
     path
-    |> cast(attrs, [:id, :content, :document_id, :predecessor_id])
-    |> validate_required([:id, :content, :document_id, :predecessor_id])
+    |> cast(attrs, [:id, :document_id, :predecessor_id])
+    |> cast_assoc(:content)
+    |> validate_required([:id, :document_id, :predecessor_id])
   end
 end

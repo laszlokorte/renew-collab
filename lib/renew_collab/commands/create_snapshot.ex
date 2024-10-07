@@ -3,6 +3,7 @@ defmodule RenewCollab.Commands.CreateSnapshot do
 
   alias RenewCollab.Versioning.Snapshot
   alias RenewCollab.Versioning.LatestSnapshot
+  alias RenewCollab.Versioning.SnapshotContent
   @snapshotters RenewCollab.Versioning.Snapshotters.snapshotters()
 
   defstruct [:document_id]
@@ -79,7 +80,22 @@ defmodule RenewCollab.Commands.CreateSnapshot do
         %Snapshot{document_id: document_id}
         |> Snapshot.changeset(%{
           id: new_id,
-          predecessor_id: predecessor_id,
+          predecessor_id: predecessor_id
+        })
+      end,
+      on_conflict: {:replace, [:id, :updated_at]}
+    )
+    |> Ecto.Multi.insert(
+      :new_snapshot_content,
+      fn %{
+           ids: %{
+             new_id: new_id
+           }
+         } =
+           results ->
+        %SnapshotContent{snapshot_id: new_id}
+        |> dbg()
+        |> SnapshotContent.changeset(%{
           content:
             @snapshotters
             |> Enum.map(& &1.storage_key())
@@ -87,7 +103,7 @@ defmodule RenewCollab.Commands.CreateSnapshot do
             |> Map.new()
         })
       end,
-      on_conflict: {:replace, [:id, :content, :updated_at]}
+      on_conflict: {:replace, [:content]}
     )
     |> Ecto.Multi.insert(
       :new_latest_snapshot,
