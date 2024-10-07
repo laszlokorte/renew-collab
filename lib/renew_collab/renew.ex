@@ -37,7 +37,7 @@ defmodule RenewCollab.Renew do
         bonds: bonds
       }
     })
-    |> RenewCollab.Commander.run_document_command()
+    |> RenewCollab.Commander.run_document_command_sync()
     |> case do
       {:ok, %{insert_document: insert_document}} -> {:ok, insert_document}
     end

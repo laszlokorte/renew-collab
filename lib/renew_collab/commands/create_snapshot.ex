@@ -75,8 +75,7 @@ defmodule RenewCollab.Commands.CreateSnapshot do
              new_id: new_id,
              predecessor_id: predecessor_id
            }
-         } =
-           results ->
+         } ->
         %Snapshot{document_id: document_id}
         |> Snapshot.changeset(%{
           id: new_id,
@@ -94,7 +93,6 @@ defmodule RenewCollab.Commands.CreateSnapshot do
          } =
            results ->
         %SnapshotContent{snapshot_id: new_id}
-        |> dbg()
         |> SnapshotContent.changeset(%{
           content:
             @snapshotters
