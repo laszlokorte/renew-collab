@@ -13,6 +13,8 @@ defmodule RenewCollab.Queries.StrippedDocument do
     %__MODULE__{document_id: document_id}
   end
 
+  def tags(%__MODULE__{document_id: document_id}), do: [{:document_content, document_id}]
+
   def multi(%__MODULE__{document_id: document_id}) do
     Ecto.Multi.new()
     |> Ecto.Multi.one(
@@ -145,13 +147,13 @@ defmodule RenewCollab.Queries.StrippedDocument do
          |> Map.update(:layer_id, nil, &Map.get(new_layer_ids, &1))
        end)}
     end)
-    |> Ecto.Multi.run(:stripped_document, fn _,
-                                             %{
-                                               new_document_content: content,
-                                               new_parenthoods: parenthoods,
-                                               new_hyperlinks: hyperlinks,
-                                               new_bonds: bonds
-                                             } ->
+    |> Ecto.Multi.run(:result, fn _,
+                                  %{
+                                    new_document_content: content,
+                                    new_parenthoods: parenthoods,
+                                    new_hyperlinks: hyperlinks,
+                                    new_bonds: bonds
+                                  } ->
       {:ok,
        %TransientDocument{
          content: content,

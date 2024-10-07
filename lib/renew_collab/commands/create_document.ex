@@ -14,6 +14,9 @@ defmodule RenewCollab.Commands.CreateDocument do
     }
   end
 
+  def tags(%__MODULE__{}), do: [:document_collection]
+  def auto_snapshot(%__MODULE__{}), do: true
+
   def multi(%__MODULE__{
         doc: %RenewCollab.Document.TransientDocument{
           content: content,

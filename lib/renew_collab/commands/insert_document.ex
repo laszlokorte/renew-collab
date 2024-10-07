@@ -13,12 +13,20 @@ defmodule RenewCollab.Commands.InsertDocument do
     %__MODULE__{target_document_id: target_document_id, source_document_id: source_document_id}
   end
 
+  def tags(%__MODULE__{target_document_id: target_document_id}),
+    do: [{:document_content, target_document_id}]
+
+  def auto_snapshot(%__MODULE__{}), do: true
+
   def multi(%__MODULE__{
         source_document_id: source_document_id,
         target_document_id: target_document_id
       }) do
     RenewCollab.Queries.StrippedDocument.new(%{document_id: source_document_id})
     |> RenewCollab.Queries.StrippedDocument.multi()
+    |> Ecto.Multi.run(:stripped_document, fn _, %{result: result} ->
+      {:ok, result}
+    end)
     |> Ecto.Multi.put(:document_id, target_document_id)
     |> Ecto.Multi.run(:now, fn _, %{} ->
       {:ok, DateTime.utc_now() |> DateTime.truncate(:second)}

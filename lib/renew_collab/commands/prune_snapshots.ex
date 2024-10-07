@@ -11,6 +11,11 @@ defmodule RenewCollab.Commands.PruneSnapshots do
     %__MODULE__{document_id: document_id}
   end
 
+  def tags(%__MODULE__{document_id: document_id}),
+    do: [{:document_versions, document_id}]
+
+  def auto_snapshot(%__MODULE__{}), do: false
+
   def multi(%__MODULE__{document_id: document_id}) do
     Ecto.Multi.new()
     |> Ecto.Multi.put(:document_id, document_id)

@@ -12,6 +12,8 @@ defmodule RenewCollab.Queries.UndoRedoState do
     }
   end
 
+  def tags(%__MODULE__{document_id: document_id}), do: [{:document_versions, document_id}]
+
   def multi(%__MODULE__{document_id: document_id}) do
     Ecto.Multi.new()
     |> Ecto.Multi.one(

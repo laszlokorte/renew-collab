@@ -18,6 +18,9 @@ defmodule RenewCollab.Commands.DeleteLayerEdgeWaypoint do
     }
   end
 
+  def tags(%__MODULE__{document_id: document_id}), do: [{:document_content, document_id}]
+  def auto_snapshot(%__MODULE__{}), do: true
+
   def multi(%__MODULE__{
         document_id: document_id,
         layer_id: layer_id,

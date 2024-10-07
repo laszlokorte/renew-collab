@@ -317,12 +317,12 @@ defmodule RenewCollabWeb.LiveDocuments do
     RenewCollab.Commands.DeleteDocument.new(%{
       document_id: document_id
     })
-    |> RenewCollab.Commander.run_document_command()
+    |> RenewCollab.Commander.run_document_command(false)
 
     {:noreply, socket}
   end
 
-  def handle_info(%{topic: @topic, payload: _state}, socket) do
+  def handle_info(:any, socket) do
     {:noreply, socket |> assign(:documents, Renew.list_documents())}
   end
 end

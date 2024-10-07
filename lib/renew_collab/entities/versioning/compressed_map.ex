@@ -14,8 +14,6 @@ defmodule RenewCollab.Versioning.CompressedMap do
   def load(data) when is_binary(data) do
     uncompressed = :zlib.uncompress(data)
 
-    # dbg(:erlang.binary_to_term(uncompressed))
-
     {:ok, :erlang.binary_to_term(uncompressed)}
   end
 

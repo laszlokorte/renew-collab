@@ -24,7 +24,6 @@ defmodule RenewCollab.Export.DocumentExport do
             icon: nil
           }
         }
-        # |> dbg()
       ],
       size: nil
     })
@@ -361,7 +360,7 @@ defmodule RenewCollab.Export.DocumentExport do
     {r, ""} = Integer.parse(rr, 16)
     {g, ""} = Integer.parse(gg, 16)
     {b, ""} = Integer.parse(bb, 16)
-    {:rgba, r, g, b, round(255 * dbg(opacity))}
+    {:rgba, r, g, b, round(255 * opacity)}
   end
 
   defp color_to_rgba(

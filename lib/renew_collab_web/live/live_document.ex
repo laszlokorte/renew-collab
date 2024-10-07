@@ -118,8 +118,8 @@ defmodule RenewCollabWeb.LiveDocument do
           </button>
         </p>
 
-        <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-meta">
-          Document
+        <h2 style="cursor: pointer;" phx-click="toggle-meta">
+          <span><%= if(@show_meta, do: "🞃", else: "🞂") %></span> Document
         </h2>
 
         <%= if @show_meta do %>
@@ -183,8 +183,11 @@ defmodule RenewCollabWeb.LiveDocument do
           </div>
         <% end %>
 
-        <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-selected">
-          Selected
+        <h2
+          {if(@selection, do: [style: "cursor: pointer;"], else: [style: "cursor: pointer; color: #aaa"])}
+          phx-click="toggle-selected"
+        >
+          <span><%= if(@show_selected, do: "🞃", else: "🞂") %></span> Selected
         </h2>
 
         <%= if @show_selected do %>
@@ -202,8 +205,8 @@ defmodule RenewCollabWeb.LiveDocument do
           </div>
         <% end %>
 
-        <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-hierarchy">
-          Hierarchy
+        <h2 style="cursor: pointer;" phx-click="toggle-hierarchy">
+          <span><%= if(@show_hierarchy, do: "🞃", else: "🞂") %></span> Hierarchy
         </h2>
 
         <%= if @show_hierarchy do %>
@@ -271,8 +274,8 @@ defmodule RenewCollabWeb.LiveDocument do
           </div>
         <% end %>
 
-        <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-snapshots">
-          Snapshots
+        <h2 style="cursor: pointer;" phx-click="toggle-snapshots">
+          <span><%= if(@show_snapshots, do: "🞃", else: "🞂") %></span> Snapshots
         </h2>
 
         <%= if @show_snapshots do %>
@@ -287,8 +290,8 @@ defmodule RenewCollabWeb.LiveDocument do
           <% end %>
         <% end %>
 
-        <h2 style="cursor: pointer; text-decoration: underline" phx-click="toggle-health">
-          Health
+        <h2 style="cursor: pointer;" phx-click="toggle-health">
+          <span><%= if(@show_health, do: "🞃", else: "🞂") %></span> Health
         </h2>
 
         <%= if @show_health do %>
@@ -492,6 +495,12 @@ defmodule RenewCollabWeb.LiveDocument do
           }}
        end
      )}
+  end
+
+  def handle_event("select_layer", %{"id" => ""}, socket) do
+    {:noreply,
+     socket
+     |> assign(:selection, nil)}
   end
 
   def handle_event("select_layer", %{"id" => id}, socket) do
@@ -1168,6 +1177,31 @@ defmodule RenewCollabWeb.LiveDocument do
          end
        )
        |> assign(:document, Renew.get_document_with_elements(document_id))}
+    end
+  end
+
+  def handle_info({:versions_changed, document_id}, socket) do
+    if document_id == socket.assigns.document.id do
+      {:noreply,
+       socket
+       |> assign_async(
+         [:undo_redo],
+         fn ->
+           {:ok,
+            %{
+              undo_redo: Versioning.document_undo_redo(document_id)
+            }}
+         end
+       )
+       |> assign_async(
+         [:snapshots],
+         fn ->
+           {:ok,
+            %{
+              snapshots: Versioning.document_versions(document_id)
+            }}
+         end
+       )}
     end
   end
 

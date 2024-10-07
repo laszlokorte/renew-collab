@@ -52,11 +52,14 @@ defmodule RenewCollabWeb.DocumentController do
 
   def inspect(conn, %{"id" => id}) do
     RenewCollab.Queries.StrippedDocument.new(%{document_id: id})
-    |> RenewCollab.Queries.StrippedDocument.multi()
-    |> RenewCollab.Repo.transaction()
+    |> RenewCollab.Fetcher.fetch()
     |> case do
-      {:ok, %{stripped_document: document}} ->
+      document ->
         conn
+        |> put_resp_header(
+          "content-disposition",
+          "inline; filename=\"#{document.content.name}.rnx\""
+        )
         |> put_resp_header(
           "content-type",
           "text/plain"

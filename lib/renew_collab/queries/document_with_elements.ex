@@ -11,6 +11,8 @@ defmodule RenewCollab.Queries.DocumentWithElements do
     }
   end
 
+  def tags(%__MODULE__{document_id: document_id}), do: [{:document_content, document_id}]
+
   def multi(%__MODULE__{document_id: document_id}) do
     Ecto.Multi.new()
     |> Ecto.Multi.one(

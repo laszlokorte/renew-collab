@@ -13,6 +13,7 @@ defmodule RenewCollab.Fetcher do
           {:ok, %{result: result}} -> result
         end
       end,
+      apply(module, :tags, [query]),
       ttl
     )
   end

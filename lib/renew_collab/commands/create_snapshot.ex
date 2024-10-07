@@ -17,6 +17,9 @@ defmodule RenewCollab.Commands.CreateSnapshot do
     |> Ecto.Multi.append(multi())
   end
 
+  def tags(%__MODULE__{document_id: document_id}), do: [{:document_versions, document_id}]
+  def auto_snapshot(%__MODULE__{}), do: false
+
   def multi() do
     multi =
       Ecto.Multi.new()

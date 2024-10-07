@@ -5,54 +5,52 @@ defmodule RenewCollab.Commander do
   def run_document_command(command, snapshot \\ true)
 
   def run_document_command(%{__struct__: module} = command, snapshot) do
+    auto_snapshot = apply(module, :auto_snapshot, [command])
+
     apply(module, :multi, [command])
-    |> then(&if(snapshot, do: Ecto.Multi.append(&1, Versioning.snapshot_multi()), else: &1))
-    |> run_document_transaction()
+    |> then(
+      &if(auto_snapshot and snapshot,
+        do: Ecto.Multi.append(&1, Versioning.snapshot_multi()),
+        else: &1
+      )
+    )
+    |> run_document_transaction(apply(module, :tags, [command]))
   end
 
-  defp run_document_transaction(multi) do
+  defp run_document_transaction(multi, tags) do
     Repo.transaction(multi)
     |> case do
       {:ok, values} ->
         with %{document_id: document_id} <- values do
-          RenewCollab.SimpleCache.delete({:document, document_id})
-          RenewCollab.SimpleCache.delete({:undo_redo, document_id})
-          RenewCollab.SimpleCache.delete({:versions, document_id})
-          RenewCollab.SimpleCache.delete({:hierarchy_missing, document_id})
-          RenewCollab.SimpleCache.delete({:hierarchy_invalids, document_id})
-          RenewCollab.SimpleCache.delete(:all_documents)
-          RenewCollab.SimpleCache.delete(:all_documents)
-          RenewCollab.SimpleCache.delete(:all_documents)
-          RenewCollab.SimpleCache.delete({:document, document_id})
-          RenewCollab.SimpleCache.delete({:undo_redo, document_id})
-          RenewCollab.SimpleCache.delete({:versions, document_id})
-          RenewCollab.SimpleCache.delete({:hierarchy_missing, document_id})
-          RenewCollab.SimpleCache.delete({:hierarchy_invalids, document_id})
-          RenewCollab.SimpleCache.delete(:all_documents)
+          RenewCollab.SimpleCache.delete_tags([{:document_versions, document_id} | tags])
 
-          Phoenix.PubSub.broadcast(
-            RenewCollab.PubSub,
-            "document:#{document_id}",
-            {:document_changed, document_id}
-          )
+          for tag <- tags do
+            case tag do
+              :document_collection ->
+                Phoenix.PubSub.broadcast(
+                  RenewCollab.PubSub,
+                  "documents",
+                  :any
+                )
 
-          RenewCollabWeb.Endpoint.broadcast!(
-            "documents",
-            "documents:new",
-            {"document:new", document_id}
-          )
+              {:document_content, ^document_id} ->
+                Phoenix.PubSub.broadcast(
+                  RenewCollab.PubSub,
+                  "document:#{document_id}",
+                  {:document_changed, document_id}
+                )
 
-          RenewCollabWeb.Endpoint.broadcast!(
-            "documents",
-            "document:renamed",
-            %{"id" => document_id}
-          )
+              {:document_versions, ^document_id} ->
+                Phoenix.PubSub.broadcast(
+                  RenewCollab.PubSub,
+                  "document:#{document_id}",
+                  {:versions_changed, document_id}
+                )
 
-          RenewCollabWeb.Endpoint.broadcast!(
-            "documents",
-            "document:deleted",
-            %{"id" => document_id}
-          )
+              _ ->
+                nil
+            end
+          end
 
           {:ok, values}
         end

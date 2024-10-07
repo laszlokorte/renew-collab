@@ -9,9 +9,16 @@ defmodule RenewCollab.Commands.DuplicateDocument do
     %__MODULE__{document_id: document_id}
   end
 
+  def tags(%__MODULE__{document_id: document_id}), do: [:document_collection]
+
+  def auto_snapshot(%__MODULE__{}), do: true
+
   def multi(%__MODULE__{document_id: id}) do
     RenewCollab.Queries.StrippedDocument.new(%{document_id: id})
     |> RenewCollab.Queries.StrippedDocument.multi()
+    |> Ecto.Multi.run(:stripped_document, fn _, %{result: result} ->
+      {:ok, result}
+    end)
     |> Ecto.Multi.merge(fn %{stripped_document: %TransientDocument{} = transient_doc} ->
       RenewCollab.Commands.CreateDocument.new(%{
         doc:

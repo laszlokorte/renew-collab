@@ -38,5 +38,8 @@ defmodule RenewCollab.Renew do
       }
     })
     |> RenewCollab.Commander.run_document_command()
+    |> case do
+      {:ok, %{insert_document: insert_document}} -> {:ok, insert_document}
+    end
   end
 end

@@ -8,6 +8,11 @@ defmodule RenewCollab.Commands.UpdateDocumentMeta do
     %__MODULE__{document_id: document_id, meta: meta}
   end
 
+  def tags(%__MODULE__{document_id: document_id}),
+    do: [{:document_content, document_id}, :document_collection]
+
+  def auto_snapshot(%__MODULE__{}), do: false
+
   def multi(%__MODULE__{document_id: document_id, meta: meta}) do
     Ecto.Multi.new()
     |> Ecto.Multi.put(:document_id, document_id)

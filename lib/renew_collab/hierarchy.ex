@@ -124,6 +124,7 @@ defmodule RenewCollab.Hierarchy do
       fn ->
         RenewCollab.Repo.all(find_missing_query(doc_id))
       end,
+      [{:document_content, doc_id}],
       600
     )
   end
@@ -217,6 +218,7 @@ defmodule RenewCollab.Hierarchy do
       fn ->
         RenewCollab.Repo.all(find_invalids_query(doc_id))
       end,
+      [{:document_content, doc_id}],
       600
     )
   end
