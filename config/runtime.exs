@@ -20,6 +20,8 @@ if System.get_env("PHX_SERVER") do
   config :renew_collab, RenewCollabWeb.Endpoint, server: true
 end
 
+maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
+
 if config_env() == :prod do
   database_password =
     System.get_env("DATABASE_PASSWORD") ||
@@ -36,6 +38,7 @@ if config_env() == :prod do
     database: "laszlo7_renew_collab",
     password: database_password,
     protocol: :tcp,
+    socket_options: maybe_ipv6,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "5")
 
   # The secret key base is used to sign/encrypt cookies and other secrets.
