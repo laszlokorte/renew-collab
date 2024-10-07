@@ -51,8 +51,8 @@ defmodule RenewCollabWeb.DocumentController do
   end
 
   def inspect(conn, %{"id" => id}) do
-    RenewCollab.Commands.StripDocument.new(%{document_id: id})
-    |> RenewCollab.Commands.StripDocument.multi()
+    RenewCollab.Queries.StrippedDocument.new(%{document_id: id})
+    |> RenewCollab.Queries.StrippedDocument.multi()
     |> RenewCollab.Repo.transaction()
     |> case do
       {:ok, %{stripped_document: document}} ->

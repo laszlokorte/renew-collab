@@ -17,8 +17,8 @@ defmodule RenewCollab.Commands.InsertDocument do
         source_document_id: source_document_id,
         target_document_id: target_document_id
       }) do
-    RenewCollab.Commands.StripDocument.new(%{document_id: source_document_id})
-    |> RenewCollab.Commands.StripDocument.multi()
+    RenewCollab.Queries.StrippedDocument.new(%{document_id: source_document_id})
+    |> RenewCollab.Queries.StrippedDocument.multi()
     |> Ecto.Multi.put(:document_id, target_document_id)
     |> Ecto.Multi.run(:now, fn _, %{} ->
       {:ok, DateTime.utc_now() |> DateTime.truncate(:second)}

@@ -229,8 +229,12 @@ defmodule RenewCollabWeb.LiveDocuments do
     """
   end
 
-  def handle_event("duplicate", %{"id" => id}, socket) do
-    RenewCollab.Renew.duplicate_document(id)
+  def handle_event("duplicate", %{"id" => document_id}, socket) do
+    RenewCollab.Commands.DuplicateDocument.new(%{
+      document_id: document_id
+    })
+    |> RenewCollab.Commander.run_document_command()
+
     {:noreply, socket}
   end
 
@@ -255,13 +259,14 @@ defmodule RenewCollabWeb.LiveDocuments do
               hyperlinks: hyperlinks,
               bonds: bonds
             }} = RenewCollab.Import.DocumentImport.import(filename, content),
-           {:ok, %RenewCollab.Document.Document{}} <-
+           {:ok, %RenewCollab.Document.Document{} = document} <-
              RenewCollab.Renew.create_document(
                %{"name" => doc_name, "kind" => kind, "layers" => layers},
                hierarchy,
                hyperlinks,
                bonds
              ) do
+        {:ok, document}
       else
         _ ->
           with {:ok, %RenewCollab.Document.Document{} = document} <-
@@ -272,6 +277,8 @@ defmodule RenewCollabWeb.LiveDocuments do
               Map.take(document, [:name, :kind, :id])
               |> Map.put("href", url(~p"/api/documents/#{document}"))
             )
+
+            {:ok, document}
           end
       end
     end)
@@ -306,8 +313,11 @@ defmodule RenewCollabWeb.LiveDocuments do
     {:noreply, socket}
   end
 
-  def handle_event("delete", %{"id" => id}, socket) do
-    Renew.delete_document(id)
+  def handle_event("delete", %{"id" => document_id}, socket) do
+    RenewCollab.Commands.DeleteDocument.new(%{
+      document_id: document_id
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end

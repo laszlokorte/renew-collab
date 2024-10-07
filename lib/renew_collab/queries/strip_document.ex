@@ -1,4 +1,4 @@
-defmodule RenewCollab.Commands.StripDocument do
+defmodule RenewCollab.Queries.StrippedDocument do
   import Ecto.Query, warn: false
 
   alias RenewCollab.Document.Document

@@ -10,8 +10,8 @@ defmodule RenewCollab.Commands.DuplicateDocument do
   end
 
   def multi(%__MODULE__{document_id: id}) do
-    RenewCollab.Commands.StripDocument.new(%{document_id: id})
-    |> RenewCollab.Commands.StripDocument.multi()
+    RenewCollab.Queries.StrippedDocument.new(%{document_id: id})
+    |> RenewCollab.Queries.StrippedDocument.multi()
     |> Ecto.Multi.merge(fn %{stripped_document: %TransientDocument{} = transient_doc} ->
       RenewCollab.Commands.CreateDocument.new(%{
         doc:

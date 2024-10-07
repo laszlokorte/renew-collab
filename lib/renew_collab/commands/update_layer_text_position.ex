@@ -31,15 +31,21 @@ defmodule RenewCollab.Commands.UpdateLayerTextPosition do
       from(l in Layer, join: t in assoc(l, :text), where: l.id == ^layer_id, select: t)
     )
     |> Ecto.Multi.update(
-      :size,
+      :update_position,
       fn %{text: text} ->
         Text.change_position(text, new_position)
       end
     )
-    |> Ecto.Multi.delete_all(
+    |> Ecto.Multi.update_all(
       :delete_size_hint,
-      fn %{text: text} ->
-        from(h in TextSizeHint, where: h.text_id == ^text.id)
+      fn %{text: text, update_position: %{position_x: new_x, position_y: new_y}} ->
+        dx = new_x - text.position_x
+        dy = new_y - text.position_y
+
+        from(h in TextSizeHint,
+          where: h.text_id == ^text.id,
+          update: [inc: [position_x: ^dx, position_y: ^dy]]
+        )
       end,
       []
     )

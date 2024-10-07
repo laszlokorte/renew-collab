@@ -38,7 +38,8 @@ defmodule RenewCollab.Commands.MoveLayerRelative do
     |> Ecto.Multi.all(:child_layers, fn %{document_id: document_id} ->
       from(p in LayerParenthood,
         where: p.ancestor_id == ^layer_id and p.document_id == ^document_id,
-        select: p.descendant_id
+        select: p.descendant_id,
+        group_by: p.descendant_id
       )
     end)
     |> Ecto.Multi.all(:connected_edge_layers, fn
@@ -64,7 +65,10 @@ defmodule RenewCollab.Commands.MoveLayerRelative do
            connected_edge_layers: connected_edge_layers,
            hyperlinked_layers: hyperlinked_layers
          } ->
-        {:ok, Enum.concat([child_layers, connected_edge_layers, hyperlinked_layers])}
+        {:ok,
+         Enum.concat([child_layers, connected_edge_layers, hyperlinked_layers])
+         |> Enum.into(MapSet.new())
+         |> Enum.into([])}
       end
     )
     |> Ecto.Multi.update_all(
@@ -90,7 +94,7 @@ defmodule RenewCollab.Commands.MoveLayerRelative do
       []
     )
     |> Ecto.Multi.update_all(
-      :delete_size_hint,
+      :update_size_hint,
       fn %{combined_layer_ids: combined_layer_ids} ->
         from(h in TextSizeHint,
           where:

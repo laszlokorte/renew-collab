@@ -427,8 +427,12 @@ defmodule RenewCollabWeb.LiveDocument do
     |> Enum.join(" ")
   end
 
-  def handle_event("toggle_visible", %{"id" => id}, socket) do
-    Renew.toggle_visible(socket.assigns.document.id, id)
+  def handle_event("toggle_visible", %{"id" => layer_id}, socket) do
+    RenewCollab.Commands.ToggleVisible.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -460,7 +464,11 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def handle_event("detach-bond", %{"id" => bond_id}, socket) do
-    Renew.detach_bond(socket.assigns.document.id, bond_id)
+    RenewCollab.Commands.DeleteBond.new(%{
+      document_id: socket.assigns.document.id,
+      bond_id: bond_id
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -498,16 +506,17 @@ defmodule RenewCollabWeb.LiveDocument do
           "layer_id" => layer_id,
           "element" => "layer",
           "style" => style_attr,
-          "value" => color
+          "value" => value
         },
         socket
       ) do
-    Renew.update_layer_style(
-      socket.assigns.document.id,
-      layer_id,
-      style_attr,
-      color
-    )
+    RenewCollab.Commands.UpdateLayerStyle.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id,
+      style_attr: style_attr,
+      value: value
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -518,16 +527,17 @@ defmodule RenewCollabWeb.LiveDocument do
           "layer_id" => layer_id,
           "element" => "edge",
           "style" => style_attr,
-          "value" => color
+          "value" => value
         },
         socket
       ) do
-    Renew.update_layer_edge_style(
-      socket.assigns.document.id,
-      layer_id,
-      style_attr,
-      color
-    )
+    RenewCollab.Commands.UpdateLayerEdgeStyle.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id,
+      style_attr: style_attr,
+      value: value
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -538,16 +548,17 @@ defmodule RenewCollabWeb.LiveDocument do
           "layer_id" => layer_id,
           "element" => "text",
           "style" => style_attr,
-          "value" => color
+          "value" => value
         },
         socket
       ) do
-    Renew.update_layer_text_style(
-      socket.assigns.document.id,
-      layer_id,
-      style_attr,
-      color
-    )
+    RenewCollab.Commands.UpdateLayerTextStyle.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id,
+      style_attr: style_attr,
+      value: value
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -560,21 +571,23 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    Renew.update_layer_text_size_hint(
-      socket.assigns.document.id,
-      layer_id,
-      box
-    )
+    RenewCollab.Commands.UpdateLayerTextSizeHint.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id,
+      box: box
+    })
+    |> RenewCollab.Commander.run_document_command(false)
 
     {:noreply, socket}
   end
 
   def handle_event("update_text_body", %{"layer_id" => layer_id, "value" => new_body}, socket) do
-    Renew.update_layer_text_body(
-      socket.assigns.document.id,
-      layer_id,
-      new_body
-    )
+    RenewCollab.Commands.UpdateLayerTextBody.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id,
+      new_body: new_body
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -587,11 +600,12 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    Renew.update_layer_box_size(
-      socket.assigns.document.id,
-      layer_id,
-      new_size
-    )
+    RenewCollab.Commands.UpdateLayerBoxSize.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id,
+      new_size: new_size
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -608,11 +622,12 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    Renew.update_layer_text_position(
-      socket.assigns.document.id,
-      layer_id,
-      new_position
-    )
+    RenewCollab.Commands.UpdateLayerTextPosition.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id,
+      new_position: new_position
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -625,11 +640,12 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    Renew.update_layer_edge_position(
-      socket.assigns.document.id,
-      layer_id,
-      new_position
-    )
+    RenewCollab.Commands.UpdateLayerEdgePosition.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id,
+      new_position: new_position
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -642,11 +658,12 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    Renew.update_layer_z_index(
-      socket.assigns.document.id,
-      layer_id,
-      new_z_index
-    )
+    RenewCollab.Commands.UpdateLayerZIndex.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id,
+      z_index: new_z_index
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -664,12 +681,13 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    Renew.update_layer_edge_waypoint_position(
-      socket.assigns.document.id,
-      layer_id,
-      waypoint_id,
-      new_position
-    )
+    RenewCollab.Commands.UpdateLayerEdgeWaypointPosition.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id,
+      waypoint_id: waypoint_id,
+      new_position: new_position
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -678,15 +696,16 @@ defmodule RenewCollabWeb.LiveDocument do
         "delete_waypoint",
         %{
           "layer_id" => layer_id,
-          "waypoint_id" => waypoint_d
+          "waypoint_id" => waypoint_id
         },
         socket
       ) do
-    Renew.delete_layer_edge_waypoint(
-      socket.assigns.document.id,
-      layer_id,
-      waypoint_d
-    )
+    RenewCollab.Commands.DeleteLayerEdgeWaypoint.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id,
+      waypoint_id: waypoint_id
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -695,18 +714,19 @@ defmodule RenewCollabWeb.LiveDocument do
         "create_waypoint",
         %{
           "layer_id" => layer_id,
-          "after_waypoint_id" => after_waypoint_id,
+          "after_waypoint_id" => prev_waypoint_id,
           "position_x" => position_x,
           "position_y" => position_y
         },
         socket
       ) do
-    Renew.create_layer_edge_waypoint(
-      socket.assigns.document.id,
-      layer_id,
-      after_waypoint_id,
-      {position_x, position_y}
-    )
+    RenewCollab.Commands.CreateLayerEdgeWaypoint.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id,
+      prev_waypoint_id: prev_waypoint_id,
+      position: {position_x, position_y}
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -715,15 +735,16 @@ defmodule RenewCollabWeb.LiveDocument do
         "create_waypoint",
         %{
           "layer_id" => layer_id,
-          "after_waypoint_id" => after_waypoint_id
+          "after_waypoint_id" => prev_waypoint_id
         },
         socket
       ) do
-    Renew.create_layer_edge_waypoint(
-      socket.assigns.document.id,
-      layer_id,
-      after_waypoint_id
-    )
+    RenewCollab.Commands.CreateLayerEdgeWaypoint.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id,
+      prev_waypoint_id: prev_waypoint_id
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -735,10 +756,11 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    Renew.remove_all_layer_edge_waypoints(
-      socket.assigns.document.id,
-      layer_id
-    )
+    RenewCollab.Commands.RemoveAllLayerEdgeWaypoints.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -751,11 +773,12 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    Renew.update_layer_semantic_tag(
-      socket.assigns.document.id,
-      layer_id,
-      new_tag
-    )
+    RenewCollab.Commands.UpdateLayerSemanticTag.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id,
+      new_tag: new_tag
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -768,12 +791,13 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    Renew.update_layer_box_shape(
-      socket.assigns.document.id,
-      layer_id,
-      shape_id,
-      shape_attributes
-    )
+    RenewCollab.Commands.UpdateLayerBoxShape.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id,
+      shape_id: shape_id,
+      attributes: shape_attributes
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -788,12 +812,13 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    Renew.move_layer(
-      socket.assigns.document.id,
-      layer_id,
-      target_layer_id,
-      RenewCollab.Commands.MoveLayer.parse_hierarchy_position(order, relative)
-    )
+    RenewCollab.Commands.MoveLayer.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id,
+      target_layer_id: target_layer_id,
+      target: RenewCollab.Commands.MoveLayer.parse_hierarchy_position(order, relative)
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -807,12 +832,13 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    Renew.move_layer_relative(
-      socket.assigns.document.id,
-      layer_id,
-      dx,
-      dy
-    )
+    RenewCollab.Commands.MoveLayerRelative.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id,
+      dx: dx,
+      dy: dy
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -822,10 +848,12 @@ defmodule RenewCollabWeb.LiveDocument do
         %{"id" => layer_id},
         socket
       ) do
-    Renew.delete_layer(
-      socket.assigns.document.id,
-      layer_id
-    )
+    RenewCollab.Commands.DeleteLayer.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id,
+      delete_children: true
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -835,9 +863,13 @@ defmodule RenewCollabWeb.LiveDocument do
         %{"example" => "yes"},
         socket
       ) do
-    Renew.create_layer(socket.assigns.document.id, %{
-      "semantic_tag" => "CH.ifa.draw.figures.GroupFigure"
+    RenewCollab.Commands.CreateLayer.new(%{
+      document_id: socket.assigns.document.id,
+      attrs: %{
+        "semantic_tag" => "CH.ifa.draw.figures.GroupFigure"
+      }
     })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -847,14 +879,18 @@ defmodule RenewCollabWeb.LiveDocument do
         %{"example" => "yes"},
         socket
       ) do
-    Renew.create_layer(socket.assigns.document.id, %{
-      "semantic_tag" => "CH.ifa.draw.figures.TextFigure",
-      "text" => %{
-        "position_x" => 0,
-        "position_y" => 0,
-        "body" => "Hello World"
+    RenewCollab.Commands.CreateLayer.new(%{
+      document_id: socket.assigns.document.id,
+      attrs: %{
+        "semantic_tag" => "CH.ifa.draw.figures.TextFigure",
+        "text" => %{
+          "position_x" => 0,
+          "position_y" => 0,
+          "body" => "Hello World"
+        }
       }
     })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -864,15 +900,19 @@ defmodule RenewCollabWeb.LiveDocument do
         %{"example" => "yes"},
         socket
       ) do
-    Renew.create_layer(socket.assigns.document.id, %{
-      "semantic_tag" => "CH.ifa.draw.figures.RectangleFigure",
-      "box" => %{
-        "position_x" => 0,
-        "position_y" => 0,
-        "width" => 200,
-        "height" => 100
+    RenewCollab.Commands.CreateLayer.new(%{
+      document_id: socket.assigns.document.id,
+      attrs: %{
+        "semantic_tag" => "CH.ifa.draw.figures.RectangleFigure",
+        "box" => %{
+          "position_x" => 0,
+          "position_y" => 0,
+          "width" => 200,
+          "height" => 100
+        }
       }
     })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -882,28 +922,36 @@ defmodule RenewCollabWeb.LiveDocument do
         %{"example" => "yes"},
         socket
       ) do
-    Renew.create_layer(socket.assigns.document.id, %{
-      "semantic_tag" => "CH.ifa.draw.figures.PolyLineFigure",
-      "edge" => %{
-        "source_x" => 0,
-        "source_y" => 0,
-        "target_x" => 200,
-        "target_y" => 100
+    RenewCollab.Commands.CreateLayer.new(%{
+      document_id: socket.assigns.document.id,
+      attrs: %{
+        "semantic_tag" => "CH.ifa.draw.figures.PolyLineFigure",
+        "edge" => %{
+          "source_x" => 0,
+          "source_y" => 0,
+          "target_x" => 200,
+          "target_y" => 100
+        }
       }
     })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
 
   def handle_event(
         "create_edge",
-        %{} = params,
+        %{} = edge,
         socket
       ) do
-    Renew.create_layer(socket.assigns.document.id, %{
-      "semantic_tag" => "CH.ifa.draw.figures.PolyLineFigure",
-      "edge" => params
+    RenewCollab.Commands.CreateLayer.new(%{
+      document_id: socket.assigns.document.id,
+      attrs: %{
+        "semantic_tag" => "CH.ifa.draw.figures.PolyLineFigure",
+        "edge" => edge
+      }
     })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -918,13 +966,14 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    Renew.create_edge_bond(
-      socket.assigns.document.id,
-      edge_id,
-      kind,
-      layer_id,
-      socket_id
-    )
+    RenewCollab.Commands.CreateEdgeBond.new(%{
+      document_id: socket.assigns.document.id,
+      edge_id: edge_id,
+      kind: kind,
+      layer_id: layer_id,
+      socket_id: socket_id
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -936,10 +985,11 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    Renew.unlink_layer(
-      socket.assigns.document.id,
-      layer_id
-    )
+    RenewCollab.Commands.UnlinkLayer.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -952,11 +1002,12 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    Renew.link_layer(
-      socket.assigns.document.id,
-      layer_id,
-      target_layer_id
-    )
+    RenewCollab.Commands.LinkLayer.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id,
+      target_layer_id: target_layer_id
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -969,11 +1020,12 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    Renew.assign_layer_socket_schema(
-      socket.assigns.document.id,
-      layer_id,
-      socket_schema_id
-    )
+    RenewCollab.Commands.AssignLayerSocketSchema.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id,
+      socket_schema_id: socket_schema_id
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -985,10 +1037,11 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    Renew.remove_layer_socket_schema(
-      socket.assigns.document.id,
-      layer_id
-    )
+    RenewCollab.Commands.RemoveLayerSocketSchema.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -998,17 +1051,22 @@ defmodule RenewCollabWeb.LiveDocument do
         %{},
         socket
       ) do
-    Versioning.create_snapshot(socket.assigns.document.id)
+    RenewCollab.Commands.CreateSnapshot.new(%{document_id: socket.assigns.document.id})
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
 
   def handle_event(
         "restore",
-        %{"id" => id},
+        %{"id" => snapshot_id},
         socket
       ) do
-    Versioning.restore_snapshot(socket.assigns.document.id, id)
+    RenewCollab.Commands.RestoreSnapshot.new(%{
+      document_id: socket.assigns.document.id,
+      snapshot_id: snapshot_id
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -1018,7 +1076,12 @@ defmodule RenewCollabWeb.LiveDocument do
         %{"snapshot_id" => snapshot_id, "description" => description},
         socket
       ) do
-    Versioning.create_snapshot_label(socket.assigns.document.id, snapshot_id, description)
+    RenewCollab.Commands.CreateSnapshotLabel.new(%{
+      document_id: socket.assigns.document.id,
+      snapshot_id: snapshot_id,
+      description: description
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -1028,7 +1091,11 @@ defmodule RenewCollabWeb.LiveDocument do
         %{"id" => snapshot_id},
         socket
       ) do
-    Versioning.remove_snapshot_label(socket.assigns.document.id, snapshot_id)
+    RenewCollab.Commands.RemoveSnapshotLabel.new(%{
+      document_id: socket.assigns.document.id,
+      snapshot_id: snapshot_id
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -1038,20 +1105,22 @@ defmodule RenewCollabWeb.LiveDocument do
         %{},
         socket
       ) do
-    Versioning.prune_snaphots(socket.assigns.document.id)
+    RenewCollab.Commands.PruneSnapshots.new(%{document_id: socket.assigns.document.id})
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
 
   def handle_event(
         "update_document_meta",
-        params,
+        meta,
         socket
       ) do
-    Renew.update_document_meta(
-      socket.assigns.document.id,
-      params
-    )
+    RenewCollab.Commands.UpdateDocumentMeta.new(%{
+      document_id: socket.assigns.document.id,
+      meta: meta
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     {:noreply, socket}
   end
@@ -1062,8 +1131,15 @@ defmodule RenewCollabWeb.LiveDocument do
         socket
       ) do
     case document_id do
-      "" -> nil
-      id -> Renew.insert_into_document(socket.assigns.document.id, id)
+      "" ->
+        nil
+
+      id ->
+        RenewCollab.Commands.InsertDocument.new(%{
+          target_document_id: socket.assigns.document.id,
+          source_document_id: id
+        })
+        |> RenewCollab.Commander.run_document_command()
     end
 
     {:noreply, socket}

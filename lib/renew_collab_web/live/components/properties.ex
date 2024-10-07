@@ -164,6 +164,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
                 🔗
               </span>
             </dd>
+
             <dd>
               <button phx-click="unlink_layer" phx-value-id={@layer.id} type="button">unlink</button>
             </dd>
