@@ -14,7 +14,7 @@ defmodule RenewCollabWeb.LiveDocuments do
       |> assign(:documents, Renew.list_documents())
       |> assign(create_form: to_form(%{}))
       |> assign(import_form: to_form(%{}))
-      |> allow_upload(:import_file, accept: ~w(.rnw), max_entries: 10)
+      |> allow_upload(:import_file, accept: ~w(.rnw .aip), max_entries: 10)
 
     {:ok, socket}
   end

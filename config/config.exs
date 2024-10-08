@@ -45,7 +45,8 @@ config :esbuild,
   ]
 
 config :mime, :types, %{
-  "application/custom+renew" => ["rnw"]
+  "application/custom+renew" => ["rnw"],
+  "application/custom+aip" => ["aip"]
 }
 
 # Import environment specific config. This must remain at the bottom
