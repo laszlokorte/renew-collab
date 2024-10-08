@@ -10,11 +10,9 @@ defmodule RenewCollabWeb.DocumentJSON do
   """
   def index(%{documents: documents}) do
     %{
-      data: %{
-        href: url(~p"/api/documents"),
-        channel: "documents",
-        items: for(document <- documents, do: list_data(document))
-      }
+      href: url(~p"/api/documents"),
+      channel: "documents",
+      items: for(document <- documents, do: list_data(document))
     }
   end
 
@@ -22,14 +20,14 @@ defmodule RenewCollabWeb.DocumentJSON do
   Renders a single document.
   """
   def show(%{document: document}) do
-    %{data: detail_data(document)}
+    detail_data(document)
   end
 
   @doc """
   Renders a single document.
   """
   def import(%{document: document}) do
-    %{data: list_data(document)}
+    list_data(document)
   end
 
   defp list_data(%Document{} = document) do
@@ -37,7 +35,8 @@ defmodule RenewCollabWeb.DocumentJSON do
       # id: document.id,
       href: url(~p"/api/documents/#{document}"),
       name: document.name,
-      kind: document.kind
+      kind: document.kind,
+      id: document.id
     }
   end
 
@@ -46,13 +45,15 @@ defmodule RenewCollabWeb.DocumentJSON do
       # id: document.id,
       href: url(~p"/api/documents/#{document}"),
       channel: "document:#{document.id}",
-      name: document.name,
-      kind: document.kind,
-      elements:
-        case document.layers do
-          %Ecto.Association.NotLoaded{} -> %{}
-          _ -> %{items: document.layers |> Enum.map(&element_data(&1))}
-        end
+      document: %{
+        name: document.name,
+        kind: document.kind,
+        elements:
+          case document.layers do
+            %Ecto.Association.NotLoaded{} -> %{}
+            _ -> %{items: document.layers |> Enum.map(&element_data(&1))}
+          end
+      }
       # |> Map.put(:href, url(~p"/api/documents/#{document}/elements"))
     }
   end
