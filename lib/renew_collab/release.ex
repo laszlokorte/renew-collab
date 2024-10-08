@@ -13,6 +13,29 @@ defmodule RenewCollab.Release do
     end
   end
 
+  def seed do
+    load_app()
+
+    for repo <- repos() do
+      Ecto.Migrator.with_repo(repo, &RenewCollab.Init.reset(&1))
+    end
+  end
+
+  def create_account(email, password) do
+    load_app()
+
+    for repo <- repos() do
+      Ecto.Migrator.with_repo(repo, fn r ->
+        %RenewCollabAuth.Entites.Account{}
+        |> RenewCollabAuth.Entites.Account.changeset(%{
+          "email" => email,
+          "new_password" => password
+        })
+        |> r.insert()
+      end)
+    end
+  end
+
   def rollback(repo, version) do
     load_app()
     {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :down, to: version))

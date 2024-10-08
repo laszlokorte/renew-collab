@@ -1,10 +1,8 @@
 import Config
 
-config :renew_collab, :app_password, "test"
-
 # Configure your database
 config :renew_collab, RenewCollab.Repo,
-  adapter: Ecto.Adapters.SQLite3,
+  adapter: Application.compile_env(:renew_collab, :db_adapter),
   database: Path.expand("../renew_collab_dev.db", __DIR__),
   pool_size: 1,
   stacktrace: true,

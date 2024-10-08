@@ -4,7 +4,33 @@
 
 ---
 
-## Installation
+## Docker
+
+### Build Image
+
+```sh
+# Inside project root
+docker build -t renew_collab:latest .
+```
+
+### Run Container
+
+```sh 
+docker run\
+-e PHX_HOST="localhost"\
+-e PORT="3000"\
+-e ADMIN_EMAIL="your@email.net"\
+-e ADMIN_PASSWORD="your_password"\
+-e SECRET_KEY_BASE="$(mix phx.gen.secret)"\
+-p 8080:3000\
+-it renew_collab
+```
+
+### Open in Browser
+
+[localhost:8080](http://localhost:8080)
+
+## Manual Installation
 
 ### Install dependencies
 

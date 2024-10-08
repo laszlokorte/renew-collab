@@ -2,11 +2,10 @@ defmodule RenewCollab.Init do
   alias RenewCollab.Document.Document
   alias RenewCollab.Symbol.Shape
   alias RenewCollab.Connection.SocketSchema
-  alias RenewCollab.Repo
   alias RenewCollab.Versioning
   import Ecto.Query, warn: false
 
-  def reset do
+  def reset(repo \\ RenewCollab.Repo) do
     Ecto.Multi.new()
     |> Ecto.Multi.delete_all(:delete_documents, Document)
     |> Ecto.Multi.delete_all(:delete_shapes, Shape)
@@ -48,7 +47,7 @@ defmodule RenewCollab.Init do
           )
         end))
     )
-    |> Repo.transaction()
+    |> repo.transaction()
     |> case do
       {:ok, _} ->
         RenewCollab.SimpleCache.clear()

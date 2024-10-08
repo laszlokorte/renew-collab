@@ -7,6 +7,8 @@
 # General application configuration
 import Config
 
+config :renew_collab, :db_adapter, Ecto.Adapters.SQLite3
+
 config :renew_collab,
   ecto_repos: [RenewCollab.Repo],
   generators: [timestamp_type: :utc_datetime, binary_id: true]

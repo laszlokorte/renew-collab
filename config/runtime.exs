@@ -24,7 +24,7 @@ maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: [
 
 if config_env() == :prod do
   config :renew_collab, RenewCollab.Repo,
-    adapter: Ecto.Adapters.SQLite3,
+    adapter: Application.compile_env(:renew_collab, :db_adapter),
     database: System.get_env("DB_PATH") || raise("DB_PATH is missing"),
     pool_size: 1,
     stacktrace: false,

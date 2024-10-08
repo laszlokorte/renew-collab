@@ -2,4 +2,12 @@
 set -eu
 
 cd -P -- "$(dirname -- "$0")"
+./migrate
+
+./renew_collab eval RenewCollab.Release.seed
+
+if test -n "$ADMIN_EMAIL" && test -n "$ADMIN_PASSWORD"; then
+./renew_collab eval "RenewCollab.Release.create_account(\"$ADMIN_EMAIL\", \"$ADMIN_PASSWORD\")"
+fi
+
 PHX_SERVER=true exec ./renew_collab start
