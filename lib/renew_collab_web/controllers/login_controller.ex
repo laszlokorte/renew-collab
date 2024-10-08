@@ -3,6 +3,7 @@ defmodule RenewCollabWeb.LoginController do
 
   def index(conn, _params) do
     render(conn, :index,
+      accounts_initialized: RenewCollabAuth.Auth.count_accounts() > 0,
       changeset:
         RenewCollabAuth.Entites.LoginAttempt.changeset(
           %RenewCollabAuth.Entites.LoginAttempt{},
@@ -47,7 +48,10 @@ defmodule RenewCollabWeb.LoginController do
         |> RenewCollabWeb.Auth.log_in_account(account)
 
       {:error, login} ->
-        render(conn, :index, changeset: login)
+        render(conn, :index,
+          changeset: login,
+          accounts_initialized: RenewCollabAuth.Auth.count_accounts() > 0
+        )
     end
   end
 

@@ -1,2 +1,17 @@
-<h2>Login</h2>
-<.login_form changeset={@changeset} action={~p"/login"} />
+<header style="background: #333; color: #fff; padding: 1em; display: flex; justify-content: space-between;">
+  <h1 style="margin: 0; font-size: 1.3em; display: flex; align-items: center; gap: 1ex">
+    <img src="/favicon.svg" style="width: 1.5em; height: 1.5em" /> Renew Web Editor
+  </h1>
+</header>
+
+<h2 style="text-align: center;">Login</h2>
+
+<%= unless @accounts_initialized  do %>
+  <p style="color: #a00; text-align: center;">
+    No accounts have been created yet. Please fully install the system.
+  </p>
+<% end %>
+
+<div style="display: grid; justify-content: center;" class="rnw-form">
+  <.login_form changeset={@changeset} action={~p"/login"} />
+</div>

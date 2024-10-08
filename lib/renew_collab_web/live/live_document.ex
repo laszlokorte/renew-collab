@@ -87,7 +87,11 @@ defmodule RenewCollabWeb.LiveDocument do
           phx-value-id=""
           preserveAspectRatio="xMidYMin meet"
           id={"document-#{@document.id}"}
-          viewBox={@viewbox}
+          viewBox={
+            @viewbox
+            |> Enum.map(&round(&1))
+            |> Enum.join(" ")
+          }
           style="display: block; width: 100%"
           width="1000"
           height="1000"
@@ -117,6 +121,58 @@ defmodule RenewCollabWeb.LiveDocument do
             Refit Camera
           </button>
         </p>
+
+        <div style="display: flex; gap: 1ex; padding: 1ex 0">
+          <button
+            type="button"
+            phx-click="create_group"
+            phx-value-example="yes"
+            style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+          >
+            Create Group
+          </button>
+
+          <button
+            type="button"
+            phx-click="create_text"
+            phx-value-example="yes"
+            style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+          >
+            Create Text
+          </button>
+
+          <button
+            type="button"
+            phx-click="create_box"
+            phx-value-example="yes"
+            style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+          >
+            Create Box
+          </button>
+
+          <button
+            type="button"
+            phx-click="create_edge"
+            phx-value-example="yes"
+            style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+          >
+            Create Line
+          </button>
+
+          <form target="" phx-change="insert_document">
+            <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: other_documents} <- @other_documents do %>
+              <select name="document_id" onchange="this.value=''">
+                <option value="" selected>Insert Other Document</option>
+
+                <%= for doc <- other_documents, doc.id != @document.id do %>
+                  <option value={doc.id}><%= doc.name %></option>
+                <% end %>
+              </select>
+              <% else _ -> %>
+                Loading...
+            <% end %>
+          </form>
+        </div>
 
         <h2 style="cursor: pointer;" phx-click="toggle-meta">
           <span><%= if(@show_meta, do: "🞃", else: "🞂") %></span> Document
@@ -211,58 +267,6 @@ defmodule RenewCollabWeb.LiveDocument do
 
         <%= if @show_hierarchy do %>
           <div style="width: 45vw;">
-            <div style="display: flex; gap: 1ex; padding: 1ex 0">
-              <button
-                type="button"
-                phx-click="create_group"
-                phx-value-example="yes"
-                style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
-              >
-                Create Group
-              </button>
-
-              <button
-                type="button"
-                phx-click="create_text"
-                phx-value-example="yes"
-                style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
-              >
-                Create Text
-              </button>
-
-              <button
-                type="button"
-                phx-click="create_box"
-                phx-value-example="yes"
-                style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
-              >
-                Create Box
-              </button>
-
-              <button
-                type="button"
-                phx-click="create_edge"
-                phx-value-example="yes"
-                style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
-              >
-                Create Line
-              </button>
-
-              <form target="" phx-change="insert_document">
-                <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: other_documents} <- @other_documents do %>
-                  <select name="document_id" onchange="this.value=''">
-                    <option value="" selected>Insert Other Document</option>
-
-                    <%= for doc <- other_documents, doc.id != @document.id do %>
-                      <option value={doc.id}><%= doc.name %></option>
-                    <% end %>
-                  </select>
-                  <% else _ -> %>
-                    Loading...
-                <% end %>
-              </form>
-            </div>
-
             <.live_component
               id="hierarchy-list"
               module={RenewCollabWeb.HierarchyListComponent}
@@ -426,8 +430,10 @@ defmodule RenewCollabWeb.LiveDocument do
       max_viewbox_x - min_viewbox_x + 2 * padding,
       max_viewbox_y - min_viewbox_y + 2 * padding
     ]
-    |> Enum.map(&round(&1))
-    |> Enum.join(" ")
+  end
+
+  def viewbox_center([x, y, w, h]) do
+    {x + w / 2, y + h / 2}
   end
 
   def handle_event("toggle_visible", %{"id" => layer_id}, socket) do
@@ -888,13 +894,15 @@ defmodule RenewCollabWeb.LiveDocument do
         %{"example" => "yes"},
         socket
       ) do
+    {cx, cy} = viewbox_center(socket.assigns.viewbox)
+
     RenewCollab.Commands.CreateLayer.new(%{
       document_id: socket.assigns.document.id,
       attrs: %{
         "semantic_tag" => "CH.ifa.draw.figures.TextFigure",
         "text" => %{
-          "position_x" => 0,
-          "position_y" => 0,
+          "position_x" => cx,
+          "position_y" => cy,
           "body" => "Hello World"
         }
       }
@@ -909,13 +917,15 @@ defmodule RenewCollabWeb.LiveDocument do
         %{"example" => "yes"},
         socket
       ) do
+    {cx, cy} = viewbox_center(socket.assigns.viewbox)
+
     RenewCollab.Commands.CreateLayer.new(%{
       document_id: socket.assigns.document.id,
       attrs: %{
         "semantic_tag" => "CH.ifa.draw.figures.RectangleFigure",
         "box" => %{
-          "position_x" => 0,
-          "position_y" => 0,
+          "position_x" => cx - 100,
+          "position_y" => cy - 50,
           "width" => 200,
           "height" => 100
         }
@@ -931,15 +941,17 @@ defmodule RenewCollabWeb.LiveDocument do
         %{"example" => "yes"},
         socket
       ) do
+    {cx, cy} = viewbox_center(socket.assigns.viewbox)
+
     RenewCollab.Commands.CreateLayer.new(%{
       document_id: socket.assigns.document.id,
       attrs: %{
         "semantic_tag" => "CH.ifa.draw.figures.PolyLineFigure",
         "edge" => %{
-          "source_x" => 0,
-          "source_y" => 0,
-          "target_x" => 200,
-          "target_y" => 100
+          "source_x" => cx - 100,
+          "source_y" => cy - 50,
+          "target_x" => cx + 100,
+          "target_y" => cy + 50
         }
       }
     })

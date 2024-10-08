@@ -271,13 +271,6 @@ defmodule RenewCollabWeb.LiveDocuments do
         _ ->
           with {:ok, %RenewCollab.Document.Document{} = document} <-
                  RenewCollab.Renew.create_document(%{"name" => filename, "kind" => "error"}) do
-            RenewCollabWeb.Endpoint.broadcast!(
-              "documents",
-              "document:new",
-              Map.take(document, [:name, :kind, :id])
-              |> Map.put("href", url(~p"/api/documents/#{document}"))
-            )
-
             {:ok, document}
           end
       end
@@ -303,12 +296,6 @@ defmodule RenewCollabWeb.LiveDocuments do
 
   def handle_event("reset", %{}, socket) do
     RenewCollab.Init.reset()
-
-    RenewCollabWeb.Endpoint.broadcast!(
-      "documents",
-      "all:deleted",
-      %{}
-    )
 
     {:noreply, socket}
   end

@@ -51,6 +51,12 @@ defmodule RenewCollab.Init do
     |> case do
       {:ok, _} ->
         RenewCollab.SimpleCache.clear()
+
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "documents",
+          :any
+        )
     end
   end
 end
