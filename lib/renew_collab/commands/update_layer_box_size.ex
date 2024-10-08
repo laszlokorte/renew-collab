@@ -90,12 +90,28 @@ defmodule RenewCollab.Commands.UpdateLayerBoxSize do
     |> Ecto.Multi.all(
       :affected_bond_ids,
       fn %{box: box} ->
+        linked_textes =
+          from(t in Text,
+            join: own_layer in assoc(t, :layer),
+            join: edge in assoc(own_layer, :attached_edges),
+            join: bond in assoc(edge, :bonds),
+            where:
+              t.layer_id in subquery(
+                from(h in Hyperlink,
+                  select: h.source_layer_id,
+                  where: h.target_layer_id == ^layer_id
+                )
+              ),
+            select: bond.id
+          )
+
         from(own_box in Box,
           join: own_layer in assoc(own_box, :layer),
           join: edge in assoc(own_layer, :attached_edges),
           join: bond in assoc(edge, :bonds),
           where: own_box.id == ^box.id,
-          select: bond.id
+          select: bond.id,
+          union: ^linked_textes
         )
       end
     )

@@ -42,7 +42,7 @@ defmodule RenewCollab.Commands.UpdateLayerTextPosition do
       end
     )
     |> Ecto.Multi.update_all(
-      :delete_size_hint,
+      :update_size_hint,
       fn %{text: text, update_position: %{position_x: new_x, position_y: new_y}} ->
         dx = new_x - text.position_x
         dy = new_y - text.position_y
@@ -54,5 +54,18 @@ defmodule RenewCollab.Commands.UpdateLayerTextPosition do
       end,
       []
     )
+    |> Ecto.Multi.all(
+      :affected_bond_ids,
+      fn %{text: text} ->
+        from(own_text in Text,
+          join: own_layer in assoc(own_text, :layer),
+          join: edge in assoc(own_layer, :attached_edges),
+          join: bond in assoc(edge, :bonds),
+          where: own_text.id == ^text.id,
+          select: bond.id
+        )
+      end
+    )
+    |> Ecto.Multi.append(RenewCollab.Bonding.reposition_multi())
   end
 end
