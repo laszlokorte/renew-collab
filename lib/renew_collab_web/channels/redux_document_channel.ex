@@ -1,20 +1,27 @@
 defmodule RenewCollabWeb.ReduxDocumentChannel do
   use LiveState.Channel, web_module: RenewCollabWeb
 
-  # Phoenix.PubSub.broadcast(
-  #         LiveStateComments.PubSub,
-  #         "comments:#{comment.url}",
-  #         {:comment_created, comment}
-  #       )
+  alias RenewCollabWeb.Presence
 
   @impl true
-  def init("redux_document:" <> document_id, _params, _socket) do
+  def init("redux_document:" <> document_id, _params, socket) do
     case RenewCollab.Renew.get_document_with_elements(document_id) do
       nil ->
         {:error, %{reason: "not found"}}
 
       doc ->
         Phoenix.PubSub.subscribe(RenewCollab.PubSub, "document:#{document_id}")
+
+        account_id = socket.assigns.current_account.account_id
+        username = socket.assigns.current_account.username
+
+        Presence.track(socket, account_id, %{
+          online_at: inspect(System.system_time(:second)),
+          username: username,
+          color: make_color(account_id)
+        })
+
+        push(socket, "presence_state", Presence.list(socket))
 
         {:ok,
          RenewCollabWeb.DocumentJSON.show(%{
@@ -29,5 +36,12 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
      RenewCollabWeb.DocumentJSON.show(%{
        document: RenewCollab.Renew.get_document_with_elements(document_id)
      })}
+  end
+
+  defp make_color(account_id) do
+    hue =
+      <<i <- account_id |> then(&:crypto.hash(:md5, &1))>> |> for(do: i) |> Enum.sum() |> rem(360)
+
+    "hsl(#{hue}, 70%, 40%)"
   end
 end

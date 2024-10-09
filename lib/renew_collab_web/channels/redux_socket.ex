@@ -5,8 +5,24 @@ defmodule RenewCollabWeb.ReduxSocket do
   channel "redux_documents", RenewCollabWeb.ReduxDocumentsChannel
 
   @impl true
+  def connect(%{"token" => "DEBUG"}, socket, _connect_info) do
+    {:ok, assign(socket, :current_account, %{account_id: "0", username: "DEBUG"})}
+  end
+
+  @impl true
+  def connect(%{"token" => token}, socket, _connect_info) do
+    with {:ok, data} <- RenewCollabWeb.Token.verify(token) do
+      {:ok,
+       assign(socket, :current_account, %{account_id: data.account_id, username: data.email})}
+    else
+      _error ->
+        {:error, "Invalid Token"}
+    end
+  end
+
+  @impl true
   def connect(%{}, socket, _connect_info) do
-    {:ok, socket}
+    {:error, "Invalid Token"}
   end
 
   # Socket IDs are topics that allow you to identify all sockets for a given user:

@@ -17,10 +17,6 @@ defmodule RenewCollabWeb.Endpoint do
     websocket: [connect_info: [session: @session_options]],
     longpoll: [connect_info: [session: @session_options]]
 
-  socket "/collaboration", RenewCollabWeb.CollabSocket,
-    websocket: [check_origin: false],
-    longpoll: false
-
   socket "/redux", RenewCollabWeb.ReduxSocket,
     websocket: [check_origin: false],
     longpoll: false
