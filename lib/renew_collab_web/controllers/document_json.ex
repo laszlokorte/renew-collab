@@ -11,8 +11,8 @@ defmodule RenewCollabWeb.DocumentJSON do
   def index(%{documents: documents}) do
     %{
       href: url(~p"/api/documents"),
-      channel: "documents",
-      items: for(document <- documents, do: list_data(document))
+      topic: "redux_documents",
+      content: for(document <- documents, do: list_data(document))
     }
   end
 
@@ -44,8 +44,9 @@ defmodule RenewCollabWeb.DocumentJSON do
     %{
       # id: document.id,
       href: url(~p"/api/documents/#{document}"),
-      channel: "document:#{document.id}",
-      document: %{
+      topic: "redux_document:#{document.id}",
+      id: document.id,
+      content: %{
         name: document.name,
         kind: document.kind,
         elements:

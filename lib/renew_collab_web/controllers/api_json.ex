@@ -15,6 +15,10 @@ defmodule RenewCollabWeb.ApiJSON do
         document: %{
           method: "GET",
           href: url(~p"/api/documents/:id")
+        },
+        live_socket: %{
+          method: "GET",
+          href: url(~p"/redux") |> String.replace_leading("http", "ws")
         }
       }
     }

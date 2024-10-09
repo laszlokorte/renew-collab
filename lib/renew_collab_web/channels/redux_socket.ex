@@ -2,6 +2,7 @@ defmodule RenewCollabWeb.ReduxSocket do
   use Phoenix.Socket
 
   channel "redux_document:*", RenewCollabWeb.ReduxDocumentChannel
+  channel "redux_documents", RenewCollabWeb.ReduxDocumentsChannel
 
   @impl true
   def connect(%{}, socket, _connect_info) do
