@@ -12,7 +12,13 @@ defmodule RenewCollabWeb.DocumentJSON do
     %{
       href: url(~p"/api/documents"),
       topic: "redux_documents",
-      content: for(document <- documents, do: list_data(document))
+      content: index_content(%{documents: documents})
+    }
+  end
+
+  def index_content(%{documents: documents}) do
+    %{
+      items: for(document <- documents, do: list_data(document))
     }
   end
 
@@ -40,34 +46,42 @@ defmodule RenewCollabWeb.DocumentJSON do
     }
   end
 
+  def show_content(%Document{} = document) do
+    %{
+      name: document.name,
+      kind: document.kind,
+      layers:
+        case document.layers do
+          %Ecto.Association.NotLoaded{} -> %{}
+          _ -> %{items: document.layers |> Enum.map(&layer_data(&1))}
+        end
+    }
+  end
+
   defp detail_data(%Document{} = document) do
     %{
       # id: document.id,
       href: url(~p"/api/documents/#{document}"),
       topic: "redux_document:#{document.id}",
       id: document.id,
-      content: %{
-        name: document.name,
-        kind: document.kind,
-        elements:
-          case document.layers do
-            %Ecto.Association.NotLoaded{} -> %{}
-            _ -> %{items: document.layers |> Enum.map(&element_data(&1))}
-          end
-      }
-      # |> Map.put(:href, url(~p"/api/documents/#{document}/elements"))
+      content: show_content(document)
     }
   end
 
-  def element_data(%Layer{} = element) do
+  def layer_data(%Layer{} = layer) do
     %{
-      # id: element.id,
-      id: element.id,
-      semantic_tag: element.semantic_tag,
-      z_index: element.z_index,
-      hidden: element.hidden,
+      # id: layer.id,
+      id: layer.id,
+      semantic_tag: layer.semantic_tag,
+      z_index: layer.z_index,
+      hidden: layer.hidden,
+      parent_id:
+        case layer.direct_parent do
+          nil -> nil
+          p -> p.ancestor_id
+        end,
       text:
-        case element.text do
+        case layer.text do
           nil ->
             nil
 
@@ -101,7 +115,7 @@ defmodule RenewCollabWeb.DocumentJSON do
             }
         end,
       box:
-        case element.box do
+        case layer.box do
           nil ->
             nil
 
@@ -123,7 +137,7 @@ defmodule RenewCollabWeb.DocumentJSON do
             }
         end,
       edge:
-        case element.edge do
+        case layer.edge do
           nil ->
             nil
 
@@ -183,7 +197,7 @@ defmodule RenewCollabWeb.DocumentJSON do
             }
         end,
       style:
-        case element.style do
+        case layer.style do
           nil ->
             nil
 

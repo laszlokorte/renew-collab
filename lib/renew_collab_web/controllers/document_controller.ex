@@ -14,13 +14,15 @@ defmodule RenewCollabWeb.DocumentController do
 
   def create(conn, %{"document" => document_params}) do
     with {:ok, %Document{} = document} <- Renew.create_document(document_params) do
-      RenewCollabWeb.Endpoint.broadcast!(
-        "documents",
-        "document:new",
-        Map.take(document, [:name, :kind, :id])
-        |> Map.put("href", url(~p"/api/documents/#{document}"))
-      )
+      conn
+      |> put_status(:created)
+      |> put_resp_header("location", ~p"/api/documents/#{document}")
+      |> render(:show, document: document)
+    end
+  end
 
+  def create(conn, %{}) do
+    with {:ok, %Document{} = document} <- Renew.create_document(%{name: "Untitled", kind: "mock"}) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", ~p"/api/documents/#{document}")
@@ -78,13 +80,6 @@ defmodule RenewCollabWeb.DocumentController do
     with {:ok, content} <- File.read(path),
          {:ok, document_params, hierarchy} <- DocumentImport.import(filename, content),
          {:ok, %Document{} = document} <- Renew.create_document(document_params, hierarchy) do
-      RenewCollabWeb.Endpoint.broadcast!(
-        "documents",
-        "document:new",
-        Map.take(document, [:name, :kind, :id])
-        |> Map.put("href", url(~p"/api/documents/#{document}"))
-      )
-
       conn
       |> put_status(:created)
       |> put_resp_header("location", ~p"/api/documents/#{document}")

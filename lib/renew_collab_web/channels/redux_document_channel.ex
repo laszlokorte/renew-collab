@@ -23,19 +23,20 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
 
         push(socket, "presence_state", Presence.list(socket))
 
-        {:ok,
-         RenewCollabWeb.DocumentJSON.show(%{
-           document: doc
-         })}
+        {:ok, RenewCollabWeb.DocumentJSON.show_content(doc)}
     end
   end
 
   @impl true
   def handle_message({:document_changed, document_id}, state) do
     {:noreply,
-     RenewCollabWeb.DocumentJSON.show(%{
-       document: RenewCollab.Renew.get_document_with_elements(document_id)
-     })}
+     RenewCollabWeb.DocumentJSON.show_content(
+       RenewCollab.Renew.get_document_with_elements(document_id)
+     )}
+  end
+
+  def handle_in("delete_document", %{"id" => document_id}, socket) do
+    {:noreply, socket}
   end
 
   defp make_color(account_id) do

@@ -18,13 +18,32 @@ defmodule RenewCollabWeb.ReduxDocumentsChannel do
 
     push(socket, "presence_state", Presence.list(socket))
 
-    {:ok, RenewCollabWeb.DocumentJSON.index(%{documents: RenewCollab.Renew.list_documents()})}
+    {:ok,
+     RenewCollabWeb.DocumentJSON.index_content(%{documents: RenewCollab.Renew.list_documents()})}
   end
 
   @impl true
   def handle_message(:any, state) do
     {:noreply,
-     RenewCollabWeb.DocumentJSON.index(%{documents: RenewCollab.Renew.list_documents()})}
+     RenewCollabWeb.DocumentJSON.index_content(%{documents: RenewCollab.Renew.list_documents()})}
+  end
+
+  def handle_event("delete_document", %{"id" => document_id}, socket) do
+    RenewCollab.Commands.DeleteDocument.new(%{
+      document_id: document_id
+    })
+    |> RenewCollab.Commander.run_document_command(false)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("duplicate_document", %{"id" => document_id}, socket) do
+    RenewCollab.Commands.DuplicateDocument.new(%{
+      document_id: document_id
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    {:noreply, socket}
   end
 
   defp make_color(account_id) do
