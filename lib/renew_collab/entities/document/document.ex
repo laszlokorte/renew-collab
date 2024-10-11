@@ -22,4 +22,10 @@ defmodule RenewCollab.Document.Document do
     |> cast_assoc(:layers)
     |> validate_required([:name, :kind])
   end
+
+  @doc false
+  def changeset_meta(document, attrs) do
+    document
+    |> cast(attrs, [:name, :kind])
+  end
 end

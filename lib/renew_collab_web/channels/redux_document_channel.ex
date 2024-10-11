@@ -1,5 +1,5 @@
 defmodule RenewCollabWeb.ReduxDocumentChannel do
-  use LiveState.Channel, web_module: RenewCollabWeb
+  use RenewCollabWeb.StateChannel, :redux
 
   alias RenewCollabWeb.Presence
 
@@ -33,10 +33,6 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
      RenewCollabWeb.DocumentJSON.show_content(
        RenewCollab.Renew.get_document_with_elements(document_id)
      )}
-  end
-
-  def handle_in("delete_document", %{"id" => document_id}, socket) do
-    {:noreply, socket}
   end
 
   defp make_color(account_id) do

@@ -17,7 +17,7 @@ defmodule RenewCollab.Commands.UpdateDocumentMeta do
     Ecto.Multi.new()
     |> Ecto.Multi.put(:document_id, document_id)
     |> Ecto.Multi.update(:update_meta, fn %{document_id: document_id} ->
-      %Document{id: document_id} |> Document.changeset(meta)
+      %Document{id: document_id} |> Document.changeset_meta(meta)
     end)
   end
 end

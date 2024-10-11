@@ -1,5 +1,5 @@
 defmodule RenewCollabWeb.ReduxDocumentsChannel do
-  use LiveState.Channel, web_module: RenewCollabWeb
+  use RenewCollabWeb.StateChannel, :redux
 
   alias RenewCollabWeb.Presence
 
@@ -23,27 +23,40 @@ defmodule RenewCollabWeb.ReduxDocumentsChannel do
   end
 
   @impl true
-  def handle_message(:any, state) do
+  def handle_message(:any, _state) do
     {:noreply,
      RenewCollabWeb.DocumentJSON.index_content(%{documents: RenewCollab.Renew.list_documents()})}
   end
 
-  def handle_event("delete_document", %{"id" => document_id}, socket) do
+  @impl true
+  def handle_event("delete_document", %{"id" => document_id}, state) do
     RenewCollab.Commands.DeleteDocument.new(%{
       document_id: document_id
     })
     |> RenewCollab.Commander.run_document_command(false)
 
-    {:noreply, socket}
+    {:noreply, state}
   end
 
-  def handle_event("duplicate_document", %{"id" => document_id}, socket) do
+  @impl true
+  def handle_event("duplicate_document", %{"id" => document_id}, state) do
     RenewCollab.Commands.DuplicateDocument.new(%{
       document_id: document_id
     })
     |> RenewCollab.Commander.run_document_command()
 
-    {:noreply, socket}
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_event("rename_document", %{"id" => document_id, "name" => name}, _state) do
+    RenewCollab.Commands.UpdateDocumentMeta.new(%{
+      document_id: document_id,
+      meta: %{name: name}
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :ack
   end
 
   defp make_color(account_id) do

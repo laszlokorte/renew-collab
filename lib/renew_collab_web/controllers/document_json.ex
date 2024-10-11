@@ -1,4 +1,5 @@
 defmodule RenewCollabWeb.DocumentJSON do
+  alias RenewCollab.ViewBox
   alias RenewCollab.Document.Document
   alias RenewCollab.Hierarchy.Layer
   alias RenewCollab.Connection.Waypoint
@@ -42,7 +43,12 @@ defmodule RenewCollabWeb.DocumentJSON do
       href: url(~p"/api/documents/#{document}"),
       name: document.name,
       kind: document.kind,
-      id: document.id
+      id: document.id,
+      links: %{
+        export: %{
+          href: url(~p"/api/documents/#{document.id}/export")
+        }
+      }
     }
   end
 
@@ -50,12 +56,17 @@ defmodule RenewCollabWeb.DocumentJSON do
     %{
       name: document.name,
       kind: document.kind,
+      viewbox: viewbox_data(RenewCollab.ViewBox.calculate(document)),
       layers:
         case document.layers do
           %Ecto.Association.NotLoaded{} -> %{}
           _ -> %{items: document.layers |> Enum.map(&layer_data(&1))}
         end
     }
+  end
+
+  def viewbox_data(%ViewBox{x: x, y: y, width: width, height: heiht}) do
+    %{x: x, y: y, width: width, height: heiht}
   end
 
   defp detail_data(%Document{} = document) do

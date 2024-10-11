@@ -87,11 +87,7 @@ defmodule RenewCollabWeb.LiveDocument do
           phx-value-id=""
           preserveAspectRatio="xMidYMin meet"
           id={"document-#{@document.id}"}
-          viewBox={
-            @viewbox
-            |> Enum.map(&round(&1))
-            |> Enum.join(" ")
-          }
+          viewBox={RenewCollab.ViewBox.into_string(@viewbox)}
           style="display: block; width: 100%"
           width="1000"
           height="1000"
@@ -357,83 +353,11 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   defp viewbox(document) do
-    edge_points =
-      document.layers
-      |> Enum.map(& &1.edge)
-      |> Enum.flat_map(fn
-        nil ->
-          []
-
-        e ->
-          [
-            {e.source_x, e.source_y},
-            {e.target_x, e.target_y}
-            | e.waypoints |> Enum.map(fn %{position_x: x, position_y: y} -> {x, y} end)
-          ]
-      end)
-
-    box_points =
-      document.layers
-      |> Enum.map(& &1.box)
-      |> Enum.flat_map(fn
-        nil ->
-          []
-
-        b ->
-          [
-            {b.position_x, b.position_y},
-            {b.position_x + b.width, b.position_y},
-            {b.position_x + b.width, b.position_y + b.height},
-            {b.position_x, b.position_y + b.height}
-          ]
-      end)
-
-    text_points =
-      document.layers
-      |> Enum.map(& &1.text)
-      |> Enum.flat_map(fn
-        nil ->
-          []
-
-        b ->
-          [
-            {b.position_x, b.position_y},
-            {b.position_x,
-             b.position_y +
-               (get_in(b, [Access.key(:style, %{}), Access.key(:font_size, %{})]) || 12) / 2 *
-                 (b.body
-                  |> String.split("\n")
-                  |> Enum.filter(&(not blank?(&1)))
-                  |> Enum.count())},
-            {b.position_x +
-               (get_in(b, [Access.key(:style, %{}), Access.key(:font_size, %{})]) || 12) / 2 *
-                 (b.body
-                  |> String.split("\n")
-                  |> Enum.map(&String.length(&1))
-                  |> Enum.max()), b.position_y}
-          ]
-      end)
-
-    points = Enum.concat([text_points, edge_points, box_points])
-
-    {{min_viewbox_x, _}, {max_viewbox_x, _}} =
-      points |> Enum.min_max_by(&elem(&1, 0), fn -> {{0, 0}, {0, 0}} end)
-
-    {{_, min_viewbox_y}, {_, max_viewbox_y}} =
-      points |> Enum.min_max_by(&elem(&1, 1), fn -> {{0, 0}, {0, 0}} end)
-
-    padding = 100
-
-    [
-      min_viewbox_x - padding,
-      min_viewbox_y - padding,
-      max_viewbox_x - min_viewbox_x + 2 * padding,
-      max_viewbox_y - min_viewbox_y + 2 * padding
-    ]
+    RenewCollab.ViewBox.calculate(document)
   end
 
-  def viewbox_center([x, y, w, h]) do
-    {x + w / 2, y + h / 2}
+  def viewbox_center(viewbox) do
+    RenewCollab.ViewBox.center(viewbox)
   end
 
   def handle_event("toggle_visible", %{"id" => layer_id}, socket) do
@@ -1216,7 +1140,4 @@ defmodule RenewCollabWeb.LiveDocument do
        )}
     end
   end
-
-  defp blank?(str_or_nil),
-    do: "" == str_or_nil |> to_string() |> String.trim()
 end

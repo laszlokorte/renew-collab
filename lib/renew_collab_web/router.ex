@@ -33,7 +33,7 @@ defmodule RenewCollabWeb.Router do
 
     scope "/documents" do
       post "/import", DocumentController, :import
-      get "/documents/:id/export", DocumentController, :export
+      get "/:id/export", DocumentController, :export
     end
 
     resources "/documents", DocumentController, except: [:new, :edit]
