@@ -23,7 +23,7 @@ defmodule RenewCollabWeb.ApiJSON do
         live_socket: %{
           method: "GET",
           href:
-            static_url(RenewCollabWeb.Endpoint, :redux)
+            static_url(RenewCollabWeb.Endpoint, "/redux")
             |> String.replace_leading("http", "ws")
         }
       }
