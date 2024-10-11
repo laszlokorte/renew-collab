@@ -12,13 +12,19 @@ defmodule RenewCollabWeb.ApiJSON do
           method: "GET",
           href: url(~p"/api/documents")
         },
+        import_documents: %{
+          method: "POST",
+          href: url(~p"/api/documents/import")
+        },
         document: %{
           method: "GET",
           href: url(~p"/api/documents/:id")
         },
         live_socket: %{
           method: "GET",
-          href: url(~p"/redux") |> String.replace_leading("http", "ws")
+          href:
+            static_url(RenewCollabWeb.Endpoint, :redux)
+            |> String.replace_leading("http", "ws")
         }
       }
     }

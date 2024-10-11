@@ -21,7 +21,7 @@ defmodule RenewCollabWeb.ReduxSocket do
   end
 
   @impl true
-  def connect(%{}, socket, _connect_info) do
+  def connect(%{}, _socket, _connect_info) do
     {:error, "Invalid Token"}
   end
 

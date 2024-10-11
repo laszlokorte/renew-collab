@@ -71,25 +71,52 @@ defmodule RenewCollabWeb.DocumentController do
   end
 
   def import(conn, %{
-        "renew_file" => %Plug.Upload{
+        "files" => files
+      }) do
+    for %Plug.Upload{
           path: path,
           content_type: _content_type,
           filename: filename
-        }
-      }) do
-    with {:ok, content} <- File.read(path),
-         {:ok, document_params, hierarchy} <- DocumentImport.import(filename, content),
-         {:ok, %Document{} = document} <- Renew.create_document(document_params, hierarchy) do
-      conn
-      |> put_status(:created)
-      |> put_resp_header("location", ~p"/api/documents/#{document}")
-      |> render(:import, document: document)
-    else
-      _e ->
+        } <- files,
+        reduce: [] do
+      :error ->
+        :error
+
+      imported ->
+        with {:ok, content} <- File.read(path),
+             {:ok,
+              %RenewCollab.Import.Converted{
+                name: doc_name,
+                kind: kind,
+                layers: layers,
+                hierarchy: hierarchy,
+                hyperlinks: hyperlinks,
+                bonds: bonds
+              }} <- DocumentImport.import(filename, content),
+             {:ok, %Document{} = document} <-
+               RenewCollab.Renew.create_document(
+                 %{"name" => doc_name, "kind" => kind, "layers" => layers},
+                 hierarchy,
+                 hyperlinks,
+                 bonds
+               ) do
+          [document | imported]
+        else
+          _ ->
+            :error
+        end
+    end
+    |> case do
+      :error ->
         conn
         |> put_status(:bad_request)
         |> Phoenix.Controller.json(%{"error" => "Not a valid renew file"})
         |> halt()
+
+      imported ->
+        conn
+        |> put_status(:created)
+        |> render(:import, imported: imported)
     end
   end
 end

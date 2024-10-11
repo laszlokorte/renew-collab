@@ -28,7 +28,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
   end
 
   @impl true
-  def handle_message({:document_changed, document_id}, state) do
+  def handle_message({:document_changed, document_id}, _state) do
     {:noreply,
      RenewCollabWeb.DocumentJSON.show_content(
        RenewCollab.Renew.get_document_with_elements(document_id)
