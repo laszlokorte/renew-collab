@@ -28,7 +28,7 @@ defmodule RenewCollabWeb.Router do
   scope "/api", RenewCollabWeb do
     pipe_through :api
     get "/", ApiController, :index
-    post "/auth", ApiController, :auth
+    post "/auth", ApiSessionController, :auth
     get "/symbols", SymbolController, :index
 
     scope "/documents" do

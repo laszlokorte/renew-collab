@@ -77,6 +77,16 @@ defmodule RenewCollabWeb.DocumentJSON do
       href: url(~p"/api/documents/#{document}"),
       topic: "redux_document:#{document.id}",
       id: document.id,
+      links: %{
+        symbols: %{
+          href: url(~p"/api/symbols"),
+          method: "get"
+        },
+        export: %{
+          href: url(~p"/api/documents/#{document.id}/export"),
+          method: "get"
+        }
+      },
       content: show_content(document)
     }
   end

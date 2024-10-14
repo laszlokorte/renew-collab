@@ -48,7 +48,9 @@ defmodule RenewCollabWeb.LoginController do
         |> RenewCollabWeb.Auth.log_in_account(account)
 
       {:error, login} ->
-        render(conn, :index,
+        conn
+        |> put_status(:unauthorized)
+        |> render(:index,
           changeset: login,
           accounts_initialized: RenewCollabAuth.Auth.count_accounts() > 0
         )

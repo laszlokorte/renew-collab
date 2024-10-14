@@ -31,25 +31,40 @@ defmodule RenewCollabWeb.DocumentController do
   end
 
   def show(conn, %{"id" => id}) do
-    document = Renew.get_document_with_elements(id)
-    render(conn, :show, document: document)
+    case Renew.get_document_with_elements(id) do
+      nil ->
+        conn
+        |> put_status(:not_found)
+        |> Phoenix.Controller.json(%{message: "Not found"})
+        |> halt()
+
+      document ->
+        render(conn, :show, document: document)
+    end
   end
 
   def export(conn, %{"id" => id}) do
-    document = Renew.get_document_with_elements(id)
+    case Renew.get_document_with_elements(id) do
+      nil ->
+        conn
+        |> put_status(:not_found)
+        |> Phoenix.Controller.json(%{message: "Not found"})
+        |> halt()
 
-    {:ok, output} = RenewCollab.Export.DocumentExport.export(document)
+      document ->
+        {:ok, output} = RenewCollab.Export.DocumentExport.export(document)
 
-    conn
-    |> put_resp_header(
-      "content-disposition",
-      "inline; filename=\"#{document.name |> String.trim_trailing(".rnw")}_exported.rnw\""
-    )
-    |> put_resp_header(
-      "content-type",
-      "text/plain+renew"
-    )
-    |> text(output)
+        conn
+        |> put_resp_header(
+          "content-disposition",
+          "inline; filename=\"#{document.name |> String.trim_trailing(".rnw")}_exported.rnw\""
+        )
+        |> put_resp_header(
+          "content-type",
+          "text/plain+renew"
+        )
+        |> text(output)
+    end
   end
 
   def inspect(conn, %{"id" => id}) do
@@ -110,7 +125,7 @@ defmodule RenewCollabWeb.DocumentController do
       :error ->
         conn
         |> put_status(:bad_request)
-        |> Phoenix.Controller.json(%{"error" => "Not a valid renew file"})
+        |> Phoenix.Controller.json(%{message: "Not a valid renew file"})
         |> halt()
 
       imported ->
