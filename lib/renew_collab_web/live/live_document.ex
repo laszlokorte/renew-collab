@@ -75,7 +75,7 @@ defmodule RenewCollabWeb.LiveDocument do
         <% end %>
       </div>
 
-      <div style="grid-area: left; width: 100%; height: 100%; overflow: auto; box-sizing: border-box; padding: 0 2em">
+      <div style="grid-area: left; width: 100%; height: 100%; overflow: auto; box-sizing: border-box; padding: 0">
         <datalist id="all-semantic-tags">
           <%= for {class_name, _} <- renew_grammar().hierarchy do %>
             <option><%= class_name %></option>
@@ -88,10 +88,19 @@ defmodule RenewCollabWeb.LiveDocument do
           preserveAspectRatio="xMidYMin meet"
           id={"document-#{@document.id}"}
           viewBox={RenewCollab.ViewBox.into_string(@viewbox)}
-          style="display: block; width: 100%"
-          width="1000"
-          height="1000"
+          style="display: block; width: 100%; height: 100%;background: #f5f5f5;"
+          width={@viewbox.width}
+          height={@viewbox.height}
         >
+          <rect
+            x={@viewbox.x}
+            y={@viewbox.y}
+            width={@viewbox.width}
+            height={@viewbox.height}
+            fill="#fff"
+            stroke="#aaa"
+            stroke-width="2"
+          />
           <%= for layer <- @document.layers, layer.direct_parent == nil do %>
             <.live_component
               selectable={true}

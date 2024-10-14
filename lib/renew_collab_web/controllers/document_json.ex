@@ -132,7 +132,9 @@ defmodule RenewCollabWeb.DocumentJSON do
                       "font_size" => v.font_size,
                       "font_family" => v.font_family,
                       "bold" => v.bold,
-                      "text_color" => v.text_color
+                      "text_color" => v.text_color,
+                      "blank_lines" => v.blank_lines,
+                      "rich" => v.rich
                     }
                 end
             }

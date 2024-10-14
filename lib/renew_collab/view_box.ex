@@ -53,17 +53,20 @@ defmodule RenewCollab.ViewBox do
               []
 
             b ->
+              keep_blanks =
+                get_in(b, [Access.key(:style, %{}), Access.key(:blank_lines, %{})]) || false
+
               [
                 {b.position_x, b.position_y},
                 {b.position_x,
                  b.position_y +
-                   (get_in(b, [Access.key(:style, %{}), Access.key(:font_size, %{})]) || 12) / 2 *
+                   (get_in(b, [Access.key(:style, %{}), Access.key(:font_size, %{})]) || 12) * 1.5 *
                      (b.body
                       |> String.split("\n")
-                      |> Enum.filter(&(not blank?(&1)))
+                      |> Enum.filter(&(keep_blanks || not blank?(&1)))
                       |> Enum.count())},
                 {b.position_x +
-                   (get_in(b, [Access.key(:style, %{}), Access.key(:font_size, %{})]) || 12) / 2 *
+                   (get_in(b, [Access.key(:style, %{}), Access.key(:font_size, %{})]) || 12) *
                      (b.body
                       |> String.split("\n")
                       |> Enum.map(&String.length(&1))
