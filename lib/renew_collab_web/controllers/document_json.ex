@@ -155,7 +155,7 @@ defmodule RenewCollabWeb.DocumentJSON do
               "shape" =>
                 case v.symbol_shape do
                   nil -> nil
-                  symbol -> symbol.name
+                  symbol -> symbol.id
                 end
             }
         end,
@@ -212,8 +212,8 @@ defmodule RenewCollabWeb.DocumentJSON do
                       "stroke_join" => v.stroke_join,
                       "stroke_cap" => v.stroke_cap,
                       "stroke_dash_array" => v.stroke_dash_array,
-                      "source_tip" => v.source_tip,
-                      "target_tip" => v.target_tip,
+                      "source_tip_symbol_shape_id" => v.source_tip_symbol_shape_id,
+                      "target_tip_symbol_shape_id" => v.target_tip_symbol_shape_id,
                       "smoothness" => v.smoothness
                     }
                 end

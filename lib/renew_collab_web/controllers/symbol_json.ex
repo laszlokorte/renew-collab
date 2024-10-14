@@ -8,7 +8,7 @@ defmodule RenewCollabWeb.SymbolJSON do
   end
 
   defp shape_data(shape) do
-    %{name: shape.name, paths: Enum.map(shape.paths, &path_data/1)}
+    %{id: shape.id, name: shape.name, paths: Enum.map(shape.paths, &path_data/1)}
   end
 
   defp path_data(path) do
