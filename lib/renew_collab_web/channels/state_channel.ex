@@ -20,11 +20,13 @@ defmodule RenewCollabWeb.StateChannel do
           apply(__MODULE__, :handle_event, [event_name, payload, Map.get(assigns, state_key())])
         end
         |> case do
+          :silent ->
+            {:noreply, socket}
+
           :ack ->
             {:noreply, socket} =
               maybe_handle_reply({:noreply, Map.get(assigns, state_key())}, socket)
 
-            dbg("xxxxxx")
             {:reply, :ok, socket}
 
           r ->
