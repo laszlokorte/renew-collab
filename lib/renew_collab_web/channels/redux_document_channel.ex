@@ -21,7 +21,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           username: username,
           connection_id: connection_id,
           color: make_color(account_id),
-          cursor: %{x: 0, y: 0}
+          cursor: nil
         })
 
         push(socket, "presence_state", Presence.list(socket))
@@ -41,7 +41,6 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
   @impl true
   def handle_event("cursor", %{"x" => x, "y" => y}, _state, socket) do
     account_id = socket.assigns.current_account.account_id
-    old_meta = Presence.get_by_key(socket, account_id)
 
     Presence.update(
       socket,
@@ -55,9 +54,38 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
   end
 
   @impl true
+  def handle_event("cursor", %{}, _state, socket) do
+    account_id = socket.assigns.current_account.account_id
+
+    Presence.update(
+      socket,
+      account_id,
+      &Map.merge(&1, %{
+        cursor: nil
+      })
+    )
+
+    :silent
+  end
+
+  @impl true
+  def handle_event("select", %{}, _state, socket) do
+    account_id = socket.assigns.current_account.account_id
+
+    Presence.update(
+      socket,
+      account_id,
+      &Map.merge(&1, %{
+        selection: nil
+      })
+    )
+
+    :silent
+  end
+
+  @impl true
   def handle_event("select", layer_id, _state, socket) when is_binary(layer_id) do
     account_id = socket.assigns.current_account.account_id
-    old_meta = Presence.get_by_key(socket, account_id)
 
     Presence.update(
       socket,

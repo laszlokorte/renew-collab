@@ -5,14 +5,17 @@ defmodule RenewCollabWeb.StateChannel do
 
   def redux do
     quote do
-
+      @impl
       def join(channel, payload, socket) do
         import Phoenix.Socket
+
         case authorize(channel, payload, socket) do
           {:ok, socket} ->
             send(self(), {:after_join, channel, payload})
             connection_id = Ecto.UUID.generate()
-            {:ok, %{connection_id: connection_id}, socket|>assign(:connection_id, connection_id)}
+
+            {:ok, %{connection_id: connection_id},
+             socket |> assign(:connection_id, connection_id)}
 
           {:error, reason} ->
             {:error, reason}
