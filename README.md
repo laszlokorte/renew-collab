@@ -46,7 +46,7 @@ mix setup
 
 ### Create Database and run migrations
 
-```
+```sh
 mix ecto.create
 mix ecto.migrate
 ```
@@ -55,13 +55,21 @@ mix ecto.migrate
 
 To import predefined data into the database (eg. symbols and socket_schemas)
 
-```
+```sh
 mix run priv/repo/seeds.exs
+```
+
+### Start Dev Server with REPL
+
+```sh
+iex -S mix phx.server
 ```
 
 ### Setup Account
 
-Create your first account to log in with
+Create your first account to log in with.
+
+Run the elixir command below. If you have started the server with the command above you have the REPL already running and can type it in.
 
 ```ex
 RenewCollabAuth.Auth.create_account("your@mail.org", "secret")
