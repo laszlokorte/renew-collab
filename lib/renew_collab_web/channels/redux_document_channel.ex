@@ -14,10 +14,12 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
 
         account_id = socket.assigns.current_account.account_id
         username = socket.assigns.current_account.username
+        connection_id = socket.assigns.connection_id
 
         Presence.track(socket, account_id, %{
           online_at: inspect(System.system_time(:second)),
           username: username,
+          connection_id: connection_id,
           color: make_color(account_id),
           cursor: %{x: 0, y: 0}
         })
