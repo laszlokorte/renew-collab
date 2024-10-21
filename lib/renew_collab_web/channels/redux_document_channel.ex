@@ -26,7 +26,8 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
 
         push(socket, "presence_state", Presence.list(socket))
 
-        {:ok, RenewCollabWeb.DocumentJSON.show_content(doc)}
+        {:ok, RenewCollabWeb.DocumentJSON.show_content(doc),
+         assign(socket, :document_id, document_id)}
     end
   end
 
@@ -94,6 +95,31 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         selection: layer_id
       })
     )
+
+    :silent
+  end
+
+  @impl true
+  def handle_event(
+        "create_layer",
+        %{"pos" => %{"x" => cx, "y" => cy}, "shape_id" => shape_id},
+        %{},
+        socket
+      ) do
+    RenewCollab.Commands.CreateLayer.new(%{
+      document_id: socket.assigns.document_id,
+      attrs: %{
+        "semantic_tag" => "CH.ifa.draw.figures.RectangleFigure",
+        "box" => %{
+          "position_x" => cx - 25,
+          "position_y" => cy - 25,
+          "width" => 50,
+          "height" => 50,
+          "symbol_shape_id" => shape_id
+        }
+      }
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     :silent
   end

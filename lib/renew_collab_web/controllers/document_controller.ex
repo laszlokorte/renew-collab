@@ -43,6 +43,31 @@ defmodule RenewCollabWeb.DocumentController do
     end
   end
 
+  def delete(conn, %{"id" => document_id}) do
+    RenewCollab.Commands.DeleteDocument.new(%{
+      document_id: document_id
+    })
+    |> RenewCollab.Commander.run_document_command_sync(false)
+
+    conn
+    |> put_status(:accepted)
+    |> json(%{message: "ok"})
+  end
+
+  def duplicate(conn, %{"id" => document_id}) do
+    RenewCollab.Commands.DuplicateDocument.new(%{
+      document_id: document_id
+    })
+    |> RenewCollab.Commander.run_document_command_sync(false)
+    |> case do
+      {:ok, %{insert_document: new_document}} ->
+        conn
+        |> put_status(:created)
+        |> put_resp_header("location", ~p"/api/documents/#{new_document}")
+        |> json(%{id: new_document.id, url: ~p"/api/documents/#{new_document}"})
+    end
+  end
+
   def export(conn, %{"id" => id}) do
     case Renew.get_document_with_elements(id) do
       nil ->

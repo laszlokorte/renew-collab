@@ -85,6 +85,10 @@ defmodule RenewCollabWeb.DocumentJSON do
         export: %{
           href: url(~p"/api/documents/#{document.id}/export"),
           method: "get"
+        },
+        duplicate: %{
+          href: url(~p"/api/documents/#{document.id}/duplicate"),
+          method: "post"
         }
       },
       content: show_content(document)
