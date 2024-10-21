@@ -57,12 +57,12 @@ git clone url-to-this-repository
 mix deps.get
 ``` 
 
-### Compile JavaScript assets
+### Compile Project
 
 ```sh
 # Inside this project directory
-mix setup
-```
+mix compile
+``` 
 
 ### Create Database and run migrations
 
@@ -79,6 +79,13 @@ To import predefined data into the database (eg. symbols and socket_schemas)
 ```sh
 # Inside this project directory
 mix run priv/repo/seeds.exs
+```
+
+### Compile JavaScript assets
+
+```sh
+# Inside this project directory
+mix setup
 ```
 
 ### Start Dev Server with REPL
