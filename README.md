@@ -6,6 +6,8 @@
 
 ## Docker
 
+To run this project as a docker container (recommended for production) follow the steps below:
+
 ### Build Image
 
 ```sh
@@ -32,21 +34,40 @@ docker run\
 
 ## Manual Installation
 
+To run this project without docker one your own machine for development follow the steps below.
+
+### Prerequisites
+
+* [Erlang](https://www.erlang.org/) is installed on your machine ([instructions](https://www.erlang.org/downloads))
+* [Elixir](https://elixir-lang.org/) is installed on your machine ([instructions](https://elixir-lang.org/install.html))
+* [NodeJS](https://nodejs.org/en) is installed on your machine ([instructions](https://nodejs.org/en/download/prebuilt-installer))
+
+### Clone this repository
+
+Download this repostitory onto your machine.
+
+```sh
+git clone url-to-this-repository
+```
+
 ### Install dependencies
 
 ```sh
+# Inside this project directory
 mix deps.get
 ``` 
 
 ### Compile JavaScript assets
 
 ```sh
+# Inside this project directory
 mix setup
 ```
 
 ### Create Database and run migrations
 
 ```sh
+# Inside this project directory
 mix ecto.create
 mix ecto.migrate
 ```
@@ -56,12 +77,14 @@ mix ecto.migrate
 To import predefined data into the database (eg. symbols and socket_schemas)
 
 ```sh
+# Inside this project directory
 mix run priv/repo/seeds.exs
 ```
 
 ### Start Dev Server with REPL
 
 ```sh
+# Inside this project directory
 iex -S mix phx.server
 ```
 
@@ -75,6 +98,27 @@ Run the elixir command below. If you have started the server with the command ab
 RenewCollabAuth.Auth.create_account("your@mail.org", "secret")
 ```
 
+### Open in Browser
+
+[localhost:4000](http://localhost:4000)
+
+## Contributing
+
+### Automatic Code Formatting
+
+To automatically format all elixir code in the project run:
+
+```sh
+mix format
+```
+
+### Git pre-commit hook
+
+To check the code formatting before every git commit, setup the git `pre-commit` hook:
+
+```sh
+cp priv/dev/git-hooks/pre-commit .git/hooks/pre-commit
+```
 
 ---
 
