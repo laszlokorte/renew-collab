@@ -124,6 +124,46 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
     :silent
   end
 
+  @impl true
+  def handle_event(
+        "create_layer",
+        %{"points" => points},
+        %{},
+        socket
+      )
+      when is_list(points) and length(points) > 1 do
+    %{"x" => source_x, "y" => source_y} = Enum.at(points, 0)
+    %{"x" => target_x, "y" => target_y} = Enum.at(points, -1)
+
+    RenewCollab.Commands.CreateLayer.new(%{
+      document_id: socket.assigns.document_id,
+      attrs: %{
+        "semantic_tag" => "CH.ifa.draw.figures.PolyLineFigure",
+        "edge" => %{
+          "source_x" => source_x,
+          "source_y" => source_y,
+          "target_x" => target_x,
+          "target_y" => target_y,
+          "waypoints" =>
+            points
+            |> Enum.drop(1)
+            |> Enum.drop(-1)
+            |> Enum.with_index()
+            |> Enum.map(fn {%{"x" => x, "y" => y}, sort} ->
+              %{
+                position_x: x,
+                position_y: y,
+                sort: sort
+              }
+            end)
+        }
+      }
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :silent
+  end
+
   defp make_color(account_id) do
     hue =
       <<i <- account_id |> then(&:crypto.hash(:md5, &1))>> |> for(do: i) |> Enum.sum() |> rem(360)
