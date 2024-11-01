@@ -12,6 +12,10 @@ defmodule RenewCollab.Document.Document do
       on_delete: :delete_all,
       preload_order: [asc: :z_index]
 
+    has_many :snapshots, RenewCollab.Versioning.Snapshot
+    has_one :latest_snapshot_marker, RenewCollab.Versioning.LatestSnapshot
+    has_one :current_snaptshot, through: [:latest_snapshot_marker, :snapshot]
+
     timestamps(type: :utc_datetime)
   end
 

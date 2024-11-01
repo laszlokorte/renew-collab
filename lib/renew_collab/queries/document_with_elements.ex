@@ -35,8 +35,12 @@ defmodule RenewCollab.Queries.DocumentWithElements do
         left_join: i in assoc(l, :interface),
         left_join: ol in assoc(l, :outgoing_link),
         left_join: il in assoc(l, :incoming_links),
+        left_join: cs in assoc(d, :current_snaptshot),
+        left_join: ps in assoc(cs, :predecessor),
+        left_join: ns in assoc(cs, :successors),
         order_by: [asc: l.z_index, asc: w.sort],
         preload: [
+          current_snaptshot: {cs, [predecessor: ps, successors: ns]},
           layers:
             {l,
              [

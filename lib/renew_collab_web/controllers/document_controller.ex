@@ -58,7 +58,7 @@ defmodule RenewCollabWeb.DocumentController do
     RenewCollab.Commands.DuplicateDocument.new(%{
       document_id: document_id
     })
-    |> RenewCollab.Commander.run_document_command_sync(false)
+    |> RenewCollab.Commander.run_document_command_sync(true)
     |> case do
       {:ok, %{insert_document: new_document}} ->
         conn

@@ -100,6 +100,29 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
   end
 
   @impl true
+  def handle_event("restore_snapshot", snapshot_id, _state, socket) when is_binary(snapshot_id) do
+    RenewCollab.Commands.RestoreSnapshot.new(%{
+      document_id: socket.assigns.document_id,
+      snapshot_id: snapshot_id
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :silent
+  end
+
+  @impl true
+  def handle_event("delete_layer", layer_id, _state, socket) when is_binary(layer_id) do
+    RenewCollab.Commands.DeleteLayer.new(%{
+      document_id: socket.assigns.document_id,
+      layer_id: layer_id,
+      delete_children: true
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :silent
+  end
+
+  @impl true
   def handle_event(
         "create_layer",
         %{"pos" => %{"x" => cx, "y" => cy}, "shape_id" => shape_id},
@@ -156,6 +179,32 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
                 sort: sort
               }
             end)
+        }
+      }
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :silent
+  end
+
+  @impl true
+  def handle_event(
+        "create_layer",
+        %{"pos" => %{"x" => position_x, "y" => position_y}, "body" => body},
+        %{},
+        socket
+      ) do
+    RenewCollab.Commands.CreateLayer.new(%{
+      document_id: socket.assigns.document_id,
+      attrs: %{
+        "semantic_tag" => "CH.ifa.draw.figures.TextFigure",
+        "text" => %{
+          "position_x" => position_x,
+          "position_y" => position_y,
+          "body" => body,
+          "style" => %{
+            "font_size" => 40
+          }
         }
       }
     })

@@ -3,6 +3,7 @@ defmodule RenewCollabWeb.DocumentJSON do
   alias RenewCollab.Document.Document
   alias RenewCollab.Hierarchy.Layer
   alias RenewCollab.Connection.Waypoint
+  alias RenewCollab.Versioning.Snapshot
 
   use RenewCollabWeb, :verified_routes
 
@@ -59,6 +60,7 @@ defmodule RenewCollabWeb.DocumentJSON do
       name: document.name,
       kind: document.kind,
       viewbox: viewbox_data(RenewCollab.ViewBox.calculate(document)),
+      snapshot: snapshot_data(document),
       layers:
         case document.layers do
           %Ecto.Association.NotLoaded{} -> %{}
@@ -67,8 +69,22 @@ defmodule RenewCollabWeb.DocumentJSON do
     }
   end
 
-  def viewbox_data(%ViewBox{x: x, y: y, width: width, height: heiht}) do
+  defp viewbox_data(%ViewBox{x: x, y: y, width: width, height: heiht}) do
     %{x: x, y: y, width: width, height: heiht}
+  end
+
+  defp snapshot_data(%Document{
+         current_snaptshot: %Snapshot{
+           id: id,
+           predecessor: %Snapshot{id: prev_id},
+           successors: successors
+         }
+       }) do
+    %{current_id: id, prev_id: prev_id, next_ids: successors |> Enum.map(& &1.id)}
+  end
+
+  defp snapshot_data(%Document{}) do
+    %{current_id: nil, prev_id: nil, next_ids: []}
   end
 
   defp detail_data(%Document{} = document) do
