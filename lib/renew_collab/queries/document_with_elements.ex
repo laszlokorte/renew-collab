@@ -38,6 +38,9 @@ defmodule RenewCollab.Queries.DocumentWithElements do
         left_join: cs in assoc(d, :current_snaptshot),
         left_join: ps in assoc(cs, :predecessor),
         left_join: ns in assoc(cs, :successors),
+        # TODO: move this conditon "ns.predecessor_id != ns.id" into :where of the has_many association
+        # of Snapshot, as soon as Ecto supports it.
+        on: ns.predecessor_id != ns.id,
         order_by: [asc: l.z_index, asc: w.sort],
         preload: [
           current_snaptshot: {cs, [predecessor: ps, successors: ns]},
