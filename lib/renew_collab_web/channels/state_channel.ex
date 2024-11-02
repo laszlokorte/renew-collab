@@ -5,7 +5,12 @@ defmodule RenewCollabWeb.StateChannel do
 
   def redux do
     quote do
-      @impl
+      def join(channel, payload, socket)
+
+      defoverridable join: 3
+      use LiveState.Channel, web_module: RenewCollabWeb
+
+      @impl true
       def join(channel, payload, socket) do
         import Phoenix.Socket
 
@@ -21,8 +26,6 @@ defmodule RenewCollabWeb.StateChannel do
             {:error, reason}
         end
       end
-
-      use LiveState.Channel, web_module: RenewCollabWeb
 
       @impl true
       def handle_in("lvs_evt:" <> event_name, payload, %{assigns: assigns} = socket) do
