@@ -213,6 +213,112 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
     :silent
   end
 
+  @impl true
+  def handle_event(
+        "change_style",
+        %{"type" => "text", "attr" => style_attr, "layer_id" => layer_id, "val" => value},
+        %{},
+        socket
+      )
+      when is_binary(style_attr) and is_binary(layer_id) do
+    RenewCollab.Commands.UpdateLayerTextStyle.new(%{
+      document_id: socket.assigns.document_id,
+      layer_id: layer_id,
+      style_attr: style_attr,
+      value: value
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :silent
+  end
+
+  @impl true
+  def handle_event(
+        "change_style",
+        %{"type" => "edge", "attr" => style_attr, "layer_id" => layer_id, "val" => value},
+        %{},
+        socket
+      )
+      when is_binary(style_attr) and is_binary(layer_id) do
+    RenewCollab.Commands.UpdateLayerEdgeStyle.new(%{
+      document_id: socket.assigns.document_id,
+      layer_id: layer_id,
+      style_attr: style_attr,
+      value: value
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :silent
+  end
+
+  @impl true
+  def handle_event(
+        "change_style",
+        %{"type" => "layer", "attr" => style_attr, "layer_id" => layer_id, "val" => value},
+        %{},
+        socket
+      )
+      when is_binary(style_attr) and is_binary(layer_id) do
+    RenewCollab.Commands.UpdateLayerStyle.new(%{
+      document_id: socket.assigns.document_id,
+      layer_id: layer_id,
+      style_attr: style_attr,
+      value: value
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :silent
+  end
+
+  @impl true
+  def handle_event(
+        "change_text_body",
+        %{"layer_id" => layer_id, "val" => new_body},
+        %{},
+        socket
+      )
+      when is_binary(new_body) and is_binary(layer_id) do
+    RenewCollab.Commands.UpdateLayerTextBody.new(%{
+      document_id: socket.assigns.document_id,
+      layer_id: layer_id,
+      new_body: new_body
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :silent
+  end
+
+  @impl true
+  def handle_event(
+        "change_layer_shape",
+        %{"layer_id" => layer_id, "shape_id" => shape_id},
+        %{},
+        socket
+      )
+      when is_binary(shape_id) and is_binary(layer_id) do
+    RenewCollab.Commands.UpdateLayerBoxShape.new(%{
+      document_id: socket.assigns.document_id,
+      layer_id: layer_id,
+      shape_id: shape_id,
+      attributes: %{}
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :silent
+  end
+
+  @impl true
+  def handle_event("set_visibility", %{"layer_id" => layer_id, "visible" => visible}, %{}, socket) do
+    RenewCollab.Commands.SetVisibility.new(%{
+      document_id: socket.assigns.document_id,
+      layer_id: layer_id,
+      visible: visible
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :silent
+  end
+
   defp make_color(account_id) do
     hue =
       <<i <- account_id |> then(&:crypto.hash(:md5, &1))>> |> for(do: i) |> Enum.sum() |> rem(360)
