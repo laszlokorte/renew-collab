@@ -98,6 +98,10 @@ defmodule RenewCollabWeb.DocumentJSON do
           href: url(~p"/api/symbols"),
           method: "get"
         },
+        socket_schemas: %{
+          href: url(~p"/api/socket_schemas"),
+          method: "get"
+        },
         export: %{
           href: url(~p"/api/documents/#{document.id}/export"),
           method: "get"
@@ -116,6 +120,7 @@ defmodule RenewCollabWeb.DocumentJSON do
       # id: layer.id,
       id: layer.id,
       semantic_tag: layer.semantic_tag,
+      interface_id: layer.interface |> then(&if(&1, do: &1.socket_schema_id, else: nil)),
       z_index: layer.z_index,
       hidden: layer.hidden,
       parent_id:
