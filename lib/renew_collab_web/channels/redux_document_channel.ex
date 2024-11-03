@@ -319,6 +319,35 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
     :silent
   end
 
+  @impl true
+  def handle_event(
+        "set_socket_schema",
+        %{"layer_id" => layer_id, "val" => socket_schema_id},
+        %{},
+        socket
+      ) do
+    RenewCollab.Commands.AssignLayerSocketSchema.new(%{
+      document_id: socket.assigns.document_id,
+      layer_id: layer_id,
+      socket_schema_id: socket_schema_id
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :silent
+  end
+
+  @impl true
+  def handle_event("set_semantic_tag", %{"layer_id" => layer_id, "val" => new_tag}, %{}, socket) do
+    RenewCollab.Commands.UpdateLayerSemanticTag.new(%{
+      document_id: socket.assigns.document_id,
+      layer_id: layer_id,
+      new_tag: new_tag
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :silent
+  end
+
   defp make_color(account_id) do
     hue =
       <<i <- account_id |> then(&:crypto.hash(:md5, &1))>> |> for(do: i) |> Enum.sum() |> rem(360)

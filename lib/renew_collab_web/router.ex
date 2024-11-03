@@ -31,6 +31,7 @@ defmodule RenewCollabWeb.Router do
     post "/auth", ApiSessionController, :auth
     get "/symbols", SymbolController, :index
     get "/socket_schemas", SocketSchemaController, :index
+    get "/semantic_tags", SemanticTagController, :index
 
     scope "/documents" do
       post "/import", DocumentController, :import

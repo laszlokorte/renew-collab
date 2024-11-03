@@ -102,6 +102,10 @@ defmodule RenewCollabWeb.DocumentJSON do
           href: url(~p"/api/socket_schemas"),
           method: "get"
         },
+        semantic_tags: %{
+          href: url(~p"/api/semantic_tags"),
+          method: "get"
+        },
         export: %{
           href: url(~p"/api/documents/#{document.id}/export"),
           method: "get"
