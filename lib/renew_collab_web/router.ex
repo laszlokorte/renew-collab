@@ -45,7 +45,6 @@ defmodule RenewCollabWeb.Router do
     get "/semantic_tags", SemanticTagController, :index
 
     scope "/documents" do
-      pipe_through :fetch_current_account
       post "/import", DocumentController, :import
       get "/:id/export", DocumentController, :export
       post "/:id/duplicate", DocumentController, :duplicate
