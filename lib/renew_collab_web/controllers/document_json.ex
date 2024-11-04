@@ -212,8 +212,8 @@ defmodule RenewCollabWeb.DocumentJSON do
                   [_ | _] = w ->
                     w
                     |> Enum.map(fn
-                      %Waypoint{position_x: x, position_y: y} ->
-                        %{"x" => x, "y" => y}
+                      %Waypoint{id: id, position_x: x, position_y: y} ->
+                        %{"x" => x, "y" => y, "id" => id}
                     end)
 
                   nil ->
