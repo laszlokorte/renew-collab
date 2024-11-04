@@ -348,6 +348,99 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
     :silent
   end
 
+  @impl true
+  def handle_event(
+        "update_box_size",
+        %{
+          "layer_id" => layer_id,
+          "value" => new_size
+        },
+        %{},
+        socket
+      ) do
+    RenewCollab.Commands.UpdateLayerBoxSize.new(%{
+      document_id: socket.assigns.document_id,
+      layer_id: layer_id,
+      new_size: new_size
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :silent
+  end
+
+  @impl true
+  def handle_event(
+        "delete_waypoint",
+        %{
+          "layer_id" => layer_id,
+          "waypoint_id" => waypoint_id
+        },
+        %{},
+        socket
+      ) do
+    RenewCollab.Commands.DeleteLayerEdgeWaypoint.new(%{
+      document_id: socket.assigns.document_id,
+      layer_id: layer_id,
+      waypoint_id: waypoint_id
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :silent
+  end
+
+  @impl true
+  def handle_event(
+        "update_waypoint_position",
+        %{
+          "layer_id" => layer_id,
+          "waypoint_id" => waypoint_id,
+          "value" => %{
+            "x" => position_x,
+            "y" => position_y
+          }
+        },
+        %{},
+        socket
+      ) do
+    RenewCollab.Commands.UpdateLayerEdgeWaypointPosition.new(%{
+      document_id: socket.assigns.document_id,
+      layer_id: layer_id,
+      waypoint_id: waypoint_id,
+      new_position: %{
+        "position_x" => position_x,
+        "position_y" => position_y
+      }
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :silent
+  end
+
+  @impl true
+  def handle_event(
+        "create_waypoint",
+        %{
+          "layer_id" => layer_id,
+          "after_waypoint_id" => prev_waypoint_id,
+          "position" => %{
+            "x" => position_x,
+            "y" => position_y
+          }
+        },
+        %{},
+        socket
+      ) do
+    RenewCollab.Commands.CreateLayerEdgeWaypoint.new(%{
+      document_id: socket.assigns.document_id,
+      layer_id: layer_id,
+      prev_waypoint_id: prev_waypoint_id,
+      position: {position_x, position_y}
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :silent
+  end
+
   defp make_color(account_id) do
     hue =
       <<i <- account_id |> then(&:crypto.hash(:md5, &1))>> |> for(do: i) |> Enum.sum() |> rem(360)
