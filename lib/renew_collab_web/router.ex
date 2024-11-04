@@ -15,6 +15,13 @@ defmodule RenewCollabWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug :fetch_current_account_by_header
+  end
+
+  pipeline :protected_api do
+    plug :accepts, ["json"]
+    plug :fetch_current_account_by_header
+    plug :require_authenticated_account, false
   end
 
   pipeline :authenticated do
@@ -29,17 +36,24 @@ defmodule RenewCollabWeb.Router do
     pipe_through :api
     get "/", ApiController, :index
     post "/auth", ApiSessionController, :auth
+  end
+
+  scope "/api", RenewCollabWeb do
+    pipe_through :protected_api
     get "/symbols", SymbolController, :index
     get "/socket_schemas", SocketSchemaController, :index
     get "/semantic_tags", SemanticTagController, :index
 
     scope "/documents" do
+      pipe_through :fetch_current_account
       post "/import", DocumentController, :import
       get "/:id/export", DocumentController, :export
       post "/:id/duplicate", DocumentController, :duplicate
     end
 
-    resources "/documents", DocumentController, except: [:new, :edit]
+    scope "/" do
+      resources "/documents", DocumentController, except: [:new, :edit]
+    end
   end
 
   scope "/", RenewCollabWeb do

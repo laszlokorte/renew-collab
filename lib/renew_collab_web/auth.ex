@@ -52,25 +52,44 @@ defmodule RenewCollabWeb.Auth do
   end
 
   def fetch_current_account(conn, _opts) do
-    {account_token, conn} = ensure_account_token(conn)
+    {account_token, conn} = ensure_account_session_token(conn)
     account = account_token && Auth.get_account_by_session_token(account_token)
     assign(conn, :current_account, account)
   end
 
-  defp ensure_account_token(conn) do
+  def fetch_current_account_by_header(conn, _opts) do
+    with {%{account_id: account_id}, conn} <- ensure_account_header_token(conn),
+         account <- Auth.get_account!(account_id) do
+      assign(conn, :current_account, account)
+    else
+      _ ->
+        conn
+    end
+  end
+
+  defp ensure_account_header_token(conn) do
     if token = get_auth_header(conn) do
+      with {:ok, data} <- RenewCollabWeb.Token.verify(token) do
+        {data, conn}
+      else
+        _ ->
+          {nil, conn}
+      end
+    else
+      {nil, conn}
+    end
+  end
+
+  defp ensure_account_session_token(conn) do
+    if token = get_session(conn, :account_token) do
       {token, conn}
     else
-      if token = get_session(conn, :account_token) do
-        {token, conn}
-      else
-        conn = fetch_cookies(conn, signed: [@remember_me_cookie])
+      conn = fetch_cookies(conn, signed: [@remember_me_cookie])
 
-        if token = conn.cookies[@remember_me_cookie] do
-          {token, put_token_in_session(conn, token)}
-        else
-          {nil, conn}
-        end
+      if token = conn.cookies[@remember_me_cookie] do
+        {token, put_token_in_session(conn, token)}
+      else
+        {nil, conn}
       end
     end
   end
@@ -130,15 +149,22 @@ defmodule RenewCollabWeb.Auth do
     end
   end
 
-  def require_authenticated_account(conn, _opts) do
+  def require_authenticated_account(conn, redirect \\ true) do
     if conn.assigns[:current_account] do
       conn
     else
-      conn
-      |> put_flash(:error, "You must log in to access this page.")
-      |> maybe_store_return_to()
-      |> redirect(to: ~p"/login")
-      |> halt()
+      if redirect do
+        conn
+        |> put_flash(:error, "You must log in to access this page.")
+        |> maybe_store_return_to()
+        |> redirect(to: ~p"/login")
+        |> halt()
+      else
+        conn
+        |> put_status(:unauthorized)
+        |> json(%{"message" => "not authorized"})
+        |> halt()
+      end
     end
   end
 
