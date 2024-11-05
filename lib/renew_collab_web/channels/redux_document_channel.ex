@@ -441,6 +441,49 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
     :silent
   end
 
+  @impl true
+  def handle_event(
+        "update_edge_position",
+        %{
+          "layer_id" => layer_id,
+          "value" => new_position
+        },
+        %{},
+        socket
+      ) do
+    RenewCollab.Commands.UpdateLayerEdgePosition.new(%{
+      document_id: socket.assigns.document_id,
+      layer_id: layer_id,
+      new_position: new_position
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :silent
+  end
+
+  def handle_event(
+        "update_text_position",
+        %{
+          "layer_id" => layer_id,
+          "value" =>
+            %{
+              "position_x" => _position_x,
+              "position_y" => _position_y
+            } = new_position
+        },
+        %{},
+        socket
+      ) do
+    RenewCollab.Commands.UpdateLayerTextPosition.new(%{
+      document_id: socket.assigns.document_id,
+      layer_id: layer_id,
+      new_position: new_position
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :silent
+  end
+
   defp make_color(account_id) do
     hue =
       <<i <- account_id |> then(&:crypto.hash(:md5, &1))>> |> for(do: i) |> Enum.sum() |> rem(360)
