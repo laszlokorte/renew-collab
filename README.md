@@ -127,6 +127,20 @@ To check the code formatting before every git commit, setup the git `pre-commit`
 cp priv/dev/git-hooks/pre-commit .git/hooks/pre-commit
 ```
 
+## Database Schema
+
+By SQLite is used as database. Once the `mix ecto.migrate` command has been run (see above) the database file `renew_collab_dev.db` is created inside this projects root folder. The database schema is defined and maintained via migration scripts inside [priv/repo/migrations](./priv/repo/migrations) file.
+
+To get an overview of the full schema, take a look at the plot in the guides ([guides/db_schema.svg](./guides/db_schema.svg)).
+
+### Regenerate DB schema plot
+
+If you change the database schema during development you should generate the plot ([guides/db_schema.svg](./guides/db_schema.svg)). To do this use [schemacrawler](https://www.schemacrawler.com) and run it with the following command line options:
+
+```sh
+schemacrawler --info-level=standard --command=schema --output-format=svg --portable-names --server sqlite --database ./renew_collab_dev.db --output-file=guides/db_schema.svg
+```
+
 ---
 
 [www.laszlokorte.de](//www.laszlokorte.de)
