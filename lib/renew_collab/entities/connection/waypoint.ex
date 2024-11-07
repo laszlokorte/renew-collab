@@ -10,6 +10,10 @@ defmodule RenewCollab.Connection.Waypoint do
     field :position_y, :float
     belongs_to :edge, RenewCollab.Element.Edge
 
+    has_many :tangents, RenewCollab.Connection.WaypointTangent
+    has_one :tangent_out, RenewCollab.Connection.WaypointTangent, where: [incoming: false]
+    has_many :tangent_in, RenewCollab.Connection.WaypointTangent, where: [incoming: true]
+
     timestamps(type: :utc_datetime)
   end
 

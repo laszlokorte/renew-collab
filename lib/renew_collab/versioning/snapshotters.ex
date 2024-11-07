@@ -11,6 +11,7 @@ defmodule RenewCollab.Versioning.Snapshotters do
     RenewCollab.Style.TextStyle.Snapshotter,
     RenewCollab.Style.TextSizeHint.Snapshotter,
     RenewCollab.Connection.Waypoint.Snapshotter,
+    RenewCollab.Connection.WaypointTangent.Snapshotter,
     RenewCollab.Connection.Hyperlink.Snapshotter,
     RenewCollab.Connection.Bond.Snapshotter
   ]

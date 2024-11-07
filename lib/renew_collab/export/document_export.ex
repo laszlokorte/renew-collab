@@ -296,8 +296,7 @@ defmodule RenewCollab.Export.DocumentExport do
              style_or_default(layer, :border_color),
              style_or_default(layer, :opacity)
            )},
-          {"LineWidth", "Int",
-           round(Integer.parse(style_or_default(layer, :border_width)) |> elem(0))}
+          {"LineWidth", "Int", round(style_or_default(layer, :border_width))}
         ]
       }
     }
@@ -342,8 +341,7 @@ defmodule RenewCollab.Export.DocumentExport do
                style_or_default(layer, :border_color),
                style_or_default(layer, :opacity)
              )},
-            {"LineWidth", "Int",
-             round(Integer.parse(style_or_default(layer, :border_width)) |> elem(0))}
+            {"LineWidth", "Int", round(style_or_default(layer, :border_width))}
           ]
         }
       }
@@ -466,6 +464,6 @@ defmodule RenewCollab.Export.DocumentExport do
 
   defp default_style(:background_color), do: "#70DB93"
   defp default_style(:opacity), do: 1.0
-  defp default_style(:border_width), do: "1"
+  defp default_style(:border_width), do: 1
   defp default_style(_style_key), do: nil
 end

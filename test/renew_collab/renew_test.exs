@@ -740,8 +740,6 @@ defmodule RenewCollab.RenewTest do
       stroke_joint: nil,
       stroke_cap: nil,
       stroke_dash_array: nil,
-      source_tip: nil,
-      target_tip: nil,
       smoothness: nil
     }
 
@@ -764,8 +762,6 @@ defmodule RenewCollab.RenewTest do
         stroke_joint: "some stroke_joint",
         stroke_cap: "some stroke_cap",
         stroke_dash_array: "some stroke_dash_array",
-        source_tip: "some source_tip",
-        target_tip: "some target_tip",
         smoothness: "some smoothness"
       }
 
@@ -795,8 +791,6 @@ defmodule RenewCollab.RenewTest do
         stroke_joint: "some updated stroke_joint",
         stroke_cap: "some updated stroke_cap",
         stroke_dash_array: "some updated stroke_dash_array",
-        source_tip: "some updated source_tip",
-        target_tip: "some updated target_tip",
         smoothness: "some updated smoothness"
       }
 

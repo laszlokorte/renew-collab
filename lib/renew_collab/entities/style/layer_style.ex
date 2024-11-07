@@ -8,7 +8,7 @@ defmodule RenewCollab.Style.LayerStyle do
     field :opacity, :float
     field :background_color, :string
     field :border_color, :string
-    field :border_width, :string
+    field :border_width, :float
     field :border_dash_array, :string
     belongs_to :layer, RenewCollab.Hierarchy.Layer
 

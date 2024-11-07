@@ -176,13 +176,11 @@ defmodule RenewCollab.RenewFixtures do
       attrs
       |> Enum.into(%{
         smoothness: "some smoothness",
-        source_tip: "some source_tip",
         stroke_cap: "some stroke_cap",
         stroke_color: "some stroke_color",
         stroke_dash_array: "some stroke_dash_array",
         stroke_joint: "some stroke_joint",
-        stroke_width: "some stroke_width",
-        target_tip: "some target_tip"
+        stroke_width: "some stroke_width"
       })
       |> RenewCollab.Renew.create_element_connection_style()
 

@@ -36,14 +36,12 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
                       %{
                         position_x:
                           @layer.edge.source_x -
-                            (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)),
+                            style_or_default(@layer.edge, :stroke_width),
                         position_y:
                           @layer.edge.source_y -
-                            (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)),
-                        width:
-                          (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)) * 2,
-                        height:
-                          (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)) * 2
+                            style_or_default(@layer.edge, :stroke_width),
+                        width: style_or_default(@layer.edge, :stroke_width) * 2,
+                        height: style_or_default(@layer.edge, :stroke_width) * 2
                       },
                       path
                     )
@@ -73,14 +71,12 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
                       %{
                         position_x:
                           @layer.edge.target_x -
-                            (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)),
+                            style_or_default(@layer.edge, :stroke_width),
                         position_y:
                           @layer.edge.target_y -
-                            (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)),
-                        width:
-                          (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)) * 2,
-                        height:
-                          (Integer.parse(style_or_default(@layer.edge, :stroke_width)) |> elem(0)) * 2
+                            style_or_default(@layer.edge, :stroke_width),
+                        width: style_or_default(@layer.edge, :stroke_width) * 2,
+                        height: style_or_default(@layer.edge, :stroke_width) * 2
                       },
                       path
                     )

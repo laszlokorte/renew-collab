@@ -5,13 +5,11 @@ defmodule RenewCollab.Style.EdgeStyle do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "element_edge_style" do
-    field :stroke_width, :string, default: "1"
+    field :stroke_width, :float, default: 1.0
     field :stroke_color, :string, default: "black"
     field :stroke_join, :string
     field :stroke_cap, :string
     field :stroke_dash_array, :string
-    field :source_tip, :string
-    field :target_tip, :string
     field :smoothness, Ecto.Enum, values: [:linear, :autobezier], default: :linear
 
     belongs_to :source_tip_symbol_shape, RenewCollab.Symbol.Shape
@@ -31,8 +29,6 @@ defmodule RenewCollab.Style.EdgeStyle do
       :stroke_join,
       :stroke_cap,
       :stroke_dash_array,
-      :source_tip,
-      :target_tip,
       :smoothness,
       :source_tip_symbol_shape_id,
       :target_tip_symbol_shape_id
@@ -63,8 +59,6 @@ defmodule RenewCollab.Style.EdgeStyle do
           stroke_join: s.stroke_join,
           stroke_cap: s.stroke_cap,
           stroke_dash_array: s.stroke_dash_array,
-          source_tip: s.source_tip,
-          target_tip: s.target_tip,
           smoothness: s.smoothness,
           source_tip_symbol_shape_id: s.source_tip_symbol_shape_id,
           target_tip_symbol_shape_id: s.target_tip_symbol_shape_id,

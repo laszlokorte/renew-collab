@@ -133,9 +133,7 @@ defmodule RenewCollab.Blueprints do
                 stroke_color: "black",
                 stroke_cap: nil,
                 source_tip_symbol_shape_id: "1BB93575-6759-4C59-8ED3-626949D1326A",
-                smoothness: :autobezier,
-                source_tip: nil,
-                target_tip: nil
+                smoothness: :autobezier
               },
               target_y: 13.538483567217234,
               target_x: 274.95270681931487,
