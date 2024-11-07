@@ -180,7 +180,7 @@ defmodule RenewCollabWeb.LiveDocument do
         </div>
 
         <h2 style="cursor: pointer;" phx-click="toggle-meta">
-          <span><%= if(@show_meta, do: "🞃", else: "🞂") %></span> Document
+          <span><%= if(@show_meta, do: "▼", else: "►") %></span> Document
         </h2>
 
         <%= if @show_meta do %>
@@ -248,7 +248,7 @@ defmodule RenewCollabWeb.LiveDocument do
           {if(@selection, do: [style: "cursor: pointer;"], else: [style: "cursor: pointer; color: #aaa"])}
           phx-click="toggle-selected"
         >
-          <span><%= if(@show_selected, do: "🞃", else: "🞂") %></span> Selected
+          <span><%= if(@show_selected, do: "▼", else: "►") %></span> Selected
         </h2>
 
         <%= if @show_selected do %>
@@ -267,7 +267,7 @@ defmodule RenewCollabWeb.LiveDocument do
         <% end %>
 
         <h2 style="cursor: pointer;" phx-click="toggle-hierarchy">
-          <span><%= if(@show_hierarchy, do: "🞃", else: "🞂") %></span> Hierarchy
+          <span><%= if(@show_hierarchy, do: "▼", else: "►") %></span> Hierarchy
         </h2>
 
         <%= if @show_hierarchy do %>
@@ -284,7 +284,7 @@ defmodule RenewCollabWeb.LiveDocument do
         <% end %>
 
         <h2 style="cursor: pointer;" phx-click="toggle-snapshots">
-          <span><%= if(@show_snapshots, do: "🞃", else: "🞂") %></span> Snapshots
+          <span><%= if(@show_snapshots, do: "▼", else: "►") %></span> Snapshots
         </h2>
 
         <%= if @show_snapshots do %>
@@ -300,7 +300,7 @@ defmodule RenewCollabWeb.LiveDocument do
         <% end %>
 
         <h2 style="cursor: pointer;" phx-click="toggle-health">
-          <span><%= if(@show_health, do: "🞃", else: "🞂") %></span> Health
+          <span><%= if(@show_health, do: "▼", else: "►") %></span> Health
         </h2>
 
         <%= if @show_health do %>
