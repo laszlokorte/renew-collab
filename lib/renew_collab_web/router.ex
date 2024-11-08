@@ -36,6 +36,11 @@ defmodule RenewCollabWeb.Router do
     pipe_through :api
     get "/", ApiController, :index
     post "/auth", ApiSessionController, :auth
+
+    scope "/media" do
+      get "/svg/:id", MediaController, :show
+      post "/svg", MediaController, :create
+    end
   end
 
   scope "/api", RenewCollabWeb do

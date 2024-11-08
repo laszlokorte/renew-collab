@@ -54,14 +54,25 @@ defmodule RenewCollabWeb.HierarchyLayerBoxComponent do
           <% else _ -> %>
         <% end %>
       <% else %>
-        <rect
-          id={"fallback-#{@layer.box.id}"}
-          x={@layer.box.position_x}
-          y={@layer.box.position_y}
-          width={@layer.box.width}
-          height={@layer.box.height}
-        >
-        </rect>
+        <%= case style_or_default(@layer, :background_url) do %>
+          <% nil -> %>
+            <rect
+              id={"fallback-#{@layer.box.id}"}
+              x={@layer.box.position_x}
+              y={@layer.box.position_y}
+              width={@layer.box.width}
+              height={@layer.box.height}
+            >
+            </rect>
+          <% str -> %>
+            <image
+              x={@layer.box.position_x}
+              y={@layer.box.position_y}
+              width={@layer.box.width}
+              height={@layer.box.height}
+              xlink:href={str}
+            />
+        <% end %>
       <% end %>
 
       <%= if @selected do %>

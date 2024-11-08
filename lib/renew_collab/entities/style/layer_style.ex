@@ -7,6 +7,7 @@ defmodule RenewCollab.Style.LayerStyle do
   schema "layer_style" do
     field :opacity, :float
     field :background_color, :string
+    field :background_url, :string
     field :border_color, :string
     field :border_width, :float
     field :border_dash_array, :string
@@ -21,6 +22,7 @@ defmodule RenewCollab.Style.LayerStyle do
     |> cast(attrs, [
       :opacity,
       :background_color,
+      :background_url,
       :border_color,
       :border_width,
       :border_dash_array
@@ -47,6 +49,7 @@ defmodule RenewCollab.Style.LayerStyle do
           id: s.id,
           opacity: s.opacity,
           background_color: s.background_color,
+          background_url: s.background_url,
           border_color: s.border_color,
           border_width: s.border_width,
           border_dash_array: s.border_dash_array,

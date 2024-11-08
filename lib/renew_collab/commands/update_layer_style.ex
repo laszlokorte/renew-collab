@@ -40,6 +40,7 @@ defmodule RenewCollab.Commands.UpdateLayerStyle do
 
   defp attr_key("opacity"), do: :opacity
   defp attr_key("background_color"), do: :background_color
+  defp attr_key("background_url"), do: :background_url
   defp attr_key("border_color"), do: :border_color
   defp attr_key("border_width"), do: :border_width
   defp attr_key("border_dash_array"), do: :border_dash_array

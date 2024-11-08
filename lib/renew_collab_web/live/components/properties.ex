@@ -559,6 +559,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
           attrs={[
             opacity: :number,
             background_color: :color,
+            background_url: :url,
             border_color: :color,
             border_width: :number,
             border_dash_array: :text

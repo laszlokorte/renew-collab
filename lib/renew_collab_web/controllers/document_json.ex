@@ -262,6 +262,7 @@ defmodule RenewCollabWeb.DocumentJSON do
             %{
               "opacity" => v.opacity,
               "background_color" => v.background_color,
+              "background_url" => v.background_url,
               "border_color" => v.border_color,
               "border_width" => v.border_width,
               "border_dash_array" => v.border_dash_array

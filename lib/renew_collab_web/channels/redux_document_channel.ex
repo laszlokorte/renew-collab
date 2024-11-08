@@ -150,6 +150,37 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
   @impl true
   def handle_event(
         "create_layer",
+        %{
+          "pos" => %{"x" => x, "y" => y, "width" => width, "height" => height},
+          "image" => background_url
+        },
+        %{},
+        socket
+      ) do
+    RenewCollab.Commands.CreateLayer.new(%{
+      document_id: socket.assigns.document_id,
+      attrs: %{
+        "semantic_tag" => "CH.ifa.draw.figures.ImageFigure",
+        "box" => %{
+          "position_x" => x,
+          "position_y" => y,
+          "width" => width,
+          "height" => height
+        },
+        "style" => %{
+          "background_url" => background_url,
+          "border_width" => 0
+        }
+      }
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :silent
+  end
+
+  @impl true
+  def handle_event(
+        "create_layer",
         %{"points" => points},
         %{},
         socket
