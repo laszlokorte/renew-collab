@@ -7,15 +7,19 @@ defmodule RenewCollab.Queries.StrippedDocument do
   alias RenewCollab.Connection.Hyperlink
   alias RenewCollab.Connection.Bond
 
-  defstruct [:document_id]
+  defstruct [:document_id, original_ids: false]
+
+  def new(%{document_id: document_id, original_ids: true}) do
+    %__MODULE__{document_id: document_id, original_ids: true}
+  end
 
   def new(%{document_id: document_id}) do
-    %__MODULE__{document_id: document_id}
+    %__MODULE__{document_id: document_id, original_ids: false}
   end
 
   def tags(%__MODULE__{document_id: document_id}), do: [{:document_content, document_id}]
 
-  def multi(%__MODULE__{document_id: document_id}) do
+  def multi(%__MODULE__{document_id: document_id, original_ids: original_ids}) do
     Ecto.Multi.new()
     |> Ecto.Multi.one(
       :original_document,
@@ -79,10 +83,17 @@ defmodule RenewCollab.Queries.StrippedDocument do
       end
     )
     |> Ecto.Multi.run(:new_layer_ids, fn _, %{original_document: %{layers: layers}} ->
-      {:ok,
-       layers
-       |> Enum.map(fn layer -> {layer.id, Ecto.UUID.generate()} end)
-       |> Map.new()}
+      if original_ids do
+        {:ok,
+         layers
+         |> Enum.map(fn layer -> {layer.id, layer.id} end)
+         |> Map.new()}
+      else
+        {:ok,
+         layers
+         |> Enum.map(fn layer -> {layer.id, Ecto.UUID.generate()} end)
+         |> Map.new()}
+      end
     end)
     |> Ecto.Multi.run(:new_document_content, fn _,
                                                 %{
@@ -96,6 +107,7 @@ defmodule RenewCollab.Queries.StrippedDocument do
        |> Map.delete(:__meta__)
        |> Map.delete(:inserted_at)
        |> Map.delete(:updated_at)
+       |> strip_not_loaded()
        |> Map.update(:layers, [], fn layers ->
          layers
          |> Enum.map(fn %{id: old_id} = layer ->
@@ -203,4 +215,13 @@ defmodule RenewCollab.Queries.StrippedDocument do
 
   defp deep_strip_filter({key, _}) when is_binary(key), do: not String.ends_with?(key, "_id")
   defp deep_strip_filter({_, _}), do: true
+
+  defp strip_not_loaded(value = %{}) do
+    value
+    |> Enum.filter(fn
+      {_k, %Ecto.Association.NotLoaded{}} -> false
+      _ -> true
+    end)
+    |> Map.new()
+  end
 end

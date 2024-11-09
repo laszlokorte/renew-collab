@@ -93,7 +93,7 @@ defmodule RenewCollabWeb.DocumentController do
   end
 
   def inspect(conn, %{"id" => id}) do
-    RenewCollab.Queries.StrippedDocument.new(%{document_id: id})
+    RenewCollab.Queries.StrippedDocument.new(%{document_id: id, original_ids: true})
     |> RenewCollab.Fetcher.fetch()
     |> case do
       document ->
@@ -106,7 +106,7 @@ defmodule RenewCollabWeb.DocumentController do
           "content-type",
           "text/plain"
         )
-        |> text(Kernel.inspect(document, pretty: true, limit: :infinity))
+        |> text(Kernel.inspect(Map.from_struct(document), pretty: true, limit: :infinity))
     end
   end
 
