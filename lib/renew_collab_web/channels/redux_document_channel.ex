@@ -492,6 +492,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
     :silent
   end
 
+  @impl true
   def handle_event(
         "update_text_position",
         %{
@@ -509,6 +510,29 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
       document_id: socket.assigns.document_id,
       layer_id: layer_id,
       new_position: new_position
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :silent
+  end
+
+  @impl true
+  def handle_event(
+        "move_layer",
+        %{
+          "layer_id" => layer_id,
+          "target_layer_id" => target_layer_id,
+          "order" => order,
+          "relative" => relative
+        },
+        %{},
+        socket
+      ) do
+    RenewCollab.Commands.MoveLayer.new(%{
+      document_id: socket.assigns.document_id,
+      layer_id: layer_id,
+      target_layer_id: target_layer_id,
+      target: RenewCollab.Commands.MoveLayer.parse_hierarchy_position(order, relative)
     })
     |> RenewCollab.Commander.run_document_command()
 
