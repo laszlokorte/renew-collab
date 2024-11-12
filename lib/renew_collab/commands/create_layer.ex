@@ -39,12 +39,22 @@ defmodule RenewCollab.Commands.CreateLayer do
       }) do
     Ecto.Multi.new()
     |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.one(
+      :top_layer,
+      fn %{document_id: document_id} ->
+        from(l in Layer,
+          left_join: dp in assoc(l, :direct_parent),
+          where: l.document_id == ^document_id and is_nil(dp.id),
+          select: max(l.z_index)
+        )
+      end
+    )
     |> Ecto.Multi.insert(
       :layer,
-      fn %{document_id: document_id} ->
+      fn %{document_id: document_id, top_layer: top_layer} ->
         %Layer{document_id: document_id}
         |> Layer.changeset(%{
-          z_index: 0,
+          z_index: (top_layer || -1) + 1,
           semantic_tag: nil,
           hidden: false
         })

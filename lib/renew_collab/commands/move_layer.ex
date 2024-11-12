@@ -172,6 +172,61 @@ defmodule RenewCollab.Commands.MoveLayer do
       end,
       []
     )
+    |> Ecto.Multi.update_all(
+      :update_others_z_Index,
+      fn
+        %{
+          target: %{
+            parent_id: parent_id,
+            z_index_above: z_index_above,
+            z_index_below: z_index_below
+          }
+        } ->
+          new_z_index =
+            case order do
+              :below -> z_index_below
+              :above -> z_index_above
+            end
+            |> then(&if(is_nil(&1), do: 0, else: &1))
+
+          case parent_id do
+            nil ->
+              from(
+                l in Layer,
+                as: :l,
+                where:
+                  l.document_id == ^document_id and l.id != ^layer_id and
+                    l.z_index >= ^new_z_index and
+                    not exists(
+                      from(p in LayerParenthood,
+                        where:
+                          p.document_id == ^document_id and
+                            p.depth == 1 and p.descendant_id == parent_as(:l).id
+                      )
+                    ),
+                update: [inc: [z_index: 1]]
+              )
+
+            pid ->
+              from(
+                l in Layer,
+                where:
+                  l.document_id == ^document_id and l.id != ^layer_id and
+                    l.z_index >= ^new_z_index and
+                    l.id in subquery(
+                      from(p in LayerParenthood,
+                        where:
+                          p.document_id == ^document_id and p.ancestor_id == ^pid and
+                            p.depth == 1,
+                        select: p.descendant_id
+                      )
+                    ),
+                update: [inc: [z_index: 1]]
+              )
+          end
+      end,
+      []
+    )
   end
 
   def parse_hierarchy_position("above", "inside"), do: {:above, :inside}
