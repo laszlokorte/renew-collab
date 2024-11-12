@@ -125,11 +125,12 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
   @impl true
   def handle_event(
         "create_layer",
-        %{"pos" => %{"x" => cx, "y" => cy}, "shape_id" => shape_id},
+        params = %{"pos" => %{"x" => cx, "y" => cy}, "shape_id" => shape_id},
         %{},
         socket
       ) do
     RenewCollab.Commands.CreateLayer.new(%{
+      base_layer_id: Map.get(params, "base_layer_id", nil),
       document_id: socket.assigns.document_id,
       attrs: %{
         "semantic_tag" => "CH.ifa.draw.figures.RectangleFigure",
@@ -142,15 +143,17 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         }
       }
     })
-    |> RenewCollab.Commander.run_document_command()
-
-    :silent
+    |> RenewCollab.Commander.run_document_command_sync()
+    |> case do
+      {:ok, %{layer: layer}} ->
+        {:reply, %{id: layer.id}, socket}
+    end
   end
 
   @impl true
   def handle_event(
         "create_layer",
-        %{
+        params = %{
           "pos" => %{"x" => x, "y" => y, "width" => width, "height" => height},
           "image" => background_url
         },
@@ -158,6 +161,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         socket
       ) do
     RenewCollab.Commands.CreateLayer.new(%{
+      base_layer_id: Map.get(params, "base_layer_id", nil),
       document_id: socket.assigns.document_id,
       attrs: %{
         "semantic_tag" => "CH.ifa.draw.figures.ImageFigure",
@@ -173,15 +177,17 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         }
       }
     })
-    |> RenewCollab.Commander.run_document_command()
-
-    :silent
+    |> RenewCollab.Commander.run_document_command_sync()
+    |> case do
+      {:ok, %{layer: layer}} ->
+        {:reply, %{id: layer.id}, socket}
+    end
   end
 
   @impl true
   def handle_event(
         "create_layer",
-        %{"points" => points},
+        params = %{"points" => points},
         %{},
         socket
       )
@@ -190,6 +196,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
     %{"x" => target_x, "y" => target_y} = Enum.at(points, -1)
 
     RenewCollab.Commands.CreateLayer.new(%{
+      base_layer_id: Map.get(params, "base_layer_id", nil),
       document_id: socket.assigns.document_id,
       attrs: %{
         "semantic_tag" => "CH.ifa.draw.figures.PolyLineFigure",
@@ -213,19 +220,22 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         }
       }
     })
-    |> RenewCollab.Commander.run_document_command()
-
-    :silent
+    |> RenewCollab.Commander.run_document_command_sync()
+    |> case do
+      {:ok, %{layer: layer}} ->
+        {:reply, %{id: layer.id}, socket}
+    end
   end
 
   @impl true
   def handle_event(
         "create_layer",
-        %{"pos" => %{"x" => position_x, "y" => position_y}, "body" => body},
+        params = %{"pos" => %{"x" => position_x, "y" => position_y}, "body" => body},
         %{},
         socket
       ) do
     RenewCollab.Commands.CreateLayer.new(%{
+      base_layer_id: Map.get(params, "base_layer_id", nil),
       document_id: socket.assigns.document_id,
       attrs: %{
         "semantic_tag" => "CH.ifa.draw.figures.TextFigure",
@@ -239,9 +249,11 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         }
       }
     })
-    |> RenewCollab.Commander.run_document_command()
-
-    :silent
+    |> RenewCollab.Commander.run_document_command_sync()
+    |> case do
+      {:ok, %{layer: layer}} ->
+        {:reply, %{id: layer.id}, socket}
+    end
   end
 
   @impl true

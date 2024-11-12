@@ -4,7 +4,19 @@ defmodule RenewCollab.Commands.CreateLayer do
   alias RenewCollab.Hierarchy.LayerParenthood
   alias RenewCollab.Element.Edge
 
-  defstruct [:document_id, :attrs]
+  defstruct [:document_id, :attrs, :base_layer_id]
+
+  def new(%{
+        document_id: document_id,
+        attrs: attrs,
+        base_layer_id: base_layer_id
+      }) do
+    %__MODULE__{
+      document_id: document_id,
+      attrs: attrs,
+      base_layer_id: base_layer_id
+    }
+  end
 
   def new(%{
         document_id: document_id,
@@ -12,7 +24,8 @@ defmodule RenewCollab.Commands.CreateLayer do
       }) do
     %__MODULE__{
       document_id: document_id,
-      attrs: attrs
+      attrs: attrs,
+      base_layer_id: nil
     }
   end
 
@@ -21,7 +34,8 @@ defmodule RenewCollab.Commands.CreateLayer do
 
   def multi(%__MODULE__{
         document_id: document_id,
-        attrs: attrs
+        attrs: attrs,
+        base_layer_id: base_layer_id
       }) do
     Ecto.Multi.new()
     |> Ecto.Multi.put(:document_id, document_id)
@@ -59,6 +73,21 @@ defmodule RenewCollab.Commands.CreateLayer do
         )
       end
     )
+    |> Ecto.Multi.merge(fn %{document_id: document_id, layer: layer} ->
+      case base_layer_id do
+        nil ->
+          Ecto.Multi.new()
+
+        target_layer_id ->
+          RenewCollab.Commands.MoveLayer.new(%{
+            document_id: document_id,
+            layer_id: layer.id,
+            target_layer_id: target_layer_id,
+            target: {:above, :outside}
+          })
+          |> RenewCollab.Commands.MoveLayer.multi(true)
+      end
+    end)
     |> Ecto.Multi.append(RenewCollab.Bonding.reposition_multi())
   end
 end

@@ -25,14 +25,19 @@ defmodule RenewCollab.Commands.MoveLayer do
 
   def auto_snapshot(%__MODULE__{}), do: true
 
-  def multi(%__MODULE__{
-        document_id: document_id,
-        layer_id: layer_id,
-        target_layer_id: target_layer_id,
-        target: {order, relative}
-      }) do
+  def multi(
+        %__MODULE__{
+          document_id: document_id,
+          layer_id: layer_id,
+          target_layer_id: target_layer_id,
+          target: {order, relative}
+        },
+        nested \\ false
+      ) do
+    doc_id_key = if(nested, do: :move_layer_document_id, else: :document_id)
+
     Ecto.Multi.new()
-    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.put(doc_id_key, document_id)
     |> Ecto.Multi.one(:conflict_count, fn _ ->
       from(p in LayerParenthood,
         where: p.ancestor_id == ^layer_id and p.descendant_id == ^target_layer_id,
@@ -84,7 +89,7 @@ defmodule RenewCollab.Commands.MoveLayer do
           where: false
         )
 
-      %{target: %{parent_id: target_parent_id}, document_id: document_id} ->
+      %{:target => %{parent_id: target_parent_id}, ^doc_id_key => document_id} ->
         # SELECT low.child_id,
         # high.parent_id,
         # low.depth + high.depth + 1
