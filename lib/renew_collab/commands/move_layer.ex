@@ -196,7 +196,8 @@ defmodule RenewCollab.Commands.MoveLayer do
                 as: :l,
                 where:
                   l.document_id == ^document_id and l.id != ^layer_id and
-                    l.z_index >= ^new_z_index and
+                    ((^(order == :below) and l.z_index >= ^new_z_index) or
+                       (^(order == :above) and l.z_index <= ^new_z_index)) and
                     not exists(
                       from(p in LayerParenthood,
                         where:
@@ -204,7 +205,15 @@ defmodule RenewCollab.Commands.MoveLayer do
                             p.depth == 1 and p.descendant_id == parent_as(:l).id
                       )
                     ),
-                update: [inc: [z_index: 1]]
+                update: [
+                  inc: [
+                    z_index:
+                      ^case order do
+                        :below -> 1
+                        :above -> -1
+                      end
+                  ]
+                ]
               )
 
             pid ->
@@ -212,7 +221,8 @@ defmodule RenewCollab.Commands.MoveLayer do
                 l in Layer,
                 where:
                   l.document_id == ^document_id and l.id != ^layer_id and
-                    l.z_index >= ^new_z_index and
+                    ((^(order == :below) and l.z_index >= ^new_z_index) or
+                       (^(order == :above) and l.z_index <= ^new_z_index)) and
                     l.id in subquery(
                       from(p in LayerParenthood,
                         where:
@@ -221,7 +231,15 @@ defmodule RenewCollab.Commands.MoveLayer do
                         select: p.descendant_id
                       )
                     ),
-                update: [inc: [z_index: 1]]
+                update: [
+                  inc: [
+                    z_index:
+                      ^case order do
+                        :below -> 1
+                        :above -> -1
+                      end
+                  ]
+                ]
               )
           end
       end,
