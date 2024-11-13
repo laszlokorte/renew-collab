@@ -10,13 +10,13 @@ defmodule RenewCollabWeb.HierarchyLayerComponent do
       phx-value-id={@layer.id}
     >
       <g
-        {if(@selection==@layer.id and Enum.any?(@document.layers, &(&1.direct_parent && &1.direct_parent.ancestor_id == @layer.id)), do: [style: "outline: 3px solid #ffdd99;cursor:move; pointer-events: bounding-box", selected: true], else: [])}
+        {if(@selection==@layer.id and Enum.any?(@document.layers, &(&1.direct_parent_hood && &1.direct_parent_hood.ancestor_id == @layer.id)), do: [style: "outline: 3px solid #ffdd99;cursor:move; pointer-events: bounding-box", selected: true], else: [])}
         phx-hook="RnwGroupDragger"
         id={"layer-parent-group-#{@layer.id}"}
         rnw-layer-id={@layer.id}
         opacity={style_or_default(@layer, :opacity)}
       >
-        <%= for child <- @document.layers, child.direct_parent, child.direct_parent.ancestor_id == @layer.id do %>
+        <%= for child <- @document.layers, child.direct_parent_hood, child.direct_parent_hood.ancestor_id == @layer.id do %>
           <.live_component
             socket_schemas={@socket_schemas}
             selection={@selection}

@@ -43,7 +43,7 @@ defmodule RenewCollab.Commands.CreateLayer do
       :top_layer,
       fn %{document_id: document_id} ->
         from(l in Layer,
-          left_join: dp in assoc(l, :direct_parent),
+          left_join: dp in assoc(l, :direct_parent_hood),
           where: l.document_id == ^document_id and is_nil(dp.id),
           select: max(l.z_index)
         )

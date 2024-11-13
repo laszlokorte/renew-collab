@@ -101,7 +101,7 @@ defmodule RenewCollabWeb.LiveDocument do
             stroke="#aaa"
             stroke-width="2"
           />
-          <%= for layer <- @document.layers, layer.direct_parent == nil do %>
+          <%= for layer <- @document.layers, layer.direct_parent_hood == nil do %>
             <.live_component
               selectable={true}
               id={layer.id}

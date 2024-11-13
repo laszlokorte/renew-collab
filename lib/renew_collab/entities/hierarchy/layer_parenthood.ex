@@ -7,8 +7,9 @@ defmodule RenewCollab.Hierarchy.LayerParenthood do
   schema "layer_parenthood" do
     field :depth, :integer
     field :document_id, :binary_id
-    field :ancestor_id, :binary_id
-    field :descendant_id, :binary_id
+
+    belongs_to :ancestor, RenewCollab.Hierarchy.Layer
+    belongs_to :descendant, RenewCollab.Hierarchy.Layer
   end
 
   @doc false

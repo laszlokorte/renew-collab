@@ -20,7 +20,7 @@ defmodule RenewCollab.Queries.DocumentWithElements do
       from(d in Document,
         where: d.id == ^document_id,
         left_join: l in assoc(d, :layers),
-        left_join: dp in assoc(l, :direct_parent),
+        left_join: dp in assoc(l, :direct_parent_hood),
         left_join: b in assoc(l, :box),
         left_join: ss in assoc(b, :symbol_shape),
         left_join: t in assoc(l, :text),
@@ -47,7 +47,7 @@ defmodule RenewCollab.Queries.DocumentWithElements do
           layers:
             {l,
              [
-               direct_parent: dp,
+               direct_parent_hood: dp,
                box: {b, [symbol_shape: ss]},
                text: {t, [style: ts, size_hint: sh]},
                edge: {e, [style: es, waypoints: w, source_bond: sb, target_bond: tb]},

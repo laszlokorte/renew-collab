@@ -16,7 +16,7 @@ defmodule RenewCollab.Export.DocumentExport do
           fields: %{
             figures:
               for l <- document.layers,
-                  is_nil(l.direct_parent),
+                  is_nil(l.direct_parent_hood),
                   exported_figures = export_figure(grammar, l, document),
                   fig <- exported_figures do
                 fig
@@ -42,8 +42,8 @@ defmodule RenewCollab.Export.DocumentExport do
             fields: %{
               figures:
                 for l <- document.layers,
-                    not is_nil(l.direct_parent),
-                    l.direct_parent.ancestor_id == layer.id,
+                    not is_nil(l.direct_parent_hood),
+                    l.direct_parent_hood.ancestor_id == layer.id,
                     exported_figures = export_figure(grammar, l, document),
                     fig <- exported_figures do
                   fig
@@ -53,8 +53,8 @@ defmodule RenewCollab.Export.DocumentExport do
         ]
         |> Enum.concat(
           for l <- document.layers,
-              not is_nil(l.direct_parent),
-              l.direct_parent.ancestor_id == layer.id,
+              not is_nil(l.direct_parent_hood),
+              l.direct_parent_hood.ancestor_id == layer.id,
               exported_figures = export_figure(grammar, l, document),
               fig <- exported_figures do
             fig
@@ -72,8 +72,8 @@ defmodule RenewCollab.Export.DocumentExport do
             fields: %{
               figures:
                 for l <- document.layers,
-                    not is_nil(l.direct_parent),
-                    l.direct_parent.ancestor_id == layer.id,
+                    not is_nil(l.direct_parent_hood),
+                    l.direct_parent_hood.ancestor_id == layer.id,
                     exported_figures = export_figure(grammar, l, document),
                     fig <- exported_figures do
                   fig

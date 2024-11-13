@@ -128,7 +128,7 @@ defmodule RenewCollabWeb.DocumentJSON do
       z_index: layer.z_index,
       hidden: layer.hidden,
       parent_id:
-        case layer.direct_parent do
+        case layer.direct_parent_hood do
           nil -> nil
           p -> p.ancestor_id
         end,
