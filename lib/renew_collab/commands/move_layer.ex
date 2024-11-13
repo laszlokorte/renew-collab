@@ -196,8 +196,8 @@ defmodule RenewCollab.Commands.MoveLayer do
                 as: :l,
                 where:
                   l.document_id == ^document_id and l.id != ^layer_id and
-                    ((^(order == :below) and l.z_index >= ^new_z_index) or
-                       (^(order == :above) and l.z_index <= ^new_z_index)) and
+                    ((^(order == :below) and l.z_index <= ^new_z_index) or
+                       (^(order == :above) and l.z_index >= ^new_z_index)) and
                     not exists(
                       from(p in LayerParenthood,
                         where:
@@ -209,8 +209,8 @@ defmodule RenewCollab.Commands.MoveLayer do
                   inc: [
                     z_index:
                       ^case order do
-                        :below -> 1
-                        :above -> -1
+                        :below -> -1
+                        :above -> 1
                       end
                   ]
                 ]
@@ -221,8 +221,8 @@ defmodule RenewCollab.Commands.MoveLayer do
                 l in Layer,
                 where:
                   l.document_id == ^document_id and l.id != ^layer_id and
-                    ((^(order == :below) and l.z_index >= ^new_z_index) or
-                       (^(order == :above) and l.z_index <= ^new_z_index)) and
+                    ((^(order == :below) and l.z_index <= ^new_z_index) or
+                       (^(order == :above) and l.z_index >= ^new_z_index)) and
                     l.id in subquery(
                       from(p in LayerParenthood,
                         where:
@@ -235,8 +235,8 @@ defmodule RenewCollab.Commands.MoveLayer do
                   inc: [
                     z_index:
                       ^case order do
-                        :below -> 1
-                        :above -> -1
+                        :below -> -1
+                        :above -> 1
                       end
                   ]
                 ]
