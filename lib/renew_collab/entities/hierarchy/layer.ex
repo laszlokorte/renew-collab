@@ -19,7 +19,20 @@ defmodule RenewCollab.Hierarchy.Layer do
       foreign_key: :descendant_id,
       where: [depth: 1]
 
+    has_many :direct_children_hoods, RenewCollab.Hierarchy.LayerParenthood,
+      foreign_key: :ancestor_id,
+      where: [depth: 1]
+
     has_one :direct_parent_layer, through: [:direct_parent_hood, :ancestor]
+
+    has_many :direct_children_layers,
+      through: [:direct_children_hoods, :descendant],
+      preload_order: [asc: :z_index]
+
+    # Does not work for top level
+    has_many :direct_sibling_layers,
+      through: [:direct_parent_hood, :siblings, :descendant],
+      preload_order: [asc: :z_index]
 
     has_one :ancestors, RenewCollab.Hierarchy.LayerParenthood,
       foreign_key: :descendant_id,

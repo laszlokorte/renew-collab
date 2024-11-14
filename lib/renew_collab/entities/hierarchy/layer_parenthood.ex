@@ -10,6 +10,11 @@ defmodule RenewCollab.Hierarchy.LayerParenthood do
 
     belongs_to :ancestor, RenewCollab.Hierarchy.Layer
     belongs_to :descendant, RenewCollab.Hierarchy.Layer
+
+    has_many :siblings, RenewCollab.Hierarchy.LayerParenthood,
+      where: [depth: 1],
+      references: :ancestor_id,
+      foreign_key: :ancestor_id
   end
 
   @doc false
