@@ -15,6 +15,10 @@ defmodule RenewCollab.Hierarchy.Layer do
     has_one :style, RenewCollab.Style.LayerStyle, on_delete: :delete_all
     has_one :interface, RenewCollab.Element.Interface, on_delete: :delete_all
 
+    has_many :layers_of_document,
+      through: [:document, :layers],
+      preload_order: [asc: :z_index]
+
     has_one :direct_parent_hood, RenewCollab.Hierarchy.LayerParenthood,
       foreign_key: :descendant_id,
       where: [depth: 1]
