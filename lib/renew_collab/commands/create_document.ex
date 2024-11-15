@@ -17,20 +17,24 @@ defmodule RenewCollab.Commands.CreateDocument do
   def tags(%__MODULE__{}), do: [:document_collection]
   def auto_snapshot(%__MODULE__{}), do: true
 
-  def multi(%__MODULE__{
-        doc: %RenewCollab.Document.TransientDocument{
-          content: content,
-          parenthoods: parenthoods,
-          hyperlinks: hyperlinks,
-          bonds: bonds
-        }
-      }) do
+  def multi(
+        %__MODULE__{
+          doc: %RenewCollab.Document.TransientDocument{
+            content: content,
+            parenthoods: parenthoods,
+            hyperlinks: hyperlinks,
+            bonds: bonds
+          }
+        },
+        id \\ nil
+      ) do
     now = DateTime.utc_now() |> DateTime.truncate(:second)
 
     Ecto.Multi.new()
     |> Ecto.Multi.insert(
       :insert_document,
-      %Document{} |> Document.changeset(content)
+      %Document{id: id}
+      |> Document.changeset(content)
     )
     |> Ecto.Multi.insert_all(
       :insert_parenthoods,
