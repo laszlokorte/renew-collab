@@ -20,6 +20,17 @@ RenewCollab.Repo.transaction()
 {:ok, r} -> r
 end |> Map.get(:result)
 
+RenewCollab.Queries.LayerHierarchyChildren.new(%{
+document_id: "8ad232eb-ab87-4504-8fb0-453be196d7e1",
+layer_id: "5ca95a38-3fb6-44a9-add6-21937f8c49e1",
+id_only: true,
+}) |>
+RenewCollab.Queries.LayerHierarchyChildren.multi() |>
+RenewCollab.Repo.transaction()
+|> case do
+{:ok, r} -> r
+end |> Map.get(:result)
+
 
 RenewCollab.Queries.LayerHierarchySiblings.new(%{
 document_id: "8ad232eb-ab87-4504-8fb0-453be196d7e1",
@@ -35,6 +46,17 @@ end |> Map.get(:result)
 RenewCollab.Queries.LayerHierarchySiblings.new(%{
 document_id: "8ad232eb-ab87-4504-8fb0-453be196d7e1",
 layer_id: "d3a08dfca-27c4-4532-b41e-5cd351976525",
+id_only: true,
+}) |>
+RenewCollab.Queries.LayerHierarchySiblings.multi() |>
+RenewCollab.Repo.transaction()
+|> case do
+{:ok, r} -> r
+end |> Map.get(:result)
+
+RenewCollab.Queries.LayerHierarchySiblings.new(%{
+document_id: "8ad232eb-ab87-4504-8fb0-453be196d7e1",
+layer_id: "8fe9a6ea-ca0d-47eb-8201-e9d2a4bedbc0",
 id_only: true,
 }) |>
 RenewCollab.Queries.LayerHierarchySiblings.multi() |>
@@ -112,7 +134,6 @@ RenewCollab.Queries.LayerHierarchyRelative.multi() |>
 RenewCollab.Repo.transaction() 
 |> case do 
 {:ok, r} -> r
-x -> dbg(x)
 end |> Map.get(:result) 
 
 
@@ -126,7 +147,6 @@ RenewCollab.Queries.LayerHierarchyRelative.multi() |>
 RenewCollab.Repo.transaction() 
 |> case do 
 {:ok, r} -> r
-x -> dbg(x)
 end |> Map.get(:result) 
 
 
@@ -140,7 +160,6 @@ RenewCollab.Queries.LayerHierarchyRelative.multi() |>
 RenewCollab.Repo.transaction() 
 |> case do 
 {:ok, r} -> r
-x -> dbg(x)
 end |> Map.get(:result) 
 
 
@@ -154,7 +173,6 @@ RenewCollab.Queries.LayerHierarchyRelative.multi() |>
 RenewCollab.Repo.transaction() 
 |> case do 
 {:ok, r} -> r
-x -> dbg(x)
 end |> Map.get(:result) 
 
 
@@ -168,7 +186,6 @@ RenewCollab.Queries.LayerHierarchyRelative.multi() |>
 RenewCollab.Repo.transaction() 
 |> case do 
 {:ok, r} -> r
-x -> dbg(x)
 end |> Map.get(:result) 
 
 
@@ -183,7 +200,6 @@ RenewCollab.Queries.LayerHierarchyRelative.multi() |>
 RenewCollab.Repo.transaction() 
 |> case do 
 {:ok, r} -> r
-x -> dbg(x)
 end |> Map.get(:result) 
 
 RenewCollab.Queries.LayerHierarchyRelative.new(%{
