@@ -6,6 +6,7 @@ defmodule RenewCollabWeb.LiveDocument do
   alias RenewCollab.Renew
   alias RenewCollab.Symbols
   alias RenewCollab.Sockets
+  alias RenewCollab.Queries
 
   @renew_grammar Renewex.Grammar.new(11)
 
@@ -271,6 +272,66 @@ defmodule RenewCollabWeb.LiveDocument do
         </h2>
 
         <%= if @show_hierarchy do %>
+          <%= if not is_nil(@selection) do %>
+            <div style="padding: 1ex 0; display: flex; gap: 1ex">
+              <button
+                phx-click="select-relative"
+                value="parent"
+                style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff"
+              >
+                Go to Parent
+              </button>
+
+              <button
+                phx-click="select-relative"
+                value="first_sibling"
+                style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff"
+              >
+                First Sibling
+              </button>
+
+              <button
+                phx-click="select-relative"
+                value="prev_sibling"
+                style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff"
+              >
+                Prev Sibling
+              </button>
+
+              <button
+                phx-click="select-relative"
+                value="first_child"
+                style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff"
+              >
+                Go to first Child
+              </button>
+
+              <button
+                phx-click="select-relative"
+                value="last_child"
+                style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff"
+              >
+                Go to last Child
+              </button>
+
+              <button
+                phx-click="select-relative"
+                value="next_sibling"
+                style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff"
+              >
+                Next Sibling
+              </button>
+
+              <button
+                phx-click="select-relative"
+                value="last_sibling"
+                style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff"
+              >
+                Last Sibling
+              </button>
+            </div>
+          <% end %>
+
           <div style="width: 45vw;">
             <.live_component
               id="hierarchy-list"
@@ -830,6 +891,7 @@ defmodule RenewCollabWeb.LiveDocument do
     {cx, cy} = viewbox_center(socket.assigns.viewbox)
 
     RenewCollab.Commands.CreateLayer.new(%{
+      base_layer_id: socket.assigns.selection,
       document_id: socket.assigns.document.id,
       attrs: %{
         "semantic_tag" => "CH.ifa.draw.figures.TextFigure",
@@ -853,6 +915,7 @@ defmodule RenewCollabWeb.LiveDocument do
     {cx, cy} = viewbox_center(socket.assigns.viewbox)
 
     RenewCollab.Commands.CreateLayer.new(%{
+      base_layer_id: socket.assigns.selection,
       document_id: socket.assigns.document.id,
       attrs: %{
         "semantic_tag" => "CH.ifa.draw.figures.RectangleFigure",
@@ -877,6 +940,7 @@ defmodule RenewCollabWeb.LiveDocument do
     {cx, cy} = viewbox_center(socket.assigns.viewbox)
 
     RenewCollab.Commands.CreateLayer.new(%{
+      base_layer_id: socket.assigns.selection,
       document_id: socket.assigns.document.id,
       attrs: %{
         "semantic_tag" => "CH.ifa.draw.figures.PolyLineFigure",
@@ -899,6 +963,7 @@ defmodule RenewCollabWeb.LiveDocument do
         socket
       ) do
     RenewCollab.Commands.CreateLayer.new(%{
+      base_layer_id: socket.assigns.selection,
       document_id: socket.assigns.document.id,
       attrs: %{
         "semantic_tag" => "CH.ifa.draw.figures.PolyLineFigure",
@@ -921,6 +986,7 @@ defmodule RenewCollabWeb.LiveDocument do
         socket
       ) do
     RenewCollab.Commands.CreateEdgeBond.new(%{
+      base_layer_id: socket.assigns.selection,
       document_id: socket.assigns.document.id,
       edge_id: edge_id,
       kind: kind,
@@ -1097,6 +1163,54 @@ defmodule RenewCollabWeb.LiveDocument do
     end
 
     {:noreply, socket}
+  end
+
+  defp find_relative(socket, rel) do
+    Queries.LayerHierarchyRelative.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: socket.assigns.selection,
+      id_only: true,
+      relative: rel
+    })
+    |> RenewCollab.Fetcher.fetch()
+  end
+
+  defp select_relative(socket, rel) do
+    with s when not is_nil(s) <- socket.assigns.selection,
+         new_selection when is_binary(new_selection) <- find_relative(socket, rel) do
+      {:noreply, socket |> assign(:selection, new_selection)}
+    else
+      _ ->
+        {:noreply, socket}
+    end
+  end
+
+  def handle_event("select-relative", %{"value" => "parent"}, socket) do
+    select_relative(socket, :parent)
+  end
+
+  def handle_event("select-relative", %{"value" => "first_sibling"}, socket) do
+    select_relative(socket, {:sibling, :first})
+  end
+
+  def handle_event("select-relative", %{"value" => "prev_sibling"}, socket) do
+    select_relative(socket, {:sibling, :prev})
+  end
+
+  def handle_event("select-relative", %{"value" => "first_child"}, socket) do
+    select_relative(socket, {:child, :first})
+  end
+
+  def handle_event("select-relative", %{"value" => "last_child"}, socket) do
+    select_relative(socket, {:child, :last})
+  end
+
+  def handle_event("select-relative", %{"value" => "next_sibling"}, socket) do
+    select_relative(socket, {:sibling, :next})
+  end
+
+  def handle_event("select-relative", %{"value" => "last_sibling"}, socket) do
+    select_relative(socket, {:sibling, :last})
   end
 
   def handle_info({:document_changed, document_id}, socket) do

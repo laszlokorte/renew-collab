@@ -62,15 +62,29 @@ defmodule RenewCollabWeb.HierarchyLayerBoxComponent do
               y={@layer.box.position_y}
               width={@layer.box.width}
               height={@layer.box.height}
+              pointer-events="all"
             >
             </rect>
           <% str -> %>
+            <rect
+              id={"fallback-#{@layer.box.id}"}
+              fill="none"
+              pointer-events="all"
+              stroke="red"
+              stroke-width="5"
+              x={@layer.box.position_x}
+              y={@layer.box.position_y}
+              width={@layer.box.width}
+              height={@layer.box.height}
+            >
+            </rect>
             <image
               x={@layer.box.position_x}
               y={@layer.box.position_y}
               width={@layer.box.width}
               height={@layer.box.height}
               xlink:href={str}
+              pointer-events="none"
             />
         <% end %>
       <% end %>
