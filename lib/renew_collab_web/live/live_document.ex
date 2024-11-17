@@ -330,6 +330,64 @@ defmodule RenewCollabWeb.LiveDocument do
                 Last Sibling
               </button>
             </div>
+
+            <div style="padding: 1ex 0; display: flex; gap: 1ex">
+              <button
+                phx-click="move-relative"
+                value="before_parent"
+                style="cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff"
+              >
+                Move before parent
+              </button>
+
+              <button
+                phx-click="move-relative"
+                value="after_parent"
+                style="cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff"
+              >
+                Move after parent
+              </button>
+
+              <button
+                phx-click="move-relative"
+                value="into_prev"
+                style="cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff"
+              >
+                Indent
+              </button>
+
+              <button
+                phx-click="move-relative"
+                value="backwards"
+                style="cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff"
+              >
+                Move backwards
+              </button>
+
+              <button
+                phx-click="move-relative"
+                value="frontwards"
+                style="cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff"
+              >
+                Move frontwards
+              </button>
+
+              <button
+                phx-click="move-relative"
+                value="to_front"
+                style="cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff"
+              >
+                Move to back
+              </button>
+
+              <button
+                phx-click="move-relative"
+                value="to_back"
+                style="cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff"
+              >
+                Move to front
+              </button>
+            </div>
           <% end %>
 
           <div style="width: 45vw;">
@@ -1165,26 +1223,6 @@ defmodule RenewCollabWeb.LiveDocument do
     {:noreply, socket}
   end
 
-  defp find_relative(socket, rel) do
-    Queries.LayerHierarchyRelative.new(%{
-      document_id: socket.assigns.document.id,
-      layer_id: socket.assigns.selection,
-      id_only: true,
-      relative: rel
-    })
-    |> RenewCollab.Fetcher.fetch()
-  end
-
-  defp select_relative(socket, rel) do
-    with s when not is_nil(s) <- socket.assigns.selection,
-         new_selection when is_binary(new_selection) <- find_relative(socket, rel) do
-      {:noreply, socket |> assign(:selection, new_selection)}
-    else
-      _ ->
-        {:noreply, socket}
-    end
-  end
-
   def handle_event("select-relative", %{"value" => "parent"}, socket) do
     select_relative(socket, :parent)
   end
@@ -1211,6 +1249,34 @@ defmodule RenewCollabWeb.LiveDocument do
 
   def handle_event("select-relative", %{"value" => "last_sibling"}, socket) do
     select_relative(socket, {:sibling, :last})
+  end
+
+  def handle_event("move-relative", %{"value" => "before_parent"}, socket) do
+    move_relative(socket, :parent, {:below, :outside})
+  end
+
+  def handle_event("move-relative", %{"value" => "after_parent"}, socket) do
+    move_relative(socket, :parent, {:above, :outside})
+  end
+
+  def handle_event("move-relative", %{"value" => "frontwards"}, socket) do
+    move_relative(socket, {:sibling, :next}, {:above, :outside})
+  end
+
+  def handle_event("move-relative", %{"value" => "backwards"}, socket) do
+    move_relative(socket, {:sibling, :prev}, {:below, :outside})
+  end
+
+  def handle_event("move-relative", %{"value" => "to_front"}, socket) do
+    move_relative(socket, {:sibling, :first}, {:below, :outside})
+  end
+
+  def handle_event("move-relative", %{"value" => "to_back"}, socket) do
+    move_relative(socket, {:sibling, :last}, {:above, :outside})
+  end
+
+  def handle_event("move-relative", %{"value" => "into_prev"}, socket) do
+    move_relative(socket, {:sibling, :prev}, {:above, :inside})
   end
 
   def handle_info({:document_changed, document_id}, socket) do
@@ -1261,6 +1327,44 @@ defmodule RenewCollabWeb.LiveDocument do
             }}
          end
        )}
+    end
+  end
+
+  defp find_relative(socket, rel) do
+    Queries.LayerHierarchyRelative.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: socket.assigns.selection,
+      id_only: true,
+      relative: rel
+    })
+    |> RenewCollab.Fetcher.fetch()
+  end
+
+  defp select_relative(socket, rel) do
+    with s when not is_nil(s) <- socket.assigns.selection,
+         new_selection when is_binary(new_selection) <- find_relative(socket, rel) do
+      {:noreply, socket |> assign(:selection, new_selection)}
+    else
+      _ ->
+        {:noreply, socket}
+    end
+  end
+
+  defp move_relative(socket, rel, order) do
+    with s when not is_nil(s) <- socket.assigns.selection,
+         target_id when is_binary(target_id) <- find_relative(socket, rel) do
+      RenewCollab.Commands.MoveLayer.new(%{
+        document_id: socket.assigns.document.id,
+        layer_id: socket.assigns.selection,
+        target_layer_id: target_id,
+        target: order
+      })
+      |> RenewCollab.Commander.run_document_command()
+
+      {:noreply, socket}
+    else
+      _ ->
+        {:noreply, socket}
     end
   end
 end
