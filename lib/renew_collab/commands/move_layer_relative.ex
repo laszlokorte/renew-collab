@@ -117,9 +117,9 @@ defmodule RenewCollab.Commands.MoveLayerRelative do
     |> Ecto.Multi.update_all(
       :update_edges,
       fn
-        %{combined_layer_ids: combined_layer_ids} ->
+        %{child_layers: child_layers} ->
           from(e in Edge,
-            where: e.layer_id in ^combined_layer_ids,
+            where: e.layer_id in ^child_layers,
             update: [inc: [source_x: ^dx, source_y: ^dy, target_x: ^dx, target_y: ^dy]]
           )
       end,
@@ -146,8 +146,8 @@ defmodule RenewCollab.Commands.MoveLayerRelative do
           join: edge in assoc(own_layer, :attached_edges),
           join: bond in assoc(edge, :bonds),
           where:
-            (own_layer.id in ^combined_layer_ids and edge.layer_id not in ^combined_layer_ids) or
-              (own_layer.id not in ^combined_layer_ids and edge.layer_id in ^combined_layer_ids),
+            own_layer.id in ^combined_layer_ids or
+              edge.layer_id in ^combined_layer_ids,
           group_by: bond.id,
           select: bond.id
         )

@@ -81,23 +81,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
       </td>
 
       <td valign="top" width="20" align="center" style="white-space: nowrap; word-wrap: none">
-        <%= if @selected do %>
-          <input
-            style="width: 3em"
-            style="padding:0.5ex"
-            type="number"
-            step="1"
-            min="0"
-            phx-hook="RenewZIndex"
-            id={"layer-zindex-#{@layer.id}"}
-            rnw-layer-id={"#{@layer.id}"}
-            value={@layer.z_index}
-            size="2"
-            width="30"
-          />
-        <% else %>
-          <%= @layer.z_index %>
-        <% end %>
+        <%= @layer.z_index %>
       </td>
 
       <td valign="top" style={"padding-left: #{0.2+ 2*@depth}em"}>

@@ -41,5 +41,9 @@ defmodule RenewCollab.Commands.UpdateLayerZIndex do
         })
       end
     )
+    |> Ecto.Multi.merge(fn %{^document_id => document_id} ->
+      RenewCollab.Commands.NormalizeZIndex.new(%{document_id: document_id})
+      |> RenewCollab.Commands.NormalizeZIndex.multi(true)
+    end)
   end
 end

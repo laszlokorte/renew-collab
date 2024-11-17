@@ -128,6 +128,13 @@ defmodule RenewCollabWeb.LiveDocument do
           </button>
         </p>
 
+        <button
+          phx-click="make-space"
+          style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff"
+        >
+          Make Space
+        </button>
+
         <div style="display: flex; gap: 1ex; padding: 1ex 0">
           <button
             type="button"
@@ -524,6 +531,17 @@ defmodule RenewCollabWeb.LiveDocument do
      |> assign(:viewbox, viewbox(socket.assigns.document))}
   end
 
+  def handle_event("make-space", %{}, socket) do
+    RenewCollab.Commands.MakeSpaceBetween.new(%{
+      document_id: socket.assigns.document.id,
+      base: {20, 0},
+      direction: {100, 0}
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    {:noreply, socket}
+  end
+
   def handle_event("detach-bond", %{"id" => bond_id}, socket) do
     RenewCollab.Commands.DeleteBond.new(%{
       document_id: socket.assigns.document.id,
@@ -711,24 +729,6 @@ defmodule RenewCollabWeb.LiveDocument do
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       new_position: new_position
-    })
-    |> RenewCollab.Commander.run_document_command()
-
-    {:noreply, socket}
-  end
-
-  def handle_event(
-        "update_z_index",
-        %{
-          "layer_id" => layer_id,
-          "value" => new_z_index
-        },
-        socket
-      ) do
-    RenewCollab.Commands.UpdateLayerZIndex.new(%{
-      document_id: socket.assigns.document.id,
-      layer_id: layer_id,
-      z_index: new_z_index
     })
     |> RenewCollab.Commander.run_document_command()
 
