@@ -20,6 +20,10 @@ defmodule RenewCollab.Commands.CreateLayerEdgeWaypoint do
     }
   end
 
+  def new(params) do
+    new(params |> Map.put(:position, nil))
+  end
+
   def tags(%__MODULE__{document_id: document_id}), do: [{:document_content, document_id}]
   def auto_snapshot(%__MODULE__{}), do: true
 
@@ -38,12 +42,7 @@ defmodule RenewCollab.Commands.CreateLayerEdgeWaypoint do
           }
 
         nil ->
-          %{
-            document_id: document_id,
-            layer_id: layer_id,
-            prev_waypoint_id: prev_waypoint_id,
-            position: position
-          }
+          %{}
       end
 
     Ecto.Multi.new()

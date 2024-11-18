@@ -89,13 +89,13 @@ defmodule RenewCollab.Commands.CreateLayer do
           Ecto.Multi.new()
 
         target_layer_id ->
-          RenewCollab.Commands.MoveLayer.new(%{
+          RenewCollab.Commands.ReorderLayer.new(%{
             document_id: document_id,
             layer_id: layer.id,
             target_layer_id: target_layer_id,
             target: {:above, :outside}
           })
-          |> RenewCollab.Commands.MoveLayer.multi(true)
+          |> RenewCollab.Commands.ReorderLayer.multi(true)
       end
     end)
     |> Ecto.Multi.append(RenewCollab.Bonding.reposition_multi())

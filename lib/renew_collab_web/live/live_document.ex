@@ -2,6 +2,8 @@ defmodule RenewCollabWeb.LiveDocument do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
+  import RenewCollabWeb.RenewComponents
+
   alias RenewCollab.Versioning
   alias RenewCollab.Renew
   alias RenewCollab.Symbols
@@ -48,6 +50,7 @@ defmodule RenewCollabWeb.LiveDocument do
         |> assign(:show_snapshots, false)
         |> assign(:show_health, false)
         |> assign(:show_meta, false)
+        |> assign(:show_grid, false)
         |> assign(:viewbox, viewbox(document))
 
       RenewCollabWeb.Endpoint.subscribe("document:#{id}")
@@ -76,12 +79,153 @@ defmodule RenewCollabWeb.LiveDocument do
         <% end %>
       </div>
 
-      <div style="grid-area: left; width: 100%; height: 100%; overflow: auto; box-sizing: border-box; padding: 0">
+      <div style="grid-area: left; width: 100%; height: 100%; overflow: auto; box-sizing: border-box; padding: 0; display: grid;">
         <datalist id="all-semantic-tags">
           <%= for {class_name, _} <- renew_grammar().hierarchy do %>
             <option><%= class_name %></option>
           <% end %>
         </datalist>
+
+        <%= if @show_grid do %>
+          <div style="font-family: sans-serif; grid-area: 1 / 1 / span 1 / span 1; display: block; width: 100%; height: 100%;background: #f5f5f5;z-index: 100;">
+            <table width="100%" border="1" cellspacing="0">
+              <tr>
+                <th>Source/Target</th>
+
+                <.layers filter={:box} document={@document}>
+                  <:item :let={layer}>
+                    <th
+                      phx-click="select_layer"
+                      phx-value-id={layer.id}
+                      bgcolor={if(layer.id == @selection, do: "#99ddff", else: "white")}
+                    >
+                      <small style="font-weight: normal;">
+                        <%= layer.semantic_tag |> String.split(".") |> Enum.at(-1) %><br />
+                        <span style="font-size: 10px; font-family: monospace">
+                          <%= layer.id %>
+                        </span>
+                      </small>
+                    </th>
+                  </:item>
+                </.layers>
+              </tr>
+
+              <.layers filter={:box} document={@document}>
+                <:item :let={layer_a = %{id: layer_a_id}}>
+                  <tr>
+                    <th
+                      phx-click="select_layer"
+                      phx-value-id={layer_a.id}
+                      bgcolor={if(layer_a.id == @selection, do: "#99ddff", else: "white")}
+                    >
+                      <small style="font-weight: normal;">
+                        <%= layer_a.semantic_tag |> String.split(".") |> Enum.at(-1) %><br />
+                        <span style="font-size: 10px; font-family: monospace">
+                          <%= layer_a.id %>
+                        </span>
+                      </small>
+
+                      <div>
+                        <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: socket_schemas} <- @socket_schemas do %>
+                          <select
+                            phx-hook="RnwAssignInterface"
+                            rnw-layer-id={"#{layer_a.id}"}
+                            id={"layer-interface-#{layer_a.id}"}
+                            name="socket_schema_id"
+                          >
+                            <option
+                              value=""
+                              {if(is_nil(layer_a.interface), do: [selected: "selected"], else: [])}
+                            >
+                              ---
+                            </option>
+
+                            <%= for {_sid, s} <- socket_schemas do %>
+                              <option
+                                value={s.id}
+                                {if(layer_a.interface && s.id == layer_a.interface.socket_schema_id, do: [selected: "selected"], else: [])}
+                              >
+                                <%= s.name %>
+                              </option>
+                            <% end %>
+                          </select>
+                          <% else _ -> %>
+                            Loading
+                        <% end %>
+                      </div>
+                    </th>
+
+                    <.layers filter={:box} document={@document}>
+                      <:item :let={layer_b = %{id: layer_b_id}}>
+                        <td align="center">
+                          <%= for edge_layer = %{edge: %{source_bond: %{layer_id: ^layer_a_id}, target_bond: %{layer_id: ^layer_b_id}}} <- @document.layers do %>
+                            <div style="display: flex; gap: 1ex; padding: 1ex; align-items: center;">
+                              <button phx-click="delete_layer" phx-value-id={edge_layer.id}>
+                                X
+                              </button>
+                              <%= edge_layer.semantic_tag |> String.split(".") |> Enum.at(-1) %>
+                            </div>
+                          <% end %>
+
+                          <div>
+                            <%= if layer_a.id != layer_b.id and (not (is_nil(layer_a.box) or is_nil(layer_b.box) or is_nil(layer_a.interface) or is_nil(layer_b.interface))) do %>
+                              Connect:
+                              <form phx-submit="create_grid_edge">
+                                <input type="hidden" name="source_layer_id" value={layer_a.id} />
+                                <input type="hidden" name="target_layer_id" value={layer_b.id} />
+                                <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: socket_schemas} <- @socket_schemas do %>
+                                  <select style="width: 5em" name="source_socket_id">
+                                    <%= with schema <- socket_schemas |> Map.get(layer_a.interface.socket_schema_id, []) do %>
+                                      <optgroup label={schema.name}>
+                                        <%= for sock <- schema.sockets do %>
+                                          <option value={sock.id}><%= sock.name %></option>
+                                        <% end %>
+                                      </optgroup>
+                                    <% end %>
+                                  </select>
+                                  <% else _ -> %>
+                                    Loading
+                                <% end %>
+
+                                <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: socket_schemas} <- @socket_schemas do %>
+                                  <select style="width: 5em" name="target_socket_id">
+                                    <%= with schema <- socket_schemas |> Map.get(layer_b.interface.socket_schema_id, []) do %>
+                                      <optgroup label={schema.name}>
+                                        <%= for sock <- schema.sockets do %>
+                                          <option value={sock.id}><%= sock.name %></option>
+                                        <% end %>
+                                      </optgroup>
+                                    <% end %>
+                                  </select>
+                                  <% else _ -> %>
+                                    Loading
+                                <% end %>
+                                <button>Connect</button>
+                              </form>
+                            <% end %>
+                          </div>
+                        </td>
+                      </:item>
+                    </.layers>
+                  </tr>
+                </:item>
+              </.layers>
+
+              <tr>
+                <th>
+                  <button
+                    type="button"
+                    phx-click="create_box"
+                    phx-value-example="yes"
+                    style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+                  >
+                    Create Box
+                  </button>
+                </th>
+              </tr>
+            </table>
+          </div>
+        <% end %>
 
         <svg
           phx-click="select_layer"
@@ -89,7 +233,7 @@ defmodule RenewCollabWeb.LiveDocument do
           preserveAspectRatio="xMidYMin meet"
           id={"document-#{@document.id}"}
           viewBox={RenewCollab.ViewBox.into_string(@viewbox)}
-          style="display: block; width: 100%; height: 100%;background: #f5f5f5;"
+          style="grid-area: 1 / 1 / span 1 / span 1; display: block; width: 100%; height: 100%;background: #f5f5f5;"
           width={@viewbox.width}
           height={@viewbox.height}
         >
@@ -125,6 +269,13 @@ defmodule RenewCollabWeb.LiveDocument do
             style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff"
           >
             Refit Camera
+          </button>
+
+          <button
+            style={"border: none; padding: 1ex; color: #fff; background-color: #{if(@show_grid, do: "#33ae33", else: "black")}; cursor: pointer"}
+            phx-click="toggle-grid"
+          >
+            Grid
           </button>
         </p>
 
@@ -521,6 +672,10 @@ defmodule RenewCollabWeb.LiveDocument do
     {:noreply, socket |> update(:show_meta, &(not &1))}
   end
 
+  def handle_event("toggle-grid", %{}, socket) do
+    {:noreply, socket |> update(:show_grid, &(not &1))}
+  end
+
   def handle_event("toggle-health", %{}, socket) do
     {:noreply, socket |> update(:show_health, &(not &1))}
   end
@@ -879,11 +1034,11 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.MoveLayer.new(%{
+    RenewCollab.Commands.ReorderLayer.new(%{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       target_layer_id: target_layer_id,
-      target: RenewCollab.Commands.MoveLayer.parse_hierarchy_position(order, relative)
+      target: RenewCollab.Commands.ReorderLayer.parse_hierarchy_position(order, relative)
     })
     |> RenewCollab.Commander.run_document_command()
 
@@ -899,7 +1054,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.MoveLayerRelative.new(%{
+    RenewCollab.Commands.ReorderLayerRelative.new(%{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       dx: dx,
@@ -922,7 +1077,7 @@ defmodule RenewCollabWeb.LiveDocument do
     })
     |> RenewCollab.Commander.run_document_command()
 
-    {:noreply, socket}
+    {:noreply, socket |> assign(:selection, nil)}
   end
 
   def handle_event(
@@ -1057,6 +1212,42 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def handle_event(
+        "create_grid_edge",
+        %{
+          "source_layer_id" => source_layer_id,
+          "source_socket_id" => source_socket_id,
+          "target_layer_id" => target_layer_id,
+          "target_socket_id" => target_socket_id
+        },
+        socket
+      ) do
+    RenewCollab.Commands.CreateLayer.new(%{
+      base_layer_id: socket.assigns.selection,
+      document_id: socket.assigns.document.id,
+      attrs: %{
+        "semantic_tag" => "CH.ifa.draw.figures.PolyLineFigure",
+        "edge" => %{
+          "source_x" => 0,
+          "source_y" => 0,
+          "target_x" => 0,
+          "target_y" => 0,
+          "source_bond" => %{
+            "layer_id" => source_layer_id,
+            "socket_id" => source_socket_id
+          },
+          "target_bond" => %{
+            "layer_id" => target_layer_id,
+            "socket_id" => target_socket_id
+          }
+        }
+      }
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
         "unlink_layer",
         %{
           "id" => layer_id
@@ -1115,7 +1306,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.RemoveLayerSocketSchema.new(%{
+    RenewCollab.Commands.ReReorderLayerSocketSchema.new(%{
       document_id: socket.assigns.document.id,
       layer_id: layer_id
     })
@@ -1351,12 +1542,11 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   defp move_relative(socket, rel, order) do
-    with s when not is_nil(s) <- socket.assigns.selection,
-         target_id when is_binary(target_id) <- find_relative(socket, rel) do
-      RenewCollab.Commands.MoveLayer.new(%{
+    with s when not is_nil(s) <- socket.assigns.selection do
+      RenewCollab.Commands.ReorderLayerRelative.new(%{
         document_id: socket.assigns.document.id,
         layer_id: socket.assigns.selection,
-        target_layer_id: target_id,
+        relative_direction: rel,
         target: order
       })
       |> RenewCollab.Commander.run_document_command()

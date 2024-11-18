@@ -1,4 +1,4 @@
-defmodule RenewCollab.Commands.MoveLayer do
+defmodule RenewCollab.Commands.ReorderLayer do
   import Ecto.Query, warn: false
 
   alias RenewCollab.Hierarchy.Layer

@@ -540,15 +540,55 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         %{},
         socket
       ) do
-    RenewCollab.Commands.MoveLayer.new(%{
+    RenewCollab.Commands.ReorderLayer.new(%{
       document_id: socket.assigns.document_id,
       layer_id: layer_id,
       target_layer_id: target_layer_id,
-      target: RenewCollab.Commands.MoveLayer.parse_hierarchy_position(order, relative)
+      target: RenewCollab.Commands.ReorderLayer.parse_hierarchy_position(order, relative)
     })
     |> RenewCollab.Commander.run_document_command()
 
     :silent
+  end
+
+  @impl true
+  def handle_event(
+        "reorder_relative",
+        %{"id" => layer_id, "target_rel" => target_rel},
+        %{},
+        socket
+      ) do
+    {rel, target} = RenewCollab.Commands.ReorderLayerRelative.parse_direction(target_rel)
+
+    rel_id =
+      RenewCollab.Commands.ReorderLayerRelative.new(%{
+        document_id: socket.assigns.document_id,
+        layer_id: layer_id,
+        relative_direction: rel,
+        target: target
+      })
+      |> RenewCollab.Commander.run_document_command()
+
+    :silent
+  end
+
+  @impl true
+  def handle_event(
+        "fetch_relative",
+        %{"id" => layer_id, "rel" => rel},
+        %{},
+        socket
+      ) do
+    rel_id =
+      RenewCollab.Queries.LayerHierarchyRelative.new(%{
+        document_id: socket.assigns.document_id,
+        layer_id: layer_id,
+        id_only: true,
+        relative: RenewCollab.Queries.LayerHierarchyRelative.parse_relative(rel)
+      })
+      |> RenewCollab.Fetcher.fetch()
+
+    {:reply, %{id: rel_id}, socket}
   end
 
   defp make_color(account_id) do
