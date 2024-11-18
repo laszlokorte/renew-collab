@@ -54,7 +54,7 @@ defmodule RenewCollab.Commands.ReorderLayerRelative do
   def parse_direction("after_parent"), do: {:parent, {:above, :outside}}
   def parse_direction("frontwards"), do: {{:sibling, :next}, {:above, :outside}}
   def parse_direction("backwards"), do: {{:sibling, :prev}, {:below, :outside}}
-  def parse_direction("to_front"), do: {{:sibling, :last}, {:below, :outside}}
-  def parse_direction("to_back"), do: {{:sibling, :first}, {:above, :outside}}
+  def parse_direction("to_front"), do: {{:sibling, :last}, {:above, :outside}}
+  def parse_direction("to_back"), do: {{:sibling, :first}, {:below, :outside}}
   def parse_direction("into_prev"), do: {{:sibling, :prev}, {:above, :inside}}
 end
