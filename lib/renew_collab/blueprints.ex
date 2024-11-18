@@ -34,15 +34,13 @@ defmodule RenewCollab.Blueprints do
             edge: nil,
             style: %{
               background_color: nil,
-              background_url:
-                "http://localhost:4000/api/media/svg/2e51bff6-5f3a-4bd9-be99-ea5b5a604a7a",
               border_color: nil,
               border_dash_array: nil,
               border_width: 0.0,
               opacity: nil
             },
             z_index: 1,
-            semantic_tag: "CH.ifa.draw.figures.ImageFigure",
+            semantic_tag: "CH.ifa.draw.figures.RectangleFigure",
             box: %{
               width: 1248.4948119325545,
               height: 1111.9703249008976,
@@ -92,62 +90,11 @@ defmodule RenewCollab.Blueprints do
             edge: %{
               cyclic: false,
               style: nil,
-              waypoints: [
-                %{
-                  sort: 0,
-                  position_x: -57.23086900129701,
-                  position_y: -47.29001109344978
-                },
-                %{
-                  sort: 1,
-                  position_x: -61.12191958495458,
-                  position_y: -43.071551408510544
-                },
-                %{
-                  sort: 2,
-                  position_x: -63.715953307392994,
-                  position_y: -37.23060722936392
-                },
-                %{
-                  sort: 3,
-                  position_x: -65.01297016861218,
-                  position_y: -30.416172353692843
-                },
-                %{
-                  sort: 4,
-                  position_x: -65.33722438391698,
-                  position_y: -22.628246781497353
-                },
-                %{
-                  sort: 5,
-                  position_x: -64.04020752269778,
-                  position_y: -15.164818108143322
-                },
-                %{
-                  sort: 6,
-                  position_x: -61.12191958495458,
-                  position_y: -8.350383232472268
-                },
-                %{
-                  sort: 7,
-                  position_x: -57.87937743190662,
-                  position_y: -2.833935952167124
-                },
-                %{
-                  sort: 8,
-                  position_x: -54.96108949416342,
-                  position_y: 1.3845237327721236
-                },
-                %{
-                  sort: 9,
-                  position_x: -52.367055771725006,
-                  position_y: 4.3049958223454325
-                }
-              ],
-              source_x: -51.070038910505815,
-              source_y: -49.56148938534013,
-              target_x: -49.44876783398183,
-              target_y: 7.2254679119187415
+              waypoints: [],
+              source_x: -151.070038910505815,
+              source_y: -3383.56148938534013,
+              target_x: 249.44876783398183,
+              target_y: -3383.2254679119187415
             },
             style: nil,
             z_index: 1,
@@ -162,18 +109,16 @@ defmodule RenewCollab.Blueprints do
             edge: nil,
             style: %{
               background_color: nil,
-              background_url:
-                "http://localhost:4000/api/media/svg/3b9efaba-e87f-4885-b899-6bccfa4bacab",
               border_color: nil,
               border_dash_array: nil,
               border_width: 0.0,
               opacity: nil
             },
             z_index: 2,
-            semantic_tag: "CH.ifa.draw.figures.ImageFigure",
+            semantic_tag: "CH.ifa.draw.figures.RectangleFigure",
             box: %{
               width: 2487.0,
-              height: 2918.0,
+              height: 918.0,
               position_x: -4625.2958984375,
               position_y: -4330.127197265625,
               symbol_shape_attributes: nil,
@@ -192,63 +137,13 @@ defmodule RenewCollab.Blueprints do
                 %{
                   sort: 0,
                   position_x: -2616.1623242174505,
-                  position_y: -628.843003543921
-                },
-                %{
-                  sort: 1,
-                  position_x: -2618.243930550924,
-                  position_y: -621.3436121263899
-                },
-                %{
-                  sort: 2,
-                  position_x: -2618.243930550924,
-                  position_y: -617.177283561095
-                },
-                %{
-                  sort: 3,
-                  position_x: -2618.243930550924,
-                  position_y: -612.1776892827411
-                },
-                %{
-                  sort: 4,
-                  position_x: -2616.99496675084,
-                  position_y: -607.1780950043869
-                },
-                %{
-                  sort: 5,
-                  position_x: -2613.664396617283,
-                  position_y: -602.178500726033
-                },
-                %{
-                  sort: 6,
-                  position_x: -2609.5011839503363,
-                  position_y: -597.5955393042085
-                },
-                %{
-                  sort: 7,
-                  position_x: -2605.33797128339,
-                  position_y: -594.679109308502
-                },
-                %{
-                  sort: 8,
-                  position_x: -2601.5910798831383,
-                  position_y: -591.346046456266
-                },
-                %{
-                  sort: 9,
-                  position_x: -2596.595224682802,
-                  position_y: -586.346452177912
-                },
-                %{
-                  sort: 10,
-                  position_x: -2594.9299396160236,
-                  position_y: -582.1801236126171
+                  position_y: -4323.843003543921
                 }
               ],
               source_x: -2613.664396617283,
-              source_y: -632.176066396157,
+              source_y: -4632.176066396157,
               target_x: -2594.9299396160236,
-              target_y: -578.013795047322
+              target_y: -4578.013795047322
             },
             style: nil,
             z_index: 2,
@@ -263,15 +158,13 @@ defmodule RenewCollab.Blueprints do
             edge: nil,
             style: %{
               background_color: nil,
-              background_url:
-                "http://localhost:4000/api/media/svg/f2924dfe-0b74-4be2-a587-24f06d284de7",
               border_color: nil,
               border_dash_array: nil,
               border_width: 0.0,
               opacity: nil
             },
             z_index: 3,
-            semantic_tag: "CH.ifa.draw.figures.ImageFigure",
+            semantic_tag: "CH.ifa.draw.figures.RectangleFigure",
             box: %{
               width: 2487.0,
               height: 2918.0,
