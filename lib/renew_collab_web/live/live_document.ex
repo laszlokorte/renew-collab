@@ -1054,7 +1054,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.ReorderLayerRelative.new(%{
+    RenewCollab.Commands.MoveLayerRelative.new(%{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       dx: dx,
