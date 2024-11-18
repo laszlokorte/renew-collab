@@ -560,14 +560,13 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
       ) do
     {rel, target} = RenewCollab.Commands.ReorderLayerRelative.parse_direction(target_rel)
 
-    rel_id =
-      RenewCollab.Commands.ReorderLayerRelative.new(%{
-        document_id: socket.assigns.document_id,
-        layer_id: layer_id,
-        relative_direction: rel,
-        target: target
-      })
-      |> RenewCollab.Commander.run_document_command()
+    RenewCollab.Commands.ReorderLayerRelative.new(%{
+      document_id: socket.assigns.document_id,
+      layer_id: layer_id,
+      relative_direction: rel,
+      target: target
+    })
+    |> RenewCollab.Commander.run_document_command()
 
     :silent
   end

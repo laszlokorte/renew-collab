@@ -1306,7 +1306,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.ReReorderLayerSocketSchema.new(%{
+    RenewCollab.Commands.RemoveLayerSocketSchema.new(%{
       document_id: socket.assigns.document.id,
       layer_id: layer_id
     })
