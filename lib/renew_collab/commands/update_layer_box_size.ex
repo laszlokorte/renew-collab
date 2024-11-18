@@ -43,9 +43,22 @@ defmodule RenewCollab.Commands.UpdateLayerBoxSize do
         Box.change_size(box, new_size)
       end
     )
-    |> Ecto.Multi.run(:delta, fn _, %{box: %{position_x: old_x, position_y: old_y}} ->
-      dx = Map.get(new_size, "position_x", old_x) - old_x
-      dy = Map.get(new_size, "position_y", old_y) - old_y
+    |> Ecto.Multi.run(:delta, fn _,
+                                 %{
+                                   box: %{
+                                     position_x: old_x,
+                                     position_y: old_y,
+                                     width: old_width,
+                                     height: old_height
+                                   }
+                                 } ->
+      dx =
+        Map.get(new_size, "position_x", old_x) - old_x +
+          (Map.get(new_size, "width", old_width) - old_width) / 2
+
+      dy =
+        Map.get(new_size, "position_y", old_y) - old_y +
+          (Map.get(new_size, "height", old_height) - old_height) / 2
 
       {:ok, {dx, dy}}
     end)

@@ -43,8 +43,9 @@ defmodule RenewCollab.Commands.MakeSpaceBetween do
                 from l in Layer, select: l.id, where: l.document_id == ^document_id
               ),
             where:
-              (b.position_x + b.width / 2 - ^bx) * ^dx + (b.position_y + b.height / 2 - ^by) * ^dy >
-                0,
+              (b.position_x + b.width / 2.0 - ^bx) * ^dx +
+                (b.position_y + b.height / 2.0 - ^by) * ^dy >
+                0.0,
             update: [inc: [position_x: ^dx, position_y: ^dy]]
           )
       end,
@@ -59,7 +60,7 @@ defmodule RenewCollab.Commands.MakeSpaceBetween do
               t.layer_id in subquery(
                 from l in Layer, select: l.id, where: l.document_id == ^document_id
               ),
-            where: (t.position_x - ^bx) * ^dx + (t.position_y - ^by) * ^dy > 0,
+            where: (t.position_x - ^bx) * ^dx + (t.position_y - ^by) * ^dy > 0.0,
             update: [inc: [position_x: ^dx, position_y: ^dy]]
           )
       end,
@@ -76,7 +77,7 @@ defmodule RenewCollab.Commands.MakeSpaceBetween do
                   t.layer_id in subquery(
                     from l in Layer, select: l.id, where: l.document_id == ^document_id
                   ),
-                where: (t.position_x - ^bx) * ^dx + (t.position_y - ^by) * ^dy > 0,
+                where: (t.position_x - ^bx) * ^dx + (t.position_y - ^by) * ^dy > 0.0,
                 select: t.id
               )
             ),
@@ -94,8 +95,8 @@ defmodule RenewCollab.Commands.MakeSpaceBetween do
               e.layer_id in subquery(
                 from l in Layer, select: l.id, where: l.document_id == ^document_id
               ),
-            where: (e.source_x - ^bx) * ^dx + (e.source_y - ^by) * ^dy > 0,
-            where: (e.target_x - ^bx) * ^dx + (e.target_y - ^by) * ^dy > 0,
+            where: (e.source_x - ^bx) * ^dx + (e.source_y - ^by) * ^dy > 0.0,
+            where: (e.target_x - ^bx) * ^dx + (e.target_y - ^by) * ^dy > 0.0,
             update: [inc: [source_x: ^dx, source_y: ^dy, target_x: ^dx, target_y: ^dy]]
           )
       end,
@@ -107,7 +108,7 @@ defmodule RenewCollab.Commands.MakeSpaceBetween do
     #     %{} ->
     #       from(e in Edge,
     #         where: e.layer_id in subquery(from l in Layer, select: l.id, where: l.document_id == ^document_id),
-    #         where: ((e.source_x - ^bx) * ^dx + (e.source_y - ^by) * ^dy > 0),
+    #         where: ((e.source_x - ^bx) * ^dx + (e.source_y - ^by) * ^dy > 0.0),
     #         update: [inc: [source_x: ^dx, source_y: ^dy]]
     #       )
     #   end,
@@ -119,7 +120,7 @@ defmodule RenewCollab.Commands.MakeSpaceBetween do
     #     %{} ->
     #       from(e in Edge,
     #         where: e.layer_id in subquery(from l in Layer, select: l.id, where: l.document_id == ^document_id),
-    #         where: ((e.target_x - ^bx) * ^dx + (e.target_y - ^by) * ^dy > 0),
+    #         where: ((e.target_x - ^bx) * ^dx + (e.target_y - ^by) * ^dy > 0.0),
     #         update: [inc: [target_x: ^dx, target_y: ^dy]]
     #       )
     #   end,
@@ -134,12 +135,12 @@ defmodule RenewCollab.Commands.MakeSpaceBetween do
               w.edge_id in subquery(
                 from l in Layer,
                   join: e in assoc(l, :edge),
-                  where: (e.source_x - ^bx) * ^dx + (e.source_y - ^by) * ^dy > 0,
-                  where: (e.target_x - ^bx) * ^dx + (e.target_y - ^by) * ^dy > 0,
+                  where: (e.source_x - ^bx) * ^dx + (e.source_y - ^by) * ^dy > 0.0,
+                  where: (e.target_x - ^bx) * ^dx + (e.target_y - ^by) * ^dy > 0.0,
                   select: e.id,
                   where: l.document_id == ^document_id
               ),
-            where: (w.position_x - ^bx) * ^dx + (w.position_y - ^by) * ^dy > 0,
+            where: (w.position_x - ^bx) * ^dx + (w.position_y - ^by) * ^dy > 0.0,
             update: [inc: [position_x: ^dx, position_y: ^dy]]
           )
       end,

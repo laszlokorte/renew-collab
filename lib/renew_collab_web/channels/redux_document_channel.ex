@@ -590,6 +590,26 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
     {:reply, %{id: rel_id}, socket}
   end
 
+  @impl true
+  def handle_event(
+        "make_space",
+        %{
+          "base" => %{"x" => bx, "y" => by},
+          "dir" => %{"x" => dx, "y" => dy}
+        },
+        %{},
+        socket
+      ) do
+    RenewCollab.Commands.MakeSpaceBetween.new(%{
+      document_id: socket.assigns.document_id,
+      base: {bx, by},
+      direction: {dx, dy}
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :silent
+  end
+
   defp make_color(account_id) do
     hue =
       <<i <- account_id |> then(&:crypto.hash(:md5, &1))>> |> for(do: i) |> Enum.sum() |> rem(360)
