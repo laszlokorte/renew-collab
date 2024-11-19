@@ -7,7 +7,21 @@ defmodule RenewCollab.Commands.MakeSpaceBetween do
   alias RenewCollab.Connection.Waypoint
   alias RenewCollab.Style.TextSizeHint
 
-  defstruct [:document_id, :base, :direction]
+  defstruct [:document_id, :base, :direction, :inverse]
+
+  def new(%{
+        document_id: document_id,
+        base: base,
+        direction: direction,
+        inverse: inverse
+      }) do
+    %__MODULE__{
+      document_id: document_id,
+      base: base,
+      direction: direction,
+      inverse: inverse
+    }
+  end
 
   def new(%{
         document_id: document_id,
@@ -17,7 +31,8 @@ defmodule RenewCollab.Commands.MakeSpaceBetween do
     %__MODULE__{
       document_id: document_id,
       base: base,
-      direction: direction
+      direction: direction,
+      inverse: false
     }
   end
 
@@ -29,8 +44,11 @@ defmodule RenewCollab.Commands.MakeSpaceBetween do
   def multi(%__MODULE__{
         document_id: document_id,
         base: {bx, by},
-        direction: {dx, dy}
+        direction: {dx, dy},
+        inverse: inverse
       }) do
+    {mdx, mdy} = if(inverse, do: {-dx, -dy}, else: {dx, dy})
+
     Ecto.Multi.new()
     |> Ecto.Multi.put(:document_id, document_id)
     |> Ecto.Multi.update_all(
@@ -46,7 +64,7 @@ defmodule RenewCollab.Commands.MakeSpaceBetween do
               (b.position_x + b.width / 2.0 - ^bx) * ^dx +
                 (b.position_y + b.height / 2.0 - ^by) * ^dy >
                 0.0,
-            update: [inc: [position_x: ^dx, position_y: ^dy]]
+            update: [inc: [position_x: ^mdx, position_y: ^mdy]]
           )
       end,
       []
@@ -61,7 +79,7 @@ defmodule RenewCollab.Commands.MakeSpaceBetween do
                 from l in Layer, select: l.id, where: l.document_id == ^document_id
               ),
             where: (t.position_x - ^bx) * ^dx + (t.position_y - ^by) * ^dy > 0.0,
-            update: [inc: [position_x: ^dx, position_y: ^dy]]
+            update: [inc: [position_x: ^mdx, position_y: ^mdy]]
           )
       end,
       []
@@ -81,7 +99,7 @@ defmodule RenewCollab.Commands.MakeSpaceBetween do
                 select: t.id
               )
             ),
-          update: [inc: [position_x: ^dx, position_y: ^dy]]
+          update: [inc: [position_x: ^mdx, position_y: ^mdy]]
         )
       end,
       []
@@ -97,7 +115,7 @@ defmodule RenewCollab.Commands.MakeSpaceBetween do
               ),
             where: (e.source_x - ^bx) * ^dx + (e.source_y - ^by) * ^dy > 0.0,
             where: (e.target_x - ^bx) * ^dx + (e.target_y - ^by) * ^dy > 0.0,
-            update: [inc: [source_x: ^dx, source_y: ^dy, target_x: ^dx, target_y: ^dy]]
+            update: [inc: [source_x: ^mdx, source_y: ^mdy, target_x: ^mdx, target_y: ^mdy]]
           )
       end,
       []
@@ -141,7 +159,7 @@ defmodule RenewCollab.Commands.MakeSpaceBetween do
                   where: l.document_id == ^document_id
               ),
             where: (w.position_x - ^bx) * ^dx + (w.position_y - ^by) * ^dy > 0.0,
-            update: [inc: [position_x: ^dx, position_y: ^dy]]
+            update: [inc: [position_x: ^mdx, position_y: ^mdy]]
           )
       end,
       []

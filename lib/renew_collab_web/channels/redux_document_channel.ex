@@ -133,14 +133,24 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
       base_layer_id: Map.get(params, "base_layer_id", nil),
       document_id: socket.assigns.document_id,
       attrs: %{
-        "semantic_tag" => "CH.ifa.draw.figures.RectangleFigure",
+        "semantic_tag" => Map.get(params, "semantic_tag", nil),
         "box" => %{
           "position_x" => cx - 25,
           "position_y" => cy - 25,
           "width" => 50,
           "height" => 50,
           "symbol_shape_id" => shape_id
-        }
+        },
+        "interface" =>
+          case Map.get(params, "socket_schema_id", nil) do
+            nil ->
+              nil
+
+            id ->
+              %{
+                "socket_schema_id" => id
+              }
+          end
       }
     })
     |> RenewCollab.Commander.run_document_command_sync()
@@ -245,6 +255,47 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "body" => body,
           "style" => %{
             "font_size" => 40
+          }
+        }
+      }
+    })
+    |> RenewCollab.Commander.run_document_command_sync()
+    |> case do
+      {:ok, %{layer: layer}} ->
+        {:reply, %{id: layer.id}, socket}
+    end
+  end
+
+  @impl true
+  def handle_event(
+        "create_layer",
+        params = %{
+          "source" => %{"socket_id" => source_socket_id, "layer_id" => source_layer_id},
+          "target" => %{"socket_id" => target_socket_id, "layer_id" => target_layer_id}
+        },
+        %{},
+        socket
+      ) do
+    RenewCollab.Commands.CreateLayer.new(%{
+      base_layer_id: Map.get(params, "base_layer_id", nil),
+      document_id: socket.assigns.document_id,
+      attrs: %{
+        "semantic_tag" => "de.renew.gui.ArcConnection",
+        "edge" => %{
+          "source_x" => 0,
+          "source_y" => 0,
+          "target_x" => 0,
+          "target_y" => 0,
+          "source_bond" => %{
+            "layer_id" => source_layer_id,
+            "socket_id" => source_socket_id
+          },
+          "target_bond" => %{
+            "layer_id" => target_layer_id,
+            "socket_id" => target_socket_id
+          },
+          "style" => %{
+            "target_tip_symbol_shape_id" => "84DC6617-D555-4BAB-BA33-04A5FA442F00"
           }
         }
       }
@@ -596,14 +647,15 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         %{
           "base" => %{"x" => bx, "y" => by},
           "dir" => %{"x" => dx, "y" => dy}
-        },
+        } = params,
         %{},
         socket
       ) do
     RenewCollab.Commands.MakeSpaceBetween.new(%{
       document_id: socket.assigns.document_id,
       base: {bx, by},
-      direction: {dx, dy}
+      direction: {dx, dy},
+      inverse: Map.get(params, "inverse", false)
     })
     |> RenewCollab.Commander.run_document_command()
 
