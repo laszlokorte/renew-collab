@@ -127,6 +127,11 @@ defmodule RenewCollabWeb.DocumentJSON do
       interface_id: layer.interface |> then(&if(&1, do: &1.socket_schema_id, else: nil)),
       z_index: layer.z_index,
       hidden: layer.hidden,
+      hyperlink:
+        case layer.outgoing_link do
+          nil -> nil
+          ol -> ol.target_layer_id
+        end,
       parent_id:
         case layer.direct_parent_hood do
           nil -> nil
