@@ -68,6 +68,7 @@ defmodule RenewCollab.Hierarchy.Layer do
     |> cast_assoc(:edge)
     |> cast_assoc(:style)
     |> cast_assoc(:interface)
+    |> cast_assoc(:outgoing_link, with: &RenewCollab.Connection.Hyperlink.nested_changeset/2)
     |> validate_required([:z_index])
   end
 

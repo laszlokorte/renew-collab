@@ -19,6 +19,20 @@ defmodule RenewCollab.Connection.Hyperlink do
     |> unique_constraint(:source_layer_id)
   end
 
+  @doc false
+  def nested_changeset(hyperlink, attrs) do
+    hyperlink
+    |> cast(attrs, [:target_layer_id])
+    |> unique_constraint(:source_layer_id)
+  end
+
+  @doc false
+  def changeset(hyperlink, attrs) do
+    hyperlink
+    |> cast(attrs, [:source_layer_id, :target_layer_id])
+    |> unique_constraint(:source_layer_id)
+  end
+
   defmodule Snapshotter do
     alias RenewCollab.Connection.Hyperlink
     @behaviour RenewCollab.Versioning.SnapshotterBehavior

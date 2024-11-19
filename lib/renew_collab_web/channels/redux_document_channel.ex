@@ -256,7 +256,17 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "style" => %{
             "font_size" => 40
           }
-        }
+        },
+        "outgoing_link" =>
+          case Map.get(params, "hyperlink", nil) do
+            nil ->
+              nil
+
+            target_id ->
+              %{
+                "target_layer_id" => target_id
+              }
+          end
       }
     })
     |> RenewCollab.Commander.run_document_command_sync()
