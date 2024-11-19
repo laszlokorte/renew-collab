@@ -662,6 +662,17 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
     :silent
   end
 
+  @impl true
+  def handle_event("set_meta", params, %{}, socket) do
+    RenewCollab.Commands.UpdateDocumentMeta.new(%{
+      document_id: socket.assigns.document_id,
+      meta: params
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :ack
+  end
+
   defp make_color(account_id) do
     hue =
       <<i <- account_id |> then(&:crypto.hash(:md5, &1))>> |> for(do: i) |> Enum.sum() |> rem(360)
