@@ -248,6 +248,7 @@ defmodule RenewCollabWeb.LiveSimulations do
 
     output_path = Path.join(output_root, "compiled.ssn")
     script_path = Path.join(output_root, "compile-script")
+    dbg(script_path)
 
     main_net_name =
       Enum.find_value(socket.assigns.uploads.import_file.entries, nil, fn
@@ -275,6 +276,7 @@ defmodule RenewCollabWeb.LiveSimulations do
         "setFormalism Java Net Compiler
 ex ShadowNetSystem -a #{Enum.join(paths, " ")} -o #{output_path}"
 
+      dbg(script_content)
       File.write!(script_path, script_content)
 
       with {:ok, 0} <- RenewCollabSim.Script.Runner.start_and_wait(script_path),
@@ -297,8 +299,8 @@ ex ShadowNetSystem -a #{Enum.join(paths, " ")} -o #{output_path}"
           :error
       end
     after
-      File.rm(output_path)
-      File.rm(script_path)
+      # File.rm(output_path)
+      # File.rm(script_path)
     end
 
     {:noreply, socket}

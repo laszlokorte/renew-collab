@@ -1,20 +1,18 @@
 defmodule RenewCollabSim.Script.Runner do
   def start(script_path) do
-    p =
-      spawn_link(fn ->
-        run(script_path)
-      end)
+    spawn_link(fn ->
+      run(script_path)
+    end)
   end
 
   def start_and_wait(script_path) do
     s = self()
 
-    p =
-      spawn_link(fn ->
-        result = run(script_path)
+    spawn_link(fn ->
+      result = run(script_path)
 
-        send(s, {:finished, result})
-      end)
+      send(s, {:finished, result})
+    end)
 
     receive do
       {:finished, result} ->
@@ -29,13 +27,15 @@ defmodule RenewCollabSim.Script.Runner do
         {:unix, _} -> ":"
       end
 
-    renew_path = "C:/Users/Laszlo/Desktop/eigene-projekte/renew-sim-script"
-    interceptor_path = "#{renew_path}/Interceptor.jar"
+    conf = Application.fetch_env!(:renew_collab, RenewCollabSim.Script.Runner)
 
-    log_conf_path =
-      "C:/Users/Laszlo/Desktop/eigene-projekte/renew_collab/priv/simulation/log4j.properties"
+    renew_path = Keyword.get(conf, :sim_renew_path)
+    interceptor_path = Keyword.get(conf, :sim_interceptor_path)
+    log_conf_path = Keyword.get(conf, :sim_log_conf_path)
 
-    module_path = "#{renew_path}/renew41" <> separator <> "#{renew_path}/renew41/libs"
+    module_path = "#{renew_path}" <> separator <> "#{renew_path}/libs"
+
+    dbg(module_path)
 
     port =
       Port.open(
@@ -78,17 +78,21 @@ defmodule RenewCollabSim.Script.Runner do
 
   def handle_output(port, return \\ nil) do
     receive do
-      {^port, {:data, "ERROR: " <> d = data}} ->
-        # IO.write(data)
+      {^port, {:data, "ERROR: " <> _d} = data} ->
+        dbg(data)
+        handle_output(port, 1)
+
+      {^port, {:data, "Error occurred" <> _d} = data} ->
+        dbg(data)
         handle_output(port, 1)
 
       {^port, {:data, data}} ->
-        # dbg(data)
+        dbg(data)
         # IO.write(data)
         handle_output(port, return)
 
       {^port, {:exit_status, status}} ->
-        handle_output(port, return)
+        handle_output(port, status)
 
       {^port, :eof} ->
         return

@@ -29,6 +29,8 @@ renew_collab-*.tar
 *.db
 *.db-*
 
+.env.local
+
 .elixir-tools
 deploy.sh
 dev.sh

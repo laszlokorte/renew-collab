@@ -1,12 +1,11 @@
-defmodule RenewCollabWeb.SimulationController do
+defmodule RenewCollabWeb.ShadowNetController do
   use RenewCollabWeb, :controller
 
-  alias RenewCollabSim.Entites.Simulation
   alias RenewCollabSim.Simulator
 
   action_fallback RenewCollabWeb.FallbackController
 
-  def shadow_net_system(conn, %{"id" => id} = p) do
+  def download(conn, %{"id" => id}) do
     content_type =
       with %{query_params: %{"text" => _}} <- conn do
         "text/plain"
@@ -16,17 +15,17 @@ defmodule RenewCollabWeb.SimulationController do
 
     Simulator.find_shadow_net_system(id)
     |> case do
-      simulation ->
+      sns ->
         conn
         |> put_resp_header(
           "content-disposition",
-          "inline; filename=\"#{simulation.id}.sns\""
+          "inline; filename=\"#{sns.id}.sns\""
         )
         |> put_resp_header(
           "content-type",
           content_type
         )
-        |> send_resp(:ok, simulation.compiled)
+        |> send_resp(:ok, sns.compiled)
     end
   end
 end
