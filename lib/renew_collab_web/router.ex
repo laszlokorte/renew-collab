@@ -83,6 +83,7 @@ defmodule RenewCollabWeb.Router do
 
     get "/documents/:id/export", DocumentController, :export
     get "/documents/:id/inspect", DocumentController, :inspect
+    get "/simulation/:id/sns", SimulationController, :shadow_net_system
   end
 
   scope "/", RenewCollabWeb do
@@ -94,6 +95,7 @@ defmodule RenewCollabWeb.Router do
       ] do
       live "/document/:id", LiveDocument
       live "/documents", LiveDocuments
+      live "/simulations", LiveSimulations
     end
   end
 
