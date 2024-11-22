@@ -186,6 +186,43 @@ defmodule RenewCollabWeb.LiveShadowNets do
                     </button>
                   </td>
                 </tr>
+
+                <tr>
+                  <td>
+                    <table width="100%">
+                      <thead>
+                        <tr>
+                          <th align="left" width="100%">
+                            <button
+                              type="button"
+                              phx-click="new-simulation"
+                              value={sns.id}
+                              style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+                            >
+                              New Simulation
+                            </button>
+                          </th>
+
+                          <th align="left"></th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        <%= for sim <- sns.simulations do %>
+                          <tr>
+                            <td>
+                              <.link navigate={~p"/simulation/#{sim.id}"}>
+                                <%= sim.id %>
+                              </.link>
+                            </td>
+                          </tr>
+                        <% end %>
+                      </tbody>
+                    </table>
+                  </td>
+
+                  <td colspan="4"></td>
+                </tr>
               <% end %>
             <% end %>
           </thead>
@@ -317,6 +354,21 @@ defmodule RenewCollabWeb.LiveShadowNets do
 
   def handle_event("delete", %{"id" => sns_id}, socket) do
     RenewCollabSim.Simulator.delete_shadow_net_system(sns_id)
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      @topic,
+      :any
+    )
+
+    {:noreply, socket}
+  end
+
+  def handle_event("new-simulation", %{"value" => sns_id}, socket) do
+    %RenewCollabSim.Entites.Simulation{
+      shadow_net_system_id: sns_id
+    }
+    |> RenewCollab.Repo.insert()
 
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,

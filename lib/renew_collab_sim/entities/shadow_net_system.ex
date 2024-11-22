@@ -8,6 +8,7 @@ defmodule RenewCollabSim.Entites.ShadowNetSystem do
     field :compiled, :binary
     field :main_net_name, :string
     has_many :nets, RenewCollabSim.Entites.ShadowNet
+    has_many :simulations, RenewCollabSim.Entites.Simulation
 
     timestamps(type: :utc_datetime)
   end

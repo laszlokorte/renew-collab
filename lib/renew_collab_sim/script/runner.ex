@@ -1,15 +1,9 @@
 defmodule RenewCollabSim.Script.Runner do
-  def start(script_path) do
-    spawn_link(fn ->
-      run(script_path)
-    end)
-  end
-
   def start_and_wait(script_path) do
     s = self()
 
     spawn_link(fn ->
-      result = run(script_path)
+      result = exec(script_path)
 
       send(s, {:finished, result})
     end)
@@ -20,7 +14,21 @@ defmodule RenewCollabSim.Script.Runner do
     end
   end
 
-  def run(script_path) do
+  def start_and_collect(script_path, collector) do
+    s = self()
+
+    spawn_link(fn ->
+      result = exec(script_path, collector)
+      send(s, {:port, result})
+    end)
+
+    receive do
+      {:port, result} ->
+        result
+    end
+  end
+
+  defp exec(script_path, collector \\ nil) do
     separator =
       case :os.type() do
         {:win32, _} -> ";"
@@ -72,32 +80,55 @@ defmodule RenewCollabSim.Script.Runner do
     Process.link(port)
 
     Port.monitor(port)
+    s = self()
 
-    handle_output(port, 0)
+    if collector do
+      spawn(fn ->
+        handle_output(port, 0, collector)
+      end)
+
+      spawn(fn ->
+        receive do
+          {:command, cmd} ->
+            dbg(cmd)
+            send(port, {s, {:command, cmd}})
+        end
+      end)
+    else
+      Process.link(port)
+
+      Port.monitor(port)
+      handle_output(port, 0, collector)
+    end
   end
 
-  def handle_output(port, return \\ nil) do
+  def handle_output(port, return \\ nil, collector \\ nil) do
     receive do
-      {^port, {:data, "ERROR: " <> _d} = _data} ->
+      {^port, {:data, "ERROR: " <> _d} = data} ->
+        collect(collector, data)
         # dbg(data)
-        handle_output(port, 1)
+        handle_output(port, 1, collector)
 
-      {^port, {:data, "Error occurred" <> _d} = _data} ->
+      {^port, {:data, "Error occurred" <> _d} = data} ->
+        collect(collector, data)
         # dbg(data)
-        handle_output(port, 1)
+        handle_output(port, 1, collector)
 
-      {^port, {:data, _data}} ->
+      {^port, {:data, data}} ->
+        collect(collector, data)
         # dbg(data)
         # IO.write(data)
-        handle_output(port, return)
+        handle_output(port, return, collector)
 
       {^port, {:exit_status, status}} ->
-        handle_output(port, status)
+        handle_output(port, status, collector)
 
       {^port, :eof} ->
+        dbg("EXIT")
         return
 
       {:EXIT, _, :normal} ->
+        dbg("EXIT")
         return
 
       e ->
@@ -105,5 +136,12 @@ defmodule RenewCollabSim.Script.Runner do
         dbg(port)
         dbg(e)
     end
+  end
+
+  defp collect(nil, _) do
+  end
+
+  defp collect(func, data) do
+    func.(data)
   end
 end

@@ -82,7 +82,7 @@ defmodule RenewCollabWeb.StateChannel do
               | {:noreply, new_state :: term}
 
   defmacro __using__(opts) do
-    quote do
+    quote generated: true do
       use unquote(Keyword.get(opts, :web_module)), :channel
 
       @dialyzer {:nowarn_function, handle_info: 2}
