@@ -35,7 +35,7 @@ defmodule RenewCollabSim.Script.Runner do
 
     module_path = "#{renew_path}" <> separator <> "#{renew_path}/libs"
 
-    dbg(module_path)
+    # dbg(module_path)
 
     port =
       Port.open(
@@ -78,16 +78,16 @@ defmodule RenewCollabSim.Script.Runner do
 
   def handle_output(port, return \\ nil) do
     receive do
-      {^port, {:data, "ERROR: " <> _d} = data} ->
-        dbg(data)
+      {^port, {:data, "ERROR: " <> _d} = _data} ->
+        # dbg(data)
         handle_output(port, 1)
 
-      {^port, {:data, "Error occurred" <> _d} = data} ->
-        dbg(data)
+      {^port, {:data, "Error occurred" <> _d} = _data} ->
+        # dbg(data)
         handle_output(port, 1)
 
-      {^port, {:data, data}} ->
-        dbg(data)
+      {^port, {:data, _data}} ->
+        # dbg(data)
         # IO.write(data)
         handle_output(port, return)
 

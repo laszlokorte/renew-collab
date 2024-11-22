@@ -1,4 +1,4 @@
-defmodule RenewCollabWeb.LiveSimulations do
+defmodule RenewCollabWeb.LiveShadowNets do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
@@ -122,8 +122,6 @@ defmodule RenewCollabWeb.LiveSimulations do
 
               <th style="border-bottom: 1px solid #333;" align="left" width="200">Created</th>
 
-              <th style="border-bottom: 1px solid #333;" align="left" width="200">Last Updated</th>
-
               <th style="border-bottom: 1px solid #333;" align="left" width="100" colspan="2">
                 Actions
               </th>
@@ -140,23 +138,42 @@ defmodule RenewCollabWeb.LiveSimulations do
             <% else %>
               <%= for {sns, si} <- @shadow_net_systems |> Enum.with_index do %>
                 <tr {if(rem(si, 2) == 0, do: [style: "background-color:#f5f5f5;"], else: [])}>
-                  <td>
-                    <code><%= sns.id %></code>
+                  <td width="100%">
+                    <.link download="x" style="color: #078" href={~p"/shadow_nets/#{sns.id}"}>
+                      <code><%= sns.id %></code>
+                    </.link>
                   </td>
 
-                  <td>
+                  <td valign="top">
                     <%= sns.main_net_name %>
                   </td>
 
-                  <td>
-                    <%= for n <- sns.nets do %>
-                      <%= n.name %>
-                    <% end %>
+                  <td valign="top">
+                    <ul style="list-style: none; margin: 0; padding: 0;">
+                      <%= for n <- sns.nets do %>
+                        <li><%= n.name %></li>
+                      <% end %>
+                    </ul>
                   </td>
 
-                  <td><%= sns.inserted_at |> Calendar.strftime("%Y-%m-%d %H:%M") %></td>
+                  <td style="white-space: nowrap;">
+                    <%= sns.inserted_at |> Calendar.strftime("%Y-%m-%d %H:%M") %>
+                  </td>
 
-                  <td><%= sns.updated_at |> Calendar.strftime("%Y-%m-%d %H:%M") %></td>
+                  <td width="50">
+                    <.link
+                      download="x"
+                      style="color: #078"
+                      href={~p"/shadow_net/#{sns.id}/binary?text"}
+                    >
+                      <button
+                        type="button"
+                        style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff"
+                      >
+                        Download SNS File
+                      </button>
+                    </.link>
+                  </td>
 
                   <td width="50">
                     <button
@@ -167,17 +184,6 @@ defmodule RenewCollabWeb.LiveSimulations do
                     >
                       Delete
                     </button>
-                  </td>
-
-                  <td width="50">
-                    <.link style="color: #078" href={~p"/simulation/#{sns.id}/sns?text"}>
-                      <button
-                        type="button"
-                        style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff"
-                      >
-                        Download SNS File
-                      </button>
-                    </.link>
                   </td>
                 </tr>
               <% end %>
@@ -248,7 +254,7 @@ defmodule RenewCollabWeb.LiveSimulations do
 
     output_path = Path.join(output_root, "compiled.ssn")
     script_path = Path.join(output_root, "compile-script")
-    dbg(script_path)
+    # dbg(script_path)
 
     main_net_name =
       Enum.find_value(socket.assigns.uploads.import_file.entries, nil, fn
@@ -273,10 +279,13 @@ defmodule RenewCollabWeb.LiveSimulations do
         end)
 
       script_content =
-        "setFormalism Java Net Compiler
-ex ShadowNetSystem -a #{Enum.join(paths, " ")} -o #{output_path}"
+        [
+          "setFormalism Java Net Compiler",
+          "ex ShadowNetSystem -a #{Enum.join(paths, " ")} -o #{output_path}"
+        ]
+        |> Enum.join("\n")
 
-      dbg(script_content)
+      # dbg(script_content)
       File.write!(script_path, script_content)
 
       with {:ok, 0} <- RenewCollabSim.Script.Runner.start_and_wait(script_path),
@@ -299,8 +308,8 @@ ex ShadowNetSystem -a #{Enum.join(paths, " ")} -o #{output_path}"
           :error
       end
     after
-      # File.rm(output_path)
-      # File.rm(script_path)
+      File.rm(output_path)
+      File.rm(script_path)
     end
 
     {:noreply, socket}

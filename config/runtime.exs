@@ -59,6 +59,12 @@ if config_env() == :prod do
     ],
     secret_key_base: secret_key_base
 
+  config :renew_collab, RenewCollabSim.Script.Runner,
+    sim_renew_path: System.get_env("SIM_RENEW_PATH") || raise("SIM_RENEW_PATH is missing"),
+    sim_interceptor_path:
+      System.get_env("SIM_STDIO_WRAPPER") || raise("SIM_STDIO_WRAPPER is missing"),
+    sim_log_conf_path: System.get_env("SIM_LOG4J_CONF") || raise("SIM_LOG4J_CONF is missing")
+
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key

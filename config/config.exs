@@ -49,12 +49,6 @@ config :mime, :types, %{
   "application/custom+aip" => ["aip"]
 }
 
-config :renew_collab, RenewCollabSim.Script.Runner,
-  sim_renew_path: System.get_env("SIM_RENEW_PATH") || raise("SIM_RENEW_PATH is missing"),
-  sim_interceptor_path:
-    System.get_env("SIM_STDIO_WRAPPER") || raise("SIM_STDIO_WRAPPER is missing"),
-  sim_log_conf_path: System.get_env("SIM_LOG4J_CONF") || raise("SIM_LOG4J_CONF is missing")
-
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

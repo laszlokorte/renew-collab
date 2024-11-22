@@ -54,6 +54,13 @@ config :renew_collab, RenewCollabWeb.Endpoint,
 # configured to run both http and https servers on
 # different ports.
 
+priv_path = Path.expand("../priv", __DIR__)
+
+config :renew_collab, RenewCollabSim.Script.Runner,
+  sim_renew_path: Path.join([priv_path, "simulation", "renew41"]),
+  sim_interceptor_path: Path.join([priv_path, "simulation", "Interceptor.jar"]),
+  sim_log_conf_path: Path.join([priv_path, "simulation", "log4j.properties"])
+
 # Enable dev routes for dashboard and mailbox
 config :renew_collab, dev_routes: true
 
