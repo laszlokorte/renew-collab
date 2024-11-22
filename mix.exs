@@ -54,7 +54,8 @@ defmodule RenewCollab.MixProject do
       {:renewex, "~> 0.14.0"},
       {:renewex_iconset, "~> 0.2.0"},
       {:renewex_routing, "~> 0.2.0"},
-      {:renewex_converter, "~> 0.4.0"}
+      {:renewex_converter, "~> 0.4.0"},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
   end
 

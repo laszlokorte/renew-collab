@@ -1,5 +1,5 @@
 defmodule RenewCollabWeb.ReduxDocumentChannel do
-  use RenewCollabWeb.StateChannel, :redux
+  use RenewCollabWeb.StateChannel, web_module: RenewCollabWeb
 
   alias RenewCollabWeb.Presence
 

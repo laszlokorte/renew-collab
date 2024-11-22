@@ -394,12 +394,17 @@ defmodule RenewCollab.Export.DocumentExport do
      round(Bitwise.bsl(a, 8) + a * opacity)}
   end
 
+  @rgba_paren ~r/\(([^,]+),([^,]+),([^,]+),([^\)]+)\)/
+
   defp color_to_rgba(
-         <<"rgba", args::utf8>>,
+         <<"rgba", args::binary>>,
          opacity
        ) do
+    foo =
+      Regex.run(@rgba_paren, args, capture: :all_but_first)
+
     [r, g, b, a] =
-      Regex.run(~r/\(([^,]+),([^,]+),([^,]+),([^\)]+)\)/, args, capture: :all_but_first)
+      foo
       |> Enum.map(&Float.parse/1)
       |> Enum.map(&elem(&1, 0))
       |> Enum.map(&round/1)
