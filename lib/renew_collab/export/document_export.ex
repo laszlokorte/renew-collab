@@ -1,4 +1,5 @@
 defmodule RenewCollab.Export.DocumentExport do
+  alias RenewCollab.ViewBox
   alias Renewex.Storable
   alias Renewex.Grammar
   alias Renewex.Hierarchy
@@ -7,125 +8,124 @@ defmodule RenewCollab.Export.DocumentExport do
   def export(%Document{} = document) do
     grammar = Grammar.new(11)
 
+    view_box = ViewBox.calculate(document, 20)
+
     document =
       Map.update(document, :layers, nil, fn layers ->
         Enum.sort_by(layers, &{is_nil(&1.box), is_nil(&1.edge), is_nil(&1.text)})
       end)
 
-    generated_figures =
-      for {l, li} <- Enum.with_index(document.layers),
-          reduce: [] do
-        prev -> Enum.concat(prev, export_figure(grammar, l, document, prev))
-      end
+    refs =
+      document.layers
+      |> Enum.filter(fn l ->
+        is_nil(l.direct_parent_hood)
+      end)
+      |> Enum.reduce([], fn layer, storables ->
+        export_layer(storables, view_box, document, grammar, layer)
+      end)
+      |> attach_syntetic_labels
 
     Renewex.serialize_document(%Renewex.Document{
       version: 11,
-      root: {:ref, 0},
-      refs:
-        [
-          %Renewex.Storable{
-            class_name: document.kind,
-            fields: %{
-              figures:
-                for {l, li} <- Enum.with_index(document.layers),
-                    is_nil(l.direct_parent_hood) do
-                  {:ref, li + 1}
-                end
-                |> Enum.concat([{:ref, Enum.count(generated_figures) + 1}]),
-              icon: nil
-            }
-          }
-        ]
-        |> Enum.concat(generated_figures)
-        |> Enum.concat([
-          %Storable{
-            class_name: "CH.ifa.draw.figures.GroupFigure",
-            fields: %{
-              figures:
-                for {l, li} <- Enum.with_index(document.layers),
-                    exported_labels = export_label(grammar, l, li, generated_figures),
-                    fig <- exported_labels do
-                  fig
-                end
-            }
-          }
-        ]),
+      root: %Renewex.Storable{
+        class_name: document.kind,
+        fields: %{
+          figures:
+            for {%{fields: %{_root: true}}, i} <- Enum.with_index(refs) do
+              {:ref, i}
+            end,
+          icon: nil
+        }
+      },
+      refs: refs,
       size: nil
     })
   end
 
-  defp export_figure(grammar, layer, document, already_exported) do
-    cond do
-      Hierarchy.is_subtype_of(
-        grammar,
-        layer.semantic_tag,
-        "de.renew.netcomponents.NetComponentFigure"
-      ) ->
-        [
-          %Storable{
-            class_name: layer.semantic_tag,
-            fields: %{
-              figures:
-                for {l, li} <- Enum.with_index(document.layers),
-                    not is_nil(l.direct_parent_hood),
-                    l.direct_parent_hood.ancestor_id == layer.id,
-                    exported_figures = export_child_figure(grammar, l, li, document),
-                    fig <- exported_figures do
-                  fig
-                end
-            }
-          }
-        ]
-        |> Enum.concat(
-          for {l, li} <- Enum.with_index(document.layers),
-              not is_nil(l.direct_parent_hood),
-              l.direct_parent_hood.ancestor_id == layer.id,
-              exported_figures = export_child_figure(grammar, l, li, document),
-              fig <- exported_figures do
-            fig
-          end
-        )
+  def export_layer(storables, view_box, document, grammar, layer) do
+    storables =
+      document.layers
+      |> Enum.filter(fn l ->
+        not is_nil(l.direct_parent_hood) and l.direct_parent_hood.ancestor_id == layer.id
+      end)
+      |> Enum.reduce(storables, fn sub_layer, storables ->
+        export_layer(storables, view_box, document, grammar, sub_layer)
+      end)
 
-      Hierarchy.is_subtype_of(
-        grammar,
-        layer.semantic_tag,
-        "CH.ifa.draw.figures.GroupFigure"
-      ) ->
-        [
-          %Storable{
-            class_name: layer.semantic_tag,
-            fields: %{
-              figures:
-                for {l, li} <- Enum.with_index(document.layers),
-                    not is_nil(l.direct_parent_hood),
-                    l.direct_parent_hood.ancestor_id == layer.id,
-                    exported_figures = export_child_figure(grammar, l, li, document),
-                    fig <- exported_figures do
-                  fig
-                end
-            }
-          }
-        ]
+    cond do
+      # Hierarchy.is_subtype_of(
+      #   grammar,
+      #   layer.semantic_tag,
+      #   "de.renew.netcomponents.NetComponentFigure"
+      # ) ->
+      #   [
+      #     %Renewex.Storable{
+      #       class_name: layer.semantic_tag,
+      #       fields: %{
+      #         figures:
+      #           for {l, li} <- Enum.with_index(document.layers),
+      #               not is_nil(l.direct_parent_hood),
+      #               l.direct_parent_hood.ancestor_id == layer.id,
+      #               exported_figures = export_child_figure(grammar, l, li, document),
+      #               fig <- exported_figures do
+      #             fig
+      #           end
+      #       }
+      #     }
+      #   ]
+      #   |> Enum.concat(
+      #     for {l, li} <- Enum.with_index(document.layers),
+      #         not is_nil(l.direct_parent_hood),
+      #         l.direct_parent_hood.ancestor_id == layer.id,
+      #         exported_figures = export_child_figure(grammar, l, li, document),
+      #         fig <- exported_figures do
+      #       fig
+      #     end
+      #   )
+
+      # Hierarchy.is_subtype_of(
+      #   grammar,
+      #   layer.semantic_tag,
+      #   "CH.ifa.draw.figures.GroupFigure"
+      # ) ->
+      #   [
+      #     %Renewex.Storable{
+      #       class_name: layer.semantic_tag,
+      #       fields: %{
+      #         figures:
+      #           for {l, li} <- Enum.with_index(document.layers),
+      #               not is_nil(l.direct_parent_hood),
+      #               l.direct_parent_hood.ancestor_id == layer.id,
+      #               exported_figures = export_child_figure(grammar, l, li, document),
+      #               fig <- exported_figures do
+      #             fig
+      #           end
+      #       }
+      #     }
+      #   ]
 
       Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "de.renew.gui.TransitionFigure") ->
-        [
-          %Storable{
+        storables
+        |> Enum.concat([
+          %Renewex.Storable{
             class_name: layer.semantic_tag,
             fields: %{
+              _root: layer.direct_parent_hood == nil,
               _gen_id: layer.id,
               attributes: export_attributes(:box, layer),
-              x: round(layer.box.position_x),
-              y: round(layer.box.position_y),
+              x: round(-view_box.x + layer.box.position_x),
+              y: round(-view_box.y + layer.box.position_y),
               w: round(layer.box.width),
               h: round(layer.box.height),
               highlight_figure: nil
             }
           }
-        ]
+        ])
 
       Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "de.renew.gui.VirtualPlaceFigure") ->
-        [
-          # %Storable{
+        storables
+        |> Enum.concat([
+          # %Renewex.Storable{
           #   class_name: layer.semantic_tag,
           #   fields: %{
           #     x: 10,
@@ -136,162 +136,211 @@ defmodule RenewCollab.Export.DocumentExport do
           #     place: nil
           #   }
           # }
-        ]
+        ])
 
       Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "de.renew.gui.PlaceFigure") ->
-        [
-          %Storable{
+        storables
+        |> Enum.concat([
+          %Renewex.Storable{
             class_name: layer.semantic_tag,
             fields: %{
+              _root: layer.direct_parent_hood == nil,
               _gen_id: layer.id,
               attributes: export_attributes(:box, layer),
-              x: round(layer.box.position_x),
-              y: round(layer.box.position_y),
+              x: round(-view_box.x + layer.box.position_x),
+              y: round(-view_box.y + layer.box.position_y),
               w: round(layer.box.width),
               h: round(layer.box.height),
               highlight_figure: nil
             }
           }
-        ]
+        ])
 
       Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "CH.ifa.draw.figures.EllipseFigure") ->
-        [
-          %Storable{
+        storables
+        |> Enum.concat([
+          %Renewex.Storable{
             class_name: layer.semantic_tag,
             fields: %{
+              _root: layer.direct_parent_hood == nil,
               _gen_id: layer.id,
               attributes: export_attributes(:box, layer),
-              x: round(layer.box.position_x),
-              y: round(layer.box.position_y),
+              x: round(-view_box.x + layer.box.position_x),
+              y: round(-view_box.y + layer.box.position_y),
               w: round(layer.box.width),
               h: round(layer.box.height)
             }
           }
-        ]
+        ])
 
       Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "CH.ifa.draw.contrib.TriangleFigure") ->
-        [
-          %Storable{
+        storables
+        |> Enum.concat([
+          %Renewex.Storable{
             class_name: layer.semantic_tag,
             fields: %{
+              _root: layer.direct_parent_hood == nil,
               attributes: export_attributes(:box, layer),
-              x: round(layer.box.position_x),
-              y: round(layer.box.position_y),
+              x: round(-view_box.x + layer.box.position_x),
+              y: round(-view_box.y + layer.box.position_y),
               w: round(layer.box.width),
               h: round(layer.box.height),
               rotation: export_triangle_rotation(layer.box.symbol_shape)
             }
           }
-        ]
+        ])
 
-      Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "CH.ifa.draw.figures.RectangleFigure") ->
-        [
-          %Storable{
+      Hierarchy.is_subtype_of(
+        grammar,
+        layer.semantic_tag,
+        "CH.ifa.draw.figures.RectangleFigure"
+      ) ->
+        storables
+        |> Enum.concat([
+          %Renewex.Storable{
             class_name: layer.semantic_tag,
             fields: %{
+              _root: layer.direct_parent_hood == nil,
               _gen_id: layer.id,
               attributes: export_attributes(:box, layer),
-              x: round(layer.box.position_x),
-              y: round(layer.box.position_y),
+              x: round(-view_box.x + layer.box.position_x),
+              y: round(-view_box.y + layer.box.position_y),
               w: round(layer.box.width),
               h: round(layer.box.height)
             }
           }
-        ]
+        ])
 
       Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "CH.ifa.draw.figures.PolyLineFigure") ->
-        [
-          %Storable{
+        {storables, source_arrow_ref} =
+          create_ref(
+            storables,
+            case layer.edge.style.source_tip_symbol_shape_id do
+              nil ->
+                nil
+
+              _ ->
+                %Renewex.Storable{
+                  class_name: "CH.ifa.draw.figures.ArrowTip",
+                  fields: %{
+                    angle: 0.4,
+                    outer_radius: 8.0,
+                    inner_radius: 8.0,
+                    filled: true
+                  }
+                }
+            end
+          )
+
+        {storables, target_arrow_ref} =
+          create_ref(
+            storables,
+            case layer.edge.style.target_tip_symbol_shape_id do
+              nil ->
+                nil
+
+              _ ->
+                %Renewex.Storable{
+                  class_name: "CH.ifa.draw.figures.ArrowTip",
+                  fields: %{
+                    angle: 0.4,
+                    outer_radius: 8.0,
+                    inner_radius: 8.0,
+                    filled: true
+                  }
+                }
+            end
+          )
+
+        {storables, start_ref} =
+          create_ref(
+            storables,
+            case layer.edge.source_bond do
+              %{layer_id: layer_id} ->
+                {:ref,
+                 target_index =
+                   Enum.find_index(storables, fn
+                     %{fields: %{_gen_id: ^layer_id}} -> true
+                     _ -> false
+                   end)}
+
+                %Renewex.Storable{
+                  class_name: "CH.ifa.draw.standard.ChopBoxConnector",
+                  fields: %{
+                    owner: {:ref, target_index}
+                  }
+                }
+            end
+          )
+
+        {storables, end_ref} =
+          create_ref(
+            storables,
+            case layer.edge.target_bond do
+              %{layer_id: layer_id} ->
+                {:ref,
+                 target_index =
+                   Enum.find_index(storables, fn
+                     %{fields: %{_gen_id: ^layer_id}} -> true
+                     _ -> false
+                   end)}
+
+                %Renewex.Storable{
+                  class_name: "CH.ifa.draw.standard.ChopBoxConnector",
+                  fields: %{
+                    owner: {:ref, target_index}
+                  }
+                }
+            end
+          )
+
+        storables
+        |> Enum.concat([
+          %Renewex.Storable{
             class_name: layer.semantic_tag,
             fields: %{
+              _gen_id: layer.id,
+              _root: layer.direct_parent_hood == nil,
               attributes: export_attributes(:edge, layer),
               points:
                 Enum.concat([
-                  [%{x: round(layer.edge.source_x), y: round(layer.edge.source_y)}],
+                  [
+                    %{
+                      x: round(-view_box.x + layer.edge.source_x),
+                      y: round(-view_box.y + layer.edge.source_y)
+                    }
+                  ],
                   layer.edge.waypoints
-                  |> Enum.map(fn w -> %{x: round(w.position_x), y: round(w.position_y)} end),
-                  [%{x: round(layer.edge.target_x), y: round(layer.edge.target_y)}]
+                  |> Enum.map(fn w ->
+                    %{x: round(w.position_x - view_box.x), y: round(w.position_y - view_box.y)}
+                  end),
+                  [
+                    %{
+                      x: round(-view_box.x + layer.edge.target_x),
+                      y: round(-view_box.y + layer.edge.target_y)
+                    }
+                  ]
                 ]),
-              start_decoration:
-                case layer.edge.style.source_tip_symbol_shape_id do
-                  nil ->
-                    nil
-
-                  _ ->
-                    %Storable{
-                      class_name: "CH.ifa.draw.figures.ArrowTip",
-                      fields: %{
-                        angle: 0.4,
-                        outer_radius: 8.0,
-                        inner_radius: 8.0,
-                        filled: true
-                      }
-                    }
-                end,
-              end_decoration:
-                case layer.edge.style.target_tip_symbol_shape_id do
-                  nil ->
-                    nil
-
-                  _ ->
-                    %Storable{
-                      class_name: "CH.ifa.draw.figures.ArrowTip",
-                      fields: %{
-                        angle: 0.4,
-                        outer_radius: 8.0,
-                        inner_radius: 8.0,
-                        filled: true
-                      }
-                    }
-                end,
+              start_decoration: source_arrow_ref,
+              end_decoration: target_arrow_ref,
               arrow_name: "",
-              start:
-                case layer.edge.source_bond do
-                  %{layer_id: layer_id} ->
-                    {:ref,
-                     target_index =
-                       Enum.find_index(already_exported, fn
-                         %{fields: %{_gen_id: ^layer_id}} -> true
-                         _ -> false
-                       end)}
-
-                    %Storable{
-                      class_name: "CH.ifa.draw.standard.ChopBoxConnector",
-                      fields: %{
-                        owner: {:ref, target_index}
-                      }
-                    }
-                end,
-              end:
-                case layer.edge.target_bond do
-                  %{layer_id: layer_id} ->
-                    {:ref,
-                     target_index =
-                       Enum.find_index(already_exported, fn
-                         %{fields: %{_gen_id: ^layer_id}} -> true
-                         _ -> false
-                       end)}
-
-                    %Storable{
-                      class_name: "CH.ifa.draw.standard.ChopBoxConnector",
-                      fields: %{
-                        owner: {:ref, target_index}
-                      }
-                    }
-                end
+              start: start_ref,
+              end: end_ref
             }
           }
-        ]
+        ])
 
       Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "de.renew.gui.fs.FSFigure") ->
         if is_nil(layer.text.style) do
-          [
-            %Storable{
+          storables
+          |> Enum.concat([
+            %Renewex.Storable{
               class_name: layer.semantic_tag,
               fields: %{
+                _root: layer.direct_parent_hood == nil,
                 attributes: export_attributes(:text, layer),
-                fOriginX: round(layer.text.position_x),
-                fOriginY: round(layer.text.position_y),
+                fOriginX: round(-view_box.x + layer.text.position_x),
+                fOriginY: round(-view_box.y + layer.text.position_y),
                 text: layer.text.body,
                 fCurrentFontName: "SansSerif",
                 fCurrentFontStyle: 0,
@@ -303,15 +352,17 @@ defmodule RenewCollab.Export.DocumentExport do
                 paths: [""]
               }
             }
-          ]
+          ])
         else
-          [
-            %Storable{
+          storables
+          |> Enum.concat([
+            %Renewex.Storable{
               class_name: layer.semantic_tag,
               fields: %{
+                _root: layer.direct_parent_hood == nil,
                 attributes: export_attributes(:text, layer),
-                fOriginX: round(layer.text.position_x),
-                fOriginY: round(layer.text.position_y),
+                fOriginX: round(-view_box.x + layer.text.position_x),
+                fOriginY: round(-view_box.y + layer.text.position_y),
                 text: layer.text.body,
                 fCurrentFontName: style_or_default(layer.text, :font_family),
                 fCurrentFontStyle: export_font_style(layer.text.style),
@@ -323,19 +374,40 @@ defmodule RenewCollab.Export.DocumentExport do
                 paths: [""]
               }
             }
-          ]
+          ])
         end
 
       Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "de.renew.gui.CPNTextFigure") ->
         if is_nil(layer.text.style) do
-          [
-            %Storable{
+          {storables, locator_base} =
+            create_ref(storables, %Renewex.Storable{
+              class_name: "CH.ifa.draw.standard.RelativeLocator",
+              fields: %{
+                fOffsetY: 0.5,
+                fOffsetX: 0.5
+              }
+            })
+
+          {storables, locator_ref} =
+            create_ref(storables, %Renewex.Storable{
+              class_name: "CH.ifa.draw.standard.OffsetLocator",
+              fields: %{
+                fOffsetY: 0,
+                fOffsetX: 0,
+                fBase: locator_base
+              }
+            })
+
+          storables
+          |> Enum.concat([
+            %Renewex.Storable{
               class_name: layer.semantic_tag,
               fields: %{
+                _root: layer.direct_parent_hood == nil,
                 _gen_id: layer.id,
                 attributes: export_attributes(:text, layer),
-                fOriginX: round(layer.text.position_x),
-                fOriginY: round(layer.text.position_y),
+                fOriginX: round(-view_box.x + layer.text.position_x),
+                fOriginY: round(-view_box.y + layer.text.position_y),
                 text: layer.text.body,
                 fCurrentFontName: "SansSerif",
                 fCurrentFontStyle: 0,
@@ -347,40 +419,48 @@ defmodule RenewCollab.Export.DocumentExport do
                       nil
 
                     target_layer_id ->
-                      Enum.find_value(Enum.with_index(already_exported), fn
+                      Enum.find_value(Enum.with_index(storables), fn
                         {%{fields: %{_gen_id: ^target_layer_id}}, i} -> {:ref, i}
                         _ -> nil
                       end)
                   end,
-                fLocator: %Storable{
-                  class_name: "CH.ifa.draw.standard.OffsetLocator",
-                  fields: %{
-                    fOffsetY: 0,
-                    fOffsetX: 0,
-                    fBase: %Storable{
-                      class_name: "CH.ifa.draw.standard.RelativeLocator",
-                      fields: %{
-                        fOffsetY: 0.5,
-                        fOffsetX: 0.5
-                      }
-                    }
-                  }
-                },
+                fLocator: locator_ref,
                 fType: 1
 
                 # CH.ifa.draw.standard.OffsetLocator 0 0 
                 #     CH.ifa.draw.standard.RelativeLocator 0.5 0.5   1  NULL 
               }
             }
-          ]
+          ])
         else
-          [
-            %Storable{
+          {storables, locator_base} =
+            create_ref(storables, %Renewex.Storable{
+              class_name: "CH.ifa.draw.standard.RelativeLocator",
+              fields: %{
+                fOffsetY: 0.5,
+                fOffsetX: 0.5
+              }
+            })
+
+          {storables, locator_ref} =
+            create_ref(storables, %Renewex.Storable{
+              class_name: "CH.ifa.draw.standard.OffsetLocator",
+              fields: %{
+                fOffsetY: 0,
+                fOffsetX: 0,
+                fBase: locator_base
+              }
+            })
+
+          storables
+          |> Enum.concat([
+            %Renewex.Storable{
               class_name: layer.semantic_tag,
               fields: %{
+                _root: layer.direct_parent_hood == nil,
                 attributes: export_attributes(:text, layer),
-                fOriginX: round(layer.text.position_x),
-                fOriginY: round(layer.text.position_y),
+                fOriginX: round(-view_box.x + layer.text.position_x),
+                fOriginY: round(-view_box.y + layer.text.position_y),
                 text: layer.text.body,
                 fCurrentFontName: style_or_default(layer.text, :font_family),
                 fCurrentFontStyle: export_font_style(layer.text.style),
@@ -392,40 +472,29 @@ defmodule RenewCollab.Export.DocumentExport do
                       nil
 
                     target_layer_id ->
-                      Enum.find_value(Enum.with_index(already_exported), fn
+                      Enum.find_value(Enum.with_index(storables), fn
                         {%{fields: %{_gen_id: ^target_layer_id}}, i} -> {:ref, i}
                         _ -> nil
                       end)
                   end,
-                fLocator: %Storable{
-                  class_name: "CH.ifa.draw.standard.OffsetLocator",
-                  fields: %{
-                    fOffsetY: 0,
-                    fOffsetX: 0,
-                    fBase: %Storable{
-                      class_name: "CH.ifa.draw.standard.RelativeLocator",
-                      fields: %{
-                        fOffsetY: 0.5,
-                        fOffsetX: 0.5
-                      }
-                    }
-                  }
-                },
+                fLocator: locator_ref,
                 fType: 1
               }
             }
-          ]
+          ])
         end
 
       Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "CH.ifa.draw.figures.TextFigure") ->
         if is_nil(layer.text.style) do
-          [
-            %Storable{
+          storables
+          |> Enum.concat([
+            %Renewex.Storable{
               class_name: layer.semantic_tag,
               fields: %{
+                _root: layer.direct_parent_hood == nil,
                 attributes: export_attributes(:text, layer),
-                fOriginX: round(layer.text.position_x),
-                fOriginY: round(layer.text.position_y),
+                fOriginX: round(-view_box.x + layer.text.position_x),
+                fOriginY: round(-view_box.y + layer.text.position_y),
                 text: layer.text.body,
                 fCurrentFontName: "SansSerif",
                 fCurrentFontStyle: 0,
@@ -436,15 +505,17 @@ defmodule RenewCollab.Export.DocumentExport do
                 fType: 0
               }
             }
-          ]
+          ])
         else
-          [
-            %Storable{
+          storables
+          |> Enum.concat([
+            %Renewex.Storable{
               class_name: layer.semantic_tag,
               fields: %{
+                _root: layer.direct_parent_hood == nil,
                 attributes: export_attributes(:text, layer),
-                fOriginX: round(layer.text.position_x),
-                fOriginY: round(layer.text.position_y),
+                fOriginX: round(-view_box.x + layer.text.position_x),
+                fOriginY: round(-view_box.y + layer.text.position_y),
                 text: layer.text.body,
                 fCurrentFontName: style_or_default(layer.text, :font_family),
                 fCurrentFontStyle: export_font_style(layer.text.style),
@@ -455,7 +526,7 @@ defmodule RenewCollab.Export.DocumentExport do
                 fType: 0
               }
             }
-          ]
+          ])
         end
 
       true ->
@@ -463,117 +534,56 @@ defmodule RenewCollab.Export.DocumentExport do
     end
   end
 
-  defp export_child_figure(grammar, l, li, document) do
-    {:ref, li}
-  end
-
-  defp export_label(grammar, layer, index, generated_figures) do
-    cond do
-      Hierarchy.is_subtype_of(
-        grammar,
-        layer.semantic_tag,
-        "de.renew.gui.TransitionFigure"
-      ) ->
-        [
-          %Storable{
-            class_name: "de.renew.gui.CPNTextFigure",
-            fields: %{
-              attributes: %Storable{
-                class_name: "CH.ifa.draw.figures.FigureAttributes",
-                fields: %{
-                  attributes: [
-                    {"Visibility", "Boolean", false}
-                  ]
-                }
-              },
-              fOriginX: round(layer.box.position_x),
-              fOriginY: round(layer.box.position_y),
-              text: layer.id,
-              fCurrentFontName: "SansSerif",
-              fCurrentFontStyle: 0,
-              fCurrentFontSize: 12,
-              fIsReadOnly: 1,
-              fType: 2,
-              fParent:
-                {:ref,
-                 Enum.find_index(generated_figures, fn
-                   %Storable{fields: %{_gen_id: gen_id}} -> layer.id == gen_id
-                   _ -> false
-                 end)},
-              fLocator: %Storable{
-                class_name: "CH.ifa.draw.standard.OffsetLocator",
-                fields: %{
-                  fOffsetY: 0,
-                  fOffsetX: 0,
-                  fBase: %Storable{
-                    class_name: "CH.ifa.draw.standard.RelativeLocator",
-                    fields: %{
-                      fOffsetY: 0.5,
-                      fOffsetX: 0.5
-                    }
+  defp attach_syntetic_labels(refs) do
+    refs
+    |> Enum.concat(
+      for {%Storable{class_name: class_name, fields: %{_gen_id: gen_id}}, index} <-
+            Enum.with_index(refs),
+          class_name == "de.renew.gui.TransitionFigure" or
+            class_name == "de.renew.gui.PlaceFigure" do
+        %Renewex.Storable{
+          class_name: "de.renew.gui.CPNTextFigure",
+          fields: %{
+            _root: true,
+            attributes: %Renewex.Storable{
+              class_name: "CH.ifa.draw.figures.FigureAttributes",
+              fields: %{
+                attributes: [
+                  {"Visible", "Boolean", true}
+                ]
+              }
+            },
+            fOriginX: 0,
+            fOriginY: 0,
+            text: gen_id,
+            fCurrentFontName: "monospaced",
+            fCurrentFontStyle: 0,
+            fCurrentFontSize: 2,
+            fIsReadOnly: 0,
+            fParent: {:ref, index},
+            fLocator: %Renewex.Storable{
+              class_name: "CH.ifa.draw.standard.OffsetLocator",
+              fields: %{
+                fOffsetY: 0,
+                fOffsetX: 0,
+                fBase: %Renewex.Storable{
+                  class_name: "CH.ifa.draw.standard.RelativeLocator",
+                  fields: %{
+                    fOffsetY: 0.5,
+                    fOffsetX: 0.5
                   }
                 }
               }
-            }
+            },
+            fType: 2
           }
-        ]
-
-      Hierarchy.is_subtype_of(
-        grammar,
-        layer.semantic_tag,
-        "de.renew.gui.PlaceFigure"
-      ) ->
-        [
-          %Storable{
-            class_name: "de.renew.gui.CPNTextFigure",
-            fields: %{
-              attributes: %Storable{
-                class_name: "CH.ifa.draw.figures.FigureAttributes",
-                fields: %{
-                  attributes: [
-                    {"Visibility", "Boolean", false}
-                  ]
-                }
-              },
-              fOriginX: round(layer.box.position_x),
-              fOriginY: round(layer.box.position_y),
-              text: layer.id,
-              fCurrentFontName: "SansSerif",
-              fCurrentFontStyle: 0,
-              fCurrentFontSize: 12,
-              fIsReadOnly: 1,
-              fType: 2,
-              fParent:
-                {:ref,
-                 Enum.find_index(generated_figures, fn
-                   %Storable{fields: %{_gen_id: gen_id}} -> layer.id == gen_id
-                   _ -> false
-                 end)},
-              fLocator: %Storable{
-                class_name: "CH.ifa.draw.standard.OffsetLocator",
-                fields: %{
-                  fOffsetY: 0,
-                  fOffsetX: 0,
-                  fBase: %Storable{
-                    class_name: "CH.ifa.draw.standard.RelativeLocator",
-                    fields: %{
-                      fOffsetY: 0.5,
-                      fOffsetX: 0.5
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ]
-
-      true ->
-        []
-    end
+        }
+      end
+    )
   end
 
   defp export_attributes(:box, layer) do
-    %Storable{
+    %Renewex.Storable{
       class_name: "CH.ifa.draw.figures.FigureAttributes",
       fields: %{
         attributes: [
@@ -594,7 +604,7 @@ defmodule RenewCollab.Export.DocumentExport do
   end
 
   defp export_attributes(:edge, _layer) do
-    %Storable{
+    %Renewex.Storable{
       class_name: "CH.ifa.draw.figures.FigureAttributes",
       fields: %{
         attributes: [{"Test", "Color", {:rgba, 100, 100, 200, 50}}]
@@ -607,7 +617,7 @@ defmodule RenewCollab.Export.DocumentExport do
          text_style <- layer.text.style,
          true <- not is_nil(layer_style),
          true <- not is_nil(text_style) do
-      %Storable{
+      %Renewex.Storable{
         class_name: "CH.ifa.draw.figures.FigureAttributes",
         fields: %{
           attributes: [
@@ -762,4 +772,9 @@ defmodule RenewCollab.Export.DocumentExport do
   defp default_style(:opacity), do: 1.0
   defp default_style(:border_width), do: 1
   defp default_style(_style_key), do: nil
+
+  defp create_ref(storables, nil), do: {storables, nil}
+
+  defp create_ref(storables, s = %Storable{}),
+    do: {Enum.concat(storables, [s]), {:ref, Enum.count(storables)}}
 end

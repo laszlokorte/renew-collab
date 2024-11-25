@@ -254,7 +254,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "position_y" => position_y,
           "body" => body,
           "style" => %{
-            "font_size" => 40
+            "font_size" => 20
           }
         },
         "outgoing_link" =>
