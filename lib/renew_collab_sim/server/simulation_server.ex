@@ -13,6 +13,14 @@ defmodule RenewCollabSim.Server.SimulationServer do
     GenServer.cast(__MODULE__, {:step, simulation_id})
   end
 
+  def play(simulation_id) do
+    GenServer.cast(__MODULE__, {:play, simulation_id})
+  end
+
+  def pause(simulation_id) do
+    GenServer.cast(__MODULE__, {:pause, simulation_id})
+  end
+
   def stop(simulation_id) do
     GenServer.cast(__MODULE__, {:stop, simulation_id})
   end
@@ -57,7 +65,38 @@ defmodule RenewCollabSim.Server.SimulationServer do
 
   @impl true
   def handle_cast({:step, simulation_id}, state) do
-    {:noreply, state}
+    case Map.get(state, simulation_id, nil) do
+      %{sim_process: p} ->
+        RenewCollabSim.Server.SimulationProcess.step(p)
+        {:noreply, state}
+
+      nil ->
+        {:noreply, state}
+    end
+  end
+
+  @impl true
+  def handle_cast({:play, simulation_id}, state) do
+    case Map.get(state, simulation_id, nil) do
+      %{sim_process: p} ->
+        RenewCollabSim.Server.SimulationProcess.play(p)
+        {:noreply, state}
+
+      nil ->
+        {:noreply, state}
+    end
+  end
+
+  @impl true
+  def handle_cast({:pause, simulation_id}, state) do
+    case Map.get(state, simulation_id, nil) do
+      %{sim_process: p} ->
+        RenewCollabSim.Server.SimulationProcess.pause(p)
+        {:noreply, state}
+
+      nil ->
+        {:noreply, state}
+    end
   end
 
   @impl true

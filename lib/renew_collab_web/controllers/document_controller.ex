@@ -22,7 +22,8 @@ defmodule RenewCollabWeb.DocumentController do
   end
 
   def create(conn, %{}) do
-    with {:ok, %Document{} = document} <- Renew.create_document(%{name: "Untitled", kind: "mock"}) do
+    with {:ok, %Document{} = document} <-
+           Renew.create_document(%{name: "Untitled", kind: "de.renew.gui.CPNDrawing"}) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", ~p"/api/documents/#{document}")

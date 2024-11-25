@@ -286,11 +286,11 @@ defmodule RenewCollabWeb.LiveShadowNets do
   end
 
   def handle_event("import_document", %{"main_net" => main_net_ref}, socket) do
-    output_root = Path.join(System.tmp_dir!(), "#{UUID.uuid4(:default)}")
-    output_root_upload = Path.join(output_root, "uploads")
+    {:ok, output_root} = Path.safe_relative("#{UUID.uuid4(:default)}", System.tmp_dir!())
+    {:ok, output_root_upload} = Path.safe_relative("uploads", output_root)
 
-    output_path = Path.join(output_root, "compiled.ssn")
-    script_path = Path.join(output_root, "compile-script")
+    {:ok, output_path} = Path.safe_relative("compiled.ssn", output_root)
+    {:ok, script_path} = Path.safe_relative("compile-script", output_root)
     # dbg(script_path)
 
     main_net_name =
@@ -310,7 +310,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
                                                           %{
                                                             client_name: filename
                                                           } ->
-          target_path = Path.join(output_root_upload, Path.basename(filename))
+          {:ok, target_path} = Path.safe_relative(Path.basename(filename), output_root_upload)
           File.cp(path, target_path)
           {:ok, target_path}
         end)

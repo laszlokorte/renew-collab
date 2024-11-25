@@ -209,7 +209,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
       base_layer_id: Map.get(params, "base_layer_id", nil),
       document_id: socket.assigns.document_id,
       attrs: %{
-        "semantic_tag" => "CH.ifa.draw.figures.PolyLineFigure",
+        "semantic_tag" => Map.get(params, "semantic_tag", "CH.ifa.draw.figures.PolyLineFigure"),
         "edge" => %{
           "source_x" => source_x,
           "source_y" => source_y,
@@ -248,7 +248,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
       base_layer_id: Map.get(params, "base_layer_id", nil),
       document_id: socket.assigns.document_id,
       attrs: %{
-        "semantic_tag" => "CH.ifa.draw.figures.TextFigure",
+        "semantic_tag" => Map.get(params, "semantic_tag", "CH.ifa.draw.figures.TextFigure"),
         "text" => %{
           "position_x" => position_x,
           "position_y" => position_y,
@@ -290,7 +290,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
       base_layer_id: Map.get(params, "base_layer_id", nil),
       document_id: socket.assigns.document_id,
       attrs: %{
-        "semantic_tag" => "de.renew.gui.ArcConnection",
+        "semantic_tag" => Map.get(params, "semantic_tag", "de.renew.gui.ArcConnection"),
         "edge" => %{
           "source_x" => 0,
           "source_y" => 0,

@@ -1455,5 +1455,19 @@ export const Hooks = {
     disconnected() { },
     reconnected() { },
   },
+  RnwScrollDown: {
+    // Callbacks
+    mounted() {
+      this.el.scrollTop = this.el.scrollHeight
+    },
+    beforeUpdate() { },
+    updated() {
+      this.el.scrollTop = this.el.scrollHeight
+
+    },
+    destroyed() { },
+    disconnected() { },
+    reconnected() { },
+  },
 
 }

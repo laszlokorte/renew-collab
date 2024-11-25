@@ -6,7 +6,6 @@ body {
 * {
   box-sizing: border-box;
 }
-
 .rnw-form > form > div {
   display: grid;
   grid-template-columns: auto auto;
@@ -15,30 +14,29 @@ body {
 .rnw-form > form > div > div {
   display: contents;
 }
-
 .rnw-form button {
   grid-column: 2;
   align-self: baseline;
   justify-self: start;
-  cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff
+  cursor: pointer;
+  padding: 1ex;
+  border: none;
+  background: #333;
+  color: #fff;
 }
-
 .rnw-form p {
   grid-column: 1 / span 2;
   margin: 0;
   color: #a00;
 }
-
 .rnw-form label {
   justify-self: end;
   align-self: baseline;
 }
-
 .rnw-form input + p {
   grid-column: 2 / span 1;
   margin: 0;
 }
-
 .rnw-form input {
   padding: 1ex;
   align-self: baseline;

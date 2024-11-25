@@ -30,7 +30,7 @@ defmodule RenewCollabSim.Simulator do
         left_join: logs in assoc(s, :log_entries),
         join: sns in assoc(s, :shadow_net_system),
         where: s.id == ^id,
-        order_by: [desc: logs.inserted_at],
+        order_by: [asc: logs.inserted_at, asc: fragment("?.rowid", logs)],
         preload: [log_entries: logs, shadow_net_system: sns]
       )
     )
