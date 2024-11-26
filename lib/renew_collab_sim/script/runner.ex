@@ -38,6 +38,7 @@ defmodule RenewCollabSim.Script.Runner do
     conf = Application.fetch_env!(:renew_collab, RenewCollabSim.Script.Runner)
 
     renew_path = Keyword.get(conf, :sim_renew_path)
+    xvbf_path = Keyword.get(conf, :sim_xvbf_path)
     interceptor_path = Keyword.get(conf, :sim_interceptor_path)
     log_conf_path = Keyword.get(conf, :sim_log_conf_path)
 
@@ -60,25 +61,28 @@ defmodule RenewCollabSim.Script.Runner do
               :exit_status,
               :use_stdio,
               :hide,
-              args: [
-                "-jar",
-                interceptor_path,
-                "java",
-                "-Djline.terminal=off",
-                "-Dorg.jline.terminal.dumb=true",
-                "-Dde.renew.splashscreen.enabled=false",
-                "-Dde.renew.gui.autostart=false",
-                "-Dde.renew.simulatorMode=-1",
-                "-Dlog4j.configuration=#{log_conf_path}",
-                "-Dde.renew.plugin.autoLoad=false",
-                "-Dde.renew.plugin.load=Renew Util, Renew Simulator, Renew Formalism, Renew Misc, Renew PTChannel, Renew Remote, Renew Window Management, Renew JHotDraw, Renew Gui, Renew Formalism Gui, Renew Logging, Renew NetComponents, Renew Console, Renew FreeHep Export",
-                "-p",
-                module_path,
-                "-m",
-                "de.renew.loader",
-                "script",
-                script_path
-              ]
+              args:
+                [
+                  "-jar",
+                  interceptor_path,
+                  if(xvbf_path, do: xvbf_path, else: nil),
+                  "java",
+                  "-Djline.terminal=off",
+                  "-Dorg.jline.terminal.dumb=true",
+                  "-Dde.renew.splashscreen.enabled=false",
+                  "-Dde.renew.gui.autostart=false",
+                  "-Dde.renew.simulatorMode=-1",
+                  "-Dlog4j.configuration=#{log_conf_path}",
+                  "-Dde.renew.plugin.autoLoad=false",
+                  "-Dde.renew.plugin.load='Renew Util, Renew Simulator, Renew Formalism, Renew Misc, Renew PTChannel, Renew Remote, Renew Window Management, Renew JHotDraw, Renew Gui, Renew Formalism Gui, Renew Logging, Renew NetComponents, Renew Console, Renew FreeHep Export'",
+                  "-p",
+                  module_path,
+                  "-m",
+                  "de.renew.loader",
+                  "script",
+                  script_path
+                ]
+                |> Enum.reject(&is_nil/1)
             ]
           )
 
@@ -113,25 +117,28 @@ defmodule RenewCollabSim.Script.Runner do
             :exit_status,
             :use_stdio,
             :hide,
-            args: [
-              "-jar",
-              interceptor_path,
-              "java",
-              "-Djline.terminal=off",
-              "-Dorg.jline.terminal.dumb=true",
-              "-Dde.renew.splashscreen.enabled=false",
-              "-Dde.renew.gui.autostart=false",
-              "-Dde.renew.simulatorMode=-1",
-              "-Dlog4j.configuration=#{log_conf_path}",
-              "-Dde.renew.plugin.autoLoad=false",
-              "-Dde.renew.plugin.load=Renew Util, Renew Simulator, Renew Formalism, Renew Misc, Renew PTChannel, Renew Remote, Renew Window Management, Renew JHotDraw, Renew Gui, Renew Formalism Gui, Renew Logging, Renew NetComponents, Renew Console, Renew FreeHep Export",
-              "-p",
-              module_path,
-              "-m",
-              "de.renew.loader",
-              "script",
-              script_path
-            ]
+            args:
+              [
+                "-jar",
+                interceptor_path,
+                if(xvbf_path, do: xvbf_path, else: nil),
+                "java",
+                "-Djline.terminal=off",
+                "-Dorg.jline.terminal.dumb=true",
+                "-Dde.renew.splashscreen.enabled=false",
+                "-Dde.renew.gui.autostart=false",
+                "-Dde.renew.simulatorMode=-1",
+                "-Dlog4j.configuration=#{log_conf_path}",
+                "-Dde.renew.plugin.autoLoad=false",
+                "-Dde.renew.plugin.load=Renew Util, Renew Simulator, Renew Formalism, Renew Misc, Renew PTChannel, Renew Remote, Renew Window Management, Renew JHotDraw, Renew Gui, Renew Formalism Gui, Renew Logging, Renew NetComponents, Renew Console, Renew FreeHep Export",
+                "-p",
+                module_path,
+                "-m",
+                "de.renew.loader",
+                "script",
+                script_path
+              ]
+              |> Enum.reject(&is_nil/1)
           ]
         )
 

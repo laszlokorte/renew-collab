@@ -314,8 +314,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
           :error
       end
     after
-      File.rm(output_path)
-      File.rm(script_path)
+      File.rm_rf(output_root_upload)
     end
 
     {:noreply, socket}
