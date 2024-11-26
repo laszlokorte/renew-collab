@@ -295,7 +295,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
       File.write!(script_path, script_content)
 
       with {:ok, 0} <- RenewCollabSim.Script.Runner.start_and_wait(script_path),
-           {:ok, content} = File.read(output_path) do
+           {:ok, content} <- File.read(output_path) do
         %RenewCollabSim.Entites.ShadowNetSystem{}
         |> RenewCollabSim.Entites.ShadowNetSystem.changeset(%{
           "compiled" => content,
