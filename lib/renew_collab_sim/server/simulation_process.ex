@@ -138,8 +138,6 @@ defmodule RenewCollabSim.Server.SimulationProcess do
         "ni_instance_number" => instance_number
       }
       when "" != time_number ->
-        dbg(%{"ni_instance_name" => instance_name, "ni_instance_number" => instance_number})
-
         %RenewCollabSim.Entites.SimulationNetInstance{
           simulation_id: simulation_id,
           label: "#{instance_name}[#{instance_number}]"
