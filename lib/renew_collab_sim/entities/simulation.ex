@@ -8,6 +8,8 @@ defmodule RenewCollabSim.Entites.Simulation do
     has_many :log_entries, RenewCollabSim.Entites.SimulationLogEntry
     has_many :net_instances, RenewCollabSim.Entites.SimulationNetInstance
 
+    field :timestep, :integer, default: 0
+
     timestamps(type: :utc_datetime)
   end
 end

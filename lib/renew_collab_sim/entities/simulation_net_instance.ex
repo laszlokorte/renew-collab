@@ -5,7 +5,10 @@ defmodule RenewCollabSim.Entites.SimulationNetInstance do
   @foreign_key_type :binary_id
   schema "simulation_net_instance" do
     belongs_to :simulation, RenewCollabSim.Entites.Simulation
+    belongs_to :shadow_net_system, RenewCollabSim.Entites.ShadowNetSystem
+    belongs_to :shadow_net, RenewCollabSim.Entites.ShadowNet
     has_many :tokens, RenewCollabSim.Entites.SimulationNetToken
     field :label, :string
+    field :integer_id, :integer
   end
 end

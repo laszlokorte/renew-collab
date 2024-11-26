@@ -32,7 +32,13 @@ defmodule RenewCollabSim.Server.SimulationProcess do
       simulation = RenewCollabSim.Simulator.find_simulation(simulation_id)
       {sim_process, directory} = init_process(simulation)
 
-      {:ok, %{simulation_id: simulation_id, sim_process: sim_process, directory: directory}}
+      {:ok,
+       %{
+         simulation: simulation,
+         simulation_id: simulation_id,
+         sim_process: sim_process,
+         directory: directory
+       }}
     rescue
       _ ->
         :ignore
@@ -41,19 +47,30 @@ defmodule RenewCollabSim.Server.SimulationProcess do
 
   @impl true
   def handle_call(:stop, _from, state = %{simulation_id: simulation_id, sim_process: sim_process}) do
-    %RenewCollabSim.Entites.SimulationLogEntry{
-      simulation_id: simulation_id,
-      content: "simulation stopped"
-    }
-    |> RenewCollab.Repo.insert()
+    import Ecto.Query
+    Process.exit(sim_process, :kill)
+
+    now = DateTime.utc_now()
+
+    RenewCollab.Repo.insert_all(
+      RenewCollabSim.Entites.SimulationLogEntry,
+      from(s in RenewCollabSim.Entites.Simulation,
+        where: s.id == ^simulation_id,
+        select: %{
+          id: ^Ecto.UUID.generate(),
+          simulation_id: s.id,
+          content: "simulation stopped",
+          inserted_at: ^now,
+          updated_at: ^now
+        }
+      )
+    )
 
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
       "simulation:#{simulation_id}",
       :any
     )
-
-    Process.exit(sim_process, :kill)
 
     {:stop, :normal, :shutdown_ok, state}
   end
@@ -108,7 +125,10 @@ defmodule RenewCollabSim.Server.SimulationProcess do
             |> Regex.compile!("um")
 
   @impl true
-  def handle_cast({:log, content}, state = %{simulation_id: simulation_id}) do
+  def handle_cast(
+        {:log, content},
+        state = %{simulation_id: simulation_id, simulation: simulation}
+      ) do
     import Ecto.Query
 
     %RenewCollabSim.Entites.SimulationLogEntry{
@@ -120,14 +140,15 @@ defmodule RenewCollabSim.Server.SimulationProcess do
     RenewCollab.Repo.delete_all(
       from(dt in RenewCollabSim.Entites.SimulationLogEntry,
         where:
-          dt.id not in subquery(
-            from(t in RenewCollabSim.Entites.SimulationLogEntry,
-              select: t.id,
-              limit: 100,
-              order_by: [desc: t.inserted_at],
-              where: t.simulation_id == ^simulation_id
+          dt.simulation_id == ^simulation_id and
+            dt.id not in subquery(
+              from(t in RenewCollabSim.Entites.SimulationLogEntry,
+                select: t.id,
+                limit: 100,
+                order_by: [desc: t.inserted_at],
+                where: t.simulation_id == ^simulation_id
+              )
             )
-          )
       )
     )
 
@@ -138,11 +159,23 @@ defmodule RenewCollabSim.Server.SimulationProcess do
         "ni_instance_number" => instance_number
       }
       when "" != time_number ->
-        %RenewCollabSim.Entites.SimulationNetInstance{
-          simulation_id: simulation_id,
-          label: "#{instance_name}[#{instance_number}]"
-        }
-        |> RenewCollab.Repo.insert(on_conflict: :replace_all)
+        RenewCollab.Repo.insert_all(
+          RenewCollabSim.Entites.SimulationNetInstance,
+          from(sn in RenewCollabSim.Entites.ShadowNet,
+            where:
+              sn.name == ^instance_name and
+                sn.shadow_net_system_id == ^simulation.shadow_net_system_id,
+            select: %{
+              id: ^Ecto.UUID.generate(),
+              simulation_id: ^simulation_id,
+              label: ^"#{instance_name}[#{instance_number}]",
+              shadow_net_system_id: sn.shadow_net_system_id,
+              shadow_net_id: sn.id,
+              integer_id: ^instance_number
+            }
+          ),
+          on_conflict: :replace_all
+        )
 
         RenewCollab.Repo.delete_all(
           from(dt in RenewCollabSim.Entites.SimulationNetToken,
@@ -245,6 +278,14 @@ defmodule RenewCollabSim.Server.SimulationProcess do
         "sc_time_number" => time_number
       }
       when "" != time_number ->
+        RenewCollab.Repo.update_all(
+          from(sim in RenewCollabSim.Entites.Simulation,
+            where: sim.id == ^simulation_id,
+            update: [set: [timestep: ^time_number]]
+          ),
+          []
+        )
+
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "simulation:#{simulation_id}",
@@ -255,6 +296,14 @@ defmodule RenewCollabSim.Server.SimulationProcess do
         "setup" => setup
       }
       when "" != setup ->
+        RenewCollab.Repo.update_all(
+          from(sim in RenewCollabSim.Entites.Simulation,
+            where: sim.id == ^simulation_id,
+            update: [set: [timestep: 1]]
+          ),
+          []
+        )
+
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "simulation:#{simulation_id}",

@@ -96,6 +96,7 @@ defmodule RenewCollabWeb.Router do
       live "/document/:id", LiveDocument
       live "/documents", LiveDocuments
       live "/shadow_nets", LiveShadowNets
+      live "/shadow_net/:id", LiveShadowNet
       live "/simulation/:id", LiveSimulation
     end
   end

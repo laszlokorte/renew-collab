@@ -14,15 +14,22 @@ defmodule RenewCollabSim.Simulator do
     Repo.all(
       from(s in ShadowNetSystem,
         join: nets in assoc(s, :nets),
-        left_join: sims in assoc(s, :simulations),
-        order_by: [desc: s.inserted_at, asc: sims.inserted_at],
-        preload: [nets: nets, simulations: sims]
+        order_by: [desc: s.inserted_at],
+        preload: [nets: nets]
       )
     )
   end
 
   def find_shadow_net_system(id) do
-    Repo.one!(from(s in ShadowNetSystem, where: s.id == ^id))
+    Repo.one!(
+      from(s in ShadowNetSystem,
+        join: nets in assoc(s, :nets),
+        left_join: sims in assoc(s, :simulations),
+        where: s.id == ^id,
+        order_by: [desc: s.inserted_at, asc: sims.inserted_at],
+        preload: [nets: nets, simulations: sims]
+      )
+    )
   end
 
   def find_simulation(id) do
@@ -30,13 +37,14 @@ defmodule RenewCollabSim.Simulator do
       from(s in Simulation,
         left_join: logs in assoc(s, :log_entries),
         join: sns in assoc(s, :shadow_net_system),
+        join: nets in assoc(sns, :nets),
         left_join: ins in assoc(s, :net_instances),
         left_join: tokens in assoc(ins, :tokens),
         where: s.id == ^id,
         order_by: [asc: logs.inserted_at, asc: fragment("?.rowid", logs)],
         preload: [
           log_entries: logs,
-          shadow_net_system: sns,
+          shadow_net_system: {sns, [nets: nets]},
           net_instances: {ins, [tokens: tokens]}
         ]
       )

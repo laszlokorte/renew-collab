@@ -122,11 +122,12 @@ defmodule RenewCollabWeb.LiveShadowNets do
 
               <th style="border-bottom: 1px solid #333;" align="left" width="200">Created</th>
 
-              <th style="border-bottom: 1px solid #333;" align="left" width="100" colspan="3">
+              <th style="border-bottom: 1px solid #333;" align="left" width="100" colspan="2">
                 Actions
               </th>
             </tr>
-
+          </thead>
+          <tbody>
             <%= if Enum.empty?(@shadow_net_systems) do %>
               <tr>
                 <td colspan="7">
@@ -139,7 +140,9 @@ defmodule RenewCollabWeb.LiveShadowNets do
               <%= for {sns, si} <- @shadow_net_systems |> Enum.with_index do %>
                 <tr {if(rem(si, 2) == 0, do: [style: "background-color:#f5f5f5;"], else: [])}>
                   <td width="100%">
-                    <strong><code><%= sns.id %></code></strong>
+                    <.link navigate={~p"/shadow_net/#{sns.id}"}>
+                      <code><%= sns.id %></code>
+                    </.link>
                   </td>
 
                   <td valign="top">
@@ -159,28 +162,14 @@ defmodule RenewCollabWeb.LiveShadowNets do
                   </td>
 
                   <td width="50">
-                    <button
-                      type="button"
-                      phx-click="new-simulation"
-                      value={sns.id}
-                      style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
-                    >
-                      New Simulation
-                    </button>
-                  </td>
-                  <td width="50">
-                    <.link
-                      download="x"
-                      style="color: #078"
-                      href={~p"/shadow_net/#{sns.id}/binary?text"}
-                    >
+                    <a style="color: #078" href={~p"/shadow_net/#{sns.id}/binary"}>
                       <button
                         type="button"
                         style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff"
                       >
                         Download SNS File
                       </button>
-                    </.link>
+                    </a>
                   </td>
 
                   <td width="50">
@@ -194,37 +183,9 @@ defmodule RenewCollabWeb.LiveShadowNets do
                     </button>
                   </td>
                 </tr>
-
-                <tr>
-                  <td>
-                    <table width="100%">
-                      <thead>
-                        <tr>
-                          <th align="left" width="100%">Simulations</th>
-
-                          <th align="left"></th>
-                        </tr>
-                      </thead>
-
-                      <tbody>
-                        <%= for sim <- sns.simulations do %>
-                          <tr>
-                            <td>
-                              <.link navigate={~p"/simulation/#{sim.id}"}>
-                                <%= sim.id %>
-                              </.link>
-                            </td>
-                          </tr>
-                        <% end %>
-                      </tbody>
-                    </table>
-                  </td>
-
-                  <td colspan="4"></td>
-                </tr>
               <% end %>
             <% end %>
-          </thead>
+          </tbody>
         </table>
       </div>
     </div>
@@ -362,21 +323,6 @@ defmodule RenewCollabWeb.LiveShadowNets do
 
   def handle_event("delete", %{"id" => sns_id}, socket) do
     RenewCollabSim.Simulator.delete_shadow_net_system(sns_id)
-
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      @topic,
-      :any
-    )
-
-    {:noreply, socket}
-  end
-
-  def handle_event("new-simulation", %{"value" => sns_id}, socket) do
-    %RenewCollabSim.Entites.Simulation{
-      shadow_net_system_id: sns_id
-    }
-    |> RenewCollab.Repo.insert()
 
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
