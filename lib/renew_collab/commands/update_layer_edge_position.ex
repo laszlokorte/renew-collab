@@ -51,5 +51,9 @@ defmodule RenewCollab.Commands.UpdateLayerEdgePosition do
       end
     )
     |> Ecto.Multi.append(RenewCollab.Bonding.reposition_multi())
+    |> Ecto.Multi.one(
+      :result_edge,
+      from(l in Layer, join: b in assoc(l, :edge), where: l.id == ^layer_id, select: b)
+    )
   end
 end

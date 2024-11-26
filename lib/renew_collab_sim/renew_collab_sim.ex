@@ -4,6 +4,7 @@ defmodule RenewCollabSim.Simulator do
   """
 
   import Ecto.Query, warn: false
+  alias RenewCollabSim.Entites.ShadowNet
   alias RenewCollabSim.Entites.SimulationLogEntry
   alias RenewCollabSim.Entites.SimulationNetInstance
   alias RenewCollabSim.Entites.ShadowNetSystem
@@ -73,5 +74,42 @@ defmodule RenewCollabSim.Simulator do
 
   def delete_simulation(id) do
     Repo.delete(find_simulation(id))
+  end
+
+  def change_main_net(sns_id, main_net_name) do
+    find_shadow_net_system(sns_id)
+    |> Ecto.Changeset.change(%{main_net_name: main_net_name})
+    |> Repo.update()
+  end
+
+  def change_net_document(
+        shadow_net_system_id,
+        shadow_net_id,
+        document_id
+      ) do
+    RenewCollab.Renew.get_document_with_elements(document_id)
+    |> case do
+      nil ->
+        nil
+
+      doc ->
+        with sn when not is_nil(sn) <-
+               Repo.one(
+                 from(sn in ShadowNet,
+                   where:
+                     sn.id == ^shadow_net_id and sn.shadow_net_system_id == ^shadow_net_system_id
+                 )
+               ),
+             {:ok, doc_json} <-
+               doc |> RenewCollabWeb.DocumentJSON.show_content() |> Jason.encode() do
+          sn
+          |> Ecto.Changeset.change(%{
+            document_json: doc_json
+          })
+          |> Repo.update()
+
+          dbg("xxxx")
+        end
+    end
   end
 end

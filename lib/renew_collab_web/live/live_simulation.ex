@@ -245,11 +245,11 @@ defmodule RenewCollabWeb.LiveSimulation do
     RenewCollabSim.Simulator.delete_simulation(socket.assigns.simulation_id)
     RenewCollabSim.Server.SimulationServer.terminate(socket.assigns.simulation.id)
 
-    # Phoenix.PubSub.broadcast(
-    #   RenewCollab.PubSub,
-    #   "#{@topic}:#{socket.assigns.simulation_id}",
-    #   :any
-    # )
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "shadow_net:#{socket.assigns.simulation.shadow_net_system_id}",
+      :any
+    )
 
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,

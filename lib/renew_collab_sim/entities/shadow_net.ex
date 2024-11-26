@@ -6,6 +6,7 @@ defmodule RenewCollabSim.Entites.ShadowNet do
   @foreign_key_type :binary_id
   schema "shadow_net" do
     field :name, :string
+    field :document_json, :binary
     belongs_to :shadow_net_system, RenewCollabSim.Entites.ShadowNetSystem
 
     timestamps(type: :utc_datetime)

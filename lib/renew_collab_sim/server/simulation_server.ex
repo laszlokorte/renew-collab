@@ -33,6 +33,10 @@ defmodule RenewCollabSim.Server.SimulationServer do
     GenServer.call(__MODULE__, {:exists, simulation_id})
   end
 
+  def count() do
+    GenServer.call(__MODULE__, :count)
+  end
+
   # Callbacks
 
   @impl true
@@ -121,6 +125,11 @@ defmodule RenewCollabSim.Server.SimulationServer do
   @impl true
   def handle_call({:exists, simulation_id}, _from, state) do
     {:reply, Map.has_key?(state, simulation_id), state}
+  end
+
+  @impl true
+  def handle_call(:count, _from, state) do
+    {:reply, map_size(state), state}
   end
 
   @impl true

@@ -11,7 +11,8 @@ defmodule RenewCollabWeb.HealthController do
       number_of_documents: RenewCollab.Renew.count_documents(),
       hierarchy_missing_count: RenewCollab.Hierarchy.count_missing_global(),
       hierarchy_invalid_count: RenewCollab.Hierarchy.count_invalids_global(),
-      cache_size: RenewCollab.SimpleCache.size()
+      cache_size: RenewCollab.SimpleCache.size(),
+      simulation_count: RenewCollabSim.Server.SimulationServer.count()
     )
   end
 end

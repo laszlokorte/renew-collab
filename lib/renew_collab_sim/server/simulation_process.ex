@@ -77,11 +77,22 @@ defmodule RenewCollabSim.Server.SimulationProcess do
 
   @impl true
   def handle_cast({:log, {:exit, status}}, state = %{simulation_id: simulation_id}) do
-    %RenewCollabSim.Entites.SimulationLogEntry{
-      simulation_id: simulation_id,
-      content: "exit #{status}"
-    }
-    |> RenewCollab.Repo.insert()
+    import Ecto.Query
+    now = DateTime.utc_now()
+
+    RenewCollab.Repo.insert_all(
+      RenewCollabSim.Entites.SimulationLogEntry,
+      from(s in RenewCollabSim.Entites.Simulation,
+        where: s.id == ^simulation_id,
+        select: %{
+          id: ^Ecto.UUID.generate(),
+          simulation_id: s.id,
+          content: ^"exit #{status}",
+          inserted_at: ^now,
+          updated_at: ^now
+        }
+      )
+    )
 
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
@@ -292,6 +303,12 @@ defmodule RenewCollabSim.Server.SimulationProcess do
           :any
         )
 
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "shadow_net:#{simulation.shadow_net_system_id}",
+          :any
+        )
+
       %{
         "setup" => setup
       }
@@ -307,6 +324,12 @@ defmodule RenewCollabSim.Server.SimulationProcess do
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "simulation:#{simulation_id}",
+          :any
+        )
+
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "shadow_net:#{simulation.shadow_net_system_id}",
           :any
         )
 

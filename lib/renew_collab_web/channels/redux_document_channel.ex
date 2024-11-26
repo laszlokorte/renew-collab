@@ -560,9 +560,28 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
       layer_id: layer_id,
       new_position: new_position
     })
-    |> RenewCollab.Commander.run_document_command()
+    |> RenewCollab.Commander.run_document_command_sync()
+    |> case do
+      {:ok,
+       %{
+         result_edge: %{
+           source_x: source_x,
+           source_y: source_y,
+           target_x: target_x,
+           target_y: target_y
+         }
+       }} ->
+        {:reply,
+         %{
+           source_x: source_x,
+           source_y: source_y,
+           target_x: target_x,
+           target_y: target_y
+         }, socket}
 
-    :silent
+      _ ->
+        :silent
+    end
   end
 
   @impl true

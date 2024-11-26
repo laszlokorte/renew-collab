@@ -2,10 +2,10 @@ defmodule RenewCollabWeb.LiveShadowNet do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
-  @topic "shadow_nets"
+  @topic "shadow_net"
 
   def mount(%{"id" => shadow_net_system_id}, _session, socket) do
-    RenewCollabWeb.Endpoint.subscribe(@topic)
+    RenewCollabWeb.Endpoint.subscribe("#{@topic}:#{shadow_net_system_id}")
 
     socket =
       socket
@@ -13,6 +13,10 @@ defmodule RenewCollabWeb.LiveShadowNet do
       |> assign(
         :shadow_net_system,
         RenewCollabSim.Simulator.find_shadow_net_system(shadow_net_system_id)
+      )
+      |> assign(
+        :documents,
+        RenewCollab.Renew.list_documents()
       )
 
     {:ok, socket}
@@ -44,17 +48,56 @@ defmodule RenewCollabWeb.LiveShadowNet do
       <div style="padding: 1em">
         <h2 style="margin: 0;">Shadow Net System <%= @shadow_net_system.id %></h2>
 
-        <dl style="display: grid; grid-template-columns: auto 1fr;">
+        <dl style="display: grid; grid-template-columns: auto auto 1fr;">
           <dt>Main Net Name</dt>
 
-          <dd><code><%= @shadow_net_system.main_net_name %></code></dd>
+          <dd>
+            <code><%= @shadow_net_system.main_net_name %></code>
+          </dd>
+          <dd>
+            <form phx-change="change_main_net">
+              <label>
+                Change main net:
+                <select name="main_net">
+                  <%= for net <- @shadow_net_system.nets do %>
+                    <option selected={net.name == @shadow_net_system.main_net_name}>
+                      <%= net.name %>
+                    </option>
+                  <% end %>
+                </select>
+              </label>
+            </form>
+          </dd>
 
           <dt>Net Definitions</dt>
 
           <dd>
             <ul style="list-style: none; margin: 0; padding: 0;">
               <%= for net <- @shadow_net_system.nets do %>
-                <li><code><%= net.name %></code></li>
+                <li>
+                  <details>
+                    <summary><code><%= net.name %></code></summary>
+                    <div style="width: 10em; height: 5em;">
+                      <textarea
+                        readonly
+                        style="position: absolute; z-index:10;white-space: pre-wrap;  overflow-y: auto;"
+                      ><%= net.document_json %></textarea>
+                    </div>
+                  </details>
+                  <form style="display: inline;" phx-change="change_net_document">
+                    <label>
+                      <input type="hidden" name="shadow_net_id" value={net.id} />
+                      <select name="document_id">
+                        <option>Assign Document</option>
+                        <%= for doc <- @documents do %>
+                          <option value={doc.id}>
+                            <%= doc.name %>
+                          </option>
+                        <% end %>
+                      </select>
+                    </label>
+                  </form>
+                </li>
               <% end %>
             </ul>
           </dd>
@@ -148,7 +191,39 @@ defmodule RenewCollabWeb.LiveShadowNet do
 
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
-      @topic,
+      "#{@topic}:#{socket.assigns.shadow_net_system_id}",
+      :any
+    )
+
+    {:noreply, socket}
+  end
+
+  def handle_event("change_main_net", %{"main_net" => main_net}, socket) do
+    RenewCollabSim.Simulator.change_main_net(socket.assigns.shadow_net_system_id, main_net)
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "#{@topic}:#{socket.assigns.shadow_net_system_id}",
+      :any
+    )
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "change_net_document",
+        %{"shadow_net_id" => shadow_net_id, "document_id" => document_id},
+        socket
+      ) do
+    RenewCollabSim.Simulator.change_net_document(
+      socket.assigns.shadow_net_system_id,
+      shadow_net_id,
+      document_id
+    )
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "#{@topic}:#{socket.assigns.shadow_net_system_id}",
       :any
     )
 
@@ -166,7 +241,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
 
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
-      @topic,
+      "#{@topic}:#{socket.assigns.shadow_net_system_id}",
       :any
     )
 
