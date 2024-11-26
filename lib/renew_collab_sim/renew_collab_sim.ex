@@ -5,6 +5,7 @@ defmodule RenewCollabSim.Simulator do
 
   import Ecto.Query, warn: false
   alias RenewCollabSim.Entites.SimulationLogEntry
+  alias RenewCollabSim.Entites.SimulationNetInstance
   alias RenewCollabSim.Entites.ShadowNetSystem
   alias RenewCollabSim.Entites.Simulation
   alias RenewCollab.Repo
@@ -29,9 +30,15 @@ defmodule RenewCollabSim.Simulator do
       from(s in Simulation,
         left_join: logs in assoc(s, :log_entries),
         join: sns in assoc(s, :shadow_net_system),
+        left_join: ins in assoc(s, :net_instances),
+        left_join: tokens in assoc(ins, :tokens),
         where: s.id == ^id,
         order_by: [asc: logs.inserted_at, asc: fragment("?.rowid", logs)],
-        preload: [log_entries: logs, shadow_net_system: sns]
+        preload: [
+          log_entries: logs,
+          shadow_net_system: sns,
+          net_instances: {ins, [tokens: tokens]}
+        ]
       )
     )
   end
@@ -39,6 +46,14 @@ defmodule RenewCollabSim.Simulator do
   def clear_log(id) do
     Repo.delete_all(
       from(l in SimulationLogEntry,
+        where: l.simulation_id == ^id
+      )
+    )
+  end
+
+  def clear_instances(id) do
+    Repo.delete_all(
+      from(l in SimulationNetInstance,
         where: l.simulation_id == ^id
       )
     )

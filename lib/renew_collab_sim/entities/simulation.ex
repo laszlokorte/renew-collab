@@ -6,6 +6,7 @@ defmodule RenewCollabSim.Entites.Simulation do
   schema "simulation" do
     belongs_to :shadow_net_system, RenewCollabSim.Entites.ShadowNetSystem
     has_many :log_entries, RenewCollabSim.Entites.SimulationLogEntry
+    has_many :net_instances, RenewCollabSim.Entites.SimulationNetInstance
 
     timestamps(type: :utc_datetime)
   end

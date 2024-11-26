@@ -65,6 +65,7 @@ defmodule RenewCollabSim.Script.Runner do
                 interceptor_path,
                 "java",
                 "-Djline.terminal=off",
+                "-Dorg.jline.terminal.dumb=true",
                 "-Dde.renew.splashscreen.enabled=false",
                 "-Dde.renew.gui.autostart=false",
                 "-Dde.renew.simulatorMode=-1",
@@ -117,6 +118,7 @@ defmodule RenewCollabSim.Script.Runner do
               interceptor_path,
               "java",
               "-Djline.terminal=off",
+              "-Dorg.jline.terminal.dumb=true",
               "-Dde.renew.splashscreen.enabled=false",
               "-Dde.renew.gui.autostart=false",
               "-Dde.renew.simulatorMode=-1",
@@ -143,41 +145,42 @@ defmodule RenewCollabSim.Script.Runner do
   def handle_output(port, return \\ nil, collector \\ nil) do
     receive do
       {^port, {:data, "ERROR: " <> _d} = data} ->
-        dbg("ABC1")
+        # dbg("ABC1")
         collect(collector, data)
         # dbg(data)
         handle_output(port, 1, collector)
 
       {^port, {:data, "Error occurred" <> _d} = data} ->
-        dbg("ABC2")
+        # dbg("ABC2")
         collect(collector, data)
         # dbg(data)
         handle_output(port, 1, collector)
 
       {^port, {:data, data}} ->
-        dbg("ABC3")
+        # dbg("ABC3")
         collect(collector, data)
         # dbg(data)
         # IO.write(data)
         handle_output(port, return, collector)
 
       {^port, {:exit_status, status}} ->
-        dbg("ABC4")
+        # dbg("ABC4")
         handle_output(port, status, collector)
 
       {^port, :eof} ->
         collect(collector, {:exit, return})
-        dbg("EXIT1")
+        # dbg("EXIT1")
         return
 
       {:EXIT, _, :normal} ->
-        dbg("EXIT2")
+        # dbg("EXIT2")
         return
 
       e ->
-        dbg("unexpected")
-        dbg(port)
-        dbg(e)
+        nil
+        # dbg("unexpected")
+        # dbg(port)
+        # dbg(e)
     end
   end
 
@@ -191,13 +194,14 @@ defmodule RenewCollabSim.Script.Runner do
   defp read_loop(port, s) do
     receive do
       {:command, cmd} ->
-        dbg(cmd)
+        # dbg(cmd)
         send(port, {s, {:command, cmd}})
         read_loop(port, s)
 
       o ->
-        dbg("what?")
-        dbg(o)
+        nil
+        # dbg("what?")
+        # dbg(o)
     end
   end
 end

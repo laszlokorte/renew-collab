@@ -63,8 +63,30 @@ defmodule RenewCollabWeb.LiveSimulation do
           <% else %>
             <button type="button" phx-click="run">run</button>
           <% end %>
-          <button type="button" phx-click="clear">Clear Log</button>
+          <button type="button" phx-click="clear_log">Clear Log</button>
+          <button type="button" phx-click="clear_instances">Clear Instances</button>
         </div>
+
+        <h3>Net Instances</h3>
+        <ul>
+          <%= for {ins, i} <- @simulation.net_instances|>Enum.with_index do %>
+            <li>
+              <strong>Net: <%= ins.label %></strong>
+              <dl style="display: grid; grid-template-columns: auto 1fr;">
+                <%= for {place, tokens} <- ins.tokens |> Enum.group_by(&(&1.place_id)) do %>
+                  <dt>Place: <%= place %></dt>
+
+                  <dd style="grid-column: 2 / span 1;">
+                    Tokens:
+                    <%= for t <- tokens do %>
+                      <%= t.value %>
+                    <% end %>
+                  </dd>
+                <% end %>
+              </dl>
+            </li>
+          <% end %>
+        </ul>
 
         <div style="overflow: auto; max-height: 50vh;" phx-hook="RnwScrollDown" id="sim-scroll-logger">
           <ol style="list-style: none; background: #333; color: #fff; font-family: monospace; margin: 0; padding: 0.5ex; line-height: 1.4;">
@@ -75,6 +97,7 @@ defmodule RenewCollabWeb.LiveSimulation do
             <% end %>
           </ol>
         </div>
+
         <div style="margin: 1ex  0; display: flex; gap: 1ex">
           <button type="button" phx-click="debug">Create Test Log Entry</button>
           <button type="button" phx-click="delete">delete</button>
@@ -100,8 +123,20 @@ defmodule RenewCollabWeb.LiveSimulation do
     {:noreply, socket}
   end
 
-  def handle_event("clear", %{}, socket) do
+  def handle_event("clear_log", %{}, socket) do
     RenewCollabSim.Simulator.clear_log(socket.assigns.simulation_id)
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "#{@topic}:#{socket.assigns.simulation_id}",
+      :any
+    )
+
+    {:noreply, socket}
+  end
+
+  def handle_event("clear_instances", %{}, socket) do
+    RenewCollabSim.Simulator.clear_instances(socket.assigns.simulation_id)
 
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,

@@ -286,12 +286,19 @@ defmodule RenewCollabWeb.LiveShadowNets do
   end
 
   def handle_event("import_document", %{"main_net" => main_net_ref}, socket) do
-    {:ok, output_root} = Path.safe_relative("#{UUID.uuid4(:default)}", System.tmp_dir!())
-    {:ok, output_root_upload} = Path.safe_relative("uploads", output_root)
+    uuid_dir = "#{UUID.uuid4(:default)}"
+    {:ok, output_root} = Path.safe_relative_to(uuid_dir, System.tmp_dir!())
+    output_root = Path.absname(output_root, System.tmp_dir!())
 
-    {:ok, output_path} = Path.safe_relative("compiled.ssn", output_root)
-    {:ok, script_path} = Path.safe_relative("compile-script", output_root)
+    {:ok, output_root_upload} = Path.safe_relative_to("uploads", output_root)
+
+    {:ok, output_path} = Path.safe_relative_to("compiled.ssn", output_root)
+    {:ok, script_path} = Path.safe_relative_to("compile-script", output_root)
     # dbg(script_path)
+
+    output_root_upload = Path.absname(output_root_upload, output_root)
+    output_path = Path.absname(output_path, output_root)
+    script_path = Path.absname(script_path, output_root)
 
     main_net_name =
       Enum.find_value(socket.assigns.uploads.import_file.entries, nil, fn
@@ -310,7 +317,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
                                                           %{
                                                             client_name: filename
                                                           } ->
-          {:ok, target_path} = Path.safe_relative(Path.basename(filename), output_root_upload)
+          {:ok, target_path} = Path.safe_relative_to(Path.basename(filename), output_root_upload)
           File.cp(path, target_path)
           {:ok, target_path}
         end)
