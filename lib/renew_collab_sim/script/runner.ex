@@ -61,6 +61,7 @@ defmodule RenewCollabSim.Script.Runner do
               :exit_status,
               :use_stdio,
               :hide,
+              line: 2048,
               args:
                 [
                   "-jar",
@@ -117,6 +118,7 @@ defmodule RenewCollabSim.Script.Runner do
             :exit_status,
             :use_stdio,
             :hide,
+            line: 2048,
             args:
               [
                 "-jar",

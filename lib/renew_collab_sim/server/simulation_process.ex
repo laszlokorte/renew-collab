@@ -137,7 +137,36 @@ defmodule RenewCollabSim.Server.SimulationProcess do
 
   @impl true
   def handle_cast(
-        {:log, content},
+        {:log, {:noeol, content}},
+        state = %{simulation_id: simulation_id, simulation: simulation}
+      ) do
+    import Ecto.Query
+
+    %RenewCollabSim.Entites.SimulationLogEntry{
+      simulation_id: simulation_id,
+      content: content
+    }
+    |> RenewCollab.Repo.insert()
+
+    RenewCollab.Repo.delete_all(
+      from(dt in RenewCollabSim.Entites.SimulationLogEntry,
+        where:
+          dt.simulation_id == ^simulation_id and
+            dt.id not in subquery(
+              from(t in RenewCollabSim.Entites.SimulationLogEntry,
+                select: t.id,
+                limit: 100,
+                order_by: [desc: t.inserted_at],
+                where: t.simulation_id == ^simulation_id
+              )
+            )
+      )
+    )
+  end
+
+  @impl true
+  def handle_cast(
+        {:log, {:eol, content}},
         state = %{simulation_id: simulation_id, simulation: simulation}
       ) do
     import Ecto.Query
