@@ -64,7 +64,8 @@ if config_env() == :prod do
     sim_interceptor_path:
       System.get_env("SIM_STDIO_WRAPPER") || raise("SIM_STDIO_WRAPPER is missing"),
     sim_log_conf_path: System.get_env("SIM_LOG4J_CONF") || raise("SIM_LOG4J_CONF is missing"),
-    sim_xvbf_path: System.get_env("SIM_XVBF") || nil
+    sim_xvbf_path: System.get_env("SIM_XVBF") || nil,
+    sim_xvbf_display: System.get_env("SIM_XVBF_DISPLAY") || nil
 
   # ## SSL Support
   #

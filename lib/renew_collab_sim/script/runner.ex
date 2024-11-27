@@ -39,8 +39,10 @@ defmodule RenewCollabSim.Script.Runner do
 
     renew_path = Keyword.get(conf, :sim_renew_path)
     xvbf_path = Keyword.get(conf, :sim_xvbf_path)
+    xvbf_display = Keyword.get(conf, :sim_xvbf_display)
     interceptor_path = Keyword.get(conf, :sim_interceptor_path)
     log_conf_path = Keyword.get(conf, :sim_log_conf_path)
+    
 
     module_path = "#{renew_path}" <> separator <> "#{renew_path}/libs"
 
@@ -62,6 +64,7 @@ defmodule RenewCollabSim.Script.Runner do
               :use_stdio,
               :hide,
               line: 2048,
+              env: if(xvbf_display, do: [{to_charlist("DISPLAY"), to_charlist(xvbf_display)}], else: []),
               args:
                 [
                   "-jar",
@@ -119,6 +122,7 @@ defmodule RenewCollabSim.Script.Runner do
             :use_stdio,
             :hide,
             line: 2048,
+            env: if(xvbf_display, do: [{to_charlist("DISPLAY"), to_charlist(xvbf_display)}], else: []),
             args:
               [
                 "-jar",
