@@ -15,8 +15,10 @@ public class Interceptor {
             final Process process = processBuilder.start();
             childProcess = process;
 
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> process.destroy()));
-
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                process.destroyForcibly(); 
+            }));
+            
             CompletableFuture<Void> input = CompletableFuture.runAsync(() -> {
                 try (OutputStream processInput = process.getOutputStream();
                      InputStream stdin = System.in) {
@@ -61,7 +63,7 @@ public class Interceptor {
 
             CompletableFuture.anyOf(input, output, error).join();
             
-            process.destroy();
+            process.destroyForcibly();
 
             process.waitFor();
             System.exit(0);
