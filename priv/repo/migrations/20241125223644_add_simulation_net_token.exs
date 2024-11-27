@@ -21,7 +21,6 @@ defmodule RenewCollab.Repo.Migrations.AddSimulationNetToken do
           ),
           null: false
 
-      add :place, :binary, null: false
       add :value, :string, null: false
     end
   end
