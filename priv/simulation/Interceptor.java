@@ -18,22 +18,21 @@ public class Interceptor {
             Runtime.getRuntime().addShutdownHook(new Thread(() -> process.destroy()));
 
             CompletableFuture<Void> input = CompletableFuture.runAsync(() -> {
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-                     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        writer.write(line);
-                        writer.newLine();
-                        writer.flush();
+                try (OutputStream processInput = process.getOutputStream();
+                     InputStream stdin = System.in) {
+                    byte[] buffer = new byte[1024];
+                    int bytesRead;
+                    while ((bytesRead = stdin.read(buffer)) != -1) {
+                        processInput.write(buffer, 0, bytesRead);
+                        processInput.flush();
                     }
-                    process.getOutputStream().close();
                 } catch (IOException e) {
                     e.printStackTrace(System.err);
                 }
             });
 
             CompletableFuture<Void> output = CompletableFuture.runAsync(() -> {
-try (InputStream processOutput = process.getInputStream();
+                try (InputStream processOutput = process.getInputStream();
                      OutputStream stdout = System.out) {
                     byte[] buffer = new byte[1024];
                     int bytesRead;
@@ -41,14 +40,13 @@ try (InputStream processOutput = process.getInputStream();
                         stdout.write(buffer, 0, bytesRead);
                         stdout.flush();
                     }
-                      process.getInputStream().close();
                 } catch (IOException e) {
                     e.printStackTrace(System.err);
                 }
             });
 
             CompletableFuture<Void> error = CompletableFuture.runAsync(() -> {
-try (InputStream processError = process.getErrorStream();
+                try (InputStream processError = process.getErrorStream();
                      OutputStream stderr = System.err) {
                     byte[] buffer = new byte[1024];
                     int bytesRead;
@@ -56,15 +54,17 @@ try (InputStream processError = process.getErrorStream();
                         stderr.write(buffer, 0, bytesRead);
                         stderr.flush();
                     }
-process.getErrorStream().close();
                 } catch (IOException e) {
                     e.printStackTrace(System.err);
                 }
             });
 
             CompletableFuture.anyOf(input, output, error).join();
- process.waitFor();
-            System.exit(0); // process.waitFor());
+            
+            process.destroy();
+
+            process.waitFor();
+            System.exit(0);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace(System.err);
             System.exit(1);

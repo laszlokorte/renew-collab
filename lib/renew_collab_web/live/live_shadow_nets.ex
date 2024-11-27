@@ -127,6 +127,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
               </th>
             </tr>
           </thead>
+
           <tbody>
             <%= if Enum.empty?(@shadow_net_systems) do %>
               <tr>
