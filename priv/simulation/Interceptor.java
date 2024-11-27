@@ -33,22 +33,30 @@ public class Interceptor {
             });
 
             CompletableFuture<Void> output = CompletableFuture.runAsync(() -> {
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        System.out.println(line);
+try (InputStream processOutput = process.getInputStream();
+                     OutputStream stdout = System.out) {
+                    byte[] buffer = new byte[1024];
+                    int bytesRead;
+                    while ((bytesRead = processOutput.read(buffer)) != -1) {
+                        stdout.write(buffer, 0, bytesRead);
+                        stdout.flush();
                     }
+                      process.getInputStream().close();
                 } catch (IOException e) {
                     e.printStackTrace(System.err);
                 }
             });
 
             CompletableFuture<Void> error = CompletableFuture.runAsync(() -> {
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        System.err.println(line);
+try (InputStream processError = process.getErrorStream();
+                     OutputStream stderr = System.err) {
+                    byte[] buffer = new byte[1024];
+                    int bytesRead;
+                    while ((bytesRead = processError.read(buffer)) != -1) {
+                        stderr.write(buffer, 0, bytesRead);
+                        stderr.flush();
                     }
+process.getErrorStream().close();
                 } catch (IOException e) {
                     e.printStackTrace(System.err);
                 }
