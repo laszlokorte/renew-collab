@@ -387,9 +387,19 @@ defmodule RenewCollabSim.Server.SimulationProcess do
 
   @impl true
   # handle termination
-  def terminate(_reason, state = %{directory: directory, sim_process: sim_process}) do
+  def terminate(
+        _reason,
+        state = %{simulation: sim, directory: directory, sim_process: sim_process}
+      ) do
     Process.exit(sim_process, :kill)
     File.rm_rf(directory)
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "shadow_net:#{sim.shadow_net_system_id}",
+      :any
+    )
+
     state
   end
 

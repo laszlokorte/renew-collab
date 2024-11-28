@@ -10,6 +10,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
     socket =
       socket
       |> assign(:shadow_net_system_id, shadow_net_system_id)
+      |> assign(:running, RenewCollabSim.Server.SimulationServer.running_ids() |> MapSet.new())
       |> assign(
         :shadow_net_system,
         RenewCollabSim.Simulator.find_shadow_net_system(shadow_net_system_id)
@@ -28,7 +29,8 @@ defmodule RenewCollabWeb.LiveShadowNet do
      |> assign(
        :shadow_net_system,
        RenewCollabSim.Simulator.find_shadow_net_system(socket.assigns.shadow_net_system_id)
-     )}
+     )
+     |> assign(:running, RenewCollabSim.Server.SimulationServer.running_ids() |> MapSet.new())}
   end
 
   def render(assigns) do
@@ -129,14 +131,14 @@ defmodule RenewCollabWeb.LiveShadowNet do
 
               <th style="border-bottom: 1px solid #333;" align="left" width="100%">Timestep</th>
 
-              <th style="border-bottom: 1px solid #333;" align="left">Actions</th>
+              <th style="border-bottom: 1px solid #333;" align="right" colspan="3">Actions</th>
             </tr>
           </thead>
 
           <tbody>
             <%= if Enum.empty?(@shadow_net_system.simulations) do %>
               <tr>
-                <td colspan="7">
+                <td colspan="4">
                   <div style="padding: 2em; border: 3px dashed #aaa; text-align: center; font-style: italic;">
                     <p>
                       No Simulations created yet.
@@ -165,6 +167,40 @@ defmodule RenewCollabWeb.LiveShadowNet do
                     <%= sim.timestep %>
                   </td>
 
+                  <%= if MapSet.member?(@running, sim.id) do %>
+                    <td>
+                      <button
+                        type="button"
+                        phx-click="step"
+                        phx-value-id={sim.id}
+                        style="cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff"
+                      >
+                        Step
+                      </button>
+                      <td>
+                        <button
+                          type="button"
+                          phx-click="stop"
+                          phx-value-id={sim.id}
+                          style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
+                        >
+                          Stop
+                        </button>
+                      </td>
+                    </td>
+                  <% else %>
+                    <td colspan="2" align="right">
+                      <button
+                        type="button"
+                        phx-click="setup"
+                        phx-value-id={sim.id}
+                        phx-disable-with="Starting..."
+                        style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+                      >
+                        Setup
+                      </button>
+                    </td>
+                  <% end %>
                   <td>
                     <button
                       type="button"
@@ -194,6 +230,26 @@ defmodule RenewCollabWeb.LiveShadowNet do
       "#{@topic}:#{socket.assigns.shadow_net_system_id}",
       :any
     )
+
+    {:noreply, socket}
+  end
+
+  def handle_event("setup", %{"id" => simulation_id}, socket) do
+    RenewCollabSim.Server.SimulationServer.setup_and_wait(simulation_id)
+
+    {:noreply,
+     socket
+     |> assign(:running, RenewCollabSim.Server.SimulationServer.running_ids() |> MapSet.new())}
+  end
+
+  def handle_event("stop", %{"id" => simulation_id}, socket) do
+    RenewCollabSim.Server.SimulationServer.terminate(simulation_id)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("step", %{"id" => simulation_id}, socket) do
+    RenewCollabSim.Server.SimulationServer.step(simulation_id)
 
     {:noreply, socket}
   end
