@@ -5,22 +5,32 @@ defmodule RenewCollabWeb.LiveShadowNet do
   @topic "shadow_net"
 
   def mount(%{"id" => shadow_net_system_id}, _session, socket) do
-    RenewCollabWeb.Endpoint.subscribe("#{@topic}:#{shadow_net_system_id}")
+    RenewCollabSim.Simulator.find_shadow_net_system(shadow_net_system_id)
+    |> case do
+      nil ->
+        {:ok, socket |> redirect(to: ~p"/shadow_nets")}
 
-    socket =
-      socket
-      |> assign(:shadow_net_system_id, shadow_net_system_id)
-      |> assign(:running, RenewCollabSim.Server.SimulationServer.running_ids() |> MapSet.new())
-      |> assign(
-        :shadow_net_system,
-        RenewCollabSim.Simulator.find_shadow_net_system(shadow_net_system_id)
-      )
-      |> assign(
-        :documents,
-        RenewCollab.Renew.list_documents()
-      )
+      sns ->
+        RenewCollabWeb.Endpoint.subscribe("#{@topic}:#{shadow_net_system_id}")
 
-    {:ok, socket}
+        socket =
+          socket
+          |> assign(:shadow_net_system_id, shadow_net_system_id)
+          |> assign(
+            :running,
+            RenewCollabSim.Server.SimulationServer.running_ids() |> MapSet.new()
+          )
+          |> assign(
+            :shadow_net_system,
+            sns
+          )
+          |> assign(
+            :documents,
+            RenewCollab.Renew.list_documents()
+          )
+
+        {:ok, socket}
+    end
   end
 
   def handle_info(:any, socket) do
@@ -182,9 +192,9 @@ defmodule RenewCollabWeb.LiveShadowNet do
                           type="button"
                           phx-click="stop"
                           phx-value-id={sim.id}
-                          style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
+                          style="cursor: pointer; padding: 1ex; border: none; background: #a3a; color: #fff"
                         >
-                          Stop
+                          Terminate
                         </button>
                       </td>
                     </td>

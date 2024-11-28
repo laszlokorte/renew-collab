@@ -121,6 +121,9 @@ defmodule RenewCollabWeb.LiveShadowNets do
               <th style="border-bottom: 1px solid #333;" align="left" width="1000">All Nets</th>
 
               <th style="border-bottom: 1px solid #333;" align="left" width="200">Created</th>
+              <th style="border-bottom: 1px solid #333;" align="left" width="200">
+                Number of Simulations
+              </th>
 
               <th style="border-bottom: 1px solid #333;" align="left" width="100" colspan="2">
                 Actions
@@ -160,6 +163,9 @@ defmodule RenewCollabWeb.LiveShadowNets do
 
                   <td style="white-space: nowrap;">
                     <%= sns.inserted_at |> Calendar.strftime("%Y-%m-%d %H:%M") %>
+                  </td>
+                  <td style="white-space: nowrap;">
+                    <%= sns.simulation_count %>
                   </td>
 
                   <td width="50">

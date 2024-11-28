@@ -16,14 +16,17 @@ defmodule RenewCollabSim.Simulator do
     Repo.all(
       from(s in ShadowNetSystem,
         join: nets in assoc(s, :nets),
+        left_join: sims in assoc(s, :simulations),
         order_by: [desc: s.inserted_at],
-        preload: [nets: nets]
+        preload: [nets: nets],
+        select: map(s, ^ShadowNetSystem.__schema__(:fields)),
+        select_merge: %{simulation_count: count(sims.id)}
       )
     )
   end
 
   def find_shadow_net_system(id) do
-    Repo.one!(
+    Repo.one(
       from(s in ShadowNetSystem,
         join: nets in assoc(s, :nets),
         left_join: sims in assoc(s, :simulations),
@@ -35,7 +38,7 @@ defmodule RenewCollabSim.Simulator do
   end
 
   def find_simulation(id) do
-    Repo.one!(
+    Repo.one(
       from(s in Simulation,
         left_join: logs in assoc(s, :log_entries),
         join: sns in assoc(s, :shadow_net_system),

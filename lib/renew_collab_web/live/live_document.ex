@@ -1472,27 +1472,34 @@ defmodule RenewCollabWeb.LiveDocument do
 
   def handle_info({:document_changed, document_id}, socket) do
     if document_id == socket.assigns.document.id do
-      {:noreply,
-       socket
-       |> assign_async(
-         [:undo_redo],
-         fn ->
-           {:ok,
-            %{
-              undo_redo: Versioning.document_undo_redo(document_id)
-            }}
-         end
-       )
-       |> assign_async(
-         [:snapshots],
-         fn ->
-           {:ok,
-            %{
-              snapshots: Versioning.document_versions(document_id)
-            }}
-         end
-       )
-       |> assign(:document, Renew.get_document_with_elements(document_id))}
+      Renew.get_document_with_elements(document_id)
+      |> case do
+        nil ->
+          {:norely, socket}
+
+        doc ->
+          {:noreply,
+           socket
+           |> assign_async(
+             [:undo_redo],
+             fn ->
+               {:ok,
+                %{
+                  undo_redo: Versioning.document_undo_redo(document_id)
+                }}
+             end
+           )
+           |> assign_async(
+             [:snapshots],
+             fn ->
+               {:ok,
+                %{
+                  snapshots: Versioning.document_versions(document_id)
+                }}
+             end
+           )
+           |> assign(:document, doc)}
+      end
     end
   end
 

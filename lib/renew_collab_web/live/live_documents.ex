@@ -1,5 +1,4 @@
 defmodule RenewCollabWeb.LiveDocuments do
-  alias RenewCollabWeb.DocumentJSON
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
@@ -169,8 +168,9 @@ defmodule RenewCollabWeb.LiveDocuments do
 
                   <td width="50">
                     <button
-                      phx-click="simulate"
+                      phx-click="compile"
                       phx-value-id={document.id}
+                      phx-value-simulate={true}
                       phx-disable-with="Compiling..."
                       style="cursor: pointer; padding: 1ex; border: none; background: #a3a; color: #fff"
                     >
@@ -320,7 +320,7 @@ defmodule RenewCollabWeb.LiveDocuments do
     {:noreply, socket}
   end
 
-  def handle_event("simulate", %{"id" => document_id}, socket) do
+  def handle_event("compile", params = %{"id" => document_id}, socket) do
     document = Renew.get_document_with_elements(document_id)
     {:ok, rnw} = RenewCollab.Export.DocumentExport.export(document)
 
@@ -333,7 +333,7 @@ defmodule RenewCollabWeb.LiveDocuments do
 
     with {:ok, content} <- RenewCollabSim.Compiler.SnsCompiler.compile(nets),
          {:ok, json} <- document |> RenewCollabWeb.DocumentJSON.show_content() |> Jason.encode(),
-         {:ok, %{id: sim_id}} <-
+         {:ok, %{id: sns_id}} <-
            %RenewCollabSim.Entites.ShadowNetSystem{}
            |> RenewCollabSim.Entites.ShadowNetSystem.changeset(%{
              "compiled" => content,
@@ -352,7 +352,29 @@ defmodule RenewCollabWeb.LiveDocuments do
         :any
       )
 
-      {:noreply, redirect(socket, to: ~p"/shadow_net/#{sim_id}")}
+      if Map.get(params, "simulate", false) do
+        %RenewCollabSim.Entites.Simulation{
+          shadow_net_system_id: sns_id
+        }
+        |> RenewCollab.Repo.insert()
+        |> case do
+          {:ok, %{id: sim_id}} ->
+            RenewCollabSim.Server.SimulationServer.setup(sim_id)
+
+            Phoenix.PubSub.broadcast(
+              RenewCollab.PubSub,
+              "shadow_net:#{sns_id}",
+              :any
+            )
+
+            {:noreply, redirect(socket, to: ~p"/simulation/#{sim_id}")}
+
+          _ ->
+            {:noreply, redirect(socket, to: ~p"/shadow_net/#{sns_id}")}
+        end
+      else
+        {:noreply, redirect(socket, to: ~p"/shadow_net/#{sns_id}")}
+      end
     else
       e ->
         dbg(e)

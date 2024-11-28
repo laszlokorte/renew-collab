@@ -5,25 +5,41 @@ defmodule RenewCollabWeb.LiveSimulation do
   @topic "simulation"
 
   def mount(%{"id" => simulation_id}, _session, socket) do
-    socket =
-      socket
-      |> assign(:simulation_id, simulation_id)
-      |> assign(:show_transitions, false)
-      |> assign(:is_active, RenewCollabSim.Server.SimulationServer.exists(simulation_id))
-      |> assign(:simulation, RenewCollabSim.Simulator.find_simulation(simulation_id))
+    RenewCollabSim.Simulator.find_simulation(simulation_id)
+    |> case do
+      nil ->
+        {:ok, socket |> redirect(to: ~p"/shadow_nets")}
 
-    RenewCollabWeb.Endpoint.subscribe("#{@topic}:#{simulation_id}")
+      sim ->
+        socket =
+          socket
+          |> assign(:simulation_id, simulation_id)
+          |> assign(:show_transitions, false)
+          |> assign(:is_active, RenewCollabSim.Server.SimulationServer.exists(simulation_id))
+          |> assign(:simulation, sim)
 
-    {:ok, socket}
+        RenewCollabWeb.Endpoint.subscribe("#{@topic}:#{simulation_id}")
+
+        {:ok, socket}
+    end
   end
 
   def handle_info(:any, socket) do
-    {:noreply,
-     socket
-     |> assign(
-       :simulation,
-       RenewCollabSim.Simulator.find_simulation(socket.assigns.simulation_id)
-     )}
+    RenewCollabSim.Simulator.find_simulation(socket.assigns.simulation_id)
+    |> case do
+      nil ->
+        {:noreply,
+         socket
+         |> redirect(to: ~p"/shadow_net/#{socket.assigns.simulation.shadow_net_system_id}")}
+
+      sim ->
+        {:noreply,
+         socket
+         |> assign(
+           :simulation,
+           sim
+         )}
+    end
   end
 
   def handle_info(:state, socket) do
@@ -283,6 +299,7 @@ defmodule RenewCollabWeb.LiveSimulation do
   end
 
   def handle_event("delete", %{}, socket) do
+    shadow_net_system_id = socket.assigns.simulation.shadow_net_system_id
     RenewCollabSim.Simulator.delete_simulation(socket.assigns.simulation_id)
     RenewCollabSim.Server.SimulationServer.terminate(socket.assigns.simulation.id)
 
@@ -298,6 +315,6 @@ defmodule RenewCollabWeb.LiveSimulation do
       :any
     )
 
-    {:noreply, socket}
+    {:noreply, socket |> redirect(to: ~p"/shadow_net/#{shadow_net_system_id}")}
   end
 end
