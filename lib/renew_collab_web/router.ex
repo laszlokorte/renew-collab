@@ -52,14 +52,19 @@ defmodule RenewCollabWeb.Router do
       post "/import", DocumentController, :import
       get "/:id/export", DocumentController, :export
       post "/:id/duplicate", DocumentController, :duplicate
+
+      resources "/", DocumentController, except: [:new, :edit]
     end
 
     scope "/media" do
       post "/svg", MediaController, :create
     end
 
-    scope "/" do
-      resources "/documents", DocumentController, except: [:new, :edit]
+    scope "/simulations" do
+      resources "/", SimulationController, except: [:new, :edit]
+      get "/:id/:net_name/:integer_id", SimulationController, :show_instance
+      post "/:id/step", SimulationController, :step
+      delete "/:id/process", SimulationController, :terminate
     end
   end
 

@@ -46,6 +46,10 @@ defmodule RenewCollabSim.Simulator do
     )
   end
 
+  def find_all_simulations() do
+    Repo.all(from(s in Simulation))
+  end
+
   def find_simulation(id) do
     Repo.one(
       from(s in Simulation,
@@ -53,6 +57,7 @@ defmodule RenewCollabSim.Simulator do
         join: sns in assoc(s, :shadow_net_system),
         join: nets in assoc(sns, :nets),
         left_join: ins in assoc(s, :net_instances),
+        left_join: net in assoc(ins, :shadow_net),
         left_join: tokens in assoc(ins, :tokens),
         left_join: firings in assoc(ins, :firings),
         where: s.id == ^id,
@@ -60,8 +65,23 @@ defmodule RenewCollabSim.Simulator do
         preload: [
           log_entries: logs,
           shadow_net_system: {sns, [nets: nets]},
-          net_instances: {ins, [tokens: tokens, firings: firings]}
+          net_instances: {ins, [tokens: tokens, firings: firings, shadow_net: net]}
         ]
+      )
+    )
+  end
+
+  def find_simulation_net_instance(simulation_id, net_name, integer_id) do
+    Repo.one(
+      from(ins in SimulationNetInstance,
+        join: net in assoc(ins, :shadow_net),
+        left_join: tokens in assoc(ins, :tokens),
+        left_join: firings in assoc(ins, :firings),
+        where:
+          ins.simulation_id == ^simulation_id and net.name == ^net_name and
+            ins.integer_id == ^integer_id,
+        order_by: [asc: firings.timestep],
+        preload: [tokens: tokens, firings: firings, shadow_net: net]
       )
     )
   end

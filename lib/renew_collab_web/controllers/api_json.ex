@@ -16,6 +16,10 @@ defmodule RenewCollabWeb.ApiJSON do
           method: "POST",
           href: url(~p"/api/documents/import")
         },
+        create_simulation: %{
+          method: "POST",
+          href: url(~p"/api/simulations")
+        },
         document: %{
           method: "GET",
           href: url(~p"/api/documents/:id")
