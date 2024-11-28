@@ -21,10 +21,6 @@ defmodule RenewCollabSim.Server.SimulationServer do
     GenServer.cast(__MODULE__, {:pause, simulation_id})
   end
 
-  def stop(simulation_id) do
-    GenServer.cast(__MODULE__, {:stop, simulation_id})
-  end
-
   def terminate(simulation_id) do
     GenServer.call(__MODULE__, {:terminate, simulation_id})
   end
@@ -104,16 +100,9 @@ defmodule RenewCollabSim.Server.SimulationServer do
   end
 
   @impl true
-  def handle_cast({:stop, simulation_id}, state) do
-    {:noreply, state}
-  end
-
-  @impl true
   def handle_call({:terminate, simulation_id}, _from, state) do
     case Map.get(state, simulation_id, nil) do
       %{sim_process: p} ->
-        dbg(p)
-
         RenewCollabSim.Server.SimulationProcess.stop(p)
         {:reply, true, state}
 
@@ -144,7 +133,7 @@ defmodule RenewCollabSim.Server.SimulationServer do
 
     {:noreply,
      Map.filter(state, fn
-       {k, %{sim_process: ^pid}} -> false
+       {_, %{sim_process: ^pid}} -> false
        _ -> true
      end)}
   end
@@ -152,7 +141,6 @@ defmodule RenewCollabSim.Server.SimulationServer do
   @impl true
   # handle the trapped exit call
   def handle_info({:EXIT, _from, reason}, state) do
-    dbg("aaaaaa")
     cleanup(reason, state)
     # see GenServer docs for other return types
     {:stop, reason, state}
@@ -161,12 +149,11 @@ defmodule RenewCollabSim.Server.SimulationServer do
   @impl true
   # handle termination
   def terminate(reason, state) do
-    dbg("xxxxxx")
     cleanup(reason, state)
     state
   end
 
-  defp cleanup(reason, state) do
+  defp cleanup(_reason, state) do
     for {simulation_id, %{sim_process: pid}} <- state do
       RenewCollabSim.Server.SimulationProcess.stop(pid)
 

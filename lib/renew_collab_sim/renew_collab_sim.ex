@@ -7,6 +7,7 @@ defmodule RenewCollabSim.Simulator do
   alias RenewCollabSim.Entites.ShadowNet
   alias RenewCollabSim.Entites.SimulationLogEntry
   alias RenewCollabSim.Entites.SimulationNetInstance
+  alias RenewCollabSim.Entites.SimulationTransitionFiring
   alias RenewCollabSim.Entites.ShadowNetSystem
   alias RenewCollabSim.Entites.Simulation
   alias RenewCollab.Repo
@@ -41,12 +42,13 @@ defmodule RenewCollabSim.Simulator do
         join: nets in assoc(sns, :nets),
         left_join: ins in assoc(s, :net_instances),
         left_join: tokens in assoc(ins, :tokens),
+        left_join: firings in assoc(ins, :firings),
         where: s.id == ^id,
-        order_by: [asc: logs.inserted_at, asc: fragment("?.rowid", logs)],
+        order_by: [asc: logs.inserted_at, asc: fragment("?.rowid", logs), asc: firings.timestep],
         preload: [
           log_entries: logs,
           shadow_net_system: {sns, [nets: nets]},
-          net_instances: {ins, [tokens: tokens]}
+          net_instances: {ins, [tokens: tokens, firings: firings]}
         ]
       )
     )
@@ -60,9 +62,25 @@ defmodule RenewCollabSim.Simulator do
     )
   end
 
+  def reset_time(id) do
+    Repo.update_all(
+      from(s in Simulation,
+        where: s.id == ^id,
+        update: [set: [timestep: 0]]
+      ),
+      []
+    )
+  end
+
   def clear_instances(id) do
     Repo.delete_all(
       from(l in SimulationNetInstance,
+        where: l.simulation_id == ^id
+      )
+    )
+
+    Repo.delete_all(
+      from(l in SimulationTransitionFiring,
         where: l.simulation_id == ^id
       )
     )

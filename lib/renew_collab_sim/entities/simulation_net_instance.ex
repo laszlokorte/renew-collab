@@ -8,6 +8,7 @@ defmodule RenewCollabSim.Entites.SimulationNetInstance do
     belongs_to :shadow_net_system, RenewCollabSim.Entites.ShadowNetSystem
     belongs_to :shadow_net, RenewCollabSim.Entites.ShadowNet
     has_many :tokens, RenewCollabSim.Entites.SimulationNetToken
+    has_many :firings, RenewCollabSim.Entites.SimulationTransitionFiring
     field :label, :string
     field :integer_id, :integer
   end

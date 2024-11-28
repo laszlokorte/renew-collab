@@ -138,7 +138,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   @impl true
   def handle_cast(
         {:log, {:noeol, content}},
-        state = %{simulation_id: simulation_id, simulation: simulation}
+        state = %{simulation_id: simulation_id}
       ) do
     import Ecto.Query
 
@@ -162,6 +162,8 @@ defmodule RenewCollabSim.Server.SimulationProcess do
             )
       )
     )
+
+    {:noreply, state}
   end
 
   @impl true
@@ -309,10 +311,24 @@ defmodule RenewCollabSim.Server.SimulationProcess do
         "fr_time_number" => time_number,
         "fr_instance_name" => instance_name,
         "fr_instance_number" => instance_number,
-        "fr_transition_id" => place_id
+        "fr_transition_id" => transition_id
       }
       when "" != time_number ->
-        nil
+        RenewCollab.Repo.insert_all(
+          RenewCollabSim.Entites.SimulationTransitionFiring,
+          from(n in RenewCollabSim.Entites.SimulationNetInstance,
+            where:
+              n.label == ^"#{instance_name}[#{instance_number}]" and
+                n.simulation_id == ^simulation_id,
+            select: %{
+              id: ^Ecto.UUID.generate(),
+              simulation_id: n.simulation_id,
+              simulation_net_instance_id: n.id,
+              transition_id: ^transition_id,
+              timestep: ^time_number
+            }
+          )
+        )
 
       %{
         "sc_time_number" => time_number
@@ -371,7 +387,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
 
   @impl true
   # handle termination
-  def terminate(reason, state = %{directory: directory, sim_process: sim_process}) do
+  def terminate(_reason, state = %{directory: directory, sim_process: sim_process}) do
     Process.exit(sim_process, :kill)
     File.rm_rf(directory)
     state
@@ -379,13 +395,13 @@ defmodule RenewCollabSim.Server.SimulationProcess do
 
   defp init_process(simulation) do
     slf = self()
-    uuid_dir = "#{UUID.uuid4(:default)}"
+    uuid_dir = "renew-simulation-#{simulation.id}/#{UUID.uuid4(:default)}"
 
     {:ok, output_root} = Path.safe_relative_to(uuid_dir, System.tmp_dir!())
     output_root = Path.absname(output_root, System.tmp_dir!())
 
-    {:ok, sns_path} = Path.safe_relative_to("compiled.ssn", output_root)
-    {:ok, script_path} = Path.safe_relative_to("compile-script", output_root)
+    {:ok, sns_path} = Path.safe_relative_to("compiled-shadow-net.ssn", output_root)
+    {:ok, script_path} = Path.safe_relative_to("simulation-script", output_root)
     # dbg(script_path)
 
     sns_path = Path.absname(sns_path, output_root)

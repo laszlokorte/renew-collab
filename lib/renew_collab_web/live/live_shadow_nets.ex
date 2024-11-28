@@ -247,7 +247,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
   end
 
   def handle_event("import_document", %{"main_net" => main_net_ref}, socket) do
-    uuid_dir = "#{UUID.uuid4(:default)}"
+    uuid_dir = "renew-ssn-compilation-#{UUID.uuid4(:default)}"
     {:ok, output_root} = Path.safe_relative_to(uuid_dir, System.tmp_dir!())
     output_root = Path.absname(output_root, System.tmp_dir!())
 

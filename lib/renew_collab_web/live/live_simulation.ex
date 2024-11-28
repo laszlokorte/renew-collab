@@ -8,6 +8,7 @@ defmodule RenewCollabWeb.LiveSimulation do
     socket =
       socket
       |> assign(:simulation_id, simulation_id)
+      |> assign(:show_transitions, false)
       |> assign(:is_active, RenewCollabSim.Server.SimulationServer.exists(simulation_id))
       |> assign(:simulation, RenewCollabSim.Simulator.find_simulation(simulation_id))
 
@@ -121,6 +122,37 @@ defmodule RenewCollabWeb.LiveSimulation do
           </ul>
         <% end %>
 
+        <h3>Firing sequence</h3>
+
+        <%= if Enum.empty?(@simulation.net_instances) do %>
+          <p style="margin: 0; padding: 1ex; opacity: 0.7; font-style: italic;">
+            &lt;No Transition firings recorded yet.&gt;
+          </p>
+        <% else %>
+          <details id="transition-log" open={@show_transitions}>
+            <summary style="cursor: pointer;" phx-click="toggle-transition">Show</summary>
+
+            <div style="max-height:10em; overflow: auto; overscroll-behavior: contain;">
+              <dl>
+                <%= for net <- @simulation.net_instances do %>
+                  <dt>
+                    <strong>Net: <%= net.label %></strong>
+                  </dt>
+                  <dd>
+                    <dl style="display: grid; grid-template-columns: auto 1fr;">
+                      <ol style="list-style: none">
+                        <%= for fir <- net.firings |> Enum.reverse() do %>
+                          <li>Transition <%= fir.transition_id %> (time: <%= fir.timestep %>)</li>
+                        <% end %>
+                      </ol>
+                    </dl>
+                  </dd>
+                <% end %>
+              </dl>
+            </div>
+          </details>
+        <% end %>
+
         <h3>Simulation Log</h3>
         <div style="margin: 1ex  0; display: flex; gap: 1ex">
           <button
@@ -138,7 +170,11 @@ defmodule RenewCollabWeb.LiveSimulation do
             Create Test Log Entry
           </button>
         </div>
-        <div style="overflow: auto; max-height: 50vh;" phx-hook="RnwScrollDown" id="sim-scroll-logger">
+        <div
+          style="overflow: auto; max-height: 50vh; overscroll-behavior: contain;"
+          phx-hook="RnwScrollDown"
+          id="sim-scroll-logger"
+        >
           <div style="background: #333; color: #fff; font-family: monospace; margin: 0; padding: 0.5ex; line-height: 1.4;">
             <%= if Enum.empty?(@simulation.log_entries) do %>
               <p style="margin: 0; padding: 1ex; opacity: 0.7; font-style: italic;">
@@ -186,6 +222,10 @@ defmodule RenewCollabWeb.LiveSimulation do
     {:noreply, socket}
   end
 
+  def handle_event("toggle-transition", %{}, socket) do
+    {:noreply, assign(socket, :show_transitions, not socket.assigns.show_transitions)}
+  end
+
   def handle_event("clear_log", %{}, socket) do
     RenewCollabSim.Simulator.clear_log(socket.assigns.simulation_id)
 
@@ -211,6 +251,7 @@ defmodule RenewCollabWeb.LiveSimulation do
   end
 
   def handle_event("reset", %{}, socket) do
+    RenewCollabSim.Simulator.reset_time(socket.assigns.simulation_id)
     RenewCollabSim.Simulator.clear_instances(socket.assigns.simulation_id)
     RenewCollabSim.Simulator.clear_log(socket.assigns.simulation_id)
 

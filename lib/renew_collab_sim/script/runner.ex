@@ -42,7 +42,6 @@ defmodule RenewCollabSim.Script.Runner do
     xvbf_display = Keyword.get(conf, :sim_xvbf_display)
     interceptor_path = Keyword.get(conf, :sim_interceptor_path)
     log_conf_path = Keyword.get(conf, :sim_log_conf_path)
-    
 
     module_path = "#{renew_path}" <> separator <> "#{renew_path}/libs"
 
@@ -64,7 +63,11 @@ defmodule RenewCollabSim.Script.Runner do
               :use_stdio,
               :hide,
               line: 2048,
-              env: if(xvbf_display, do: [{to_charlist("DISPLAY"), to_charlist(xvbf_display)}], else: []),
+              env:
+                if(xvbf_display,
+                  do: [{to_charlist("DISPLAY"), to_charlist(xvbf_display)}],
+                  else: []
+                ),
               args:
                 [
                   "-jar",
@@ -122,7 +125,11 @@ defmodule RenewCollabSim.Script.Runner do
             :use_stdio,
             :hide,
             line: 2048,
-            env: if(xvbf_display, do: [{to_charlist("DISPLAY"), to_charlist(xvbf_display)}], else: []),
+            env:
+              if(xvbf_display,
+                do: [{to_charlist("DISPLAY"), to_charlist(xvbf_display)}],
+                else: []
+              ),
             args:
               [
                 "-jar",
@@ -190,10 +197,7 @@ defmodule RenewCollabSim.Script.Runner do
         return
 
       e ->
-        nil
-        # dbg("unexpected")
-        # dbg(port)
-        # dbg(e)
+        {:unexpected, e}
     end
   end
 
@@ -211,10 +215,8 @@ defmodule RenewCollabSim.Script.Runner do
         send(port, {s, {:command, cmd}})
         read_loop(port, s)
 
-      o ->
-        nil
-        # dbg("what?")
-        # dbg(o)
+      msg ->
+        raise {:unexpected, msg}
     end
   end
 end
