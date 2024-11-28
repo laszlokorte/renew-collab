@@ -177,6 +177,7 @@ defmodule RenewCollabWeb.LiveDocuments do
                       Simulate
                     </button>
                   </td>
+
                   <td width="50">
                     <a href={~p"/documents/#{document.id}/export"}>
                       <button style="cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff">
@@ -298,7 +299,7 @@ defmodule RenewCollabWeb.LiveDocuments do
                "" -> "untitled"
                n -> n
              end)
-             |> Map.put("kind", "CH.ifa.draw.standard.StandardDrawing")
+             |> Map.put("kind", "de.renew.gui.CPNDrawing")
            ) do
     end
 
@@ -346,12 +347,6 @@ defmodule RenewCollabWeb.LiveDocuments do
              ]
            })
            |> RenewCollab.Repo.insert() do
-      Phoenix.PubSub.broadcast(
-        RenewCollab.PubSub,
-        @topic,
-        :any
-      )
-
       if Map.get(params, "simulate", false) do
         %RenewCollabSim.Entites.Simulation{
           shadow_net_system_id: sns_id

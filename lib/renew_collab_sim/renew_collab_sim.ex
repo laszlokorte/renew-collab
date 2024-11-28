@@ -15,12 +15,21 @@ defmodule RenewCollabSim.Simulator do
   def list_shadow_net_systems do
     Repo.all(
       from(s in ShadowNetSystem,
+        as: :ssn,
         join: nets in assoc(s, :nets),
         left_join: sims in assoc(s, :simulations),
         order_by: [desc: s.inserted_at],
         preload: [nets: nets],
         select: map(s, ^ShadowNetSystem.__schema__(:fields)),
-        select_merge: %{simulation_count: count(sims.id)}
+        select_merge: %{
+          simulation_count:
+            subquery(
+              from(sims in Simulation,
+                where: sims.shadow_net_system_id == parent_as(:ssn).id,
+                select: count(sims.id)
+              )
+            )
+        }
       )
     )
   end

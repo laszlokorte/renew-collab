@@ -67,6 +67,7 @@ defmodule RenewCollabWeb.LiveSimulation do
 
         <dl>
           <dt>Timestep</dt>
+
           <dd><%= @simulation.timestep %></dd>
         </dl>
 
@@ -79,6 +80,7 @@ defmodule RenewCollabWeb.LiveSimulation do
             >
               Step
             </button>
+
             <button
               type="button"
               phx-click="terminate"
@@ -94,6 +96,7 @@ defmodule RenewCollabWeb.LiveSimulation do
             >
               Initialize
             </button>
+
             <button
               type="button"
               phx-click="reset"
@@ -105,6 +108,7 @@ defmodule RenewCollabWeb.LiveSimulation do
         </div>
 
         <h3>Net Instances</h3>
+
         <%= if Enum.empty?(@simulation.net_instances) do %>
           <p style="margin: 0; padding: 1ex; opacity: 0.7; font-style: italic;">
             &lt;No Net instances recorded yet.&gt;
@@ -117,6 +121,7 @@ defmodule RenewCollabWeb.LiveSimulation do
           >
             Clear Instances
           </button>
+
           <ul>
             <%= for ins <- @simulation.net_instances do %>
               <li>
@@ -154,6 +159,7 @@ defmodule RenewCollabWeb.LiveSimulation do
                   <dt>
                     <strong>Net: <%= net.label %></strong>
                   </dt>
+
                   <dd>
                     <dl style="display: grid; grid-template-columns: auto 1fr;">
                       <ol style="list-style: none">
@@ -170,6 +176,7 @@ defmodule RenewCollabWeb.LiveSimulation do
         <% end %>
 
         <h3>Simulation Log</h3>
+
         <div style="margin: 1ex  0; display: flex; gap: 1ex">
           <button
             type="button"
@@ -178,6 +185,7 @@ defmodule RenewCollabWeb.LiveSimulation do
           >
             Clear Log
           </button>
+
           <button
             type="button"
             phx-click="debug"
@@ -186,6 +194,7 @@ defmodule RenewCollabWeb.LiveSimulation do
             Create Test Log Entry
           </button>
         </div>
+
         <div
           style="overflow: auto; max-height: 50vh; overscroll-behavior: contain;"
           phx-hook="RnwScrollDown"

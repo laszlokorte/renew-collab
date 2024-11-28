@@ -338,6 +338,45 @@ defmodule RenewCollabWeb.LiveDocument do
           </form>
         </div>
 
+        <div style="display: flex; gap: 1ex; padding: 1ex 0">
+          <button
+            type="button"
+            phx-click="create_transition"
+            phx-value-example="yes"
+            style="cursor: pointer; padding: 1ex; border: none; background: #3a9; color: #fff"
+          >
+            Create Transition
+          </button>
+
+          <button
+            type="button"
+            phx-click="create_place"
+            phx-value-example="yes"
+            style="cursor: pointer; padding: 1ex; border: none; background: #3a9; color: #fff"
+          >
+            Create Place
+          </button>
+
+          <button
+            disabled={is_nil(@selection)}
+            type="button"
+            phx-click="create_linked_text"
+            phx-value-example="yes"
+            style={"#{if(is_nil(@selection), do: "opacity: 0.3;", else: "cursor: pointer;")} padding: 1ex; border: none; background: #3a3; color: #fff;"}
+          >
+            Create Inscription
+          </button>
+
+          <button
+            type="button"
+            phx-click="simulate"
+            phx-disable-with="Compiling..."
+            style="cursor: pointer;padding: 1ex; border: none; background: #a3a; color: #fff;"
+          >
+            Simulate
+          </button>
+        </div>
+
         <h2 style="cursor: pointer;" phx-click="toggle-meta">
           <span><%= if(@show_meta, do: "▼", else: "►") %></span> Document
         </h2>
@@ -1107,11 +1146,46 @@ defmodule RenewCollabWeb.LiveDocument do
       base_layer_id: socket.assigns.selection,
       document_id: socket.assigns.document.id,
       attrs: %{
-        "semantic_tag" => "CH.ifa.draw.figures.TextFigure",
+        "semantic_tag" => "de.renew.gui.CPNTextFigure",
         "text" => %{
           "position_x" => cx,
           "position_y" => cy,
           "body" => "Hello World"
+        }
+      }
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "create_linked_text",
+        %{"example" => "yes"},
+        socket
+      ) do
+    {cx, cy} =
+      Enum.find(socket.assigns.document.layers, &(&1.id == socket.assigns.selection))
+      |> case do
+        %{box: %{position_x: x, position_y: y, width: width, height: height}} ->
+          {x + width / 2, y + height / 2}
+
+        %{edge: %{source_x: source_x, source_y: source_y, target_x: target_x, target_y: target_y}} ->
+          {(source_x + target_x) / 2, (source_y + target_y) / 2}
+      end
+
+    RenewCollab.Commands.CreateLayer.new(%{
+      base_layer_id: socket.assigns.selection,
+      document_id: socket.assigns.document.id,
+      attrs: %{
+        "semantic_tag" => "de.renew.gui.CPNTextFigure",
+        "text" => %{
+          "position_x" => cx,
+          "position_y" => cy,
+          "body" => "[]"
+        },
+        "outgoing_link" => %{
+          "target_layer_id" => socket.assigns.selection
         }
       }
     })
@@ -1171,6 +1245,63 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def handle_event(
+        "create_transition",
+        %{"example" => "yes"},
+        socket
+      ) do
+    {cx, cy} = viewbox_center(socket.assigns.viewbox)
+
+    RenewCollab.Commands.CreateLayer.new(%{
+      base_layer_id: socket.assigns.selection,
+      document_id: socket.assigns.document.id,
+      attrs: %{
+        "semantic_tag" => "de.renew.gui.TransitionFigure",
+        "box" => %{
+          "position_x" => cx - 100,
+          "position_y" => cy - 50,
+          "width" => 200,
+          "height" => 100
+        },
+        "interface" => %{
+          "socket_schema_id" => "4FDF577B-DB81-462E-971E-FA842F0ABA1E"
+        }
+      }
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "create_place",
+        %{"example" => "yes"},
+        socket
+      ) do
+    {cx, cy} = viewbox_center(socket.assigns.viewbox)
+
+    RenewCollab.Commands.CreateLayer.new(%{
+      base_layer_id: socket.assigns.selection,
+      document_id: socket.assigns.document.id,
+      attrs: %{
+        "semantic_tag" => "de.renew.gui.PlaceFigure",
+        "box" => %{
+          "position_x" => cx - 100,
+          "position_y" => cy - 50,
+          "width" => 100,
+          "height" => 100,
+          "symbol_shape_id" => "3B66E69A-057A-40B9-A1A0-9DB44EF5CE42"
+        },
+        "interface" => %{
+          "socket_schema_id" => "2C5DE751-2FB8-48DE-99B6-D99648EBDFFC"
+        }
+      }
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
         "create_edge",
         %{} = edge,
         socket
@@ -1179,8 +1310,14 @@ defmodule RenewCollabWeb.LiveDocument do
       base_layer_id: socket.assigns.selection,
       document_id: socket.assigns.document.id,
       attrs: %{
-        "semantic_tag" => "CH.ifa.draw.figures.PolyLineFigure",
-        "edge" => edge
+        "semantic_tag" => "de.renew.gui.ArcConnection",
+        "edge" =>
+          edge
+          |> Map.put_new("style", %{})
+          |> put_in(
+            ["style", "target_tip_symbol_shape_id"],
+            "84DC6617-D555-4BAB-BA33-04A5FA442F00"
+          )
       }
     })
     |> RenewCollab.Commander.run_document_command()
@@ -1468,6 +1605,58 @@ defmodule RenewCollabWeb.LiveDocument do
 
   def handle_event("move-relative", %{"value" => "into_prev"}, socket) do
     move_relative(socket, {:sibling, :prev}, {:above, :inside})
+  end
+
+  def handle_event("simulate", %{}, socket) do
+    document = socket.assigns.document
+    {:ok, rnw} = RenewCollab.Export.DocumentExport.export(document)
+
+    nets = [
+      {
+        document.name,
+        rnw
+      }
+    ]
+
+    with {:ok, content} <- RenewCollabSim.Compiler.SnsCompiler.compile(nets),
+         {:ok, json} <- document |> RenewCollabWeb.DocumentJSON.show_content() |> Jason.encode(),
+         {:ok, %{id: sns_id}} <-
+           %RenewCollabSim.Entites.ShadowNetSystem{}
+           |> RenewCollabSim.Entites.ShadowNetSystem.changeset(%{
+             "compiled" => content,
+             "main_net_name" => document.name,
+             "nets" => [
+               %{
+                 "name" => document.name,
+                 "document_json" => json
+               }
+             ]
+           })
+           |> RenewCollab.Repo.insert() do
+      %RenewCollabSim.Entites.Simulation{
+        shadow_net_system_id: sns_id
+      }
+      |> RenewCollab.Repo.insert()
+      |> case do
+        {:ok, %{id: sim_id}} ->
+          RenewCollabSim.Server.SimulationServer.setup(sim_id)
+
+          Phoenix.PubSub.broadcast(
+            RenewCollab.PubSub,
+            "shadow_net:#{sns_id}",
+            :any
+          )
+
+          {:noreply, redirect(socket, to: ~p"/simulation/#{sim_id}")}
+
+        _ ->
+          {:noreply, redirect(socket, to: ~p"/shadow_net/#{sns_id}")}
+      end
+    else
+      e ->
+        dbg(e)
+        {:noreply, socket}
+    end
   end
 
   def handle_info({:document_changed, document_id}, socket) do

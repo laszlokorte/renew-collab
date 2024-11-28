@@ -35,7 +35,7 @@ defmodule RenewCollabSim.Compiler.SnsCompiler do
       File.write!(script_path, script_content)
 
       with {:ok, 0} <- RenewCollabSim.Script.Runner.start_and_wait(script_path),
-           {:ok, content} <- File.read(output_path) do
+           {:ok, content} when content != [] <- File.read(output_path) do
         {:ok, content}
       else
         _ ->

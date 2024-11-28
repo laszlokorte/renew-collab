@@ -66,6 +66,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
           <dd>
             <code><%= @shadow_net_system.main_net_name %></code>
           </dd>
+
           <dd>
             <form phx-change="change_main_net">
               <label>
@@ -89,6 +90,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
                 <li>
                   <details>
                     <summary><code><%= net.name %></code></summary>
+
                     <div style="width: 10em; height: 5em;">
                       <textarea
                         readonly
@@ -96,11 +98,13 @@ defmodule RenewCollabWeb.LiveShadowNet do
                       ><%= net.document_json %></textarea>
                     </div>
                   </details>
+
                   <form style="display: inline;" phx-change="change_net_document">
                     <label>
                       <input type="hidden" name="shadow_net_id" value={net.id} />
                       <select name="document_id">
                         <option>Assign Document</option>
+
                         <%= for doc <- @documents do %>
                           <option value={doc.id}>
                             <%= doc.name %>
@@ -187,6 +191,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
                       >
                         Step
                       </button>
+
                       <td>
                         <button
                           type="button"
@@ -211,6 +216,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
                       </button>
                     </td>
                   <% end %>
+
                   <td>
                     <button
                       type="button"
