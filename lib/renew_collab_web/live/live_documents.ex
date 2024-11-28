@@ -1,4 +1,5 @@
 defmodule RenewCollabWeb.LiveDocuments do
+  alias RenewCollabWeb.DocumentJSON
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
@@ -138,7 +139,7 @@ defmodule RenewCollabWeb.LiveDocuments do
 
               <th style="border-bottom: 1px solid #333;" align="left" width="200">Last Updated</th>
 
-              <th style="border-bottom: 1px solid #333;" align="left" width="100" colspan="3">
+              <th style="border-bottom: 1px solid #333;" align="left" width="100" colspan="4">
                 Actions
               </th>
             </tr>
@@ -166,6 +167,16 @@ defmodule RenewCollabWeb.LiveDocuments do
 
                   <td><%= document.updated_at |> Calendar.strftime("%Y-%m-%d %H:%M") %></td>
 
+                  <td width="50">
+                    <button
+                      phx-click="simulate"
+                      phx-value-id={document.id}
+                      phx-disable-with="Compiling..."
+                      style="cursor: pointer; padding: 1ex; border: none; background: #a3a; color: #fff"
+                    >
+                      Simulate
+                    </button>
+                  </td>
                   <td width="50">
                     <a href={~p"/documents/#{document.id}/export"}>
                       <button style="cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff">
@@ -307,6 +318,46 @@ defmodule RenewCollabWeb.LiveDocuments do
     |> RenewCollab.Commander.run_document_command(false)
 
     {:noreply, socket}
+  end
+
+  def handle_event("simulate", %{"id" => document_id}, socket) do
+    document = Renew.get_document_with_elements(document_id)
+    {:ok, rnw} = RenewCollab.Export.DocumentExport.export(document)
+
+    nets = [
+      {
+        document.name,
+        rnw
+      }
+    ]
+
+    with {:ok, content} <- RenewCollabSim.Compiler.SnsCompiler.compile(nets),
+         {:ok, json} <- document |> RenewCollabWeb.DocumentJSON.show_content() |> Jason.encode(),
+         {:ok, %{id: sim_id}} <-
+           %RenewCollabSim.Entites.ShadowNetSystem{}
+           |> RenewCollabSim.Entites.ShadowNetSystem.changeset(%{
+             "compiled" => content,
+             "main_net_name" => document.name,
+             "nets" => [
+               %{
+                 "name" => document.name,
+                 "document_json" => json
+               }
+             ]
+           })
+           |> RenewCollab.Repo.insert() do
+      Phoenix.PubSub.broadcast(
+        RenewCollab.PubSub,
+        @topic,
+        :any
+      )
+
+      {:noreply, redirect(socket, to: ~p"/shadow_net/#{sim_id}")}
+    else
+      e ->
+        dbg(e)
+        {:noreply, socket}
+    end
   end
 
   def handle_info(:any, socket) do

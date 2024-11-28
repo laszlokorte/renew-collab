@@ -15,7 +15,7 @@ defmodule RenewCollabSim.Entites.ShadowNet do
   @doc false
   def changeset(shadow_net, attrs) do
     shadow_net
-    |> cast(attrs, [:name])
+    |> cast(attrs, [:name, :document_json])
     |> validate_required([:name])
   end
 end

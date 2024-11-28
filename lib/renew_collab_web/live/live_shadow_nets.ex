@@ -247,20 +247,6 @@ defmodule RenewCollabWeb.LiveShadowNets do
   end
 
   def handle_event("import_document", %{"main_net" => main_net_ref}, socket) do
-    uuid_dir = "renew-ssn-compilation-#{UUID.uuid4(:default)}"
-    {:ok, output_root} = Path.safe_relative_to(uuid_dir, System.tmp_dir!())
-    output_root = Path.absname(output_root, System.tmp_dir!())
-
-    {:ok, output_root_upload} = Path.safe_relative_to("uploads", output_root)
-
-    {:ok, output_path} = Path.safe_relative_to("compiled.ssn", output_root)
-    {:ok, script_path} = Path.safe_relative_to("compile-script", output_root)
-    # dbg(script_path)
-
-    output_root_upload = Path.absname(output_root_upload, output_root)
-    output_path = Path.absname(output_path, output_root)
-    script_path = Path.absname(script_path, output_root)
-
     main_net_name =
       Enum.find_value(socket.assigns.uploads.import_file.entries, nil, fn
         %{ref: ^main_net_ref, client_name: client_name} ->
@@ -270,52 +256,29 @@ defmodule RenewCollabWeb.LiveShadowNets do
           false
       end)
 
-    try do
-      File.mkdir_p(output_root_upload)
+    paths =
+      consume_uploaded_entries(socket, :import_file, fn %{path: path},
+                                                        %{
+                                                          client_name: filename
+                                                        } ->
+        {:ok, file_content} = File.read(path)
+        {:ok, {Path.basename(filename), file_content}}
+      end)
 
-      paths =
-        consume_uploaded_entries(socket, :import_file, fn %{path: path},
-                                                          %{
-                                                            client_name: filename
-                                                          } ->
-          {:ok, target_path} = Path.safe_relative_to(Path.basename(filename), output_root_upload)
-          target_path = Path.absname(target_path, output_root_upload)
+    with {:ok, content} <- RenewCollabSim.Compiler.SnsCompiler.compile(paths) do
+      %RenewCollabSim.Entites.ShadowNetSystem{}
+      |> RenewCollabSim.Entites.ShadowNetSystem.changeset(%{
+        "compiled" => content,
+        "main_net_name" => main_net_name,
+        "nets" => Enum.map(paths, &%{"name" => Path.rootname(Path.basename(elem(&1, 0)))})
+      })
+      |> RenewCollab.Repo.insert()
 
-          File.cp(path, target_path)
-          {:ok, target_path}
-        end)
-
-      script_content =
-        [
-          "setFormalism Java Net Compiler",
-          "ex ShadowNetSystem -a #{Enum.join(paths, " ")} -o #{output_path}"
-        ]
-        |> Enum.join("\n")
-
-      # dbg(script_content)
-      File.write!(script_path, script_content)
-
-      with {:ok, 0} <- RenewCollabSim.Script.Runner.start_and_wait(script_path),
-           {:ok, content} <- File.read(output_path) do
-        %RenewCollabSim.Entites.ShadowNetSystem{}
-        |> RenewCollabSim.Entites.ShadowNetSystem.changeset(%{
-          "compiled" => content,
-          "main_net_name" => main_net_name,
-          "nets" => Enum.map(paths, &%{"name" => Path.rootname(Path.basename(&1))})
-        })
-        |> RenewCollab.Repo.insert()
-
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          @topic,
-          :any
-        )
-      else
-        _ ->
-          :error
-      end
-    after
-      File.rm_rf(output_root_upload)
+      Phoenix.PubSub.broadcast(
+        RenewCollab.PubSub,
+        @topic,
+        :any
+      )
     end
 
     {:noreply, socket}
