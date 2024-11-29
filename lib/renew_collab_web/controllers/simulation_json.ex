@@ -5,7 +5,7 @@ defmodule RenewCollabWeb.SimulationJSON do
   def index(%{simulations: simulations}) do
     %{
       href: url(~p"/api/simulations"),
-      topic: "redux_documents",
+      topic: "redux_simulations",
       content: index_content(%{simulations: simulations}),
       links: %{
         create: %{
@@ -46,6 +46,14 @@ defmodule RenewCollabWeb.SimulationJSON do
         delete: %{
           href: url(~p"/api/simulations/#{simulation}"),
           method: "DELETE"
+        },
+        symbols: %{
+          href: url(~p"/api/symbols"),
+          method: "get"
+        },
+        socket_schemas: %{
+          href: url(~p"/api/socket_schemas"),
+          method: "get"
         }
       },
       content: show_content(simulation)
@@ -55,6 +63,7 @@ defmodule RenewCollabWeb.SimulationJSON do
   def show_content(%Simulation{} = simulation) do
     %{
       timestep: simulation.timestep,
+      name: simulation.id,
       net_instances: Enum.map(simulation.net_instances, &list_instance/1)
     }
   end
@@ -105,7 +114,6 @@ defmodule RenewCollabWeb.SimulationJSON do
 
   defp list_data(%Simulation{} = simulation) do
     %{
-      # id: document.id,
       href: url(~p"/api/simulations/#{simulation}"),
       id: simulation.id,
       links: %{

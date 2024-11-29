@@ -28,6 +28,10 @@ defmodule RenewCollabWeb.ApiJSON do
           method: "GET",
           href: url(~p"/api/documents/:id")
         },
+        simulation: %{
+          method: "GET",
+          href: url(~p"/api/simulations/:id")
+        },
         upload_svg: %{
           method: "POST",
           href: url(~p"/api/media/svg")
