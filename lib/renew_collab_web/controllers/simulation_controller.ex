@@ -19,6 +19,10 @@ defmodule RenewCollabWeb.SimulationController do
     render(conn, :show, simulation: RenewCollabSim.Simulator.find_simulation(simulation_id))
   end
 
+  def show_sns(conn, %{"id" => sns_id}) do
+    render(conn, :show_sns, sns: RenewCollabSim.Simulator.find_shadow_net_system(sns_id))
+  end
+
   def step(conn, %{"id" => simulation_id}) do
     render(conn, :step, status: :ok, simulation_id: simulation_id)
   end

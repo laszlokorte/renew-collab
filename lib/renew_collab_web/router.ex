@@ -43,7 +43,7 @@ defmodule RenewCollabWeb.Router do
   end
 
   scope "/api", RenewCollabWeb do
-    pipe_through :protected_api
+    pipe_through :api
     get "/symbols", SymbolController, :index
     get "/socket_schemas", SocketSchemaController, :index
     get "/semantic_tags", SemanticTagController, :index
@@ -62,10 +62,12 @@ defmodule RenewCollabWeb.Router do
 
     scope "/simulations" do
       resources "/", SimulationController, except: [:new, :edit]
-      get "/:id/:net_name/:integer_id", SimulationController, :show_instance
+      get "/:id/instance/:net_name/:integer_id", SimulationController, :show_instance
       post "/:id/step", SimulationController, :step
       delete "/:id/process", SimulationController, :terminate
     end
+
+    get "/shadow_net_system/:id", SimulationController, :show_sns
   end
 
   scope "/", RenewCollabWeb do

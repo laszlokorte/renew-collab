@@ -49,11 +49,11 @@ defmodule RenewCollabWeb.SimulationJSON do
         },
         symbols: %{
           href: url(~p"/api/symbols"),
-          method: "get"
+          method: "GET"
         },
         socket_schemas: %{
           href: url(~p"/api/socket_schemas"),
-          method: "get"
+          method: "GET"
         }
       },
       content: show_content(simulation)
@@ -64,7 +64,8 @@ defmodule RenewCollabWeb.SimulationJSON do
     %{
       timestep: simulation.timestep,
       name: simulation.id,
-      net_instances: Enum.map(simulation.net_instances, &list_instance/1)
+      net_instances: Enum.map(simulation.net_instances, &list_instance/1),
+      shadow_net_system: show_sns_item(simulation.shadow_net_system)
     }
   end
 
@@ -72,7 +73,7 @@ defmodule RenewCollabWeb.SimulationJSON do
     %{
       href:
         url(
-          ~p"/api/simulations/#{net_instance.simulation_id}/#{net_instance.shadow_net.name}/#{net_instance.integer_id}"
+          ~p"/api/simulations/#{net_instance.simulation_id}/instance/#{net_instance.shadow_net.name}/#{net_instance.integer_id}"
         ),
       links: %{
         simulation: %{
@@ -87,9 +88,11 @@ defmodule RenewCollabWeb.SimulationJSON do
     %{
       href:
         url(
-          ~p"/api/simulations/#{net_instance.simulation_id}/#{net_instance.shadow_net.name}/#{net_instance.integer_id}"
+          ~p"/api/simulations/#{net_instance.simulation_id}/instance/#{net_instance.shadow_net.name}/#{net_instance.integer_id}"
         ),
-      label: net_instance.label
+      id: net_instance.id,
+      label: net_instance.label,
+      shadow_net_id: net_instance.shadow_net_id
     }
   end
 
@@ -101,6 +104,37 @@ defmodule RenewCollabWeb.SimulationJSON do
       integer_id: net_instance.integer_id
     }
   end
+
+  defp show_sns_item(sns) do
+    %{
+      "href" => url(~p"/api/shadow_net_system/#{sns.id}"),
+      "content" => %{
+        "main_net_name" => sns.main_net_name,
+        "nets" => Enum.map(sns.nets, &%{"id" => &1.id, "name" => &1.name})
+      }
+    }
+  end
+
+  def show_sns(%{sns: sns}) do
+    %{
+      "id" => sns.id,
+      "href" => url(~p"/api/shadow_net_system/#{sns.id}"),
+      "content" => %{
+        "main_net_name" => sns.main_net_name,
+        "nets" =>
+          Enum.map(sns.nets, &%{"id" => &1.id, "name" => &1.name, "document" => net_document(&1)})
+      }
+    }
+  end
+
+  defp net_document(%{document_json: json}) when is_binary(json) do
+    case Jason.decode(json) do
+      {:ok, j = %{}} -> j
+      _ -> nil
+    end
+  end
+
+  defp net_document(%{document_json: nil}), do: nil
 
   defp show_token(net_token) do
     %{id: net_token.id, value: net_token.value}
