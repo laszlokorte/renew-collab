@@ -31,6 +31,35 @@ defmodule RenewCollabWeb.ReduxSimulationChannel do
     end
   end
 
+  @impl true
+  def handle_message({:simulation_change, simulation_id, _details}, state) do
+    {:noreply,
+     RenewCollabWeb.SimulationJSON.show_content(
+       RenewCollabSim.Simulator.find_simulation(simulation_id)
+     )}
+  end
+
+  @impl true
+  def handle_event("step", %{}, _state, socket) do
+    RenewCollabSim.Server.SimulationServer.step(socket.assigns.simulation_id)
+
+    :silent
+  end
+
+  @impl true
+  def handle_event("terminate", %{}, _state, socket) do
+    RenewCollabSim.Server.SimulationServer.terminate(socket.assigns.simulation_id)
+
+    :silent
+  end
+
+  @impl true
+  def handle_event("init", %{}, _state, socket) do
+    RenewCollabSim.Server.SimulationServer.setup(socket.assigns.simulation_id)
+
+    :silent
+  end
+
   defp make_color(account_id) do
     hue =
       <<i <- account_id |> then(&:crypto.hash(:md5, &1))>> |> for(do: i) |> Enum.sum() |> rem(360)

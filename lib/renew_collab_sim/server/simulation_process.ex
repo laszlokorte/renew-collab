@@ -69,7 +69,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
       "simulation:#{simulation_id}",
-      :any
+      {:simulation_change, simulation_id, :stop}
     )
 
     {:stop, :normal, :shutdown_ok, state}
@@ -97,7 +97,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
       "simulation:#{simulation_id}",
-      :any
+      {:simulation_change, simulation_id, :stop}
     )
 
     {:stop, :normal, state}
@@ -345,7 +345,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "simulation:#{simulation_id}",
-          :any
+          {:simulation_change, simulation_id, :step}
         )
 
         Phoenix.PubSub.broadcast(
@@ -369,7 +369,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "simulation:#{simulation_id}",
-          :any
+          {:simulation_change, simulation_id, :init}
         )
 
         Phoenix.PubSub.broadcast(

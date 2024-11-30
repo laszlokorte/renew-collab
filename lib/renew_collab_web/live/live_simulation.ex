@@ -24,21 +24,23 @@ defmodule RenewCollabWeb.LiveSimulation do
     end
   end
 
-  def handle_info(:any, socket) do
-    RenewCollabSim.Simulator.find_simulation(socket.assigns.simulation_id)
-    |> case do
-      nil ->
-        {:noreply,
-         socket
-         |> redirect(to: ~p"/shadow_net/#{socket.assigns.simulation.shadow_net_system_id}")}
+  def handle_info({:simulation_change, sim_id, _}, socket) do
+    if sim_id == socket.assigns.simulation_id do
+      RenewCollabSim.Simulator.find_simulation(socket.assigns.simulation_id)
+      |> case do
+        nil ->
+          {:noreply,
+           socket
+           |> redirect(to: ~p"/shadow_net/#{socket.assigns.simulation.shadow_net_system_id}")}
 
-      sim ->
-        {:noreply,
-         socket
-         |> assign(
-           :simulation,
-           sim
-         )}
+        sim ->
+          {:noreply,
+           socket
+           |> assign(
+             :simulation,
+             sim
+           )}
+      end
     end
   end
 
@@ -241,7 +243,7 @@ defmodule RenewCollabWeb.LiveSimulation do
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
       "#{@topic}:#{socket.assigns.simulation_id}",
-      :any
+      {:simulation_change, socket.assigns.simulation_id, :log}
     )
 
     {:noreply, socket}
@@ -257,7 +259,7 @@ defmodule RenewCollabWeb.LiveSimulation do
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
       "#{@topic}:#{socket.assigns.simulation_id}",
-      :any
+      {:simulation_change, socket.assigns.simulation_id, :log}
     )
 
     {:noreply, socket}
@@ -269,7 +271,7 @@ defmodule RenewCollabWeb.LiveSimulation do
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
       "#{@topic}:#{socket.assigns.simulation_id}",
-      :any
+      {:simulation_change, socket.assigns.simulation_id, :records}
     )
 
     {:noreply, socket}
@@ -283,7 +285,7 @@ defmodule RenewCollabWeb.LiveSimulation do
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
       "#{@topic}:#{socket.assigns.simulation_id}",
-      :any
+      {:simulation_change, socket.assigns.simulation_id, :reset}
     )
 
     {:noreply, socket}

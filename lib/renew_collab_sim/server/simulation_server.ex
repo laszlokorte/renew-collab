@@ -60,7 +60,7 @@ defmodule RenewCollabSim.Server.SimulationServer do
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "simulation:#{simulation_id}",
-          :state
+          {:simulation_change, simulation_id, :state}
         )
 
         {:noreply,
@@ -119,7 +119,7 @@ defmodule RenewCollabSim.Server.SimulationServer do
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "simulation:#{simulation_id}",
-          :state
+          {:simulation_change, simulation_id, :state}
         )
 
         {:reply, :ok,
@@ -166,7 +166,7 @@ defmodule RenewCollabSim.Server.SimulationServer do
       Phoenix.PubSub.broadcast(
         RenewCollab.PubSub,
         "simulation:#{simulation_id}",
-        :state
+        {:simulation_change, simulation_id, :state}
       )
     end
 
@@ -199,7 +199,7 @@ defmodule RenewCollabSim.Server.SimulationServer do
       Phoenix.PubSub.broadcast(
         RenewCollab.PubSub,
         "simulation:#{simulation_id}",
-        :state
+        {:simulation_change, simulation_id, :state}
       )
     end
   end
