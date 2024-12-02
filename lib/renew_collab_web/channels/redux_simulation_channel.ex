@@ -26,8 +26,11 @@ defmodule RenewCollabWeb.ReduxSimulationChannel do
 
         push(socket, "presence_state", Presence.list(socket))
 
-        {:ok, RenewCollabWeb.SimulationJSON.show_content(sim),
-         assign(socket, :simulation_id, simulation_id)}
+        {:ok,
+         RenewCollabWeb.SimulationJSON.show_content(
+           sim,
+           RenewCollabSim.Server.SimulationServer.exists(simulation_id)
+         ), assign(socket, :simulation_id, simulation_id)}
     end
   end
 
@@ -35,7 +38,8 @@ defmodule RenewCollabWeb.ReduxSimulationChannel do
   def handle_message({:simulation_change, simulation_id, _details}, state) do
     {:noreply,
      RenewCollabWeb.SimulationJSON.show_content(
-       RenewCollabSim.Simulator.find_simulation(simulation_id)
+       RenewCollabSim.Simulator.find_simulation(simulation_id),
+       RenewCollabSim.Server.SimulationServer.exists(simulation_id)
      )}
   end
 

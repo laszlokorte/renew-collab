@@ -16,8 +16,8 @@ defmodule RenewCollabWeb.SimulationJSON do
     }
   end
 
-  def show(%{simulation: simulation}) do
-    detail_data(simulation)
+  def show(%{simulation: simulation, running: running}) do
+    detail_data(simulation, running)
   end
 
   def step(%{status: :ok = status}) do
@@ -28,7 +28,7 @@ defmodule RenewCollabWeb.SimulationJSON do
     %{status: status}
   end
 
-  defp detail_data(%Simulation{} = simulation) do
+  defp detail_data(%Simulation{} = simulation, running) do
     %{
       # id: simulation.id,
       href: url(~p"/api/simulations/#{simulation}"),
@@ -56,13 +56,14 @@ defmodule RenewCollabWeb.SimulationJSON do
           method: "GET"
         }
       },
-      content: show_content(simulation)
+      content: show_content(simulation, running)
     }
   end
 
-  def show_content(%Simulation{} = simulation) do
+  def show_content(%Simulation{} = simulation, running) do
     %{
       timestep: simulation.timestep,
+      running: running,
       name: simulation.id,
       net_instances: Enum.map(simulation.net_instances, &list_instance/1),
       shadow_net_system: show_sns_item(simulation.shadow_net_system)
@@ -75,6 +76,7 @@ defmodule RenewCollabWeb.SimulationJSON do
         url(
           ~p"/api/simulations/#{net_instance.simulation_id}/instance/#{net_instance.shadow_net.name}/#{net_instance.integer_id}"
         ),
+      id: net_instance.id,
       links: %{
         simulation: %{
           href: url(~p"/api/simulations/#{net_instance.simulation_id}")
@@ -90,14 +92,21 @@ defmodule RenewCollabWeb.SimulationJSON do
         url(
           ~p"/api/simulations/#{net_instance.simulation_id}/instance/#{net_instance.shadow_net.name}/#{net_instance.integer_id}"
         ),
+      topic: "redux_net_instance:#{net_instance.id}",
       id: net_instance.id,
       label: net_instance.label,
-      shadow_net_id: net_instance.shadow_net_id
+      links: %{
+        shadow_net: %{
+          href: url(~p"/api/shadow_net_system/#{net_instance.shadow_net_id}"),
+          id: net_instance.shadow_net_id
+        }
+      }
     }
   end
 
   def show_instance_content(net_instance) do
     %{
+      id: net_instance.id,
       shadow_net_id: net_instance.shadow_net_id,
       tokens: Enum.map(net_instance.tokens, &show_token/1),
       label: net_instance.label,
@@ -137,7 +146,7 @@ defmodule RenewCollabWeb.SimulationJSON do
   defp net_document(%{document_json: nil}), do: nil
 
   defp show_token(net_token) do
-    %{id: net_token.id, value: net_token.value}
+    %{place_id: net_token.place_id, id: net_token.id, value: net_token.value}
   end
 
   def index_content(%{simulations: simulations}) do

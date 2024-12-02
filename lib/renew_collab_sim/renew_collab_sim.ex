@@ -86,6 +86,19 @@ defmodule RenewCollabSim.Simulator do
     )
   end
 
+  def find_simulation_net_instance(net_instance_id) do
+    Repo.one(
+      from(ins in SimulationNetInstance,
+        join: net in assoc(ins, :shadow_net),
+        left_join: tokens in assoc(ins, :tokens),
+        left_join: firings in assoc(ins, :firings),
+        where: ins.id == ^net_instance_id,
+        order_by: [asc: firings.timestep],
+        preload: [tokens: tokens, firings: firings, shadow_net: net]
+      )
+    )
+  end
+
   def clear_log(id) do
     Repo.delete_all(
       from(l in SimulationLogEntry,

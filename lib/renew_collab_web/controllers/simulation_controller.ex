@@ -16,7 +16,10 @@ defmodule RenewCollabWeb.SimulationController do
   end
 
   def show(conn, %{"id" => simulation_id}) do
-    render(conn, :show, simulation: RenewCollabSim.Simulator.find_simulation(simulation_id))
+    render(conn, :show,
+      simulation: RenewCollabSim.Simulator.find_simulation(simulation_id),
+      running: RenewCollabSim.Server.SimulationServer.exists(simulation_id)
+    )
   end
 
   def show_sns(conn, %{"id" => sns_id}) do

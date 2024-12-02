@@ -66,6 +66,20 @@ defmodule RenewCollabSim.Server.SimulationProcess do
       )
     )
 
+    RenewCollab.Repo.delete_all(
+      from(i in RenewCollabSim.Entites.SimulationNetInstance,
+        where: i.simulation_id == ^simulation_id
+      )
+    )
+
+    RenewCollab.Repo.update_all(
+      from(sim in RenewCollabSim.Entites.Simulation,
+        where: sim.id == ^simulation_id,
+        update: [set: [timestep: 0]]
+      ),
+      []
+    )
+
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
       "simulation:#{simulation_id}",
