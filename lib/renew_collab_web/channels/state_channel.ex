@@ -233,6 +233,8 @@ defmodule RenewCollabWeb.StateChannel do
         end
       end
 
+      defp maybe_handle_reply({:error, e}, socket), do: {:stop, {:error, e}, socket}
+
       defp maybe_handle_reply({:noreply, new_state}, socket), do: update_state(socket, new_state)
 
       defp maybe_handle_reply({:noreply, new_state, new_socket}, socket),

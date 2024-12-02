@@ -39,7 +39,8 @@ defmodule RenewCollabWeb.LiveSimulation do
            |> assign(
              :simulation,
              sim
-           )}
+           )
+           |> assign(:is_active, RenewCollabSim.Server.SimulationServer.exists(sim_id))}
       end
     end
   end

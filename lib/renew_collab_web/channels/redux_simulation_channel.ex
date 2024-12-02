@@ -5,7 +5,7 @@ defmodule RenewCollabWeb.ReduxSimulationChannel do
 
   @impl true
   def init("redux_simulation:" <> simulation_id, _params, socket) do
-    case RenewCollabSim.Simulator.find_simulation(simulation_id) do
+    case RenewCollabSim.Simulator.find_simulation_simple(simulation_id) do
       nil ->
         {:error, %{reason: "not found"}}
 
@@ -38,7 +38,7 @@ defmodule RenewCollabWeb.ReduxSimulationChannel do
   def handle_message({:simulation_change, simulation_id, _details}, state) do
     {:noreply,
      RenewCollabWeb.SimulationJSON.show_content(
-       RenewCollabSim.Simulator.find_simulation(simulation_id),
+       RenewCollabSim.Simulator.find_simulation_simple(simulation_id),
        RenewCollabSim.Server.SimulationServer.exists(simulation_id)
      )}
   end

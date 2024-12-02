@@ -109,6 +109,7 @@ defmodule RenewCollabWeb.SimulationJSON do
       id: net_instance.id,
       shadow_net_id: net_instance.shadow_net_id,
       tokens: Enum.map(net_instance.tokens, &show_token/1),
+      firings: Enum.map(net_instance.firings, &show_firing/1),
       label: net_instance.label,
       integer_id: net_instance.integer_id
     }
@@ -149,6 +150,10 @@ defmodule RenewCollabWeb.SimulationJSON do
     %{place_id: net_token.place_id, id: net_token.id, value: net_token.value}
   end
 
+  defp show_firing(firing) do
+    %{transition_id: firing.transition_id, id: firing.id, timestep: firing.timestep}
+  end
+
   def index_content(%{simulations: simulations}) do
     %{
       items: for(simulation <- simulations, do: list_data(simulation))
@@ -159,6 +164,7 @@ defmodule RenewCollabWeb.SimulationJSON do
     %{
       href: url(~p"/api/simulations/#{simulation}"),
       id: simulation.id,
+      label: simulation.shadow_net_system.main_net_name,
       links: %{
         step: %{
           href: url(~p"/api/simulations/#{simulation}/step"),

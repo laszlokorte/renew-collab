@@ -19,9 +19,13 @@ defmodule RenewCollabWeb.ReduxSimulationNetInstanceChannel do
 
   @impl true
   def handle_message({:simulation_change, _simulation_id, _details}, %{id: net_instance_id}) do
-    {:noreply,
-     RenewCollabWeb.SimulationJSON.show_instance_content(
-       RenewCollabSim.Simulator.find_simulation_net_instance(net_instance_id)
-     )}
+    RenewCollabSim.Simulator.find_simulation_net_instance(net_instance_id)
+    |> case do
+      nil ->
+        {:error, :not_found}
+
+      ni ->
+        {:noreply, RenewCollabWeb.SimulationJSON.show_instance_content(ni)}
+    end
   end
 end
