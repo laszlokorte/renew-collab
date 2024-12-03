@@ -16,6 +16,10 @@ defmodule RenewCollabWeb.SimulationJSON do
     }
   end
 
+  def created(%{simulation: simulation}) do
+    %{id: simulation.id}
+  end
+
   def show(%{simulation: simulation, running: running}) do
     detail_data(simulation, running)
   end
