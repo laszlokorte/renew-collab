@@ -1,29 +1,36 @@
 defmodule RenewCollabWeb.SimulationController do
+  alias RenewCollabSim.Server.SimulationServer
   use RenewCollabWeb, :controller
 
   action_fallback RenewCollabWeb.FallbackController
 
   def index(conn, %{}) do
-    render(conn, :index, simulations: RenewCollabSim.Simulator.find_all_simulations())
+    render(conn, :index,
+      simulations: RenewCollabSim.Simulator.find_all_simulations(),
+      runnings: SimulationServer.running_ids() |> MapSet.new()
+    )
   end
 
   def create(conn, params = %{"document_ids" => [first_id | _] = document_ids})
       when is_list(document_ids) do
     nets =
-      document_ids
-      |> Enum.map(fn doc_id ->
-        document = RenewCollab.Renew.get_document_with_elements(doc_id)
-        {:ok, rnw} = RenewCollab.Export.DocumentExport.export(document)
-        {:ok, json} = RenewCollabWeb.DocumentJSON.show_content(document) |> Jason.encode()
+      try do
+        document_ids
+        |> Enum.map(fn doc_id ->
+          document = RenewCollab.Renew.get_document_with_elements(doc_id)
+          {:ok, rnw} = RenewCollab.Export.DocumentExport.export(document)
+          {:ok, json} = RenewCollabWeb.DocumentJSON.show_content(document) |> Jason.encode()
 
-        {document.name, rnw, json}
-      end)
+          {document.name, rnw, json}
+        end)
+      rescue
+        _ ->
+          :export_error
+      end
 
-    {default_main_name, _, _} = Enum.at(nets, 0)
-
-    main_name = Map.get(params, "main_net_name", default_main_name)
-
-    with {:ok, content} <-
+    with [{default_main_name, _, _} | _] <- nets,
+         main_name <- Map.get(params, "main_net_name", default_main_name),
+         {:ok, content} <-
            RenewCollabSim.Compiler.SnsCompiler.compile(
              nets
              |> Enum.map(fn {name, rnw, json} -> {name, rnw} end)
@@ -58,6 +65,12 @@ defmodule RenewCollabWeb.SimulationController do
             :any
           )
 
+          Phoenix.PubSub.broadcast(
+            RenewCollab.PubSub,
+            "simulations",
+            {:simulation_change, sim_id, :created}
+          )
+
           render(conn, :created, simulation: simulation)
 
         _ ->
@@ -67,12 +80,16 @@ defmodule RenewCollabWeb.SimulationController do
           |> halt()
       end
     else
-      x ->
-        dbg(x)
-
+      :export_error ->
         conn
         |> put_status(:bad_request)
-        |> Phoenix.Controller.json(%{message: "Compilation Failed"})
+        |> Phoenix.Controller.json(%{message: "Conversion to .rnw failed"})
+        |> halt()
+
+      x ->
+        conn
+        |> put_status(:bad_request)
+        |> Phoenix.Controller.json(%{message: "Compilation to SNS Failed"})
         |> halt()
     end
   end

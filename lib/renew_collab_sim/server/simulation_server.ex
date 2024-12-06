@@ -63,6 +63,12 @@ defmodule RenewCollabSim.Server.SimulationServer do
           {:simulation_change, simulation_id, :state}
         )
 
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "simulations",
+          {:simulation_change, simulation_id, :state}
+        )
+
         {:noreply,
          Map.put(state, simulation_id, %{
            sim_process: pid
@@ -122,6 +128,12 @@ defmodule RenewCollabSim.Server.SimulationServer do
           {:simulation_change, simulation_id, :state}
         )
 
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "simulations",
+          {:simulation_change, simulation_id, :state}
+        )
+
         {:reply, :ok,
          Map.put(state, simulation_id, %{
            sim_process: pid
@@ -168,6 +180,12 @@ defmodule RenewCollabSim.Server.SimulationServer do
         "simulation:#{simulation_id}",
         {:simulation_change, simulation_id, :state}
       )
+
+      Phoenix.PubSub.broadcast(
+        RenewCollab.PubSub,
+        "simulations",
+        {:simulation_change, simulation_id, :state}
+      )
     end
 
     {:noreply,
@@ -199,6 +217,12 @@ defmodule RenewCollabSim.Server.SimulationServer do
       Phoenix.PubSub.broadcast(
         RenewCollab.PubSub,
         "simulation:#{simulation_id}",
+        {:simulation_change, simulation_id, :state}
+      )
+
+      Phoenix.PubSub.broadcast(
+        RenewCollab.PubSub,
+        "simulations",
         {:simulation_change, simulation_id, :state}
       )
     end

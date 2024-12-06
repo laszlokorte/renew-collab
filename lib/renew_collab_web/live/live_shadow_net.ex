@@ -12,6 +12,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
 
       sns ->
         RenewCollabWeb.Endpoint.subscribe("#{@topic}:#{shadow_net_system_id}")
+        RenewCollabWeb.Endpoint.subscribe("simulations")
 
         socket =
           socket
@@ -34,6 +35,16 @@ defmodule RenewCollabWeb.LiveShadowNet do
   end
 
   def handle_info(:any, socket) do
+    {:noreply,
+     socket
+     |> assign(
+       :shadow_net_system,
+       RenewCollabSim.Simulator.find_shadow_net_system(socket.assigns.shadow_net_system_id)
+     )
+     |> assign(:running, RenewCollabSim.Server.SimulationServer.running_ids() |> MapSet.new())}
+  end
+
+  def handle_info({:simulation_change, _, _}, socket) do
     {:noreply,
      socket
      |> assign(

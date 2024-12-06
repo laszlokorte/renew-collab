@@ -50,6 +50,7 @@ defmodule RenewCollabSim.Simulator do
     Repo.all(
       from(s in Simulation,
         inner_join: sns in assoc(s, :shadow_net_system),
+        order_by: [desc: s.inserted_at],
         preload: [shadow_net_system: sns]
       )
     )
@@ -63,16 +64,15 @@ defmodule RenewCollabSim.Simulator do
         left_join: ins in assoc(s, :net_instances),
         left_join: net in assoc(ins, :shadow_net),
         left_join: tokens in assoc(ins, :tokens),
-        left_join: firings in assoc(ins, :firings),
         where: s.id == ^id,
-        order_by: [asc: firings.timestep],
         preload: [
           shadow_net_system: {sns, [nets: nets]},
-          net_instances: {ins, [tokens: tokens, firings: firings, shadow_net: net]}
+          net_instances: {ins, [tokens: tokens, shadow_net: net]}
         ]
       )
     )
     |> Repo.preload(:log_entries)
+    |> Repo.preload(net_instances: :firings)
   end
 
   def find_simulation_simple(id) do
@@ -162,6 +162,12 @@ defmodule RenewCollabSim.Simulator do
 
   def delete_simulation(id) do
     Repo.delete(find_simulation(id))
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "simulations",
+      {:simulation_change, id, :delete}
+    )
   end
 
   def change_main_net(sns_id, main_net_name) do
@@ -195,8 +201,6 @@ defmodule RenewCollabSim.Simulator do
             document_json: doc_json
           })
           |> Repo.update()
-
-          dbg("xxxx")
         end
     end
   end

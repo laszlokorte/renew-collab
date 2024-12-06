@@ -86,6 +86,22 @@ defmodule RenewCollabWeb.LiveSimulation do
 
             <button
               type="button"
+              phx-click="play"
+              style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+            >
+              play
+            </button>
+
+            <button
+              type="button"
+              phx-click="pause"
+              style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+            >
+              pause
+            </button>
+
+            <button
+              type="button"
               phx-click="terminate"
               style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #a3a; color: #fff"
             >
@@ -294,6 +310,18 @@ defmodule RenewCollabWeb.LiveSimulation do
 
   def handle_event("step", %{}, socket) do
     RenewCollabSim.Server.SimulationServer.step(socket.assigns.simulation.id)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("play", %{}, socket) do
+    RenewCollabSim.Server.SimulationServer.play(socket.assigns.simulation.id)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("pause", %{}, socket) do
+    RenewCollabSim.Server.SimulationServer.pause(socket.assigns.simulation.id)
 
     {:noreply, socket}
   end

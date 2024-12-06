@@ -51,6 +51,20 @@ defmodule RenewCollabWeb.ReduxSimulationChannel do
   end
 
   @impl true
+  def handle_event("play", %{}, _state, socket) do
+    RenewCollabSim.Server.SimulationServer.play(socket.assigns.simulation_id)
+
+    :silent
+  end
+
+  @impl true
+  def handle_event("pause", %{}, _state, socket) do
+    RenewCollabSim.Server.SimulationServer.pause(socket.assigns.simulation_id)
+
+    :silent
+  end
+
+  @impl true
   def handle_event("terminate", %{}, _state, socket) do
     RenewCollabSim.Server.SimulationServer.terminate(socket.assigns.simulation_id)
 
