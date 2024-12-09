@@ -26,30 +26,27 @@ defmodule RenewCollab.Commands.ReorderLayer do
   def auto_snapshot(%__MODULE__{}), do: true
 
   def multi(
-        %__MODULE__{
+        cmd = %__MODULE__{
           document_id: document_id,
           layer_id: layer_id,
           target_layer_id: target_layer_id,
           target: {order, relative}
-        },
-        nested \\ false
+        }
       ) do
-    doc_id_key = if(nested, do: :move_layer_document_id, else: :document_id)
-
     Ecto.Multi.new()
-    |> Ecto.Multi.put(doc_id_key, document_id)
-    |> Ecto.Multi.one(:conflict_count, fn _ ->
+    |> Ecto.Multi.put({cmd, :document_id}, document_id)
+    |> Ecto.Multi.one({cmd, :conflict_count}, fn _ ->
       from(p in LayerParenthood,
         where: p.ancestor_id == ^layer_id and p.descendant_id == ^target_layer_id,
         select: count(p.id)
       )
     end)
-    |> Ecto.Multi.run(:check_conflict, fn
-      _, %{conflict_count: 0} = changes -> {:ok, changes}
-      _, %{conflict_count: c} when c > 0 -> {:error, :cyclic_hierarchy}
+    |> Ecto.Multi.run({cmd, :check_conflict}, fn
+      _, %{{^cmd, :conflict_count} => 0} = changes -> {:ok, changes}
+      _, %{{^cmd, :conflict_count} => c} when c > 0 -> {:error, :cyclic_hierarchy}
       _, changes -> {:error, changes}
     end)
-    |> Ecto.Multi.one(:target, fn _ ->
+    |> Ecto.Multi.one({cmd, :target}, fn _ ->
       case relative do
         :inside ->
           from(parent in LayerParenthood,
@@ -82,14 +79,14 @@ defmodule RenewCollab.Commands.ReorderLayer do
           )
       end
     end)
-    |> Ecto.Multi.all(:new_parents, fn
-      %{target: %{parent_id: nil}} ->
+    |> Ecto.Multi.all({cmd, :new_parents}, fn
+      %{{^cmd, :target} => %{parent_id: nil}} ->
         from(
           low in LayerParenthood,
           where: false
         )
 
-      %{:target => %{parent_id: target_parent_id}, ^doc_id_key => document_id} ->
+      %{{^cmd, :target} => %{parent_id: target_parent_id}, {^cmd, :document_id} => document_id} ->
         # SELECT low.child_id,
         # high.parent_id,
         # low.depth + high.depth + 1
@@ -110,7 +107,7 @@ defmodule RenewCollab.Commands.ReorderLayer do
         )
     end)
     |> Ecto.Multi.delete_all(
-      :delete_old_parents,
+      {cmd, :delete_old_parents},
       fn
         # DELETE FROM site_closure WHERE id IN (
         # SELECT bad.id FROM site_closure ok
@@ -138,7 +135,7 @@ defmodule RenewCollab.Commands.ReorderLayer do
       end
     )
     |> Ecto.Multi.insert_all(
-      :insert_new_parents,
+      {cmd, :insert_new_parents},
       LayerParenthood,
       fn
         # INSERT INTO site_closure(child_id, parent_id, depth)
@@ -148,15 +145,15 @@ defmodule RenewCollab.Commands.ReorderLayer do
         # FROM site_closure low, site_closure high
         # WHERE low.parent_id = 3 AND high.child_id=5;
 
-        %{new_parents: new_parents} ->
+        %{{^cmd, :new_parents} => new_parents} ->
           new_parents
           |> Enum.map(&Map.put(&1, :id, Ecto.UUID.generate()))
       end
     )
     |> Ecto.Multi.update_all(
-      :update_z_Index,
+      {cmd, :update_z_Index},
       fn
-        %{target: %{z_index_above: z_index_above, z_index_below: z_index_below}} ->
+        %{{^cmd, :target} => %{z_index_above: z_index_above, z_index_below: z_index_below}} ->
           new_z_index =
             case order do
               :below -> z_index_below
@@ -173,10 +170,10 @@ defmodule RenewCollab.Commands.ReorderLayer do
       []
     )
     |> Ecto.Multi.update_all(
-      :update_others_z_Index,
+      {cmd, :update_others_z_Index},
       fn
         %{
-          target: %{
+          {^cmd, :target} => %{
             parent_id: parent_id,
             z_index_above: z_index_above,
             z_index_below: z_index_below
@@ -245,9 +242,9 @@ defmodule RenewCollab.Commands.ReorderLayer do
       end,
       []
     )
-    |> Ecto.Multi.merge(fn %{^doc_id_key => document_id} ->
-      RenewCollab.Commands.NormalizeZIndex.new(%{document_id: document_id})
-      |> RenewCollab.Commands.NormalizeZIndex.multi(true)
+    |> Ecto.Multi.merge(fn %{{^cmd, :document_id} => document_id} ->
+      RenewCollab.Commands.NormalizeZIndex.new(%{document_id: document_id, ref_id: cmd})
+      |> RenewCollab.Commands.NormalizeZIndex.multi()
     end)
   end
 

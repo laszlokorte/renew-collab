@@ -12,23 +12,21 @@ defmodule RenewCollab.Commands.CreateSnapshot do
     %__MODULE__{document_id: document_id}
   end
 
-  def multi(%__MODULE__{document_id: document_id}) do
-    Ecto.Multi.new()
-    |> Ecto.Multi.put(:document_id, document_id)
-    |> Ecto.Multi.append(multi())
-  end
-
   def tags(%__MODULE__{document_id: document_id}), do: [{:document_versions, document_id}]
   def auto_snapshot(%__MODULE__{}), do: false
 
-  def multi() do
+  def multi(%__MODULE__{document_id: document_id}) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.append(multi(document_id))
+  end
+
+  def multi(document_id) when is_binary(document_id) do
     multi =
       Ecto.Multi.new()
       |> Ecto.Multi.one(
         :latest_snapshot,
-        fn %{document_id: document_id} ->
-          from(l in LatestSnapshot, where: l.document_id == ^document_id, select: l.snapshot_id)
-        end
+        from(l in LatestSnapshot, where: l.document_id == ^document_id, select: l.snapshot_id)
       )
       |> Ecto.Multi.run(
         :ids,
@@ -56,13 +54,13 @@ defmodule RenewCollab.Commands.CreateSnapshot do
     @snapshotters
     |> Enum.reduce(multi, fn snap, acc ->
       acc
-      |> Ecto.Multi.all(snap.storage_key(), fn %{document_id: document_id} ->
+      |> Ecto.Multi.all(snap.storage_key(), fn %{} ->
         snap.query(document_id)
       end)
     end)
     |> Ecto.Multi.delete_all(
       :delete_current_latest,
-      fn %{document_id: document_id} ->
+      fn %{} ->
         from(l in LatestSnapshot, where: l.document_id == ^document_id)
       end,
       []
@@ -70,7 +68,6 @@ defmodule RenewCollab.Commands.CreateSnapshot do
     |> Ecto.Multi.insert(
       :new_snapshot,
       fn %{
-           document_id: document_id,
            ids: %{
              new_id: new_id,
              predecessor_id: predecessor_id
@@ -106,7 +103,6 @@ defmodule RenewCollab.Commands.CreateSnapshot do
     |> Ecto.Multi.insert(
       :new_latest_snapshot,
       fn %{
-           document_id: document_id,
            ids: %{
              new_id: new_id
            }

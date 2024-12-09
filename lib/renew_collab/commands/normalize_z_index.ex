@@ -3,13 +3,15 @@ defmodule RenewCollab.Commands.NormalizeZIndex do
 
   alias RenewCollab.Hierarchy.Layer
 
-  defstruct [:document_id]
+  defstruct [:document_id, :ref_id]
 
   def new(%{
-        document_id: document_id
+        document_id: document_id,
+        ref_id: ref_id
       }) do
     %__MODULE__{
-      document_id: document_id
+      document_id: document_id,
+      ref_id: ref_id
     }
   end
 
@@ -19,20 +21,17 @@ defmodule RenewCollab.Commands.NormalizeZIndex do
   def auto_snapshot(%__MODULE__{}), do: true
 
   def multi(
-        %__MODULE__{
+        cmd = %__MODULE__{
           document_id: document_id
-        },
-        nested \\ false
+        }
       ) do
-    doc_id_key = if(nested, do: :normalize_z_index_document_id, else: :document_id)
-
     Ecto.Multi.new()
-    |> Ecto.Multi.put(doc_id_key, document_id)
+    |> Ecto.Multi.put({cmd, :document_id}, document_id)
     |> Ecto.Multi.insert_all(
-      :normalize_z_index,
+      {cmd, :normalize_z_index},
       Layer,
       fn
-        %{^doc_id_key => document_id} ->
+        %{{^cmd, :document_id} => document_id} ->
           from(l in Layer,
             left_join: dp in assoc(l, :direct_parent_layer),
             where: l.document_id == ^document_id,

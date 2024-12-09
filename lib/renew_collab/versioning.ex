@@ -11,7 +11,7 @@ defmodule RenewCollab.Versioning do
     |> RenewCollab.Fetcher.fetch()
   end
 
-  def snapshot_multi() do
-    RenewCollab.Commands.CreateSnapshot.multi()
+  def snapshot_multi(document_id) do
+    RenewCollab.Commands.CreateSnapshot.multi(document_id)
   end
 end

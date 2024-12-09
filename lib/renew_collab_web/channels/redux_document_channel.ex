@@ -319,6 +319,29 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
 
   @impl true
   def handle_event(
+        "create_layer",
+        params = %{
+          "child_layer_id" => child_layer_id
+        },
+        %{},
+        socket
+      ) do
+    RenewCollab.Commands.CreateParentLayer.new(%{
+      child_layer_id: child_layer_id,
+      document_id: socket.assigns.document_id,
+      attrs: %{
+        "semantic_tag" => Map.get(params, "semantic_tag", "CH.ifa.draw.figures.GroupFigure")
+      }
+    })
+    |> RenewCollab.Commander.run_document_command_sync()
+    |> case do
+      {:ok, %{layer: layer}} ->
+        {:reply, %{id: layer.id}, socket}
+    end
+  end
+
+  @impl true
+  def handle_event(
         "change_style",
         %{"type" => "text", "attr" => style_attr, "layer_id" => layer_id, "val" => value},
         %{},
@@ -629,6 +652,28 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
     |> RenewCollab.Commander.run_document_command()
 
     :silent
+  end
+
+  @impl true
+  def handle_event(
+        "move_layer_relative",
+        %{
+          "layer_id" => layer_id,
+          "dx" => dx,
+          "dy" => dy
+        },
+        %{},
+        socket
+      ) do
+    RenewCollab.Commands.MoveLayerRelative.new(%{
+      document_id: socket.assigns.document_id,
+      layer_id: layer_id,
+      dx: dx,
+      dy: dy
+    })
+    |> RenewCollab.Commander.run_document_command_sync()
+
+    :ack
   end
 
   @impl true

@@ -22,11 +22,13 @@ defmodule RenewCollab.Commands.UpdateLayerZIndex do
 
   def auto_snapshot(%__MODULE__{}), do: true
 
-  def multi(%__MODULE__{
-        document_id: document_id,
-        layer_id: layer_id,
-        z_index: z_index
-      }) do
+  def multi(
+        cmd = %__MODULE__{
+          document_id: document_id,
+          layer_id: layer_id,
+          z_index: z_index
+        }
+      ) do
     Ecto.Multi.new()
     |> Ecto.Multi.put(:document_id, document_id)
     |> Ecto.Multi.one(
@@ -42,8 +44,8 @@ defmodule RenewCollab.Commands.UpdateLayerZIndex do
       end
     )
     |> Ecto.Multi.merge(fn %{^document_id => document_id} ->
-      RenewCollab.Commands.NormalizeZIndex.new(%{document_id: document_id})
-      |> RenewCollab.Commands.NormalizeZIndex.multi(true)
+      RenewCollab.Commands.NormalizeZIndex.new(%{document_id: document_id, ref_id: cmd})
+      |> RenewCollab.Commands.NormalizeZIndex.multi()
     end)
   end
 end

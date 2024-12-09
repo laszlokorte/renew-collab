@@ -95,7 +95,7 @@ defmodule RenewCollab.Commands.CreateLayer do
             target_layer_id: target_layer_id,
             target: {:above, :outside}
           })
-          |> RenewCollab.Commands.ReorderLayer.multi(true)
+          |> RenewCollab.Commands.ReorderLayer.multi()
       end
     end)
     |> Ecto.Multi.append(RenewCollab.Bonding.reposition_multi())

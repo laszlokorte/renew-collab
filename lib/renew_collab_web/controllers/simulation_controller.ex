@@ -34,7 +34,6 @@ defmodule RenewCollabWeb.SimulationController do
            RenewCollabSim.Compiler.SnsCompiler.compile(
              nets
              |> Enum.map(fn {name, rnw, json} -> {name, rnw} end)
-             |> dbg()
            ),
          {:ok, %{id: sns_id}} <-
            %RenewCollabSim.Entites.ShadowNetSystem{}

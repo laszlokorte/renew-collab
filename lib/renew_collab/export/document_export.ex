@@ -12,7 +12,11 @@ defmodule RenewCollab.Export.DocumentExport do
 
     document =
       Map.update(document, :layers, nil, fn layers ->
-        Enum.sort_by(layers, &{is_nil(&1.box), is_nil(&1.edge), is_nil(&1.text)})
+        Enum.sort_by(
+          layers,
+          &{not (is_nil(&1.box) and is_nil(&1.edge) and is_nil(&1.text)), is_nil(&1.box),
+           is_nil(&1.edge), is_nil(&1.text)}
+        )
       end)
 
     refs =
@@ -42,14 +46,17 @@ defmodule RenewCollab.Export.DocumentExport do
     })
   end
 
-  def export_layer(storables, view_box, document, grammar, layer) do
-    storables =
+  def export_layer(prev_storables, view_box, document, grammar, layer) do
+    child_storables =
       document.layers
       |> Enum.filter(fn l ->
         not is_nil(l.direct_parent_hood) and l.direct_parent_hood.ancestor_id == layer.id
       end)
-      |> Enum.reduce(storables, fn sub_layer, storables ->
-        export_layer(storables, view_box, document, grammar, sub_layer)
+
+    storables =
+      child_storables
+      |> Enum.reduce(prev_storables, fn sub_layer, acc_storables ->
+        export_layer(acc_storables, view_box, document, grammar, sub_layer)
       end)
 
     cond do
@@ -528,6 +535,33 @@ defmodule RenewCollab.Export.DocumentExport do
             }
           ])
         end
+
+      Hierarchy.is_subtype_of(
+        grammar,
+        layer.semantic_tag,
+        "CH.ifa.draw.figures.GroupFigure"
+      ) ->
+        storables
+        |> Enum.concat([
+          %Renewex.Storable{
+            class_name: "CH.ifa.draw.figures.GroupFigure",
+            fields: %{
+              _root: layer.direct_parent_hood == nil,
+              _gen_id: layer.id,
+              figures:
+                for c <- child_storables,
+                    cid = c.id,
+                    ref =
+                      Enum.find_value(Enum.with_index(storables), fn
+                        {%{fields: %{_gen_id: ^cid}}, i} -> {:ref, i}
+                        _ -> nil
+                      end),
+                    not is_nil(ref) do
+                  ref
+                end
+            }
+          }
+        ])
 
       true ->
         []
