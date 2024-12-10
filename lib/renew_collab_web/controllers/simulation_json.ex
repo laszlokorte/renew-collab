@@ -60,15 +60,16 @@ defmodule RenewCollabWeb.SimulationJSON do
           method: "GET"
         }
       },
-      content: show_content(simulation, running)
+      content: show_content(simulation, running, nil)
     }
   end
 
-  def show_content(%Simulation{} = simulation, running) do
+  def show_content(%Simulation{} = simulation, running, is_playing) do
     %{
       timestep: simulation.timestep,
       running: running,
       name: simulation.id,
+      is_playing: is_playing,
       net_instances: Enum.map(simulation.net_instances, &list_instance/1),
       shadow_net_system: show_sns_item(simulation.shadow_net_system)
     }

@@ -15,6 +15,10 @@ defmodule RenewCollabSim.Server.SimulationProcess do
     GenServer.call(pid, :stop)
   end
 
+  def is_playing(pid) do
+    GenServer.call(pid, :is_playing)
+  end
+
   def step(pid) do
     GenServer.cast(pid, :step)
   end
@@ -28,7 +32,12 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   end
 
   defp broadcast_change(
-         state = %{simulation_id: sim_id, latest_update: latest_update, retry: retry},
+         state = %{
+           simulation_id: sim_id,
+           latest_update: latest_update,
+           retry: retry,
+           playing: playing
+         },
          event
        ) do
     now = DateTime.utc_now()
@@ -41,13 +50,13 @@ defmodule RenewCollabSim.Server.SimulationProcess do
       Phoenix.PubSub.broadcast(
         RenewCollab.PubSub,
         "simulation:#{sim_id}",
-        {:simulation_change, sim_id, event}
+        {:simulation_change, sim_id, {event, playing}}
       )
 
       Phoenix.PubSub.broadcast(
         RenewCollab.PubSub,
         "simulations",
-        {:simulation_change, sim_id, event}
+        {:simulation_change, sim_id, {event, playing}}
       )
 
       %{state | latest_update: now, retry: nil}
@@ -90,6 +99,17 @@ defmodule RenewCollabSim.Server.SimulationProcess do
       _ ->
         :ignore
     end
+  end
+
+  @impl true
+  def handle_call(
+        :is_playing,
+        _from,
+        state = %{
+          playing: is_playing
+        }
+      ) do
+    {:reply, is_playing, state}
   end
 
   @impl true

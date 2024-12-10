@@ -36,6 +36,10 @@ defmodule RenewCollabSim.Server.SimulationServer do
     GenServer.call(__MODULE__, {:exists, simulation_id})
   end
 
+  def is_playing(simulation_id) do
+    GenServer.call(__MODULE__, {:is_playing, simulation_id})
+  end
+
   def running_ids() do
     GenServer.call(__MODULE__, :running_ids)
   end
@@ -160,6 +164,16 @@ defmodule RenewCollabSim.Server.SimulationServer do
   @impl true
   def handle_call({:exists, simulation_id}, _from, state) do
     {:reply, Map.has_key?(state, simulation_id), state}
+  end
+
+  @impl true
+  def handle_call({:is_playing, simulation_id}, _from, state) do
+    Map.has_key?(state, simulation_id)
+    |> case do
+      %{sim_process: pid} -> RenewCollabSim.Server.SimulationProcess.is_playing(pid)
+      _ -> false
+    end
+    |> then(&{:reply, &1, state})
   end
 
   @impl true

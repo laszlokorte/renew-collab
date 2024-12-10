@@ -7,8 +7,8 @@ defmodule RenewCollabSim.Entites.ShadowNetSystem do
   schema "shadow_net_system" do
     field :compiled, :binary
     field :main_net_name, :string
-    has_many :nets, RenewCollabSim.Entites.ShadowNet
-    has_many :simulations, RenewCollabSim.Entites.Simulation
+    has_many :nets, RenewCollabSim.Entites.ShadowNet, preload_order: [asc: :id]
+    has_many :simulations, RenewCollabSim.Entites.Simulation, preload_order: [desc: :inserted_at]
 
     timestamps(type: :utc_datetime)
   end
