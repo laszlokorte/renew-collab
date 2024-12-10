@@ -117,7 +117,8 @@ defmodule RenewCollab.Export.DocumentExport do
           %Renewex.Storable{
             class_name: layer.semantic_tag,
             fields: %{
-              _root: layer.direct_parent_hood == nil,
+              # layer.direct_parent_hood == nil,
+              _root: true,
               _gen_id: layer.id,
               attributes: export_attributes(:box, layer),
               x: round(-view_box.x + layer.box.position_x),
@@ -132,17 +133,28 @@ defmodule RenewCollab.Export.DocumentExport do
       Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "de.renew.gui.VirtualPlaceFigure") ->
         storables
         |> Enum.concat([
-          # %Renewex.Storable{
-          #   class_name: layer.semantic_tag,
-          #   fields: %{
-          #     x: 10,
-          #     y: 10,
-          #     w: 10,
-          #     h: 10,
-          #     highlight_figure: nil,
-          #     place: nil
-          #   }
-          # }
+          %Renewex.Storable{
+            class_name: layer.semantic_tag,
+            fields: %{
+              # layer.direct_parent_hood == nil,
+              _root: true,
+              _gen_id: layer.id,
+              attributes: export_attributes(:box, layer),
+              x: round(-view_box.x + layer.box.position_x),
+              y: round(-view_box.y + layer.box.position_y),
+              w: round(layer.box.width),
+              h: round(layer.box.height),
+              highlight_figure: nil,
+              place:
+                with out when not is_nil(out) <- layer.outgoing_link,
+                     target_layer_id when not is_nil(target_layer_id) <- out.target_layer_id do
+                  Enum.find_value(Enum.with_index(storables), fn
+                    {%{fields: %{_gen_id: ^target_layer_id}}, i} -> {:ref, i}
+                    _ -> nil
+                  end)
+                end
+            }
+          }
         ])
 
       Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "de.renew.gui.PlaceFigure") ->
@@ -151,7 +163,8 @@ defmodule RenewCollab.Export.DocumentExport do
           %Renewex.Storable{
             class_name: layer.semantic_tag,
             fields: %{
-              _root: layer.direct_parent_hood == nil,
+              # layer.direct_parent_hood == nil,
+              _root: true,
               _gen_id: layer.id,
               attributes: export_attributes(:box, layer),
               x: round(-view_box.x + layer.box.position_x),
@@ -169,7 +182,8 @@ defmodule RenewCollab.Export.DocumentExport do
           %Renewex.Storable{
             class_name: layer.semantic_tag,
             fields: %{
-              _root: layer.direct_parent_hood == nil,
+              # layer.direct_parent_hood == nil,
+              _root: true,
               _gen_id: layer.id,
               attributes: export_attributes(:box, layer),
               x: round(-view_box.x + layer.box.position_x),
@@ -186,7 +200,8 @@ defmodule RenewCollab.Export.DocumentExport do
           %Renewex.Storable{
             class_name: layer.semantic_tag,
             fields: %{
-              _root: layer.direct_parent_hood == nil,
+              # layer.direct_parent_hood == nil,
+              _root: true,
               attributes: export_attributes(:box, layer),
               x: round(-view_box.x + layer.box.position_x),
               y: round(-view_box.y + layer.box.position_y),
@@ -207,7 +222,8 @@ defmodule RenewCollab.Export.DocumentExport do
           %Renewex.Storable{
             class_name: layer.semantic_tag,
             fields: %{
-              _root: layer.direct_parent_hood == nil,
+              # layer.direct_parent_hood == nil,
+              _root: true,
               _gen_id: layer.id,
               attributes: export_attributes(:box, layer),
               x: round(-view_box.x + layer.box.position_x),
@@ -307,7 +323,8 @@ defmodule RenewCollab.Export.DocumentExport do
             class_name: layer.semantic_tag,
             fields: %{
               _gen_id: layer.id,
-              _root: layer.direct_parent_hood == nil,
+              # layer.direct_parent_hood == nil,
+              _root: true,
               attributes: export_attributes(:edge, layer),
               points:
                 Enum.concat([
@@ -344,7 +361,8 @@ defmodule RenewCollab.Export.DocumentExport do
             %Renewex.Storable{
               class_name: layer.semantic_tag,
               fields: %{
-                _root: layer.direct_parent_hood == nil,
+                # layer.direct_parent_hood == nil,
+                _root: true,
                 attributes: export_attributes(:text, layer),
                 fOriginX: round(-view_box.x + layer.text.position_x),
                 fOriginY: round(-view_box.y + layer.text.position_y),
@@ -366,7 +384,8 @@ defmodule RenewCollab.Export.DocumentExport do
             %Renewex.Storable{
               class_name: layer.semantic_tag,
               fields: %{
-                _root: layer.direct_parent_hood == nil,
+                # layer.direct_parent_hood == nil,
+                _root: true,
                 attributes: export_attributes(:text, layer),
                 fOriginX: round(-view_box.x + layer.text.position_x),
                 fOriginY: round(-view_box.y + layer.text.position_y),
@@ -386,31 +405,45 @@ defmodule RenewCollab.Export.DocumentExport do
 
       Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "de.renew.gui.CPNTextFigure") ->
         if is_nil(layer.text.style) do
-          {storables, locator_base} =
-            create_ref(storables, %Renewex.Storable{
-              class_name: "CH.ifa.draw.standard.RelativeLocator",
-              fields: %{
-                fOffsetY: 0.5,
-                fOffsetX: 0.5
-              }
-            })
+          parent_ref =
+            with out when not is_nil(out) <- layer.outgoing_link,
+                 target_layer_id when not is_nil(target_layer_id) <- out.target_layer_id do
+              Enum.find_value(Enum.with_index(storables), fn
+                {%{fields: %{_gen_id: ^target_layer_id}}, i} -> {:ref, i}
+                _ -> nil
+              end)
+            end
 
           {storables, locator_ref} =
-            create_ref(storables, %Renewex.Storable{
-              class_name: "CH.ifa.draw.standard.OffsetLocator",
-              fields: %{
-                fOffsetY: 0,
-                fOffsetX: 0,
-                fBase: locator_base
-              }
-            })
+            if parent_ref do
+              {storables, locator_base} =
+                create_ref(storables, %Renewex.Storable{
+                  class_name: "CH.ifa.draw.standard.RelativeLocator",
+                  fields: %{
+                    fOffsetY: 0.5,
+                    fOffsetX: 0.5
+                  }
+                })
+
+              create_ref(storables, %Renewex.Storable{
+                class_name: "CH.ifa.draw.standard.OffsetLocator",
+                fields: %{
+                  fOffsetY: 0,
+                  fOffsetX: 0,
+                  fBase: locator_base
+                }
+              })
+            else
+              {storables, nil}
+            end
 
           storables
           |> Enum.concat([
             %Renewex.Storable{
               class_name: layer.semantic_tag,
               fields: %{
-                _root: layer.direct_parent_hood == nil,
+                # layer.direct_parent_hood == nil,
+                _root: true,
                 _gen_id: layer.id,
                 attributes: export_attributes(:text, layer),
                 fOriginX: round(-view_box.x + layer.text.position_x),
@@ -420,17 +453,7 @@ defmodule RenewCollab.Export.DocumentExport do
                 fCurrentFontStyle: 0,
                 fCurrentFontSize: 12,
                 fIsReadOnly: 0,
-                fParent:
-                  case layer.outgoing_link.target_layer_id do
-                    nil ->
-                      nil
-
-                    target_layer_id ->
-                      Enum.find_value(Enum.with_index(storables), fn
-                        {%{fields: %{_gen_id: ^target_layer_id}}, i} -> {:ref, i}
-                        _ -> nil
-                      end)
-                  end,
+                fParent: parent_ref,
                 fLocator: locator_ref,
                 fType: 1
 
@@ -464,7 +487,8 @@ defmodule RenewCollab.Export.DocumentExport do
             %Renewex.Storable{
               class_name: layer.semantic_tag,
               fields: %{
-                _root: layer.direct_parent_hood == nil,
+                # layer.direct_parent_hood == nil,
+                _root: true,
                 attributes: export_attributes(:text, layer),
                 fOriginX: round(-view_box.x + layer.text.position_x),
                 fOriginY: round(-view_box.y + layer.text.position_y),
@@ -474,15 +498,12 @@ defmodule RenewCollab.Export.DocumentExport do
                 fCurrentFontSize: round(style_or_default(layer.text, :font_size)),
                 fIsReadOnly: 0,
                 fParent:
-                  case layer.outgoing_link.target_layer_id do
-                    nil ->
-                      nil
-
-                    target_layer_id ->
-                      Enum.find_value(Enum.with_index(storables), fn
-                        {%{fields: %{_gen_id: ^target_layer_id}}, i} -> {:ref, i}
-                        _ -> nil
-                      end)
+                  with out when not is_nil(out) <- layer.outgoing_link,
+                       target_layer_id when not is_nil(target_layer_id) <- out.target_layer_id do
+                    Enum.find_value(Enum.with_index(storables), fn
+                      {%{fields: %{_gen_id: ^target_layer_id}}, i} -> {:ref, i}
+                      _ -> nil
+                    end)
                   end,
                 fLocator: locator_ref,
                 fType: 1
@@ -498,7 +519,8 @@ defmodule RenewCollab.Export.DocumentExport do
             %Renewex.Storable{
               class_name: layer.semantic_tag,
               fields: %{
-                _root: layer.direct_parent_hood == nil,
+                # layer.direct_parent_hood == nil,
+                _root: true,
                 attributes: export_attributes(:text, layer),
                 fOriginX: round(-view_box.x + layer.text.position_x),
                 fOriginY: round(-view_box.y + layer.text.position_y),
@@ -519,7 +541,8 @@ defmodule RenewCollab.Export.DocumentExport do
             %Renewex.Storable{
               class_name: layer.semantic_tag,
               fields: %{
-                _root: layer.direct_parent_hood == nil,
+                # layer.direct_parent_hood == nil,
+                _root: true,
                 attributes: export_attributes(:text, layer),
                 fOriginX: round(-view_box.x + layer.text.position_x),
                 fOriginY: round(-view_box.y + layer.text.position_y),
@@ -540,13 +563,34 @@ defmodule RenewCollab.Export.DocumentExport do
         grammar,
         layer.semantic_tag,
         "CH.ifa.draw.figures.GroupFigure"
-      ) ->
+      ) ||
+          Hierarchy.is_subtype_of(
+            grammar,
+            layer.semantic_tag,
+            "de.renew.netcomponents.NetComponentFigure"
+          ) ->
         storables
+        # |> Enum.concat(
+        #   for c <- child_storables,
+        #       cid = c.id,
+        #       strbl =
+        #         Enum.find_value(storables, fn
+        #           %{fields: %{_gen_id: ^cid}} = s ->
+        #             Map.update(s, :fields, %{}, &Map.put(&1, :_root, true))
+
+        #           _ ->
+        #             nil
+        #         end),
+        #       not is_nil(strbl) do
+        #     strbl
+        #   end
+        # )
         |> Enum.concat([
           %Renewex.Storable{
-            class_name: "CH.ifa.draw.figures.GroupFigure",
+            class_name: layer.semantic_tag,
             fields: %{
-              _root: layer.direct_parent_hood == nil,
+              # layer.direct_parent_hood == nil,
+              _root: true,
               _gen_id: layer.id,
               figures:
                 for c <- child_storables,
