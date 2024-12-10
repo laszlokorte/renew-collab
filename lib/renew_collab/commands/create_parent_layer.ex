@@ -1,8 +1,5 @@
 defmodule RenewCollab.Commands.CreateParentLayer do
   import Ecto.Query, warn: false
-  alias RenewCollab.Hierarchy.Layer
-  alias RenewCollab.Hierarchy.LayerParenthood
-  alias RenewCollab.Element.Edge
 
   defstruct [:document_id, :attrs, :child_layer_id]
 

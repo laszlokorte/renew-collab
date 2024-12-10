@@ -11,7 +11,7 @@ defmodule RenewCollabWeb.SimulationController do
     )
   end
 
-  def create(conn, params = %{"document_ids" => [first_id | _] = document_ids})
+  def create(conn, params = %{"document_ids" => document_ids})
       when is_list(document_ids) do
     nets =
       try do
@@ -33,7 +33,7 @@ defmodule RenewCollabWeb.SimulationController do
          {:ok, content} <-
            RenewCollabSim.Compiler.SnsCompiler.compile(
              nets
-             |> Enum.map(fn {name, rnw, json} -> {name, rnw} end)
+             |> Enum.map(fn {name, rnw, _} -> {name, rnw} end)
            ),
          {:ok, %{id: sns_id}} <-
            %RenewCollabSim.Entites.ShadowNetSystem{}
@@ -42,7 +42,7 @@ defmodule RenewCollabWeb.SimulationController do
              "main_net_name" => main_name,
              "nets" =>
                nets
-               |> Enum.map(fn {name, rnw, json} ->
+               |> Enum.map(fn {name, _, json} ->
                  %{
                    "name" => name,
                    "document_json" => json
@@ -85,7 +85,7 @@ defmodule RenewCollabWeb.SimulationController do
         |> Phoenix.Controller.json(%{message: "Conversion to .rnw failed"})
         |> halt()
 
-      x ->
+      _ ->
         conn
         |> put_status(:bad_request)
         |> Phoenix.Controller.json(%{message: "Compilation to SNS Failed"})
@@ -94,7 +94,12 @@ defmodule RenewCollabWeb.SimulationController do
   end
 
   def delete(conn, %{"simulation_id" => simulation_id}) do
-    conn |> redirect(url(~p"/api/simulations"))
+    RenewCollabSim.Simulator.delete_simulation(simulation_id)
+    RenewCollabSim.Server.SimulationServer.terminate(simulation_id)
+
+    conn
+    |> put_status(:ok)
+    |> halt()
   end
 
   def show(conn, %{"id" => simulation_id}) do

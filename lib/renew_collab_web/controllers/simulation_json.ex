@@ -164,7 +164,7 @@ defmodule RenewCollabWeb.SimulationJSON do
     }
   end
 
-  defp list_data(%Simulation{} = simulation, runnings \\ nil) do
+  defp list_data(%Simulation{} = simulation, runnings) do
     %{
       href: url(~p"/api/simulations/#{simulation}"),
       id: simulation.id,

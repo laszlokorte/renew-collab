@@ -35,7 +35,7 @@ defmodule RenewCollabWeb.ReduxSimulationChannel do
   end
 
   @impl true
-  def handle_message({:simulation_change, simulation_id, _details}, state) do
+  def handle_message({:simulation_change, simulation_id, _details}, _state) do
     {:noreply,
      RenewCollabWeb.SimulationJSON.show_content(
        RenewCollabSim.Simulator.find_simulation_simple(simulation_id),

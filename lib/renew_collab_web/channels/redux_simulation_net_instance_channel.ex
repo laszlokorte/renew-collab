@@ -1,8 +1,6 @@
 defmodule RenewCollabWeb.ReduxSimulationNetInstanceChannel do
   use RenewCollabWeb.StateChannel, web_module: RenewCollabWeb
 
-  alias RenewCollabWeb.Presence
-
   @impl true
   def init("redux_net_instance:" <> net_instance_id, _params, socket) do
     case RenewCollabSim.Simulator.find_simulation_net_instance(net_instance_id) do
