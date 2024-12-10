@@ -83,7 +83,8 @@ defmodule RenewCollabSim.Server.SimulationProcess do
          retry: nil,
          playing: false,
          scheduled: false,
-         logging: true
+         logging: true,
+         open_multi: {0, Ecto.Multi.new()}
        }}
     rescue
       _ ->
@@ -92,61 +93,92 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   end
 
   @impl true
-  def handle_call(:stop, _from, state = %{simulation_id: simulation_id, sim_process: sim_process}) do
+  def handle_call(
+        :stop,
+        _from,
+        state = %{
+          simulation_id: simulation_id,
+          sim_process: sim_process,
+          open_multi: {om_counter, open_multi}
+        }
+      ) do
     import Ecto.Query
     Process.exit(sim_process, :kill)
 
     now = DateTime.utc_now()
 
-    RenewCollab.Repo.insert_all(
+    open_multi
+    |> Ecto.Multi.insert_all(
+      {om_counter, :make_log_entry},
       RenewCollabSim.Entites.SimulationLogEntry,
       from(s in RenewCollabSim.Entites.Simulation,
         where: s.id == ^simulation_id,
         select: %{
           id: ^Ecto.UUID.generate(),
           simulation_id: s.id,
-          content: "simulation stopped",
+          content: ^"simulation stopped",
           inserted_at: ^now,
           updated_at: ^now
         }
       )
     )
-
-    RenewCollab.Repo.delete_all(
+    |> Ecto.Multi.delete_all(
+      {om_counter, :delete_net_instances},
       from(i in RenewCollabSim.Entites.SimulationNetInstance,
         where: i.simulation_id == ^simulation_id
       )
     )
-
-    RenewCollab.Repo.update_all(
+    |> Ecto.Multi.update_all(
+      {om_counter, :reset_timestep},
       from(sim in RenewCollabSim.Entites.Simulation,
         where: sim.id == ^simulation_id,
         update: [set: [timestep: 0]]
       ),
       []
     )
+    |> RenewCollab.Repo.transaction()
 
     {:stop, :normal, :shutdown_ok, state |> broadcast_change(:stop)}
   end
 
   @impl true
-  def handle_cast({:log, {:exit, status}}, state = %{simulation_id: simulation_id}) do
+  def handle_cast(
+        {:log, {:exit, status}},
+        state = %{simulation_id: simulation_id, open_multi: {om_counter, open_multi}}
+      ) do
     import Ecto.Query
     now = DateTime.utc_now()
 
-    RenewCollab.Repo.insert_all(
+    open_multi
+    |> Ecto.Multi.insert_all(
+      {om_counter, :make_log_entry},
       RenewCollabSim.Entites.SimulationLogEntry,
       from(s in RenewCollabSim.Entites.Simulation,
         where: s.id == ^simulation_id,
         select: %{
           id: ^Ecto.UUID.generate(),
           simulation_id: s.id,
-          content: ^"exit #{status}",
+          content: ^"simulation process exit: #{status}",
           inserted_at: ^now,
           updated_at: ^now
         }
       )
     )
+    |> Ecto.Multi.delete_all(
+      {om_counter, :delete_net_instances},
+      from(i in RenewCollabSim.Entites.SimulationNetInstance,
+        where: i.simulation_id == ^simulation_id
+      )
+    )
+    |> Ecto.Multi.update_all(
+      {om_counter, :reset_timestep},
+      from(sim in RenewCollabSim.Entites.Simulation,
+        where: sim.id == ^simulation_id,
+        update: [set: [timestep: 0]]
+      ),
+      []
+    )
+    |> RenewCollab.Repo.transaction()
 
     {:stop, :normal, state |> broadcast_change(:stop)}
   end
@@ -187,32 +219,46 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   @impl true
   def handle_cast(
         {:log, {:noeol, content}},
-        state = %{simulation_id: simulation_id, logging: logging, playing: playing}
+        state = %{
+          simulation_id: simulation_id,
+          logging: logging,
+          playing: playing,
+          open_multi: {om_counter, _}
+        }
       ) do
     import Ecto.Query
 
-    if logging and not playing do
-      %RenewCollabSim.Entites.SimulationLogEntry{
-        simulation_id: simulation_id,
-        content: content
-      }
-      |> RenewCollab.Repo.insert()
-
-      RenewCollab.Repo.delete_all(
-        from(dt in RenewCollabSim.Entites.SimulationLogEntry,
-          where:
-            dt.simulation_id == ^simulation_id and
-              dt.id not in subquery(
-                from(t in RenewCollabSim.Entites.SimulationLogEntry,
-                  select: t.id,
-                  limit: 100,
-                  order_by: [desc: t.inserted_at],
-                  where: t.simulation_id == ^simulation_id
-                )
-              )
+    state =
+      if logging and not playing do
+        state
+        |> append_multi(
+          Ecto.Multi.new()
+          |> Ecto.Multi.insert(
+            {om_counter, :log_entry},
+            %RenewCollabSim.Entites.SimulationLogEntry{
+              simulation_id: simulation_id,
+              content: content
+            }
+          )
+          |> Ecto.Multi.delete_all(
+            {om_counter, :delete_old_logs},
+            from(dt in RenewCollabSim.Entites.SimulationLogEntry,
+              where:
+                dt.simulation_id == ^simulation_id and
+                  dt.id not in subquery(
+                    from(t in RenewCollabSim.Entites.SimulationLogEntry,
+                      select: t.id,
+                      limit: 100,
+                      order_by: [desc: t.inserted_at],
+                      where: t.simulation_id == ^simulation_id
+                    )
+                  )
+            )
+          )
         )
-      )
-    end
+      else
+        state
+      end
 
     {:noreply, state}
   end
@@ -225,33 +271,43 @@ defmodule RenewCollabSim.Server.SimulationProcess do
           simulation: simulation,
           playing: playing,
           logging: logging,
-          scheduled: scheduled
+          scheduled: scheduled,
+          open_multi: {om_counter, open_multi}
         }
       ) do
     import Ecto.Query
 
-    if logging and not playing do
-      %RenewCollabSim.Entites.SimulationLogEntry{
-        simulation_id: simulation_id,
-        content: content
-      }
-      |> RenewCollab.Repo.insert()
-
-      RenewCollab.Repo.delete_all(
-        from(dt in RenewCollabSim.Entites.SimulationLogEntry,
-          where:
-            dt.simulation_id == ^simulation_id and
-              dt.id not in subquery(
-                from(t in RenewCollabSim.Entites.SimulationLogEntry,
-                  select: t.id,
-                  limit: 100,
-                  order_by: [desc: t.inserted_at],
-                  where: t.simulation_id == ^simulation_id
-                )
-              )
+    state =
+      if logging and not playing do
+        state
+        |> append_multi(
+          Ecto.Multi.new()
+          |> Ecto.Multi.insert(
+            {om_counter, :log_entry},
+            %RenewCollabSim.Entites.SimulationLogEntry{
+              simulation_id: simulation_id,
+              content: content
+            }
+          )
+          |> Ecto.Multi.delete_all(
+            {om_counter, :delete_old_logs},
+            from(dt in RenewCollabSim.Entites.SimulationLogEntry,
+              where:
+                dt.simulation_id == ^simulation_id and
+                  dt.id not in subquery(
+                    from(t in RenewCollabSim.Entites.SimulationLogEntry,
+                      select: t.id,
+                      limit: 100,
+                      order_by: [desc: t.inserted_at],
+                      where: t.simulation_id == ^simulation_id
+                    )
+                  )
+            )
+          )
         )
-      )
-    end
+      else
+        state
+      end
 
     case Regex.named_captures(@combined, content) do
       %{
@@ -260,39 +316,43 @@ defmodule RenewCollabSim.Server.SimulationProcess do
         "ni_instance_number" => instance_number
       }
       when "" != time_number ->
-        RenewCollab.Repo.insert_all(
-          RenewCollabSim.Entites.SimulationNetInstance,
-          from(sn in RenewCollabSim.Entites.ShadowNet,
-            where:
-              sn.name == ^instance_name and
-                sn.shadow_net_system_id == ^simulation.shadow_net_system_id,
-            select: %{
-              id: ^Ecto.UUID.generate(),
-              simulation_id: ^simulation_id,
-              label: ^"#{instance_name}[#{instance_number}]",
-              shadow_net_system_id: sn.shadow_net_system_id,
-              shadow_net_id: sn.id,
-              integer_id: ^instance_number
-            }
-          ),
-          on_conflict: :replace_all
-        )
-
-        RenewCollab.Repo.delete_all(
-          from(dt in RenewCollabSim.Entites.SimulationNetToken,
-            where:
-              dt.simulation_net_instance_id in subquery(
-                from(i in RenewCollabSim.Entites.SimulationNetInstance,
-                  select: i.id,
-                  where:
-                    i.simulation_id == ^simulation_id and
-                      i.label == ^"#{instance_name}[#{instance_number}]"
-                )
-              )
-          )
-        )
-
-        {:noreply, state}
+        {:noreply,
+         state
+         |> append_multi(
+           Ecto.Multi.new()
+           |> Ecto.Multi.insert_all(
+             {om_counter, :create_net_instances},
+             RenewCollabSim.Entites.SimulationNetInstance,
+             from(sn in RenewCollabSim.Entites.ShadowNet,
+               where:
+                 sn.name == ^instance_name and
+                   sn.shadow_net_system_id == ^simulation.shadow_net_system_id,
+               select: %{
+                 id: ^Ecto.UUID.generate(),
+                 simulation_id: ^simulation_id,
+                 label: ^"#{instance_name}[#{instance_number}]",
+                 shadow_net_system_id: sn.shadow_net_system_id,
+                 shadow_net_id: sn.id,
+                 integer_id: ^instance_number
+               }
+             ),
+             on_conflict: :replace_all
+           )
+           |> Ecto.Multi.delete_all(
+             {om_counter, :delete_old_tokens},
+             from(dt in RenewCollabSim.Entites.SimulationNetToken,
+               where:
+                 dt.simulation_net_instance_id in subquery(
+                   from(i in RenewCollabSim.Entites.SimulationNetInstance,
+                     select: i.id,
+                     where:
+                       i.simulation_id == ^simulation_id and
+                         i.label == ^"#{instance_name}[#{instance_number}]"
+                   )
+                 )
+             )
+           )
+         )}
 
       %{
         "it_time_number" => time_number,
@@ -302,23 +362,27 @@ defmodule RenewCollabSim.Server.SimulationProcess do
         "it_place_id" => place_id
       }
       when "" != time_number ->
-        RenewCollab.Repo.insert_all(
-          RenewCollabSim.Entites.SimulationNetToken,
-          from(n in RenewCollabSim.Entites.SimulationNetInstance,
-            where:
-              n.label == ^"#{instance_name}[#{instance_number}]" and
-                n.simulation_id == ^simulation_id,
-            select: %{
-              id: ^Ecto.UUID.generate(),
-              simulation_id: n.simulation_id,
-              simulation_net_instance_id: n.id,
-              place_id: ^place_id,
-              value: ^value
-            }
-          )
-        )
-
-        {:noreply, state}
+        {:noreply,
+         state
+         |> append_multi(
+           Ecto.Multi.new()
+           |> Ecto.Multi.insert_all(
+             {om_counter, :init_tokens},
+             RenewCollabSim.Entites.SimulationNetToken,
+             from(n in RenewCollabSim.Entites.SimulationNetInstance,
+               where:
+                 n.label == ^"#{instance_name}[#{instance_number}]" and
+                   n.simulation_id == ^simulation_id,
+               select: %{
+                 id: ^Ecto.UUID.generate(),
+                 simulation_id: n.simulation_id,
+                 simulation_net_instance_id: n.id,
+                 place_id: ^place_id,
+                 value: ^value
+               }
+             )
+           )
+         )}
 
       %{
         "pt_time_number" => time_number,
@@ -328,23 +392,27 @@ defmodule RenewCollabSim.Server.SimulationProcess do
         "pt_place_id" => place_id
       }
       when "" != time_number ->
-        RenewCollab.Repo.insert_all(
-          RenewCollabSim.Entites.SimulationNetToken,
-          from(n in RenewCollabSim.Entites.SimulationNetInstance,
-            where:
-              n.label == ^"#{instance_name}[#{instance_number}]" and
-                n.simulation_id == ^simulation_id,
-            select: %{
-              id: ^Ecto.UUID.generate(),
-              simulation_id: n.simulation_id,
-              simulation_net_instance_id: n.id,
-              place_id: ^place_id,
-              value: ^value
-            }
-          )
-        )
-
-        {:noreply, state}
+        {:noreply,
+         state
+         |> append_multi(
+           Ecto.Multi.new()
+           |> Ecto.Multi.insert_all(
+             {om_counter, :put_tokens},
+             RenewCollabSim.Entites.SimulationNetToken,
+             from(n in RenewCollabSim.Entites.SimulationNetInstance,
+               where:
+                 n.label == ^"#{instance_name}[#{instance_number}]" and
+                   n.simulation_id == ^simulation_id,
+               select: %{
+                 id: ^Ecto.UUID.generate(),
+                 simulation_id: n.simulation_id,
+                 simulation_net_instance_id: n.id,
+                 place_id: ^place_id,
+                 value: ^value
+               }
+             )
+           )
+         )}
 
       %{
         "rm_time_number" => time_number,
@@ -354,27 +422,29 @@ defmodule RenewCollabSim.Server.SimulationProcess do
         "rm_place_id" => place_id
       }
       when "" != time_number ->
-        dbg(value)
-
-        RenewCollab.Repo.delete_all(
-          from(dt in RenewCollabSim.Entites.SimulationNetToken,
-            where:
-              dt.id in subquery(
-                from(t in RenewCollabSim.Entites.SimulationNetToken,
-                  select: t.id,
-                  limit: 1,
-                  join: i in assoc(t, :simulation_net_instance),
-                  where:
-                    t.value == ^value and
-                      fragment("? = ?", t.place_id, ^place_id) and
-                      t.simulation_id == ^simulation_id and
-                      i.label == ^"#{instance_name}[#{instance_number}]"
-                )
-              )
-          )
-        )
-
-        {:noreply, state}
+        {:noreply,
+         state
+         |> append_multi(
+           Ecto.Multi.new()
+           |> Ecto.Multi.delete_all(
+             {om_counter, :remove_tokens},
+             from(dt in RenewCollabSim.Entites.SimulationNetToken,
+               where:
+                 dt.id in subquery(
+                   from(t in RenewCollabSim.Entites.SimulationNetToken,
+                     select: t.id,
+                     limit: 1,
+                     join: i in assoc(t, :simulation_net_instance),
+                     where:
+                       t.value == ^value and
+                         fragment("? = ?", t.place_id, ^place_id) and
+                         t.simulation_id == ^simulation_id and
+                         i.label == ^"#{instance_name}[#{instance_number}]"
+                   )
+                 )
+             )
+           )
+         )}
 
       %{
         "fr_time_number" => time_number,
@@ -383,35 +453,44 @@ defmodule RenewCollabSim.Server.SimulationProcess do
         "fr_transition_id" => transition_id
       }
       when "" != time_number ->
-        RenewCollab.Repo.insert_all(
-          RenewCollabSim.Entites.SimulationTransitionFiring,
-          from(n in RenewCollabSim.Entites.SimulationNetInstance,
-            where:
-              n.label == ^"#{instance_name}[#{instance_number}]" and
-                n.simulation_id == ^simulation_id,
-            select: %{
-              id: ^Ecto.UUID.generate(),
-              simulation_id: n.simulation_id,
-              simulation_net_instance_id: n.id,
-              transition_id: ^transition_id,
-              timestep: ^time_number
-            }
-          )
-        )
-
-        {:noreply, state}
+        {:noreply,
+         state
+         |> append_multi(
+           Ecto.Multi.new()
+           |> Ecto.Multi.insert_all(
+             {om_counter, :track_firings},
+             RenewCollabSim.Entites.SimulationTransitionFiring,
+             from(n in RenewCollabSim.Entites.SimulationNetInstance,
+               where:
+                 n.label == ^"#{instance_name}[#{instance_number}]" and
+                   n.simulation_id == ^simulation_id,
+               select: %{
+                 id: ^Ecto.UUID.generate(),
+                 simulation_id: n.simulation_id,
+                 simulation_net_instance_id: n.id,
+                 transition_id: ^transition_id,
+                 timestep: ^time_number
+               }
+             )
+           )
+         )}
 
       %{
         "sc_time_number" => time_number
       }
       when "" != time_number ->
-        RenewCollab.Repo.update_all(
+        open_multi
+        |> Ecto.Multi.update_all(
+          {om_counter, :update_time},
           from(sim in RenewCollabSim.Entites.Simulation,
             where: sim.id == ^simulation_id,
             update: [set: [timestep: ^time_number]]
           ),
           []
         )
+        |> RenewCollab.Repo.transaction()
+
+        state = %{state | open_multi: {0, Ecto.Multi.new()}}
 
         if playing and not scheduled do
           Process.send_after(self(), :auto_step, 100)
@@ -425,13 +504,16 @@ defmodule RenewCollabSim.Server.SimulationProcess do
         "setup" => setup
       }
       when "" != setup ->
-        RenewCollab.Repo.update_all(
+        open_multi
+        |> Ecto.Multi.update_all(
+          {om_counter, :reset_time},
           from(sim in RenewCollabSim.Entites.Simulation,
             where: sim.id == ^simulation_id,
             update: [set: [timestep: 1]]
           ),
           []
         )
+        |> RenewCollab.Repo.transaction()
 
         {:noreply, state |> broadcast_change(:init)}
 
@@ -440,11 +522,15 @@ defmodule RenewCollabSim.Server.SimulationProcess do
     end
   end
 
+  def append_multi(state = %{open_multi: {counter, open}}, multi) do
+    %{state | open_multi: {counter + 1, open |> Ecto.Multi.append(multi)}}
+  end
+
   @impl true
   # handle termination
   def terminate(
         _reason,
-        state = %{simulation: sim, directory: directory, sim_process: sim_process}
+        state = %{simulation: _sim, directory: directory, sim_process: sim_process}
       ) do
     Process.exit(sim_process, :kill)
     File.rm_rf(directory)
@@ -461,7 +547,6 @@ defmodule RenewCollabSim.Server.SimulationProcess do
 
     {:ok, sns_path} = Path.safe_relative_to("compiled-shadow-net.ssn", output_root)
     {:ok, script_path} = Path.safe_relative_to("simulation-script", output_root)
-    # dbg(script_path)
 
     sns_path = Path.absname(sns_path, output_root)
     script_path = Path.absname(script_path, output_root)
@@ -470,7 +555,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
 
     script_content =
       [
-        "startsimulation #{sns_path} #{simulation.shadow_net_system.main_net_name} -i"
+        "startsimulation \"#{sns_path}\" \"#{simulation.shadow_net_system.main_net_name}\" -i"
       ]
       |> Enum.join("\n")
 

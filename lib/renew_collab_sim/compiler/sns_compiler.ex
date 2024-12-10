@@ -28,7 +28,7 @@ defmodule RenewCollabSim.Compiler.SnsCompiler do
       script_content =
         [
           "setFormalism Java Net Compiler",
-          "ex ShadowNetSystem -a #{Enum.join(paths, " ")} -o #{output_path}"
+          "ex ShadowNetSystem -a #{Enum.join(paths |> Enum.map(&"\"#{&1}\""), " ")} -o \"#{output_path}\""
         ]
         |> Enum.join("\n")
 
