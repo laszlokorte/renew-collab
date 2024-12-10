@@ -48,7 +48,7 @@ defmodule RenewCollabWeb.UndoRedoComponent do
                     phx-click="restore"
                     phx-value-id={suc_id}
                   >
-                    Redo (<%= i %>)
+                    Redo ({i})
                   </button>
                 <% end %>
               </div>

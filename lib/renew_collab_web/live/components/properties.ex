@@ -53,7 +53,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
           <%= if false && @layer.interface do %>
             <span style="display: inline-flex; align-items: baseline;gap: 1ex;  padding: 0.5ex 1ex; background: #333; color: #fff">
               <span>
-                <%= @layer.interface.socket_schema.name %>
+                {@layer.interface.socket_schema.name}
               </span>
 
               <button
@@ -83,7 +83,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
                     value={s.id}
                     {if(@layer.interface && s.id == @layer.interface.socket_schema_id, do: [selected: "selected"], else: [])}
                   >
-                    <%= s.name %>
+                    {s.name}
                   </option>
                 <% end %>
               </select>
@@ -123,7 +123,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
                         value={id}
                         {if(id == @layer.box.symbol_shape_id, do: [selected: "selected"], else: [])}
                       >
-                        <%= symbol.name %>
+                        {symbol.name}
                       </option>
                     <% end %>
                   </select>
@@ -179,7 +179,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
                   <option value="">Target</option>
 
                   <%= for l <- @document.layers do %>
-                    <option value={l.id}><%= l.semantic_tag %>/<%= l.id %></option>
+                    <option value={l.id}>{l.semantic_tag}/{l.id}</option>
                   <% end %>
                 </select>
               </form>
@@ -329,7 +329,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
 
             <%= for w <- @layer.edge.waypoints do %>
               <li>
-                <small style="white-space: nowrap;"><%= w.sort %> - <%= w.id %></small> <br />
+                <small style="white-space: nowrap;">{w.sort} - {w.id}</small> <br />
                 <form
                   style="display: inline"
                   phx-hook="RenewEdgeWaypointPosition"
@@ -394,7 +394,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
                   phx-value-id={@layer.edge.source_bond.layer_id}
                   style="display: inline-block; cursor: pointer; background: #333; color: #fff"
                 >
-                  <%= @layer.edge.source_bond.layer_id %>/<br /> <%= @layer.edge.source_bond.socket_id %>
+                  {@layer.edge.source_bond.layer_id}/<br /> {@layer.edge.source_bond.socket_id}
                 </small>
                 <br />
                 <button
@@ -415,7 +415,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
                     <option value="">Layer</option>
 
                     <%= for l <- @document.layers, not is_nil(l.box) do %>
-                      <option value={l.id}><%= l.semantic_tag %>/<%= l.id %></option>
+                      <option value={l.id}>{l.semantic_tag}/{l.id}</option>
                     <% end %>
                   </select>
 
@@ -426,7 +426,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
                       <%= for {_sid, schema} <- socket_schemas do %>
                         <optgroup label={schema.name}>
                           <%= for sock <- schema.sockets do %>
-                            <option value={sock.id}><%= sock.name %></option>
+                            <option value={sock.id}>{sock.name}</option>
                           <% end %>
                         </optgroup>
                       <% end %>
@@ -448,7 +448,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
                   phx-value-id={@layer.edge.target_bond.layer_id}
                   style="display: inline-block; cursor: pointer; background: #333; color: #fff"
                 >
-                  <%= @layer.edge.target_bond.layer_id %>/<br /> <%= @layer.edge.target_bond.socket_id %>
+                  {@layer.edge.target_bond.layer_id}/<br /> {@layer.edge.target_bond.socket_id}
                 </small>
                 <br />
                 <button
@@ -469,7 +469,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
                     <option value="">Layer</option>
 
                     <%= for l <- @document.layers, not is_nil(l.box) do %>
-                      <option value={l.id}><%= l.semantic_tag %>/<%= l.id %></option>
+                      <option value={l.id}>{l.semantic_tag}/{l.id}</option>
                     <% end %>
                   </select>
 
@@ -480,7 +480,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
                       <%= for {_sid, schema} <- socket_schemas do %>
                         <optgroup label={schema.name}>
                           <%= for sock <- schema.sockets do %>
-                            <option value={sock.id}><%= sock.name %></option>
+                            <option value={sock.id}>{sock.name}</option>
                           <% end %>
                         </optgroup>
                       <% end %>

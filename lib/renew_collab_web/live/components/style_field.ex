@@ -20,7 +20,7 @@ defmodule RenewCollabWeb.HierarchyStyleField do
               <option value="">None</option>
 
               <%= for {sid, s} <- symbols, s.name |> String.starts_with?("arrow") do %>
-                <option selected={@value == sid} value={sid}><%= s.name %></option>
+                <option selected={@value == sid} value={sid}>{s.name}</option>
               <% end %>
             </select>
             <% else _ -> %>
@@ -49,7 +49,7 @@ defmodule RenewCollabWeb.HierarchyStyleField do
             style="padding: 0.5ex; "
           >
             <%= for o <- options do %>
-              <option selected={@value == o} value={o}><%= o %></option>
+              <option selected={@value == o} value={o}>{o}</option>
             <% end %>
           </select>
         <% _ -> %>

@@ -81,7 +81,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
       </td>
 
       <td valign="top" width="20" align="center" style="white-space: nowrap; word-wrap: none">
-        <%= @layer.z_index %>
+        {@layer.z_index}
       </td>
 
       <td valign="top" style={"padding-left: #{0.2+ 2*@depth}em"}>
@@ -143,8 +143,8 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
         {[style: "cursor: pointer;padding-left: #{0.2+ 2*@depth}em", "phx-click": "select_layer"]}
         phx-value-id={@layer.id}
       >
-        <small><code><%= @layer.id %></code></small> <br />
-        <small><code><%= @layer.semantic_tag %></code></small>
+        <small><code>{@layer.id}</code></small> <br />
+        <small><code>{@layer.semantic_tag}</code></small>
       </td>
     </tr>
     """

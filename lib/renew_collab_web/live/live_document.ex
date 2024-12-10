@@ -66,7 +66,7 @@ defmodule RenewCollabWeb.LiveDocument do
       <div style="grid-area: top; padding: 1em; background: #333; color: #fff; display: flex; justify-content: space-between; align-items: stretch;">
         <div>
           <.link navigate={~p"/documents"} style="color: inherit">Back</.link>
-          <h2 style="margin: 0;"><%= @document.name %></h2>
+          <h2 style="margin: 0;">{@document.name}</h2>
         </div>
 
         <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: undo_redo} <- @undo_redo do %>
@@ -82,7 +82,7 @@ defmodule RenewCollabWeb.LiveDocument do
       <div style="grid-area: left; width: 100%; height: 100%; overflow: auto; box-sizing: border-box; padding: 0; display: grid;">
         <datalist id="all-semantic-tags">
           <%= for {class_name, _} <- renew_grammar().hierarchy do %>
-            <option><%= class_name %></option>
+            <option>{class_name}</option>
           <% end %>
         </datalist>
 
@@ -100,9 +100,9 @@ defmodule RenewCollabWeb.LiveDocument do
                       bgcolor={if(layer.id == @selection, do: "#99ddff", else: "white")}
                     >
                       <small style="font-weight: normal;">
-                        <%= layer.semantic_tag |> String.split(".") |> Enum.at(-1) %><br />
+                        {layer.semantic_tag |> String.split(".") |> Enum.at(-1)}<br />
                         <span style="font-size: 10px; font-family: monospace">
-                          <%= layer.id %>
+                          {layer.id}
                         </span>
                       </small>
                     </th>
@@ -119,9 +119,9 @@ defmodule RenewCollabWeb.LiveDocument do
                       bgcolor={if(layer_a.id == @selection, do: "#99ddff", else: "white")}
                     >
                       <small style="font-weight: normal;">
-                        <%= layer_a.semantic_tag |> String.split(".") |> Enum.at(-1) %><br />
+                        {layer_a.semantic_tag |> String.split(".") |> Enum.at(-1)}<br />
                         <span style="font-size: 10px; font-family: monospace">
-                          <%= layer_a.id %>
+                          {layer_a.id}
                         </span>
                       </small>
 
@@ -145,7 +145,7 @@ defmodule RenewCollabWeb.LiveDocument do
                                 value={s.id}
                                 {if(layer_a.interface && s.id == layer_a.interface.socket_schema_id, do: [selected: "selected"], else: [])}
                               >
-                                <%= s.name %>
+                                {s.name}
                               </option>
                             <% end %>
                           </select>
@@ -163,7 +163,7 @@ defmodule RenewCollabWeb.LiveDocument do
                               <button phx-click="delete_layer" phx-value-id={edge_layer.id}>
                                 X
                               </button>
-                              <%= edge_layer.semantic_tag |> String.split(".") |> Enum.at(-1) %>
+                              {edge_layer.semantic_tag |> String.split(".") |> Enum.at(-1)}
                             </div>
                           <% end %>
 
@@ -178,7 +178,7 @@ defmodule RenewCollabWeb.LiveDocument do
                                     <%= with schema <- socket_schemas |> Map.get(layer_a.interface.socket_schema_id, []) do %>
                                       <optgroup label={schema.name}>
                                         <%= for sock <- schema.sockets do %>
-                                          <option value={sock.id}><%= sock.name %></option>
+                                          <option value={sock.id}>{sock.name}</option>
                                         <% end %>
                                       </optgroup>
                                     <% end %>
@@ -192,7 +192,7 @@ defmodule RenewCollabWeb.LiveDocument do
                                     <%= with schema <- socket_schemas |> Map.get(layer_b.interface.socket_schema_id, []) do %>
                                       <optgroup label={schema.name}>
                                         <%= for sock <- schema.sockets do %>
-                                          <option value={sock.id}><%= sock.name %></option>
+                                          <option value={sock.id}>{sock.name}</option>
                                         <% end %>
                                       </optgroup>
                                     <% end %>
@@ -329,7 +329,7 @@ defmodule RenewCollabWeb.LiveDocument do
                 <option value="" selected>Insert Other Document</option>
 
                 <%= for doc <- other_documents, doc.id != @document.id do %>
-                  <option value={doc.id}><%= doc.name %></option>
+                  <option value={doc.id}>{doc.name}</option>
                 <% end %>
               </select>
               <% else _ -> %>
@@ -378,7 +378,7 @@ defmodule RenewCollabWeb.LiveDocument do
         </div>
 
         <h2 style="cursor: pointer;" phx-click="toggle-meta">
-          <span><%= if(@show_meta, do: "▼", else: "►") %></span> Document
+          <span>{if(@show_meta, do: "▼", else: "►")}</span> Document
         </h2>
 
         <%= if @show_meta do %>
@@ -446,7 +446,7 @@ defmodule RenewCollabWeb.LiveDocument do
           {if(@selection, do: [style: "cursor: pointer;"], else: [style: "cursor: pointer; color: #aaa"])}
           phx-click="toggle-selected"
         >
-          <span><%= if(@show_selected, do: "▼", else: "►") %></span> Selected
+          <span>{if(@show_selected, do: "▼", else: "►")}</span> Selected
         </h2>
 
         <%= if @show_selected do %>
@@ -465,7 +465,7 @@ defmodule RenewCollabWeb.LiveDocument do
         <% end %>
 
         <h2 style="cursor: pointer;" phx-click="toggle-hierarchy">
-          <span><%= if(@show_hierarchy, do: "▼", else: "►") %></span> Hierarchy
+          <span>{if(@show_hierarchy, do: "▼", else: "►")}</span> Hierarchy
         </h2>
 
         <%= if @show_hierarchy do %>
@@ -600,7 +600,7 @@ defmodule RenewCollabWeb.LiveDocument do
         <% end %>
 
         <h2 style="cursor: pointer;" phx-click="toggle-snapshots">
-          <span><%= if(@show_snapshots, do: "▼", else: "►") %></span> Snapshots
+          <span>{if(@show_snapshots, do: "▼", else: "►")}</span> Snapshots
         </h2>
 
         <%= if @show_snapshots do %>
@@ -616,7 +616,7 @@ defmodule RenewCollabWeb.LiveDocument do
         <% end %>
 
         <h2 style="cursor: pointer;" phx-click="toggle-health">
-          <span><%= if(@show_health, do: "▼", else: "►") %></span> Health
+          <span>{if(@show_health, do: "▼", else: "►")}</span> Health
         </h2>
 
         <%= if @show_health do %>
@@ -627,11 +627,11 @@ defmodule RenewCollabWeb.LiveDocument do
               <dd style="margin: 0">
                 <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: hierachy_missing} <- @hierachy_missing do %>
                   <details>
-                    <summary style="cursor: pointer"><%= Enum.count(hierachy_missing) %></summary>
+                    <summary style="cursor: pointer">{Enum.count(hierachy_missing)}</summary>
 
                     <ul>
                       <%= for i <- hierachy_missing do %>
-                        <li><%= i.ancestor_id %>/<%= i.descendant_id %>/<%= i.depth %></li>
+                        <li>{i.ancestor_id}/{i.descendant_id}/{i.depth}</li>
                       <% end %>
                     </ul>
                   </details>
@@ -645,11 +645,11 @@ defmodule RenewCollabWeb.LiveDocument do
               <dd style="margin: 0">
                 <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: hierachy_invalid} <- @hierachy_invalid do %>
                   <details>
-                    <summary style="cursor: pointer"><%= Enum.count(hierachy_invalid) %></summary>
+                    <summary style="cursor: pointer">{Enum.count(hierachy_invalid)}</summary>
 
                     <ul>
                       <%= for id <- hierachy_invalid do %>
-                        <li><%= id %></li>
+                        <li>{id}</li>
                       <% end %>
                     </ul>
                   </details>

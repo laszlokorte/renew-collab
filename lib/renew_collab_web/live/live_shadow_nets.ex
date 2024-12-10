@@ -71,18 +71,18 @@ defmodule RenewCollabWeb.LiveShadowNets do
                     >
                       &times;
                     </button>
-                    <%= entry.client_name %>
+                    {entry.client_name}
                   </dt>
 
                   <dd>
                     <%!-- entry.progress will update automatically for in-flight entries --%>
-                    <progress value={entry.progress} max="100"><%= entry.progress %>%</progress>
+                    <progress value={entry.progress} max="100">{entry.progress}%</progress>
                   </dd>
 
                   <dd style="grid-column: 1 / span 3;">
                     <ul>
                       <%= for err <- upload_errors(@uploads.import_file, entry) do %>
-                        <li class="alert alert-danger"><%= error_to_string(err) %></li>
+                        <li class="alert alert-danger">{error_to_string(err)}</li>
                       <% end %>
                     </ul>
                   </dd>
@@ -92,7 +92,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
 
             <ul style="margin: 0; padding: 0;">
               <%= for err <- upload_errors(@uploads.import_file) do %>
-                <li class="alert alert-danger"><%= error_to_string(err) %></li>
+                <li class="alert alert-danger">{error_to_string(err)}</li>
               <% end %>
             </ul>
 
@@ -146,28 +146,28 @@ defmodule RenewCollabWeb.LiveShadowNets do
                 <tr {if(rem(si, 2) == 0, do: [style: "background-color:#f5f5f5;"], else: [])}>
                   <td width="100%">
                     <.link navigate={~p"/shadow_net/#{sns.id}"}>
-                      <code><%= sns.id %></code>
+                      <code>{sns.id}</code>
                     </.link>
                   </td>
 
                   <td valign="top">
-                    <strong><%= sns.main_net_name %></strong>
+                    <strong>{sns.main_net_name}</strong>
                   </td>
 
                   <td valign="top">
                     <ul style="list-style: none; margin: 0; padding: 0;">
                       <%= for n <- sns.nets do %>
-                        <li><%= n.name %></li>
+                        <li>{n.name}</li>
                       <% end %>
                     </ul>
                   </td>
 
                   <td style="white-space: nowrap;">
-                    <%= sns.inserted_at |> Calendar.strftime("%Y-%m-%d %H:%M") %>
+                    {sns.inserted_at |> Calendar.strftime("%Y-%m-%d %H:%M")}
                   </td>
 
                   <td style="white-space: nowrap;">
-                    <%= sns.simulation_count %>
+                    {sns.simulation_count}
                   </td>
 
                   <td width="50">

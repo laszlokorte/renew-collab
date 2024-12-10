@@ -8,15 +8,15 @@ defmodule RenewCollabWeb.HierarchyStyleList do
       <%= for {attr, type} <- @attrs do %>
         <dt>
           <label for={"layer-style-#{@layer.id}-#{@element_type}-#{attr}"}>
-            <%= attr
+            {attr
             |> Atom.to_string()
             |> String.split("_")
             |> Enum.map(&String.capitalize/1)
-            |> Enum.join(" ") %>
+            |> Enum.join(" ")}
           </label>
           <br />
           <small style="display: block; max-width: 10em; overflow: hidden; text-overflow: ellipsis; font-family: monospace">
-            <%= style_or_default(@element, attr) %>
+            {style_or_default(@element, attr)}
           </small>
         </dt>
 

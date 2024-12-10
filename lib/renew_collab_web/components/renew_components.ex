@@ -8,10 +8,10 @@ defmodule RenewCollabWeb.RenewComponents do
   def layers(assigns) do
     ~H"""
     <%= for layer <- @document.layers, layer.direct_parent_hood == nil and of_type(@filter, layer) do %>
-      <%= render_slot(@item, layer) %>
+      {render_slot(@item, layer)}
       <.child_layers document={@document} parent_id={layer.id} filter={@filter}>
         <:item :let={child_layer}>
-          <%= render_slot(@item, child_layer) %>
+          {render_slot(@item, child_layer)}
         </:item>
       </.child_layers>
     <% end %>
@@ -26,10 +26,10 @@ defmodule RenewCollabWeb.RenewComponents do
   defp child_layers(assigns) do
     ~H"""
     <%= for layer <- @document.layers, layer.direct_parent_hood, layer.direct_parent_hood.ancestor_id == @parent_id and of_type(@filter, layer) do %>
-      <%= render_slot(@item, layer) %>
+      {render_slot(@item, layer)}
       <.child_layers document={@document} parent_id={layer.id} filter={@filter}>
         <:item :let={child_layer}>
-          <%= render_slot(@item, child_layer) %>
+          {render_slot(@item, child_layer)}
         </:item>
       </.child_layers>
     <% end %>

@@ -23,7 +23,7 @@ defmodule RenewCollabWeb.SnapshotListComponent do
 
       <div style="width: 45vw">
         <%= for {day, snaps} <- @snapshots |> Enum.group_by(&DateTime.to_date(&1.inserted_at))|>Enum.reverse do %>
-          <h5 style="margin: 0;"><%= day |> Calendar.strftime("%Y-%m-%d") %></h5>
+          <h5 style="margin: 0;">{day |> Calendar.strftime("%Y-%m-%d")}</h5>
 
           <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.2ex">
             <%= for s <- snaps  do %>
@@ -32,7 +32,7 @@ defmodule RenewCollabWeb.SnapshotListComponent do
                   <span style="cursor: default; font-size: 10pt; font-family: sans-serif; width: max-content; display: inline; padding: 1ex; border: none; background: #33a; color: #fff">
                     Current
                   </span>
-                  <%= s.inserted_at |> Calendar.strftime("%H:%M:%S") %>
+                  {s.inserted_at |> Calendar.strftime("%H:%M:%S")}
                   <%= if not is_nil(s.label) do %>
                     <button
                       phx-click="remove_snapshot_label"
@@ -43,7 +43,7 @@ defmodule RenewCollabWeb.SnapshotListComponent do
                     >
                       📌
                     </button>
-                    <%= s.label %>
+                    {s.label}
                   <% else %>
                     <form
                       phx-hook="RnwSnapshotPin"
@@ -68,7 +68,7 @@ defmodule RenewCollabWeb.SnapshotListComponent do
                   >
                     Restore
                   </button>
-                  <%= s.inserted_at |> Calendar.strftime("%H:%M:%S") %>
+                  {s.inserted_at |> Calendar.strftime("%H:%M:%S")}
                   <%= if not is_nil(s.label)  do %>
                     <button
                       phx-click="remove_snapshot_label"
@@ -79,7 +79,7 @@ defmodule RenewCollabWeb.SnapshotListComponent do
                     >
                       📌
                     </button>
-                    <%= s.label %>
+                    {s.label}
                   <% end %>
                 <% end %>
               </li>

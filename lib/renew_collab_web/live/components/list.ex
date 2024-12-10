@@ -29,7 +29,7 @@ defmodule RenewCollabWeb.HierarchyListComponent do
         </thead>
 
         <tbody>
-          <%= layer_hierarchy(assigns, 0, nil) %>
+          {layer_hierarchy(assigns, 0, nil)}
         </tbody>
       </table>
     </div>
@@ -50,7 +50,7 @@ defmodule RenewCollabWeb.HierarchyListComponent do
         layer={layer}
         selected={@selection == layer.id}
         depth={@depth}
-      /> <%= layer_hierarchy(assigns, @depth + 1, layer.id) %>
+      /> {layer_hierarchy(assigns, @depth + 1, layer.id)}
     <% end %>
     """
   end
@@ -69,7 +69,7 @@ defmodule RenewCollabWeb.HierarchyListComponent do
         layer={layer}
         selected={@selection == layer.id}
         depth={@depth}
-      /> <%= layer_hierarchy(assigns, @depth + 1, layer.id) %>
+      /> {layer_hierarchy(assigns, @depth + 1, layer.id)}
     <% end %>
     """
   end

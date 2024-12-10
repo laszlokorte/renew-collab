@@ -69,13 +69,13 @@ defmodule RenewCollabWeb.LiveShadowNet do
       </div>
 
       <div style="padding: 1em">
-        <h2 style="margin: 0;">Shadow Net System <%= @shadow_net_system.id %></h2>
+        <h2 style="margin: 0;">Shadow Net System {@shadow_net_system.id}</h2>
 
         <dl style="display: grid; grid-template-columns: auto auto 1fr;">
           <dt>Main Net Name</dt>
 
           <dd>
-            <code><%= @shadow_net_system.main_net_name %></code>
+            <code>{@shadow_net_system.main_net_name}</code>
           </dd>
 
           <dd>
@@ -85,7 +85,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
                 <select name="main_net">
                   <%= for net <- @shadow_net_system.nets do %>
                     <option selected={net.name == @shadow_net_system.main_net_name}>
-                      <%= net.name %>
+                      {net.name}
                     </option>
                   <% end %>
                 </select>
@@ -100,7 +100,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
               <%= for net <- @shadow_net_system.nets do %>
                 <li>
                   <details>
-                    <summary><code><%= net.name %></code></summary>
+                    <summary><code>{net.name}</code></summary>
 
                     <div style="width: 10em; height: 5em;">
                       <textarea
@@ -118,7 +118,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
 
                         <%= for doc <- @documents do %>
                           <option value={doc.id}>
-                            <%= doc.name %>
+                            {doc.name}
                           </option>
                         <% end %>
                       </select>
@@ -184,12 +184,12 @@ defmodule RenewCollabWeb.LiveShadowNet do
                 <tr {if(rem(si, 2) == 0, do: [style: "background-color:#f5f5f5;"], else: [])}>
                   <td>
                     <.link navigate={~p"/simulation/#{sim.id}"}>
-                      <%= sim.id %>
+                      {sim.id}
                     </.link>
                   </td>
 
                   <td>
-                    <%= sim.timestep %>
+                    {sim.timestep}
                   </td>
 
                   <%= if MapSet.member?(@running, sim.id) do %>

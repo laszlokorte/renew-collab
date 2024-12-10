@@ -89,18 +89,18 @@ defmodule RenewCollabWeb.LiveDocuments do
                     >
                       &times;
                     </button>
-                    <%= entry.client_name %>
+                    {entry.client_name}
                   </dt>
 
                   <dd>
                     <%!-- entry.progress will update automatically for in-flight entries --%>
-                    <progress value={entry.progress} max="100"><%= entry.progress %>%</progress>
+                    <progress value={entry.progress} max="100">{entry.progress}%</progress>
                   </dd>
 
                   <dd style="grid-column: 1 / span 3;">
                     <ul>
                       <%= for err <- upload_errors(@uploads.import_file, entry) do %>
-                        <li class="alert alert-danger"><%= error_to_string(err) %></li>
+                        <li class="alert alert-danger">{error_to_string(err)}</li>
                       <% end %>
                     </ul>
                   </dd>
@@ -110,7 +110,7 @@ defmodule RenewCollabWeb.LiveDocuments do
 
             <ul style="margin: 0; padding: 0;">
               <%= for err <- upload_errors(@uploads.import_file) do %>
-                <li class="alert alert-danger"><%= error_to_string(err) %></li>
+                <li class="alert alert-danger">{error_to_string(err)}</li>
               <% end %>
             </ul>
 
@@ -158,13 +158,13 @@ defmodule RenewCollabWeb.LiveDocuments do
                 <tr {if(rem(di, 2) == 0, do: [style: "background-color:#f5f5f5;"], else: [])}>
                   <td>
                     <.link style="color: #078" navigate={~p"/document/#{document.id}"}>
-                      <%= document.name %>
+                      {document.name}
                     </.link>
                   </td>
 
-                  <td><%= document.inserted_at |> Calendar.strftime("%Y-%m-%d %H:%M") %></td>
+                  <td>{document.inserted_at |> Calendar.strftime("%Y-%m-%d %H:%M")}</td>
 
-                  <td><%= document.updated_at |> Calendar.strftime("%Y-%m-%d %H:%M") %></td>
+                  <td>{document.updated_at |> Calendar.strftime("%Y-%m-%d %H:%M")}</td>
 
                   <td width="50">
                     <button

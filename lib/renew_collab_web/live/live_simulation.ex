@@ -66,12 +66,12 @@ defmodule RenewCollabWeb.LiveSimulation do
 
       <div style="padding: 1em">
         <.link navigate={~p"/shadow_net/#{@simulation.shadow_net_system_id}"}>Back</.link>
-        <h2 style="margin: 0;">Simulation <%= @simulation.id %></h2>
+        <h2 style="margin: 0;">Simulation {@simulation.id}</h2>
 
         <dl>
           <dt>Timestep</dt>
 
-          <dd><%= @simulation.timestep %></dd>
+          <dd>{@simulation.timestep}</dd>
         </dl>
 
         <div style="margin: 1ex  0; display: flex; gap: 1ex">
@@ -144,15 +144,15 @@ defmodule RenewCollabWeb.LiveSimulation do
           <ul>
             <%= for ins <- @simulation.net_instances do %>
               <li>
-                <strong>Net: <%= ins.label %></strong>
+                <strong>Net: {ins.label}</strong>
                 <dl style="display: grid; grid-template-columns: auto 1fr;">
                   <%= for {place, tokens} <- ins.tokens |> Enum.group_by(&(&1.place_id)) do %>
-                    <dt>Place: <%= place %></dt>
+                    <dt>Place: {place}</dt>
 
                     <dd style="grid-column: 2 / span 1;">
                       Tokens:
                       <%= for t <- tokens do %>
-                        <%= t.value %>
+                        {t.value}
                       <% end %>
                     </dd>
                   <% end %>
@@ -176,14 +176,14 @@ defmodule RenewCollabWeb.LiveSimulation do
               <dl>
                 <%= for net <- @simulation.net_instances do %>
                   <dt>
-                    <strong>Net: <%= net.label %></strong>
+                    <strong>Net: {net.label}</strong>
                   </dt>
 
                   <dd>
                     <dl style="display: grid; grid-template-columns: auto 1fr;">
                       <ol style="list-style: none">
                         <%= for fir <- net.firings |> Enum.reverse() do %>
-                          <li>Transition <%= fir.transition_id %> (time: <%= fir.timestep %>)</li>
+                          <li>Transition {fir.transition_id} (time: {fir.timestep})</li>
                         <% end %>
                       </ol>
                     </dl>
@@ -228,7 +228,7 @@ defmodule RenewCollabWeb.LiveSimulation do
               <ol style="list-style: none; padding: 0; margin: 0;">
                 <%= for {e, ei} <- @simulation.log_entries|>Enum.with_index do %>
                   <li style={"padding: 1ex; background: #{if(rem(ei, 2) == 0, do: "#333", else: "#3a3a3a")}"}>
-                    <%= e.content %>
+                    {e.content}
                   </li>
                 <% end %>
               </ol>
