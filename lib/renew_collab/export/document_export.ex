@@ -455,7 +455,7 @@ defmodule RenewCollab.Export.DocumentExport do
                 fIsReadOnly: 0,
                 fParent: parent_ref,
                 fLocator: locator_ref,
-                fType: 1
+                fType: if(locator_ref, do: 1, else: 0)
 
                 # CH.ifa.draw.standard.OffsetLocator 0 0 
                 #     CH.ifa.draw.standard.RelativeLocator 0.5 0.5   1  NULL 
@@ -463,24 +463,37 @@ defmodule RenewCollab.Export.DocumentExport do
             }
           ])
         else
-          {storables, locator_base} =
-            create_ref(storables, %Renewex.Storable{
-              class_name: "CH.ifa.draw.standard.RelativeLocator",
-              fields: %{
-                fOffsetY: 0.5,
-                fOffsetX: 0.5
-              }
-            })
+          parent_ref =
+            with out when not is_nil(out) <- layer.outgoing_link,
+                 target_layer_id when not is_nil(target_layer_id) <- out.target_layer_id do
+              Enum.find_value(Enum.with_index(storables), fn
+                {%{fields: %{_gen_id: ^target_layer_id}}, i} -> {:ref, i}
+                _ -> nil
+              end)
+            end
 
           {storables, locator_ref} =
-            create_ref(storables, %Renewex.Storable{
-              class_name: "CH.ifa.draw.standard.OffsetLocator",
-              fields: %{
-                fOffsetY: 0,
-                fOffsetX: 0,
-                fBase: locator_base
-              }
-            })
+            if parent_ref do
+              {storables, locator_base} =
+                create_ref(storables, %Renewex.Storable{
+                  class_name: "CH.ifa.draw.standard.RelativeLocator",
+                  fields: %{
+                    fOffsetY: 0.5,
+                    fOffsetX: 0.5
+                  }
+                })
+
+              create_ref(storables, %Renewex.Storable{
+                class_name: "CH.ifa.draw.standard.OffsetLocator",
+                fields: %{
+                  fOffsetY: 0,
+                  fOffsetX: 0,
+                  fBase: locator_base
+                }
+              })
+            else
+              {storables, nil}
+            end
 
           storables
           |> Enum.concat([
@@ -497,16 +510,9 @@ defmodule RenewCollab.Export.DocumentExport do
                 fCurrentFontStyle: export_font_style(layer.text.style),
                 fCurrentFontSize: round(style_or_default(layer.text, :font_size)),
                 fIsReadOnly: 0,
-                fParent:
-                  with out when not is_nil(out) <- layer.outgoing_link,
-                       target_layer_id when not is_nil(target_layer_id) <- out.target_layer_id do
-                    Enum.find_value(Enum.with_index(storables), fn
-                      {%{fields: %{_gen_id: ^target_layer_id}}, i} -> {:ref, i}
-                      _ -> nil
-                    end)
-                  end,
+                fParent: parent_ref,
                 fLocator: locator_ref,
-                fType: 1
+                fType: if(locator_ref, do: 1, else: 0)
               }
             }
           ])

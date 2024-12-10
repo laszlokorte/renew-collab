@@ -126,6 +126,17 @@ defmodule RenewCollab.Import.DocumentImport do
                     }
                 end
 
+              class_name =
+                if class_name == "de.renew.gui.CPNTextFigure" do
+                  case Map.get(fields, :fType) do
+                    0 -> "CH.ifa.draw.figures.TextFigure"
+                    2 -> "CH.ifa.draw.figures.TextFigure"
+                    _ -> class_name
+                  end
+                else
+                  class_name
+                end
+
               %{
                 "semantic_tag" => class_name,
                 "z_index" => z_index,
