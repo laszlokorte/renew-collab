@@ -46,7 +46,7 @@ defmodule RenewCollab.Commands.ReorderLayerRelative do
           target_layer_id: target_id,
           target: target
         })
-        |> RenewCollab.Commands.ReorderLayer.multi(false)
+        |> RenewCollab.Commands.ReorderLayer.multi()
     end)
   end
 

@@ -41,7 +41,9 @@ defmodule RenewCollab.Init do
             fn rep, %{} ->
               RenewCollab.Commands.CreateDocument.new(%{doc: transient_doc})
               |> RenewCollab.Commands.CreateDocument.multi()
-              |> Ecto.Multi.append(Versioning.snapshot_multi())
+              |> Ecto.Multi.merge(fn %{insert_document: %{id: doc_id}} ->
+                Versioning.snapshot_multi(doc_id)
+              end)
               |> rep.transaction()
             end
           )
