@@ -1,6 +1,8 @@
 defmodule RenewCollabSim.Server.SimulationProcess do
   use GenServer
 
+  alias RenewCollabSim.Repo
+
   def start_monitor(simulation_id) do
     with {:ok, pid} <-
            GenServer.start(__MODULE__, %{simulation_id: simulation_id, latest_update: nil}) do
@@ -156,7 +158,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
       ),
       []
     )
-    |> RenewCollab.Repo.transaction()
+    |> Repo.transaction()
 
     {:stop, :normal, :shutdown_ok, state |> broadcast_change(:stop)}
   end
@@ -198,7 +200,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
       ),
       []
     )
-    |> RenewCollab.Repo.transaction()
+    |> Repo.transaction()
 
     {:stop, :normal, state |> broadcast_change(:stop)}
   end
@@ -508,7 +510,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
           ),
           []
         )
-        |> RenewCollab.Repo.transaction()
+        |> Repo.transaction()
 
         state = %{state | open_multi: {0, Ecto.Multi.new()}}
 
@@ -533,7 +535,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
           ),
           []
         )
-        |> RenewCollab.Repo.transaction()
+        |> Repo.transaction()
 
         {:noreply, state |> broadcast_change(:init)}
 

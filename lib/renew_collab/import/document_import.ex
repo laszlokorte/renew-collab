@@ -393,7 +393,7 @@ defmodule RenewCollab.Import.DocumentImport do
                     {"simple", "center-socket"}
 
                   other ->
-                    dbg(other)
+                    # dbg(other)
                     {"simple", "center-socket"}
                 end
               ),
@@ -682,7 +682,10 @@ defmodule RenewCollab.Import.DocumentImport do
         {"rect", nil}
 
       true ->
-        {dbg(class_name), nil}
+        {
+          class_name,
+          nil
+        }
     end
   end
 

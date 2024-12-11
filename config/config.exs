@@ -10,7 +10,7 @@ import Config
 config :renew_collab, :db_adapter, Ecto.Adapters.SQLite3
 
 config :renew_collab,
-  ecto_repos: [RenewCollab.Repo],
+  ecto_repos: [RenewCollab.Repo, RenewCollabSim.Repo, RenewCollabAuth.Repo],
   generators: [timestamp_type: :utc_datetime, binary_id: true]
 
 # Configures the endpoint

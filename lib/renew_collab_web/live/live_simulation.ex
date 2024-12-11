@@ -251,16 +251,9 @@ defmodule RenewCollabWeb.LiveSimulation do
   end
 
   def handle_event("debug", %{}, socket) do
-    %RenewCollabSim.Entites.SimulationLogEntry{
-      simulation_id: socket.assigns.simulation_id,
-      content: "Manual Test Entry"
-    }
-    |> RenewCollab.Repo.insert()
-
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "#{@topic}:#{socket.assigns.simulation_id}",
-      {:simulation_change, socket.assigns.simulation_id, :log}
+    RenewCollabSim.Simulator.add_manual_log_entry(
+      socket.assigns.simulation_id,
+      "Manual Test Entry"
     )
 
     {:noreply, socket}

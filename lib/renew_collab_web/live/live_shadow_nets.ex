@@ -273,21 +273,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
         {:ok, {Path.basename(filename), file_content}}
       end)
 
-    with {:ok, content} <- RenewCollabSim.Compiler.SnsCompiler.compile(paths) do
-      %RenewCollabSim.Entites.ShadowNetSystem{}
-      |> RenewCollabSim.Entites.ShadowNetSystem.changeset(%{
-        "compiled" => content,
-        "main_net_name" => main_net_name,
-        "nets" => Enum.map(paths, &%{"name" => Path.rootname(Path.basename(elem(&1, 0)))})
-      })
-      |> RenewCollab.Repo.insert()
-
-      Phoenix.PubSub.broadcast(
-        RenewCollab.PubSub,
-        @topic,
-        :any
-      )
-    end
+    RenewCollabSim.Simulator.compile_rnws_to_ssn(paths, main_net_name)
 
     {:noreply, socket}
   end

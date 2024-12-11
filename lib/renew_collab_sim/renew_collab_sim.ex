@@ -10,7 +10,7 @@ defmodule RenewCollabSim.Simulator do
   alias RenewCollabSim.Entites.SimulationTransitionFiring
   alias RenewCollabSim.Entites.ShadowNetSystem
   alias RenewCollabSim.Entites.Simulation
-  alias RenewCollab.Repo
+  alias RenewCollabSim.Repo
 
   def list_shadow_net_systems do
     Repo.all(
@@ -162,6 +162,7 @@ defmodule RenewCollabSim.Simulator do
 
   def delete_simulation(id) do
     Repo.delete(find_simulation(id))
+    RenewCollabSim.Server.SimulationServer.terminate(id)
 
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
@@ -170,10 +171,34 @@ defmodule RenewCollabSim.Simulator do
     )
   end
 
+  def create_and_start_simulation(shadow_net_system_id) do
+    %RenewCollabSim.Entites.Simulation{
+      shadow_net_system_id: shadow_net_system_id
+    }
+    |> Repo.insert()
+    |> case do
+      {:ok, %{id: id}} -> RenewCollabSim.Server.SimulationServer.setup(id)
+    end
+  end
+
   def change_main_net(sns_id, main_net_name) do
     find_shadow_net_system(sns_id)
     |> Ecto.Changeset.change(%{main_net_name: main_net_name})
     |> Repo.update()
+  end
+
+  def add_manual_log_entry(sim_id, content) do
+    %RenewCollabSim.Entites.SimulationLogEntry{
+      simulation_id: sim_id,
+      content: content
+    }
+    |> Repo.insert()
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "simulation:#{sim_id}",
+      {:simulation_change, sim_id, :log}
+    )
   end
 
   def change_net_document(
@@ -202,6 +227,90 @@ defmodule RenewCollabSim.Simulator do
           })
           |> Repo.update()
         end
+    end
+  end
+
+  def compile_rnws_to_ssn(paths, main_net_name) do
+    with {:ok, content} <- RenewCollabSim.Compiler.SnsCompiler.compile(paths) do
+      %RenewCollabSim.Entites.ShadowNetSystem{}
+      |> RenewCollabSim.Entites.ShadowNetSystem.changeset(%{
+        "compiled" => content,
+        "main_net_name" => main_net_name,
+        "nets" => Enum.map(paths, &%{"name" => Path.rootname(Path.basename(elem(&1, 0)))})
+      })
+      |> Repo.insert()
+
+      Phoenix.PubSub.broadcast(
+        RenewCollab.PubSub,
+        "shadow_nets",
+        :any
+      )
+    end
+  end
+
+  def create_simulation_from_documents(document_ids, main_net_name \\ nil) do
+    nets =
+      try do
+        document_ids
+        |> Enum.map(fn doc_id ->
+          document = RenewCollab.Renew.get_document_with_elements(doc_id)
+          {:ok, rnw} = RenewCollab.Export.DocumentExport.export(document)
+          {:ok, json} = RenewCollabWeb.DocumentJSON.show_content(document) |> Jason.encode()
+
+          {document.name, rnw, json}
+        end)
+      rescue
+        _ ->
+          :export_error
+      end
+
+    with [{default_main_name, _, _} | _] <- nets,
+         main_name <- main_net_name || default_main_name,
+         {:ok, content} <-
+           RenewCollabSim.Compiler.SnsCompiler.compile(
+             nets
+             |> Enum.map(fn {name, rnw, _} -> {name, rnw} end)
+           ),
+         {:ok, %{id: sns_id}} <-
+           %RenewCollabSim.Entites.ShadowNetSystem{}
+           |> RenewCollabSim.Entites.ShadowNetSystem.changeset(%{
+             "compiled" => content,
+             "main_net_name" => main_name,
+             "nets" =>
+               nets
+               |> Enum.map(fn {name, _, json} ->
+                 %{
+                   "name" => name,
+                   "document_json" => json
+                 }
+               end)
+           })
+           |> Repo.insert() do
+      %RenewCollabSim.Entites.Simulation{
+        shadow_net_system_id: sns_id
+      }
+      |> Repo.insert()
+      |> case do
+        {:ok, %{id: sim_id} = simulation} ->
+          RenewCollabSim.Server.SimulationServer.setup(sim_id)
+
+          Phoenix.PubSub.broadcast(
+            RenewCollab.PubSub,
+            "shadow_net:#{sns_id}",
+            :any
+          )
+
+          Phoenix.PubSub.broadcast(
+            RenewCollab.PubSub,
+            "simulations",
+            {:simulation_change, sim_id, :created}
+          )
+
+          simulation
+
+        e ->
+          {:error, e}
+      end
     end
   end
 end

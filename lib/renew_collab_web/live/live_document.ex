@@ -1608,53 +1608,15 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def handle_event("simulate", %{}, socket) do
-    document = socket.assigns.document
-    {:ok, rnw} = RenewCollab.Export.DocumentExport.export(document)
+    RenewCollabSim.Simulator.create_simulation_from_documents(
+      [socket.assigns.document.id],
+      socket.assigns.document.name
+    )
+    |> case do
+      %RenewCollabSim.Entites.Simulation{} = sim ->
+        {:noreply, redirect(socket, to: ~p"/simulation/#{sim.id}")}
 
-    nets = [
-      {
-        document.name,
-        rnw
-      }
-    ]
-
-    with {:ok, content} <- RenewCollabSim.Compiler.SnsCompiler.compile(nets),
-         {:ok, json} <- document |> RenewCollabWeb.DocumentJSON.show_content() |> Jason.encode(),
-         {:ok, %{id: sns_id}} <-
-           %RenewCollabSim.Entites.ShadowNetSystem{}
-           |> RenewCollabSim.Entites.ShadowNetSystem.changeset(%{
-             "compiled" => content,
-             "main_net_name" => document.name,
-             "nets" => [
-               %{
-                 "name" => document.name,
-                 "document_json" => json
-               }
-             ]
-           })
-           |> RenewCollab.Repo.insert() do
-      %RenewCollabSim.Entites.Simulation{
-        shadow_net_system_id: sns_id
-      }
-      |> RenewCollab.Repo.insert()
-      |> case do
-        {:ok, %{id: sim_id}} ->
-          RenewCollabSim.Server.SimulationServer.setup(sim_id)
-
-          Phoenix.PubSub.broadcast(
-            RenewCollab.PubSub,
-            "shadow_net:#{sns_id}",
-            :any
-          )
-
-          {:noreply, redirect(socket, to: ~p"/simulation/#{sim_id}")}
-
-        _ ->
-          {:noreply, redirect(socket, to: ~p"/shadow_net/#{sns_id}")}
-      end
-    else
       e ->
-        dbg(e)
         {:noreply, socket}
     end
   end

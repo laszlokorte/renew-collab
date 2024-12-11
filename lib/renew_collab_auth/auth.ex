@@ -4,7 +4,7 @@ defmodule RenewCollabAuth.Auth do
   """
 
   import Ecto.Query, warn: false
-  alias RenewCollab.Repo
+  alias RenewCollabAuth.Repo
 
   alias RenewCollabAuth.Entites.Account
   alias RenewCollabAuth.Entites.SessionToken
@@ -14,6 +14,8 @@ defmodule RenewCollabAuth.Auth do
   def count_accounts(), do: Repo.one!(from(a in Account, select: count(a.id)))
 
   def count_sessions(), do: Repo.one!(from(a in SessionToken, select: count(a.id)))
+
+  def get_account(id), do: Repo.get(Account, id)
 
   def get_account!(id), do: Repo.get!(Account, id)
 
@@ -36,7 +38,7 @@ defmodule RenewCollabAuth.Auth do
   def create_account(params) do
     %Account{}
     |> Account.changeset(params)
-    |> RenewCollab.Repo.insert()
+    |> Repo.insert()
   end
 
   def create_account(email, password) do

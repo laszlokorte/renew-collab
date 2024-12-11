@@ -38,11 +38,11 @@ defmodule RenewCollabSim.Compiler.SnsCompiler do
            {:ok, content} when content != [] <- File.read(output_path) do
         {:ok, content}
       else
-        _ ->
-          :error
+        e ->
+          {:error, e}
       end
     after
-      File.rm_rf(output_root_upload)
+      # File.rm_rf(output_root_upload)
     end
   end
 end

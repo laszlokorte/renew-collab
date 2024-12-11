@@ -2,6 +2,7 @@ defmodule RenewCollab.Hierarchy do
   import Ecto.Query, only: [from: 2, union: 2]
 
   alias RenewCollab.Hierarchy.LayerParenthood
+  alias RenewCollab.Repo
 
   @attributes [:document_id, :ancestor_id, :descendant_id, :depth]
 
@@ -32,7 +33,7 @@ defmodule RenewCollab.Hierarchy do
     |> Ecto.Multi.insert_all(:insert_missings, LayerParenthood, fn %{missings: rows_to_insert} ->
       rows_to_insert
     end)
-    |> RenewCollab.Repo.transaction()
+    |> Repo.transaction()
   end
 
   def find_missing_query(doc_id) do
@@ -122,7 +123,7 @@ defmodule RenewCollab.Hierarchy do
     RenewCollab.SimpleCache.cache(
       {:hierarchy_missing, doc_id},
       fn ->
-        RenewCollab.Repo.all(find_missing_query(doc_id))
+        Repo.all(find_missing_query(doc_id))
       end,
       [{:document_content, doc_id}],
       600
@@ -130,7 +131,7 @@ defmodule RenewCollab.Hierarchy do
   end
 
   def count_missing_global() do
-    RenewCollab.Repo.all(find_missing_query()) |> Enum.count()
+    Repo.all(find_missing_query()) |> Enum.count()
   end
 
   def find_invalids_query(doc_id) do
@@ -216,7 +217,7 @@ defmodule RenewCollab.Hierarchy do
     RenewCollab.SimpleCache.cache(
       {:hierarchy_invalids, doc_id},
       fn ->
-        RenewCollab.Repo.all(find_invalids_query(doc_id))
+        Repo.all(find_invalids_query(doc_id))
       end,
       [{:document_content, doc_id}],
       600
@@ -224,6 +225,6 @@ defmodule RenewCollab.Hierarchy do
   end
 
   def count_invalids_global() do
-    RenewCollab.Repo.all(find_invalids_query()) |> Enum.count()
+    Repo.all(find_invalids_query()) |> Enum.count()
   end
 end

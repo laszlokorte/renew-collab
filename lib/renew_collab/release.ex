@@ -24,16 +24,14 @@ defmodule RenewCollab.Release do
   def create_account(email, password) do
     load_app()
 
-    for repo <- repos() do
-      Ecto.Migrator.with_repo(repo, fn r ->
-        %RenewCollabAuth.Entites.Account{}
-        |> RenewCollabAuth.Entites.Account.changeset(%{
-          "email" => email,
-          "new_password" => password
-        })
-        |> r.insert()
-      end)
-    end
+    Ecto.Migrator.with_repo(RenewCollabAuth.Repo, fn r ->
+      %RenewCollabAuth.Entites.Account{}
+      |> RenewCollabAuth.Entites.Account.changeset(%{
+        "email" => email,
+        "new_password" => password
+      })
+      |> r.insert()
+    end)
   end
 
   def rollback(repo, version) do

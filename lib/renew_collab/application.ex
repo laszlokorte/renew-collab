@@ -10,6 +10,8 @@ defmodule RenewCollab.Application do
     children = [
       RenewCollabWeb.Telemetry,
       RenewCollab.Repo,
+      RenewCollabSim.Repo,
+      RenewCollabAuth.Repo,
       {Ecto.Migrator,
        repos: Application.fetch_env!(:renew_collab, :ecto_repos), skip: skip_migrations?()},
       {DNSCluster, query: Application.get_env(:renew_collab, :dns_cluster_query) || :ignore},

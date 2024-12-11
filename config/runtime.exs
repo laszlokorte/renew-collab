@@ -30,6 +30,24 @@ if config_env() == :prod do
     stacktrace: false,
     show_sensitive_data_on_connection_error: false
 
+  config :renew_collab, RenewCollabAuth.Repo,
+    adapter: Application.compile_env(:renew_collab, :db_adapter),
+    database:
+      System.get_env("AUTH_DB_PATH") ||
+        raise("AUTH_DB_PATH is missing"),
+    pool_size: 1,
+    stacktrace: false,
+    show_sensitive_data_on_connection_error: false
+
+  config :renew_collab, RenewCollabSim.Repo,
+    adapter: Application.compile_env(:renew_collab, :db_adapter),
+    database:
+      System.get_env("SIM_DB_PATH") ||
+        raise("SIM_DB_PATH is missing"),
+    pool_size: 1,
+    stacktrace: false,
+    show_sensitive_data_on_connection_error: false
+
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you
   # want to use a different value for prod and you most likely don't want

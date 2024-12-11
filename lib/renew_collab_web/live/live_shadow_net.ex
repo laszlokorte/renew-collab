@@ -156,14 +156,14 @@ defmodule RenewCollabWeb.LiveShadowNet do
 
               <th style="border-bottom: 1px solid #333;" align="left" width="100%">Timestep</th>
 
-              <th style="border-bottom: 1px solid #333;" align="right" colspan="3">Actions</th>
+              <th style="border-bottom: 1px solid #333;" align="right" colspan="5">Actions</th>
             </tr>
           </thead>
 
           <tbody>
             <%= if Enum.empty?(@shadow_net_system.simulations) do %>
               <tr>
-                <td colspan="4">
+                <td colspan="7">
                   <div style="padding: 2em; border: 3px dashed #aaa; text-align: center; font-style: italic;">
                     <p>
                       No Simulations created yet.
@@ -196,6 +196,26 @@ defmodule RenewCollabWeb.LiveShadowNet do
                     <td>
                       <button
                         type="button"
+                        phx-click="play"
+                        phx-value-id={sim.id}
+                        style="cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff"
+                      >
+                        Play
+                      </button>
+                    </td>
+                    <td>
+                      <button
+                        type="button"
+                        phx-click="pause"
+                        phx-value-id={sim.id}
+                        style="cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff"
+                      >
+                        Pause
+                      </button>
+                    </td>
+                    <td>
+                      <button
+                        type="button"
                         phx-click="step"
                         phx-value-id={sim.id}
                         style="cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff"
@@ -215,7 +235,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
                       </td>
                     </td>
                   <% else %>
-                    <td colspan="2" align="right">
+                    <td colspan="4" align="right">
                       <button
                         type="button"
                         phx-click="setup"
@@ -250,7 +270,6 @@ defmodule RenewCollabWeb.LiveShadowNet do
 
   def handle_event("delete", %{"id" => simulation_id}, socket) do
     RenewCollabSim.Simulator.delete_simulation(simulation_id)
-    RenewCollabSim.Server.SimulationServer.terminate(simulation_id)
 
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
@@ -277,6 +296,18 @@ defmodule RenewCollabWeb.LiveShadowNet do
 
   def handle_event("step", %{"id" => simulation_id}, socket) do
     RenewCollabSim.Server.SimulationServer.step(simulation_id)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("play", %{"id" => simulation_id}, socket) do
+    RenewCollabSim.Server.SimulationServer.play(simulation_id)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("pause", %{"id" => simulation_id}, socket) do
+    RenewCollabSim.Server.SimulationServer.pause(simulation_id)
 
     {:noreply, socket}
   end
@@ -314,13 +345,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
   end
 
   def handle_event("new-simulation", %{}, socket) do
-    %RenewCollabSim.Entites.Simulation{
-      shadow_net_system_id: socket.assigns.shadow_net_system_id
-    }
-    |> RenewCollab.Repo.insert()
-    |> case do
-      {:ok, %{id: id}} -> RenewCollabSim.Server.SimulationServer.setup(id)
-    end
+    RenewCollabSim.Simulator.create_and_start_simulation(socket.assigns.shadow_net_system.id)
 
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,

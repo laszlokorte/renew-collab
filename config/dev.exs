@@ -6,6 +6,23 @@ config :renew_collab, RenewCollab.Repo,
   database: Path.expand("../renew_collab_dev.db", __DIR__),
   pool_size: 1,
   stacktrace: true,
+  priv: "priv/repo",
+  show_sensitive_data_on_connection_error: true
+
+config :renew_collab, RenewCollabSim.Repo,
+  adapter: Application.compile_env(:renew_collab, :db_adapter),
+  database: Path.expand("../renew_collab_sim_dev.db", __DIR__),
+  pool_size: 1,
+  stacktrace: true,
+  priv: "priv/repo_sim",
+  show_sensitive_data_on_connection_error: true
+
+config :renew_collab, RenewCollabAuth.Repo,
+  adapter: Application.compile_env(:renew_collab, :db_adapter),
+  database: Path.expand("../renew_collab_auth_dev.db", __DIR__),
+  pool_size: 1,
+  stacktrace: true,
+  priv: "priv/repo_auth",
   show_sensitive_data_on_connection_error: true
 
 # For development, we disable any cache and enable

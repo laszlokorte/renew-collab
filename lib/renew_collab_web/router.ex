@@ -43,7 +43,7 @@ defmodule RenewCollabWeb.Router do
   end
 
   scope "/api", RenewCollabWeb do
-    pipe_through :api
+    pipe_through :protected_api
     get "/symbols", SymbolController, :index
     get "/socket_schemas", SocketSchemaController, :index
     get "/semantic_tags", SemanticTagController, :index
