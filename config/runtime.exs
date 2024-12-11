@@ -25,7 +25,7 @@ maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: [
 if config_env() == :prod do
   config :renew_collab, RenewCollab.Repo,
     adapter: Application.compile_env(:renew_collab, :db_adapter),
-    database: System.get_env("DB_PATH") || raise("DB_PATH is missing"),
+    database: System.get_env("RENEW_DOCS_DB_PATH") || raise("RENEW_DOCS_DB_PATH is missing"),
     pool_size: 1,
     stacktrace: false,
     show_sensitive_data_on_connection_error: false
@@ -33,8 +33,8 @@ if config_env() == :prod do
   config :renew_collab, RenewCollabAuth.Repo,
     adapter: Application.compile_env(:renew_collab, :db_adapter),
     database:
-      System.get_env("AUTH_DB_PATH") ||
-        raise("AUTH_DB_PATH is missing"),
+      System.get_env("RENEW_AUTH_DB_PATH") ||
+        raise("RENEW_AUTH_DB_PATH is missing"),
     pool_size: 1,
     stacktrace: false,
     show_sensitive_data_on_connection_error: false
@@ -42,8 +42,8 @@ if config_env() == :prod do
   config :renew_collab, RenewCollabSim.Repo,
     adapter: Application.compile_env(:renew_collab, :db_adapter),
     database:
-      System.get_env("SIM_DB_PATH") ||
-        raise("SIM_DB_PATH is missing"),
+      System.get_env("RENEW_SIM_DB_PATH") ||
+        raise("RENEW_SIM_DB_PATH is missing"),
     pool_size: 1,
     stacktrace: false,
     show_sensitive_data_on_connection_error: false
