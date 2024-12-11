@@ -38,7 +38,7 @@ if config_env() == :prod do
         raise("RENEW_AUTH_DB_PATH is missing"),
     pool_size: 1,
     stacktrace: false,
-    priv: "priv/repo_sim",
+    priv: "priv/repo_auth",
     show_sensitive_data_on_connection_error: false
 
   config :renew_collab, RenewCollabSim.Repo,
@@ -48,7 +48,7 @@ if config_env() == :prod do
         raise("RENEW_SIM_DB_PATH is missing"),
     pool_size: 1,
     stacktrace: false,
-    priv: "priv/repo_auth",
+    priv: "priv/repo_sim",
     show_sensitive_data_on_connection_error: false
 
   # The secret key base is used to sign/encrypt cookies and other secrets.

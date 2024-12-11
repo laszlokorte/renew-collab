@@ -32,7 +32,8 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-config :exqlite, make_force_build: false
+config :exqlite, make_force_build: true
+config :exqlite, force_build: true
 
 # Configure esbuild (the version is required)
 config :esbuild,
