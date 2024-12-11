@@ -6,8 +6,8 @@ cd -P -- "$(dirname -- "$0")"
 
 ./renew_collab eval RenewCollab.Release.seed
 
-if test -n "$ADMIN_EMAIL" && test -n "$ADMIN_PASSWORD"; then
-./renew_collab eval "RenewCollab.Release.create_account(\"$ADMIN_EMAIL\", \"$ADMIN_PASSWORD\")"
+if test -n "$RENEW_ADMIN_EMAIL" && test -n "$RENEW_ADMIN_PASSWORD"; then
+./renew_collab eval "RenewCollab.Release.create_account(\"$RENEW_ADMIN_EMAIL\", \"$RENEW_ADMIN_PASSWORD\")"
 fi
 
 PHX_SERVER=true exec ./renew_collab start

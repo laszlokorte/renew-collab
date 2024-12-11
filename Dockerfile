@@ -94,6 +94,8 @@ USER nobody
 # above and adding an entrypoint. See https://github.com/krallin/tini for details
 # ENTRYPOINT ["/tini", "--"]
 
-ENV DB_PATH="/app/renew.db"
+ENV RENEW_DOCS_DB_PATH="/app/renew_docs.db"
+ENV RENEW_AUTH_DB_PATH="/app/renew_auth.db"
+ENV RENEW_SIM_DB_PATH="/app/renew_sim.db"
 
 CMD ["/app/bin/server"]
