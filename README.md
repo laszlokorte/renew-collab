@@ -57,6 +57,15 @@ git clone url-to-this-repository
 mix deps.get
 ``` 
 
+### Compile dependencies 
+
+This step is needed if the GLIBC version on your machine differs from the one used in the precompiled SQlite adapter.
+
+```sh
+# Inside this project directory
+mix deps.compile
+``` 
+
 ### Compile Project
 
 ```sh
