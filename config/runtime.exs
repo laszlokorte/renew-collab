@@ -34,8 +34,8 @@ if config_env() == :prod do
   config :renew_collab, RenewCollabAuth.Repo,
     adapter: Application.compile_env(:renew_collab, :db_adapter),
     database:
-      System.get_env("RENEW_AUTH_DB_PATH") ||
-        raise("RENEW_AUTH_DB_PATH is missing"),
+      System.get_env("RENEW_ACCOUNT_DB_PATH") ||
+        raise("RENEW_ACCOUNT_DB_PATH is missing"),
     pool_size: 1,
     stacktrace: false,
     priv: "priv/repo_auth",

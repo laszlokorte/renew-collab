@@ -16,9 +16,7 @@ defmodule RenewCollab.Release do
   def seed do
     load_app()
 
-    for repo <- repos() do
-      Ecto.Migrator.with_repo(repo, &RenewCollab.Init.reset(&1))
-    end
+    Ecto.Migrator.with_repo(RenewCollab.Repo, &RenewCollab.Init.reset(&1))
   end
 
   def create_account(email, password) do

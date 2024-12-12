@@ -18,7 +18,7 @@ ARG DEBIAN_VERSION=bullseye-20240612-slim
 ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
 ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
 
-FROM ${BUILDER_IMAGE} as builder
+FROM ${BUILDER_IMAGE} AS builder
 
 # install build dependencies
 RUN apt-get update -y && apt-get install -y build-essential git \
@@ -63,20 +63,46 @@ COPY config/runtime.exs config/
 COPY rel rel
 RUN mix release
 
+# Use openJDK with alpine linux
+FROM eclipse-temurin:17 AS java_builder
+
+WORKDIR /interceptor
+
+ADD priv/simulation/Interceptor.java Interceptor.java
+ADD priv/simulation/manifest.txt manifest.txt
+
+RUN javac Interceptor.java && jar cmf manifest.txt Interceptor.jar Interceptor.class
+RUN java -jar Interceptor.jar echo
+
 # start a new build stage so that the final image will only contain
 # the compiled release and other runtime necessities
 FROM ${RUNNER_IMAGE}
 
 RUN apt-get update -y && \
-  apt-get install -y libstdc++6 openssl libncurses5 locales ca-certificates \
+  apt-get install -y libstdc++6 openssl libncurses5 locales \
+  ca-certificates openjdk-17-jdk wget xvfb unzip \
   && apt-get clean && rm -f /var/lib/apt/lists/*_*
+
+ENV JAVA_HOME=/usr/lib/jvm/jdk-17/
+ENV PATH="$JAVA_HOME/bin:$PATH"
+
+RUN java --version
+
+COPY --from=java_builder /interceptor/Interceptor.jar  /app/priv/simulation/Interceptor.jar
+COPY priv/simulation/log4j.properties  /app/priv/simulation/log4j.properties
+
+RUN mkdir -p /app/priv/simulation/renew41 && \
+    mkdir -p /app/priv/simulation/download && \
+    wget https://www2.informatik.uni-hamburg.de/TGI/renew/4.1/renew4.1base.zip -O /app/priv/simulation/download/renew4.1base.zip && \
+    unzip /app/priv/simulation/download/renew4.1base.zip -d /app/priv/simulation/renew41 && \
+    rm -rf /app/priv/simulation/download
 
 # Set the locale
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
 
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en
-ENV LC_ALL en_US.UTF-8
+ENV LANG="en_US.UTF-8"
+ENV LANGUAGE="en_US:en"
+ENV LC_ALL="en_US.UTF-8"
 
 WORKDIR "/app"
 RUN chown nobody /app
@@ -87,7 +113,12 @@ ENV MIX_ENV="prod"
 # Only copy the final release from the build stage
 COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/renew_collab ./
 
-USER nobody
+RUN chmod +x /app/bin/server
+RUN chmod +x /app/bin/migrate
+
+RUN mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix
+
+USER root
 
 # If using an environment that doesn't automatically reap zombie processes, it is
 # advised to add an init process such as tini via `apt-get install`
@@ -95,7 +126,11 @@ USER nobody
 # ENTRYPOINT ["/tini", "--"]
 
 ENV RENEW_DOCS_DB_PATH="/app/renew_docs.db"
-ENV RENEW_AUTH_DB_PATH="/app/renew_auth.db"
+ENV RENEW_ACCOUNT_DB_PATH="/app/renew_auth.db"
 ENV RENEW_SIM_DB_PATH="/app/renew_sim.db"
+ENV SIM_RENEW_PATH="/app/priv/simulation/renew41"
+ENV SIM_STDIO_WRAPPER="/app/priv/simulation/Interceptor.jar"
+ENV SIM_LOG4J_CONF="/app/priv/simulation/log4j.properties"
+ENV SIM_XVBF_DISPLAY=":23"
 
 CMD ["/app/bin/server"]

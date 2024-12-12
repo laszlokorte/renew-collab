@@ -3,4 +3,4 @@
 # mix run priv/repo/seeds.exs
 # ```
 
-RenewCollab.Init.reset()
+# RenewCollab.Init.reset()
