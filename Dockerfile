@@ -116,9 +116,10 @@ COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/renew_collab 
 RUN chmod +x /app/bin/server
 RUN chmod +x /app/bin/migrate
 
-RUN mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix
+RUN chown -R nobody:nogroup /app/priv/simulation
+RUN chmod 1777 /tmp
 
-USER root
+USER nobody
 
 # If using an environment that doesn't automatically reap zombie processes, it is
 # advised to add an init process such as tini via `apt-get install`

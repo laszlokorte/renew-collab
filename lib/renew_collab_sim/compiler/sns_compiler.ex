@@ -42,7 +42,7 @@ defmodule RenewCollabSim.Compiler.SnsCompiler do
           {:error, e}
       end
     after
-      # File.rm_rf(output_root_upload)
+      File.rm_rf(output_root_upload)
     end
   end
 end
