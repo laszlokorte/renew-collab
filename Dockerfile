@@ -135,6 +135,7 @@ RUN chmod +x /app/bin/migrate
 RUN mkdir "${DATA_ROOT_PATH}"
 RUN chown -R nobody:nogroup "${DATA_ROOT_PATH}"
 RUN chmod 1777 /tmp
+RUN mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix && chown root:root /tmp/.X11-unix
 
 USER nobody
 
@@ -150,5 +151,7 @@ ENV SIM_RENEW_PATH=${SIMULATOR_ROOT_PATH}/renew
 ENV SIM_STDIO_WRAPPER=${SIMULATOR_ROOT_PATH}/Interceptor.jar
 ENV SIM_LOG4J_CONF=${SIMULATOR_ROOT_PATH}/log4j.properties
 ENV SIM_XVBF_DISPLAY=":23"
+ENV PHX_HOST="localhost"
+ENV PORT="4000"
 
 CMD ["/app/bin/server"]

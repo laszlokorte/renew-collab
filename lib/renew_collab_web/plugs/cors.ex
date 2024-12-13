@@ -6,5 +6,5 @@ defmodule RenewCollabWeb.Plug.CORS do
     allow_methods: :all,
     max_age: 600
 
-  resource("/*")
+  resource("/api/*")
 end

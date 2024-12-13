@@ -63,13 +63,20 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
-  host = System.get_env("PHX_HOST") || "example.com"
+  host = System.get_env("PHX_HOST") || raise "PHX_HOST IS MISSING"
+  is_local = host == "localhost"
+
   port = String.to_integer(System.get_env("PORT") || "4000")
+  ssl_port = String.to_integer(System.get_env("SSL_PORT") || "443")
 
   config :renew_collab, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
   config :renew_collab, RenewCollabWeb.Endpoint,
-    url: [host: host, port: 443, scheme: "https"],
+    url:
+      if(is_local,
+        do: [host: host, port: port, scheme: "http"],
+        else: [host: host, port: ssl_port, scheme: "https"]
+      ),
     http: [
       # Enable IPv6 and bind on all interfaces.
       # Set it to  {0, 0, 0, 0, 0, 0, 0, 1} for local network only access.
@@ -78,6 +85,8 @@ if config_env() == :prod do
       ip: {0, 0, 0, 0, 0, 0, 0, 0},
       port: port
     ],
+    https: not is_local,
+    force_ssl: not is_local,
     secret_key_base: secret_key_base
 
   config :renew_collab, RenewCollabSim.Script.Runner,

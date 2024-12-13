@@ -20,13 +20,19 @@ docker build -t renew_collab:latest .
 ```sh 
 docker run\
 -e PHX_HOST="localhost"\
--e PORT="3000"\
--e ADMIN_EMAIL="your@email.net"\
--e ADMIN_PASSWORD="your_password"\
+-e PORT="8080"\
+-e RENEW_ADMIN_EMAIL="your@email.net"\
+-e RENEW_ADMIN_PASSWORD="your_password"\
 -e SECRET_KEY_BASE="$(mix phx.gen.secret)"\
--p 8080:3000\
+-p 8080:8080\
 -it renew_collab
 ```
+
+`RENEW_ADMIN_EMAIL` and `RENEW_ADMIN_PASSWORD` are the credentials to log into the Web Application.
+Additional accounts can be created there.
+
+`PORT` is the TCP port the webserver listens on for incoming connections. This port must be exposed by via `-p`. *Important:* Do not remap the internal port to a differnt external port. The Internal port is also used to generate absolute URLs inside the web applications. If internal and external ports differ, the generated URLs are invalid. 
+
 
 ### Open in Browser
 
