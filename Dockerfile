@@ -86,9 +86,12 @@ ARG RENEW_DOWNLOAD_URL="https://www2.informatik.uni-hamburg.de/TGI/renew/4.1/ren
 ARG RENEW_DOWNLOAD_TARGET="/tmp/renew-download.zip"
 ARG JAVA_VERSION="17"
 
-ENV DATA_ROOT_PATH="/data"
-ENV SIMULATOR_ROOT_PATH="/simulator"
+ARG DATA_ROOT_PATH="/data"
+ENV DATA_ROOT_PATH=${DATA_ROOT_PATH}
+ARG SIMULATOR_ROOT_PATH="/simulator"
 ENV JAVA_VERSION=${JAVA_VERSION}
+
+WORKDIR ${SIMULATOR_ROOT_PATH}
 
 RUN apt-get update -y && \
   apt-get install -y libstdc++6 openssl libncurses5 locales \
@@ -100,13 +103,14 @@ ENV PATH="$JAVA_HOME/bin:$PATH"
 
 RUN java --version
 
-COPY --from=java_builder /interceptor/Interceptor.jar "${SIMULATOR_ROOT_PATH}/Interceptor.jar"
-COPY priv/simulation/log4j.properties "${SIMULATOR_ROOT_PATH}/log4j.properties"
+COPY --from=java_builder /interceptor/Interceptor.jar "./Interceptor.jar"
+COPY priv/simulation/log4j.properties "./log4j.properties"
 
-RUN mkdir -p ${SIMULATOR_ROOT_PATH}/renew && \
+RUN mkdir -p ./renew && \
     wget ${RENEW_DOWNLOAD_URL} -O ${RENEW_DOWNLOAD_TARGET} && \
-    unzip ${RENEW_DOWNLOAD_TARGET} -d ${SIMULATOR_ROOT_PATH}/renew && \
-    rm ${RENEW_DOWNLOAD_TARGET}
+    unzip ${RENEW_DOWNLOAD_TARGET} -d ./renew && \
+    rm ${RENEW_DOWNLOAD_TARGET} && chown -R nobody:nogroup .
+
 
 # Set the locale
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
@@ -116,7 +120,7 @@ ENV LANGUAGE="en_US:en"
 ENV LC_ALL="en_US.UTF-8"
 
 WORKDIR "/app"
-RUN chown nobody /app
+RUN chown nobody:nogroup /app
 
 # set runner ENV
 ENV MIX_ENV="prod"
@@ -127,9 +131,9 @@ COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/renew_collab 
 RUN chmod +x /app/bin/server
 RUN chmod +x /app/bin/migrate
 
+
 RUN mkdir "${DATA_ROOT_PATH}"
 RUN chown -R nobody:nogroup "${DATA_ROOT_PATH}"
-RUN chown -R nobody:nogroup "${SIMULATOR_ROOT_PATH}"
 RUN chmod 1777 /tmp
 
 USER nobody
