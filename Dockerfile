@@ -18,6 +18,9 @@ ARG DEBIAN_VERSION=bullseye-20240612-slim
 ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
 ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
 
+ARG JAVA_VERSION="17"
+ARG JAVA_BUILDER_IMAGE="eclipse-temurin:${JAVA_VERSION}"
+
 FROM ${BUILDER_IMAGE} AS builder
 
 # install build dependencies
@@ -64,7 +67,7 @@ COPY rel rel
 RUN mix release
 
 # Use openJDK with alpine linux
-FROM eclipse-temurin:17 AS java_builder
+FROM ${JAVA_BUILDER_IMAGE} AS java_builder
 
 WORKDIR /interceptor
 
@@ -78,24 +81,32 @@ RUN java -jar Interceptor.jar echo
 # the compiled release and other runtime necessities
 FROM ${RUNNER_IMAGE}
 
+
+ARG RENEW_DOWNLOAD_URL="https://www2.informatik.uni-hamburg.de/TGI/renew/4.1/renew4.1base.zip"
+ARG RENEW_DOWNLOAD_TARGET="/tmp/renew-download.zip"
+ARG JAVA_VERSION="17"
+
+ENV DATA_ROOT_PATH="/data"
+ENV SIMULATOR_ROOT_PATH="/simulator"
+ENV JAVA_VERSION=${JAVA_VERSION}
+
 RUN apt-get update -y && \
   apt-get install -y libstdc++6 openssl libncurses5 locales \
-  ca-certificates openjdk-17-jdk wget xvfb unzip \
+  ca-certificates openjdk-$JAVA_VERSION-jdk wget xvfb unzip \
   && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
-ENV JAVA_HOME=/usr/lib/jvm/jdk-17/
+ENV JAVA_HOME=/usr/lib/jvm/jdk-${JAVA_VERSION}/
 ENV PATH="$JAVA_HOME/bin:$PATH"
 
 RUN java --version
 
-COPY --from=java_builder /interceptor/Interceptor.jar  /app/priv/simulation/Interceptor.jar
-COPY priv/simulation/log4j.properties  /app/priv/simulation/log4j.properties
+COPY --from=java_builder /interceptor/Interceptor.jar "${SIMULATOR_ROOT_PATH}/Interceptor.jar"
+COPY priv/simulation/log4j.properties "${SIMULATOR_ROOT_PATH}/log4j.properties"
 
-RUN mkdir -p /app/priv/simulation/renew41 && \
-    mkdir -p /app/priv/simulation/download && \
-    wget https://www2.informatik.uni-hamburg.de/TGI/renew/4.1/renew4.1base.zip -O /app/priv/simulation/download/renew4.1base.zip && \
-    unzip /app/priv/simulation/download/renew4.1base.zip -d /app/priv/simulation/renew41 && \
-    rm -rf /app/priv/simulation/download
+RUN mkdir -p ${SIMULATOR_ROOT_PATH}/renew && \
+    wget ${RENEW_DOWNLOAD_URL} -O ${RENEW_DOWNLOAD_TARGET} && \
+    unzip ${RENEW_DOWNLOAD_TARGET} -d ${SIMULATOR_ROOT_PATH}/renew && \
+    rm ${RENEW_DOWNLOAD_TARGET}
 
 # Set the locale
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
@@ -116,7 +127,9 @@ COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/renew_collab 
 RUN chmod +x /app/bin/server
 RUN chmod +x /app/bin/migrate
 
-RUN chown -R nobody:nogroup /app/priv/simulation
+RUN mkdir "${DATA_ROOT_PATH}"
+RUN chown -R nobody:nogroup "${DATA_ROOT_PATH}"
+RUN chown -R nobody:nogroup "${SIMULATOR_ROOT_PATH}"
 RUN chmod 1777 /tmp
 
 USER nobody
@@ -126,12 +139,12 @@ USER nobody
 # above and adding an entrypoint. See https://github.com/krallin/tini for details
 # ENTRYPOINT ["/tini", "--"]
 
-ENV RENEW_DOCS_DB_PATH="/app/renew_docs.db"
-ENV RENEW_ACCOUNT_DB_PATH="/app/renew_auth.db"
-ENV RENEW_SIM_DB_PATH="/app/renew_sim.db"
-ENV SIM_RENEW_PATH="/app/priv/simulation/renew41"
-ENV SIM_STDIO_WRAPPER="/app/priv/simulation/Interceptor.jar"
-ENV SIM_LOG4J_CONF="/app/priv/simulation/log4j.properties"
+ENV RENEW_DOCS_DB_PATH=${DATA_ROOT_PATH}/renew_docs.db
+ENV RENEW_ACCOUNT_DB_PATH=${DATA_ROOT_PATH}/renew_auth.db
+ENV RENEW_SIM_DB_PATH=${DATA_ROOT_PATH}/renew_sim.db
+ENV SIM_RENEW_PATH=${SIMULATOR_ROOT_PATH}/renew
+ENV SIM_STDIO_WRAPPER=${SIMULATOR_ROOT_PATH}/Interceptor.jar
+ENV SIM_LOG4J_CONF=${SIMULATOR_ROOT_PATH}/log4j.properties
 ENV SIM_XVBF_DISPLAY=":23"
 
 CMD ["/app/bin/server"]
