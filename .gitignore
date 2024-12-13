@@ -35,6 +35,7 @@ renew_collab-*.tar
 deploy.sh
 dev.sh
 env.sh
+restart.sh
 mkpass.sh
 dev_stderr.txt
 dev_stdout.txt
