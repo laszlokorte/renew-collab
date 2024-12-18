@@ -21,7 +21,12 @@ defmodule RenewCollab.Commands.UpdateLayerTextBody do
     |> Ecto.Multi.put(:document_id, document_id)
     |> Ecto.Multi.one(
       :text,
-      from(l in Layer, join: t in assoc(l, :text), where: l.id == ^layer_id, select: t)
+      from(t in Text,
+        join: l in assoc(t, :layer),
+        left_join: s in assoc(t, :style),
+        where: l.id == ^layer_id,
+        preload: [style: s]
+      )
     )
     |> Ecto.Multi.update(
       :body,
@@ -35,6 +40,13 @@ defmodule RenewCollab.Commands.UpdateLayerTextBody do
         from(h in TextSizeHint, where: h.text_id == ^text.id)
       end,
       []
+    )
+    |> Ecto.Multi.append(
+      RenewCollab.Commands.UpdateLayerTextSizeHintAuto.new(%{
+        document_id: document_id,
+        layer_id: layer_id
+      })
+      |> RenewCollab.Commands.UpdateLayerTextSizeHintAuto.multi()
     )
   end
 end

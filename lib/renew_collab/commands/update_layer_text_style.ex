@@ -47,6 +47,13 @@ defmodule RenewCollab.Commands.UpdateLayerTextStyle do
       end,
       []
     )
+    |> Ecto.Multi.append(
+      RenewCollab.Commands.UpdateLayerTextSizeHintAuto.new(%{
+        document_id: document_id,
+        layer_id: layer_id
+      })
+      |> RenewCollab.Commands.UpdateLayerTextSizeHintAuto.multi()
+    )
   end
 
   def attr_key("italic"), do: :italic

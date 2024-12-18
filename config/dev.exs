@@ -25,6 +25,9 @@ config :renew_collab, RenewCollabAuth.Repo,
   priv: "priv/repo_auth",
   show_sensitive_data_on_connection_error: true
 
+config :renew_collab, RenewCollab.TextMeasure.MeasureServer,
+  script: "priv/text_metrics/TextMeasure.java"
+
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #

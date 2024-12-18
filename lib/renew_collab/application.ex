@@ -22,7 +22,8 @@ defmodule RenewCollab.Application do
       # Start to serve requests, typically the last entry
       RenewCollabWeb.Endpoint,
       RenewCollabWeb.Presence,
-      RenewCollabSim.Server.SimulationServer
+      RenewCollabSim.Server.SimulationServer,
+      RenewCollab.TextMeasure.MeasureServer
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

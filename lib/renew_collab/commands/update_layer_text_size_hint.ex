@@ -16,16 +16,16 @@ defmodule RenewCollab.Commands.UpdateLayerTextSizeHint do
 
   def auto_snapshot(%__MODULE__{}), do: false
 
-  def multi(%__MODULE__{document_id: document_id, layer_id: layer_id, box: box}) do
+  def multi(%__MODULE__{document_id: document_id, layer_id: layer_id, box: box} = cmd) do
     Ecto.Multi.new()
-    |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.put({cmd, :document_id}, document_id)
     |> Ecto.Multi.one(
-      :text,
+      {cmd, :text},
       from(l in Layer, join: e in assoc(l, :text), where: l.id == ^layer_id, select: e)
     )
     |> Ecto.Multi.insert(
-      :style,
-      fn %{text: text} ->
+      {cmd, :hint},
+      fn %{{^cmd, :text} => text} ->
         Ecto.build_assoc(text, :size_hint)
         |> TextSizeHint.changeset(box)
       end,
@@ -33,7 +33,7 @@ defmodule RenewCollab.Commands.UpdateLayerTextSizeHint do
     )
     |> Ecto.Multi.all(
       :affected_bond_ids,
-      fn %{text: text} ->
+      fn %{{^cmd, :text} => text} ->
         from(own_text in Text,
           join: own_layer in assoc(own_text, :layer),
           join: edge in assoc(own_layer, :attached_edges),
