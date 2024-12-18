@@ -24,13 +24,10 @@ public class TextMeasure {
                     int style = Integer.parseInt(parts[1]);
                     int size = Integer.parseInt(parts[2]);
                     String text = parts[3];
-                    if(text.equals(":")) {
-                        break;
-                    }
+
                     String[] textLines = splitLines(text);
                     Font f = new Font(font, style, size);
                     FontMetrics fm = canvas.getFontMetrics(f);
-
 
                     Size box = measureBox(fm, textLines);
 
