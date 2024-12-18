@@ -85,8 +85,6 @@ if config_env() == :prod do
       ip: {0, 0, 0, 0, 0, 0, 0, 0},
       port: port
     ],
-    https: not is_local,
-    force_ssl: not is_local,
     secret_key_base: secret_key_base
 
   config :renew_collab, RenewCollabSim.Script.Runner,
