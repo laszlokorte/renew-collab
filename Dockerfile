@@ -111,6 +111,8 @@ RUN mkdir -p ./renew && \
     unzip ${RENEW_DOWNLOAD_TARGET} -d ./renew && \
     rm ${RENEW_DOWNLOAD_TARGET} && chown -R nobody:nogroup .
 
+WORKDIR /text_metrics
+COPY --chown=nobody:root priv/text_metrics/TextMeasure.java "./TextMeasure.java"
 
 # Set the locale
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
@@ -130,6 +132,7 @@ COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/renew_collab 
 
 RUN chmod +x /app/bin/server
 RUN chmod +x /app/bin/migrate
+RUN chmod +x /text_metrics/TextMeasure.java
 
 
 RUN mkdir "${DATA_ROOT_PATH}"
@@ -150,6 +153,7 @@ ENV RENEW_SIM_DB_PATH=${DATA_ROOT_PATH}/renew_sim.db
 ENV SIM_RENEW_PATH=${SIMULATOR_ROOT_PATH}/renew
 ENV SIM_STDIO_WRAPPER=${SIMULATOR_ROOT_PATH}/Interceptor.jar
 ENV SIM_LOG4J_CONF=${SIMULATOR_ROOT_PATH}/log4j.properties
+ENV RENEW_TEXT_MEASURE=/text_metrics/TextMeasure.java
 ENV SIM_XVBF_DISPLAY=":23"
 ENV PHX_HOST="localhost"
 ENV PORT="4000"

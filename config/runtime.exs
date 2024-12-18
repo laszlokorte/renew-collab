@@ -97,6 +97,9 @@ if config_env() == :prod do
     sim_xvbf_path: System.get_env("SIM_XVBF") || nil,
     sim_xvbf_display: System.get_env("SIM_XVBF_DISPLAY") || nil
 
+  config :renew_collab, RenewCollab.TextMeasure.MeasureServer,
+    script: System.get_env("RENEW_TEXT_MEASURE") || raise("RENEW_TEXT_MEASURE is missing")
+
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key

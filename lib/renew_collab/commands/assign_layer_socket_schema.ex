@@ -41,14 +41,6 @@ defmodule RenewCollab.Commands.AssignLayerSocketSchema do
 
     if socket_schema_id do
       multi
-      |> Ecto.Multi.delete_all(
-        :remopve_interface,
-        fn %{layer: layer} ->
-          from(i in Interface, where: i.layer_id == ^layer.id)
-        end
-      )
-    else
-      multi
       |> Ecto.Multi.insert(
         :insert_interface,
         fn %{layer: layer} ->
@@ -59,6 +51,14 @@ defmodule RenewCollab.Commands.AssignLayerSocketSchema do
           })
         end,
         on_conflict: {:replace, [:socket_schema_id]}
+      )
+    else
+      multi
+      |> Ecto.Multi.delete_all(
+        :remopve_interface,
+        fn %{layer: layer} ->
+          from(i in Interface, where: i.layer_id == ^layer.id)
+        end
       )
     end
   end
