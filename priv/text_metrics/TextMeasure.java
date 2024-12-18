@@ -31,11 +31,12 @@ public class TextMeasure {
                     Font f = new Font(font, style, size);
                     FontMetrics fm = canvas.getFontMetrics(f);
 
+
                     Size box = measureBox(fm, textLines);
 
                     System.out.printf("%d:%d\n", box.x, box.y);
                 } else {
-                    System.out.println("invalid");
+                    System.out.println("0:0");
                 }
             }
         } catch (IOException e) {
@@ -50,8 +51,8 @@ public class TextMeasure {
 
     private static String[] splitLines(String text) {
         try {
-            String[] lines = text.split(singleColon);
 
+            String[] lines = text.split(singleColon, -1);
             for(int i=0;i<lines.length;i++) {
                 lines[i] = URLDecoder.decode(lines[i], "UTF-8");
             }

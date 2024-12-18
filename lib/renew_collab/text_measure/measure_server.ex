@@ -62,7 +62,7 @@ defmodule RenewCollab.TextMeasure.MeasureServer do
       )
       when is_binary(font) and is_integer(style) and is_integer(size) and is_list(lines) do
     joined_text = lines |> Enum.map(&:uri_string.quote(&1)) |> Enum.join(":") |> dbg
-    Port.command(port, "#{font}:#{style}:#{size}:#{joined_text}\n")
+    Port.command(port, "#{java_font_name(font)}:#{style}:#{size}:#{joined_text}\n")
 
     {:noreply, %{state | clients: :queue.in(from, clients)}}
   end
@@ -75,7 +75,7 @@ defmodule RenewCollab.TextMeasure.MeasureServer do
       )
       when is_binary(font) and is_integer(style) and is_float(size) and is_list(lines) do
     joined_text = lines |> Enum.map(&:uri_string.quote(&1)) |> Enum.join(":") |> dbg
-    Port.command(port, "#{font}:#{style}:#{round(size)}:#{joined_text}\n")
+    Port.command(port, "#{java_font_name(font)}:#{style}:#{round(size)}:#{joined_text}\n")
 
     {:noreply, %{state | clients: :queue.in(from, clients)}}
   end
@@ -87,5 +87,13 @@ defmodule RenewCollab.TextMeasure.MeasureServer do
         %{port: port}
       ) do
     Process.exit(port, :kill)
+  end
+
+  defp java_font_name("sans-serif"), do: "Helvetica"
+  defp java_font_name("serif"), do: "TimesRoman"
+  defp java_font_name("monospace"), do: "Courier"
+
+  defp java_font_name(font) do
+    font
   end
 end

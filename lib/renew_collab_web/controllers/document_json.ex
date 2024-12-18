@@ -149,6 +149,24 @@ defmodule RenewCollabWeb.DocumentJSON do
             %{
               "position_x" => v.position_x,
               "position_y" => v.position_y,
+              "hint" =>
+                case layer.text.size_hint do
+                  %RenewCollab.Style.TextSizeHint{
+                    position_x: position_x,
+                    position_y: position_y,
+                    width: width,
+                    height: height
+                  } ->
+                    %{
+                      x: position_x,
+                      y: position_y,
+                      width: width,
+                      height: height
+                    }
+
+                  _ ->
+                    nil
+                end,
               "body" => v.body,
               "style" =>
                 case v.style do

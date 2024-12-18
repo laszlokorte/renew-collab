@@ -32,10 +32,10 @@ defmodule RenewCollab.Commands.UpdateLayerTextSizeHintAuto do
       fn _, %{{^cmd, :text} => text} ->
         {:ok,
          RenewCollab.TextMeasure.MeasureServer.measure(
-           {text.style.font_family, 0, text.style.font_size,
+           {text.style.font_family, style_as_int(text), text.style.font_size,
             text.body
             |> String.split("\n")
-            |> Enum.filter(&(text.style.blank_lines or not blank?(&1)))}
+            |> Enum.filter(&(include_blank(text) or not blank?(&1)))}
          )}
       end
     )
@@ -53,6 +53,23 @@ defmodule RenewCollab.Commands.UpdateLayerTextSizeHintAuto do
       |> RenewCollab.Commands.UpdateLayerTextSizeHint.multi()
     end)
   end
+
+  defp include_blank(text) do
+    case text.style do
+      %{blank_lines: blank_lines} -> blank_lines
+      _ -> false
+    end
+  end
+
+  defp style_as_int(%{style: text_style}) do
+    [
+      if(text_style.bold, do: 1, else: 0),
+      if(text_style.italic, do: 2, else: 0)
+    ]
+    |> Enum.reduce(0, &Bitwise.bor/2)
+  end
+
+  defp style_as_int(_), do: 0
 
   defp blank?(str_or_nil),
     do: "" == str_or_nil |> to_string() |> String.trim()
