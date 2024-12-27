@@ -91,6 +91,13 @@ defmodule RenewCollabWeb do
 
       # Routes generation with the ~p sigil
       unquote(verified_routes())
+
+      def is_admin(conn) do
+        case conn.assigns[:current_account] do
+          %{is_admin: a} -> a
+          _ -> false
+        end
+      end
     end
   end
 

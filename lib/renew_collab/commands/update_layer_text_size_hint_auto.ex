@@ -1,8 +1,6 @@
 defmodule RenewCollab.Commands.UpdateLayerTextSizeHintAuto do
   import Ecto.Query, warn: false
 
-  alias RenewCollab.Hierarchy.Layer
-  alias RenewCollab.Style.TextSizeHint
   alias RenewCollab.Element.Text
 
   defstruct [:document_id, :layer_id]

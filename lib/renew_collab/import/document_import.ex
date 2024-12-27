@@ -392,7 +392,7 @@ defmodule RenewCollab.Import.DocumentImport do
                   "de.renew.diagram.VSplitCenterConnector" ->
                     {"simple", "center-socket"}
 
-                  other ->
+                  _other ->
                     # dbg(other)
                     {"simple", "center-socket"}
                 end

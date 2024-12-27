@@ -1616,7 +1616,7 @@ defmodule RenewCollabWeb.LiveDocument do
       %RenewCollabSim.Entites.Simulation{} = sim ->
         {:noreply, redirect(socket, to: ~p"/simulation/#{sim.id}")}
 
-      e ->
+      _e ->
         {:noreply, socket}
     end
   end

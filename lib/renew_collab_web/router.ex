@@ -28,6 +28,10 @@ defmodule RenewCollabWeb.Router do
     plug :require_authenticated_account
   end
 
+  pipeline :is_admin do
+    plug :require_admin
+  end
+
   pipeline :not_authenticated do
     plug :redirect_if_account_is_authenticated
   end
@@ -83,14 +87,19 @@ defmodule RenewCollabWeb.Router do
     delete "/logout", LoginController, :delete
 
     get "/", HomeController, :index
-    get "/health", HealthController, :index
-    get "/accounts", AccountsController, :index
-    post "/accounts", AccountsController, :create
-    delete "/accounts/:id", AccountsController, :delete
 
     get "/documents/:id/export", DocumentController, :export
     get "/documents/:id/inspect", DocumentController, :inspect
     get "/shadow_net/:id/binary", ShadowNetController, :download
+  end
+
+  scope "/", RenewCollabWeb do
+    pipe_through [:browser, :authenticated, :is_admin]
+
+    get "/health", HealthController, :index
+    get "/accounts", AccountsController, :index
+    post "/accounts", AccountsController, :create
+    delete "/accounts/:id", AccountsController, :delete
   end
 
   scope "/", RenewCollabWeb do

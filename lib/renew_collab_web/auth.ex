@@ -160,11 +160,20 @@ defmodule RenewCollabWeb.Auth do
         |> redirect(to: ~p"/login")
         |> halt()
       else
-        conn
-        |> put_status(:unauthorized)
-        |> json(%{"message" => "not authorized"})
-        |> halt()
+        conn |> RenewCollabWeb.FallbackController.call({:error, :forbidden}) |> halt()
       end
+    end
+  end
+
+  def require_admin(conn, redirect \\ true) do
+    dbg(conn.assigns[:current_account])
+
+    case conn.assigns[:current_account] do
+      %{is_admin: true} ->
+        conn |> assign(:is_admin, true)
+
+      _ ->
+        conn |> RenewCollabWeb.FallbackController.call({:error, :forbidden}) |> halt()
     end
   end
 

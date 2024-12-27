@@ -27,21 +27,23 @@
     </.link>
   </li>
 
-  <li style="background-color: #eee;">
-    <.link
-      style="text-align: center; padding: 2em; display: block; color: #078"
-      navigate={~p"/health"}
-    >
-      Health
-    </.link>
-  </li>
+  <%= if is_admin(@conn) do %>
+    <li style="background-color: #eee;">
+      <.link
+        style="text-align: center; padding: 2em; display: block; color: #078"
+        navigate={~p"/health"}
+      >
+        Health
+      </.link>
+    </li>
 
-  <li style="background-color: #eee;">
-    <.link
-      style="text-align: center; padding: 2em; display: block; color: #078"
-      navigate={~p"/accounts"}
-    >
-      Accounts
-    </.link>
-  </li>
+    <li style="background-color: #eee;">
+      <.link
+        style="text-align: center; padding: 2em; display: block; color: #078"
+        navigate={~p"/accounts"}
+      >
+        Accounts
+      </.link>
+    </li>
+  <% end %>
 </ul>

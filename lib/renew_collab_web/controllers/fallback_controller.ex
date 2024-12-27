@@ -13,4 +13,20 @@ defmodule RenewCollabWeb.FallbackController do
     |> put_view(html: RenewCollabWeb.ErrorHTML, json: RenewCollabWeb.ErrorJSON)
     |> render(:"404")
   end
+
+  # This clause is an example of how to handle resources that cannot be found.
+  def call(conn, {:error, :unauthorized}) do
+    conn
+    |> put_status(:unauthorized)
+    |> put_view(html: RenewCollabWeb.ErrorHTML, json: RenewCollabWeb.ErrorJSON)
+    |> render(:"401")
+  end
+
+  # This clause is an example of how to handle resources that cannot be found.
+  def call(conn, {:error, :forbidden}) do
+    conn
+    |> put_status(:unauthorized)
+    |> put_view(html: RenewCollabWeb.ErrorHTML, json: RenewCollabWeb.ErrorJSON)
+    |> render(:"403")
+  end
 end

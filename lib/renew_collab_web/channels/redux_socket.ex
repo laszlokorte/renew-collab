@@ -10,11 +10,6 @@ defmodule RenewCollabWeb.ReduxSocket do
   channel "redux_net_instance:*", RenewCollabWeb.ReduxSimulationNetInstanceChannel
 
   @impl true
-  def connect(%{"token" => "DEBUG"}, socket, _connect_info) do
-    {:ok, assign(socket, :current_account, %{account_id: "0", username: "DEBUG"})}
-  end
-
-  @impl true
   def connect(%{"token" => token}, socket, _connect_info) do
     with {:ok, data} <- RenewCollabWeb.Token.verify(token) do
       {:ok,

@@ -8,6 +8,7 @@ defmodule RenewCollabAuth.Entites.Account do
     field :password, :string, redact: true
     field :new_password, :string, virtual: true, redact: true
     field :email, :string
+    field :is_admin, :boolean, default: false
 
     timestamps(type: :utc_datetime)
   end
@@ -15,7 +16,7 @@ defmodule RenewCollabAuth.Entites.Account do
   @doc false
   def changeset(account, attrs) do
     account
-    |> cast(attrs, [:email, :new_password])
+    |> cast(attrs, [:email, :new_password, :is_admin])
     |> validate_required([:email, :new_password])
     |> unique_constraint(:email)
     |> maybe_hash_password()

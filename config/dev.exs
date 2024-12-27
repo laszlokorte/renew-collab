@@ -51,6 +51,9 @@ config :renew_collab, RenewCollabWeb.Endpoint,
     ]
   ]
 
+config :exqlite, make_force_build: false
+config :exqlite, force_build: false
+
 # ## SSL Support
 #
 # In order to use HTTPS in development, a self-signed

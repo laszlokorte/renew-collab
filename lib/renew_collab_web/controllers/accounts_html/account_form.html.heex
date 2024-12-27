@@ -2,8 +2,15 @@
   <.error :if={@changeset.action}>
     Oops, something went wrong! Please check the errors below.
   </.error>
-  <.input field={f[:email]} type="email" label="E-mail" />
-  <.input field={f[:new_password]} type="password" label="Password" />
+  <.input field={f[:email]} type="email" label="E-mail" autocomplete="cc-number" />
+  <.input field={f[:new_password]} type="password" label="Password" autocomplete="new-password" />
+
+  <div>
+    <div>
+      Is Admin?
+    </div>
+    <.input field={f[:is_admin]} type="checkbox" label="Yes" />
+  </div>
   <:actions>
     <.button>Create Account</.button>
   </:actions>

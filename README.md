@@ -112,13 +112,15 @@ iex -S mix phx.server
 
 ### Setup Account
 
-Create your first account to log in with.
+Create your first admin account to log in with.
 
 Run the elixir command below. If you have started the server with the command above you have the REPL already running and can type it in.
 
 ```ex
-RenewCollabAuth.Auth.create_account("your@mail.org", "secret")
+RenewCollabAuth.Auth.create_account("your@mail.org", "secret", true)
 ```
+
+The third parameter (`true`) makes the new account an admin account, that is authorized to create further accounts via the web UI.
 
 ### Open in Browser
 

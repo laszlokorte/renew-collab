@@ -1,7 +1,6 @@
 defmodule RenewCollab.Commands.UpdateLayerTextBody do
   import Ecto.Query, warn: false
 
-  alias RenewCollab.Hierarchy.Layer
   alias RenewCollab.Element.Text
   alias RenewCollab.Style.TextSizeHint
 

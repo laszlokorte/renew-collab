@@ -13,6 +13,7 @@
       <th style="text-align: left;">Login</th>
 
       <th style="text-align: left;">Password</th>
+      <th style="text-align: left;">Admin?</th>
 
       <th style="text-align: left;">Actions</th>
     </tr>
@@ -24,11 +25,16 @@
         <td>{a.email}</td>
 
         <td>****</td>
+        <td>{if(a.is_admin, do: "yes", else: "no")}</td>
 
         <td>
-          <.link href={~p"/accounts/#{a}"} method="delete" data-confirm="Are you sure?">
-            Delete
-          </.link>
+          <%= if @conn.assigns[:current_account].id != a.id do %>
+            <.link href={~p"/accounts/#{a}"} method="delete" data-confirm="Are you sure?">
+              Delete
+            </.link>
+          <% else %>
+            <em>Your current account</em>
+          <% end %>
         </td>
       </tr>
     <% end %>

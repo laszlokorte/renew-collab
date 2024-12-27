@@ -41,10 +41,11 @@ defmodule RenewCollabAuth.Auth do
     |> Repo.insert()
   end
 
-  def create_account(email, password) do
+  def create_account(email, password, is_admin \\ false) do
     create_account(%{
       "email" => email,
-      "new_password" => password
+      "new_password" => password,
+      "is_admin" => is_admin
     })
   end
 
