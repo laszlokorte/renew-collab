@@ -5,8 +5,9 @@ defmodule RenewCollab.Export.DocumentExport do
   alias Renewex.Hierarchy
   alias RenewCollab.Document.Document
 
-  def export(%Document{} = document) do
+  def export(%Document{} = document, opts \\ [syntetic: false]) do
     grammar = Grammar.new(11)
+    sockets = RenewCollab.Sockets.all_socket_by_id()
 
     view_box = ViewBox.calculate(document, 20)
 
@@ -25,9 +26,15 @@ defmodule RenewCollab.Export.DocumentExport do
         is_nil(l.direct_parent_hood)
       end)
       |> Enum.reduce([], fn layer, storables ->
-        export_layer(storables, view_box, document, grammar, layer)
+        export_layer(storables, view_box, document, grammar, sockets, layer)
       end)
-      |> attach_syntetic_labels
+
+    refs =
+      if Keyword.get(opts, :syntetic, false) do
+        refs |> attach_syntetic_labels
+      else
+        refs
+      end
 
     Renewex.serialize_document(%Renewex.Document{
       version: 11,
@@ -46,7 +53,7 @@ defmodule RenewCollab.Export.DocumentExport do
     })
   end
 
-  def export_layer(prev_storables, view_box, document, grammar, layer) do
+  def export_layer(prev_storables, view_box, document, grammar, sockets, layer) do
     child_storables =
       document.layers
       |> Enum.filter(fn l ->
@@ -56,7 +63,7 @@ defmodule RenewCollab.Export.DocumentExport do
     storables =
       child_storables
       |> Enum.reduce(prev_storables, fn sub_layer, acc_storables ->
-        export_layer(acc_storables, view_box, document, grammar, sub_layer)
+        export_layer(acc_storables, view_box, document, grammar, sockets, sub_layer)
       end)
 
     cond do
@@ -288,7 +295,7 @@ defmodule RenewCollab.Export.DocumentExport do
                    end)}
 
                 %Renewex.Storable{
-                  class_name: "CH.ifa.draw.standard.ChopBoxConnector",
+                  class_name: bond_to_connector(layer.edge.source_bond, sockets),
                   fields: %{
                     owner: {:ref, target_index}
                   }
@@ -309,7 +316,7 @@ defmodule RenewCollab.Export.DocumentExport do
                    end)}
 
                 %Renewex.Storable{
-                  class_name: "CH.ifa.draw.standard.ChopBoxConnector",
+                  class_name: bond_to_connector(layer.edge.target_bond, sockets),
                   fields: %{
                     owner: {:ref, target_index}
                   }
@@ -861,4 +868,21 @@ defmodule RenewCollab.Export.DocumentExport do
 
   defp create_ref(storables, s = %Storable{}),
     do: {Enum.concat(storables, [s]), {:ref, Enum.count(storables)}}
+
+  defp bond_to_connector(bond, sockets) do
+    sockets
+    |> Map.get(bond.socket_id)
+    |> Map.get(:socket_schema)
+    |> Map.get(:stencil, :rect)
+    |> case do
+      :rect ->
+        "CH.ifa.draw.standard.ChopBoxConnector"
+
+      :ellipse ->
+        "CH.ifa.draw.figures.ChopEllipseConnector"
+
+      _ ->
+        "CH.ifa.draw.standard.ChopBoxConnector"
+    end
+  end
 end

@@ -13,4 +13,14 @@ defmodule RenewCollab.Sockets do
     RenewCollab.Queries.SocketSchemasList.new()
     |> RenewCollab.Fetcher.fetch(:infinity)
   end
+
+  def all_socket_schemas do
+    RenewCollab.Queries.SocketSchemasList.new()
+    |> RenewCollab.Fetcher.fetch(:infinity)
+  end
+
+  def all_socket_by_id do
+    RenewCollab.Queries.SocketsById.new()
+    |> RenewCollab.Fetcher.fetch(:infinity)
+  end
 end

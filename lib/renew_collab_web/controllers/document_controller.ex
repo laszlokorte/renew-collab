@@ -69,7 +69,7 @@ defmodule RenewCollabWeb.DocumentController do
     end
   end
 
-  def export(conn, %{"id" => id}) do
+  def export(conn, %{"id" => id} = params) do
     case Renew.get_document_with_elements(id) do
       nil ->
         conn
@@ -83,7 +83,7 @@ defmodule RenewCollabWeb.DocumentController do
         conn
         |> put_resp_header(
           "content-disposition",
-          "inline; filename=\"#{document.name |> String.trim_trailing(".rnw")}_exported.rnw\""
+          "#{if(Map.has_key?(params, "inline"), do: "inline", else: "attachment")}; filename=\"#{document.name |> String.trim_trailing(".rnw")}.rnw\""
         )
         |> put_resp_header(
           "content-type",

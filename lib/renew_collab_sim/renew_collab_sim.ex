@@ -254,7 +254,7 @@ defmodule RenewCollabSim.Simulator do
         document_ids
         |> Enum.map(fn doc_id ->
           document = RenewCollab.Renew.get_document_with_elements(doc_id)
-          {:ok, rnw} = RenewCollab.Export.DocumentExport.export(document)
+          {:ok, rnw} = RenewCollab.Export.DocumentExport.export(document, syntetic: true)
           {:ok, json} = RenewCollabWeb.DocumentJSON.show_content(document) |> Jason.encode()
 
           {document.name, rnw, json}
