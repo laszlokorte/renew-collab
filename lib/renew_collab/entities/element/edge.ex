@@ -74,6 +74,13 @@ defmodule RenewCollab.Element.Edge do
     ])
   end
 
+  def attribute_changeset(element_edge, attrs) do
+    element_edge
+    |> cast(attrs, [
+      :cyclic
+    ])
+  end
+
   defmodule Snapshotter do
     alias RenewCollab.Element.Edge
     alias RenewCollab.Hierarchy.Layer

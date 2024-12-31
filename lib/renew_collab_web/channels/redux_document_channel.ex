@@ -215,6 +215,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "source_y" => source_y,
           "target_x" => target_x,
           "target_y" => target_y,
+          "cyclic" => Map.get(params, "cyclic", false),
           "waypoints" =>
             points
             |> Enum.drop(1)
@@ -393,6 +394,25 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
       value: value
     })
     |> RenewCollab.Commander.run_document_command()
+
+    :silent
+  end
+
+  @impl true
+  def handle_event(
+        "change_edge_attributes",
+        %{"layer_id" => layer_id, "attrs" => attributes},
+        %{},
+        socket
+      )
+      when is_map(attributes) and is_binary(layer_id) do
+    RenewCollab.Commands.UpdateLayerEdgeAttributes.new(%{
+      document_id: socket.assigns.document_id,
+      layer_id: layer_id,
+      attributes: attributes
+    })
+    |> RenewCollab.Commander.run_document_command()
+    |> dbg
 
     :silent
   end
