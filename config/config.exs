@@ -7,7 +7,15 @@
 # General application configuration
 import Config
 
-config :renew_collab, :db_adapter, Ecto.Adapters.SQLite3
+defmodule DbAdapter do
+  def choose do
+    Ecto.Adapters.SQLite3
+  end
+end
+
+config :renew_collab, :db_adapter, DbAdapter.choose()
+config :renew_collab, :db_auth_adapter, DbAdapter.choose()
+config :renew_collab, :db_sim_adapter, DbAdapter.choose()
 
 config :renew_collab,
   ecto_repos: [RenewCollab.Repo, RenewCollabSim.Repo, RenewCollabAuth.Repo],

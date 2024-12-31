@@ -2,7 +2,7 @@ import Config
 
 # Configure your database
 config :renew_collab, RenewCollab.Repo,
-  adapter: Application.compile_env(:renew_collab, :db_adapter),
+  adapter: Ecto.Adapters.SQLite3,
   database: Path.expand("../renew_collab_dev.db", __DIR__),
   pool_size: 1,
   stacktrace: true,
@@ -10,7 +10,7 @@ config :renew_collab, RenewCollab.Repo,
   show_sensitive_data_on_connection_error: true
 
 config :renew_collab, RenewCollabSim.Repo,
-  adapter: Application.compile_env(:renew_collab, :db_adapter),
+  adapter: Ecto.Adapters.SQLite3,
   database: Path.expand("../renew_collab_sim_dev.db", __DIR__),
   pool_size: 1,
   stacktrace: true,
@@ -18,7 +18,7 @@ config :renew_collab, RenewCollabSim.Repo,
   show_sensitive_data_on_connection_error: true
 
 config :renew_collab, RenewCollabAuth.Repo,
-  adapter: Application.compile_env(:renew_collab, :db_adapter),
+  adapter: Ecto.Adapters.SQLite3,
   database: Path.expand("../renew_collab_auth_dev.db", __DIR__),
   pool_size: 1,
   stacktrace: true,

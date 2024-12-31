@@ -23,33 +23,98 @@ end
 maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
 if config_env() == :prod do
-  config :renew_collab, RenewCollab.Repo,
-    adapter: Application.compile_env(:renew_collab, :db_adapter),
-    database: System.get_env("RENEW_DOCS_DB_PATH") || raise("RENEW_DOCS_DB_PATH is missing"),
-    pool_size: 1,
-    stacktrace: false,
-    priv: "priv/repo",
-    show_sensitive_data_on_connection_error: false
+  config :renew_collab,
+         RenewCollab.Repo,
+         [
+           adapter: Application.compile_env(:renew_collab, :db_adapter),
+           pool_size: 1,
+           stacktrace: false,
+           priv: "priv/repo",
+           show_sensitive_data_on_connection_error: false
+         ]
+         |> Keyword.merge(
+           case Application.compile_env(:renew_collab, :db_adapter) do
+             Ecto.Adapters.SQLite3 ->
+               [
+                 database:
+                   System.get_env("RENEW_DOCS_DB_PATH") || raise("RENEW_DOCS_DB_PATH is missing")
+               ]
 
-  config :renew_collab, RenewCollabAuth.Repo,
-    adapter: Application.compile_env(:renew_collab, :db_adapter),
-    database:
-      System.get_env("RENEW_ACCOUNT_DB_PATH") ||
-        raise("RENEW_ACCOUNT_DB_PATH is missing"),
-    pool_size: 1,
-    stacktrace: false,
-    priv: "priv/repo_auth",
-    show_sensitive_data_on_connection_error: false
+             Ecto.Adapters.Postgres ->
+               [
+                 socket_dir:
+                   System.get_env("RENEW_DOCS_DB_SOCKET_DIR") ||
+                     raise("RENEW_DOCS_DB_SOCKET_DIR is missing"),
+                 hostname:
+                   System.get_env("RENEW_DOCS_DB_HOST") || raise("RENEW_DOCS_DB_HOST is missing"),
+                 username:
+                   System.get_env("RENEW_DOCS_DB_USER") || raise("RENEW_DOCS_DB_USER is missing"),
+                 password:
+                   System.get_env("RENEW_DOCS_DB_PASSWORD") ||
+                     raise("RENEW_DOCS_DB_PASSWORD is missing"),
+                 database:
+                   System.get_env("RENEW_DOCS_DB_DATABASe") ||
+                     raise("RENEW_DOCS_DB_DATABASe is missing")
+               ]
 
-  config :renew_collab, RenewCollabSim.Repo,
-    adapter: Application.compile_env(:renew_collab, :db_adapter),
-    database:
-      System.get_env("RENEW_SIM_DB_PATH") ||
-        raise("RENEW_SIM_DB_PATH is missing"),
-    pool_size: 1,
-    stacktrace: false,
-    priv: "priv/repo_sim",
-    show_sensitive_data_on_connection_error: false
+             Ecto.Adapters.MyXQL ->
+               [
+                 socket:
+                   System.get_env("RENEW_DOCS_DB_SOCKET") ||
+                     raise("RENEW_DOCS_DB_SOCKET is missing"),
+                 hostname:
+                   System.get_env("RENEW_DOCS_DB_HOST") || raise("RENEW_DOCS_DB_HOST is missing"),
+                 username:
+                   System.get_env("RENEW_DOCS_DB_USER") || raise("RENEW_DOCS_DB_USER is missing"),
+                 password:
+                   System.get_env("RENEW_DOCS_DB_PASSWORD") ||
+                     raise("RENEW_DOCS_DB_PASSWORD is missing"),
+                 database:
+                   System.get_env("RENEW_DOCS_DB_DATABASe") ||
+                     raise("RENEW_DOCS_DB_DATABASe is missing")
+               ]
+           end
+         )
+
+  config :renew_collab,
+         RenewCollabAuth.Repo,
+         [
+           adapter: Application.compile_env(:renew_collab, :db_auth_adapter),
+           pool_size: 1,
+           stacktrace: false,
+           priv: "priv/repo_auth",
+           show_sensitive_data_on_connection_error: false
+         ]
+         |> Keyword.merge(
+           case Application.compile_env(:renew_collab, :db_auth_adapter) do
+             Ecto.Adapters.SQLite3 ->
+               [
+                 database:
+                   System.get_env("RENEW_ACCOUNT_DB_PATH") ||
+                     raise("RENEW_ACCOUNT_DB_PATH is missing")
+               ]
+           end
+         )
+
+  config :renew_collab,
+         RenewCollabSim.Repo,
+         [
+           adapter: Application.compile_env(:renew_collab, :db_sim_adapter),
+           pool_size: 1,
+           stacktrace: false,
+           priv: "priv/repo_sim",
+           show_sensitive_data_on_connection_error: false
+         ]
+         |> Keyword.merge(
+           case Application.compile_env(:renew_collab, :db_sim_adapter) do
+             Ecto.Adapters.SQLite3 ->
+               [
+                 database:
+                   System.get_env("RENEW_SIM_DB_PATH") ||
+                     raise("RENEW_SIM_DB_PATH is missing")
+               ]
+           end
+         )
 
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you

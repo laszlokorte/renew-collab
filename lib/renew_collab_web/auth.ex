@@ -165,9 +165,7 @@ defmodule RenewCollabWeb.Auth do
     end
   end
 
-  def require_admin(conn, redirect \\ true) do
-    dbg(conn.assigns[:current_account])
-
+  def require_admin(conn, _opts) do
     case conn.assigns[:current_account] do
       %{is_admin: true} ->
         conn |> assign(:is_admin, true)
