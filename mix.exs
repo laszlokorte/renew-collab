@@ -19,7 +19,7 @@ defmodule RenewCollab.MixProject do
   def application do
     [
       mod: {RenewCollab.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :postgrex]
     ]
   end
 
@@ -33,16 +33,16 @@ defmodule RenewCollab.MixProject do
   defp deps do
     [
       {:phoenix, "~> 1.7.14"},
+      {:ecto_sql, "~> 3.10"},
+      {:ecto_sqlite3, "~> 0.18"},
+      {:myxql, "~> 0.7.0"},
+      {:postgrex, "~> 0.19.3"},
       {:phoenix_ecto, "~> 4.5"},
       {:phoenix_html, "~> 3.2"},
       {:phoenix_view, "~> 2.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:phoenix_live_view, "~> 1.0.0-rc.1", override: true},
-      {:ecto_sql, "~> 3.10"},
-      {:ecto_sqlite3, "~> 0.18"},
-      {:myxql, "~> 0.7.0"},
-      {:postgrex, "~> 0.19.3"},
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
