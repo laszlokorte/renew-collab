@@ -136,7 +136,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
       from(s in RenewCollabSim.Entites.Simulation,
         where: s.id == ^simulation_id,
         select: %{
-          id: ^Ecto.UUID.generate(),
+          id: ^Ecto.UUID.bingenerate(),
           simulation_id: s.id,
           content: ^"simulation stopped",
           inserted_at: ^now,
@@ -178,7 +178,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
       from(s in RenewCollabSim.Entites.Simulation,
         where: s.id == ^simulation_id,
         select: %{
-          id: ^Ecto.UUID.generate(),
+          id: ^Ecto.UUID.bingenerate(),
           simulation_id: s.id,
           content: ^"simulation process exit: #{status}",
           inserted_at: ^now,
@@ -262,20 +262,30 @@ defmodule RenewCollabSim.Server.SimulationProcess do
               content: content
             }
           )
+          |> Ecto.Multi.one(
+            {om_counter, :oldest_to_keep},
+            from(t in RenewCollabSim.Entites.SimulationLogEntry,
+              select: t.inserted_at,
+              offset: 100,
+              limit: 1,
+              order_by: [desc: t.inserted_at],
+              where: t.simulation_id == ^simulation_id
+            )
+          )
           |> Ecto.Multi.delete_all(
             {om_counter, :delete_old_logs},
-            from(dt in RenewCollabSim.Entites.SimulationLogEntry,
-              where:
-                dt.simulation_id == ^simulation_id and
-                  dt.id not in subquery(
-                    from(t in RenewCollabSim.Entites.SimulationLogEntry,
-                      select: t.id,
-                      limit: 100,
-                      order_by: [desc: t.inserted_at],
-                      where: t.simulation_id == ^simulation_id
-                    )
-                  )
-            )
+            fn
+              %{{^om_counter, :oldest_to_keep} => oldest_to_keep}
+              when not is_nil(oldest_to_keep) ->
+                from(dt in RenewCollabSim.Entites.SimulationLogEntry,
+                  where:
+                    dt.simulation_id == ^simulation_id and
+                      dt.inserted_at < ^oldest_to_keep
+                )
+
+              _ ->
+                from(dt in RenewCollabSim.Entites.SimulationLogEntry, where: false)
+            end
           )
         )
       else
@@ -311,20 +321,30 @@ defmodule RenewCollabSim.Server.SimulationProcess do
               content: content
             }
           )
+          |> Ecto.Multi.one(
+            {om_counter, :oldest_to_keep},
+            from(t in RenewCollabSim.Entites.SimulationLogEntry,
+              select: t.inserted_at,
+              offset: 100,
+              limit: 1,
+              order_by: [desc: t.inserted_at],
+              where: t.simulation_id == ^simulation_id
+            )
+          )
           |> Ecto.Multi.delete_all(
             {om_counter, :delete_old_logs},
-            from(dt in RenewCollabSim.Entites.SimulationLogEntry,
-              where:
-                dt.simulation_id == ^simulation_id and
-                  dt.id not in subquery(
-                    from(t in RenewCollabSim.Entites.SimulationLogEntry,
-                      select: t.id,
-                      limit: 100,
-                      order_by: [desc: t.inserted_at],
-                      where: t.simulation_id == ^simulation_id
-                    )
-                  )
-            )
+            fn
+              %{{^om_counter, :oldest_to_keep} => oldest_to_keep}
+              when not is_nil(oldest_to_keep) ->
+                from(dt in RenewCollabSim.Entites.SimulationLogEntry,
+                  where:
+                    dt.simulation_id == ^simulation_id and
+                      dt.inserted_at < ^oldest_to_keep
+                )
+
+              _ ->
+                from(dt in RenewCollabSim.Entites.SimulationLogEntry, where: false)
+            end
           )
         )
       else
@@ -349,9 +369,11 @@ defmodule RenewCollabSim.Server.SimulationProcess do
                where:
                  sn.name == ^instance_name and
                    sn.shadow_net_system_id == ^simulation.shadow_net_system_id,
+               join: sim in RenewCollabSim.Entites.Simulation,
+               on: sim.id == ^simulation_id,
                select: %{
-                 id: ^Ecto.UUID.generate(),
-                 simulation_id: ^simulation_id,
+                 id: ^Ecto.UUID.bingenerate(),
+                 simulation_id: sim.id,
                  label: ^"#{instance_name}[#{instance_number}]",
                  shadow_net_system_id: sn.shadow_net_system_id,
                  shadow_net_id: sn.id,
@@ -396,7 +418,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
                  n.label == ^"#{instance_name}[#{instance_number}]" and
                    n.simulation_id == ^simulation_id,
                select: %{
-                 id: ^Ecto.UUID.generate(),
+                 id: ^Ecto.UUID.bingenerate(),
                  simulation_id: n.simulation_id,
                  simulation_net_instance_id: n.id,
                  place_id: ^place_id,
@@ -426,7 +448,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
                  n.label == ^"#{instance_name}[#{instance_number}]" and
                    n.simulation_id == ^simulation_id,
                select: %{
-                 id: ^Ecto.UUID.generate(),
+                 id: ^Ecto.UUID.bingenerate(),
                  simulation_id: n.simulation_id,
                  simulation_net_instance_id: n.id,
                  place_id: ^place_id,
@@ -448,23 +470,26 @@ defmodule RenewCollabSim.Server.SimulationProcess do
          state
          |> append_multi(
            Ecto.Multi.new()
+           |> Ecto.Multi.one(
+             {om_counter, :find_remove_tokens},
+             from(t in RenewCollabSim.Entites.SimulationNetToken,
+               select: t.id,
+               limit: 1,
+               join: i in assoc(t, :simulation_net_instance),
+               where:
+                 t.value == ^value and
+                   fragment("? = ?", t.place_id, ^place_id) and
+                   t.simulation_id == ^simulation_id and
+                   i.label == ^"#{instance_name}[#{instance_number}]"
+             )
+           )
            |> Ecto.Multi.delete_all(
              {om_counter, :remove_tokens},
-             from(dt in RenewCollabSim.Entites.SimulationNetToken,
-               where:
-                 dt.id in subquery(
-                   from(t in RenewCollabSim.Entites.SimulationNetToken,
-                     select: t.id,
-                     limit: 1,
-                     join: i in assoc(t, :simulation_net_instance),
-                     where:
-                       t.value == ^value and
-                         fragment("? = ?", t.place_id, ^place_id) and
-                         t.simulation_id == ^simulation_id and
-                         i.label == ^"#{instance_name}[#{instance_number}]"
-                   )
-                 )
-             )
+             fn %{{^om_counter, :find_remove_tokens} => to_delete} ->
+               from(dt in RenewCollabSim.Entites.SimulationNetToken,
+                 where: dt.id == ^to_delete
+               )
+             end
            )
          )}
 
@@ -487,7 +512,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
                  n.label == ^"#{instance_name}[#{instance_number}]" and
                    n.simulation_id == ^simulation_id,
                select: %{
-                 id: ^Ecto.UUID.generate(),
+                 id: ^Ecto.UUID.bingenerate(),
                  simulation_id: n.simulation_id,
                  simulation_net_instance_id: n.id,
                  transition_id: ^transition_id,

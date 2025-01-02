@@ -308,6 +308,12 @@ defmodule RenewCollabWeb.LiveDocuments do
   def handle_event("reset", %{}, socket) do
     RenewCollab.Init.reset()
 
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "documents",
+      :any
+    )
+
     {:noreply, socket}
   end
 

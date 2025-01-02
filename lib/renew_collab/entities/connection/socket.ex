@@ -52,6 +52,5 @@ defmodule RenewCollab.Connection.Socket do
       :y_offset_dynamic_unit
     ])
     |> validate_required([:id, :name])
-    |> unique_constraint([:socket_schema_id, :name])
   end
 end

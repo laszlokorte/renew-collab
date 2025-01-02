@@ -32,36 +32,52 @@ if config_env() == :prod do
         ]
 
       Ecto.Adapters.Postgres ->
-        [
-          pool_size: 3,
-          socket_dir:
-            System.get_env("#{prefix}_SOCKET_DIR") ||
-              raise("#{prefix}_SOCKET_DIR is missing"),
-          hostname: System.get_env("#{prefix}_HOST") || raise("#{prefix}_HOST is missing"),
-          username: System.get_env("#{prefix}_USER") || raise("#{prefix}_USER is missing"),
-          password:
-            System.get_env("#{prefix}_PASSWORD") ||
-              raise("#{prefix}_PASSWORD is missing"),
-          database:
-            System.get_env("#{prefix}_DATABASE") ||
-              raise("#{prefix}_DATABASE is missing")
-        ]
+        db_url = System.get_env("#{prefix}_URL")
+        socket_dir = System.get_env("#{prefix}_SOCKET_DIR")
+        pool_size = System.get_env("#{prefix}_POOL_SIZE") || 10
+
+        if socket_dir do
+          [
+            pool_size: pool_size,
+            socket_dir: socket_dir,
+            username: System.get_env("#{prefix}_USER") || raise("#{prefix}_USER is missing"),
+            password:
+              System.get_env("#{prefix}_PASSWORD") ||
+                raise("#{prefix}_PASSWORD is missing"),
+            database:
+              System.get_env("#{prefix}_DATABASE") ||
+                raise("#{prefix}_DATABASE is missing")
+          ]
+        else
+          [
+            pool_size: pool_size,
+            url: db_url || raise("#{prefix}_URL is missing")
+          ]
+        end
 
       Ecto.Adapters.MyXQL ->
-        [
-          pool_size: 3,
-          socket:
-            System.get_env("#{prefix}_SOCKET") ||
-              raise("#{prefix}_SOCKET is missing"),
-          hostname: System.get_env("#{prefix}_HOST") || raise("#{prefix}_HOST is missing"),
-          username: System.get_env("#{prefix}_USER") || raise("#{prefix}_USER is missing"),
-          password:
-            System.get_env("#{prefix}_PASSWORD") ||
-              raise("#{prefix}_PASSWORD is missing"),
-          database:
-            System.get_env("#{prefix}_DATABASE") ||
-              raise("#{prefix}_DATABASE is missing")
-        ]
+        db_url = System.get_env("#{prefix}_URL")
+        socket = System.get_env("#{prefix}_SOCKET")
+        pool_size = System.get_env("#{prefix}_POOL_SIZE") || 10
+
+        if socket do
+          [
+            pool_size: pool_size,
+            socket: socket,
+            username: System.get_env("#{prefix}_USER") || raise("#{prefix}_USER is missing"),
+            password:
+              System.get_env("#{prefix}_PASSWORD") ||
+                raise("#{prefix}_PASSWORD is missing"),
+            database:
+              System.get_env("#{prefix}_DATABASE") ||
+                raise("#{prefix}_DATABASE is missing")
+          ]
+        else
+          [
+            pool_size: pool_size,
+            url: db_url || raise("#{prefix}_URL is missing")
+          ]
+        end
 
       _ ->
         raise "Unexpected adapter for #{prefix}"

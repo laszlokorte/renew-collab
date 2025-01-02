@@ -25,6 +25,7 @@ defmodule RenewCollab.Document.Document do
     |> cast(attrs, [:name, :kind])
     |> cast_assoc(:layers)
     |> validate_required([:name, :kind])
+    |> unique_constraint(:id)
   end
 
   @doc false
