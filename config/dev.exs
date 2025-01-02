@@ -6,7 +6,6 @@ config :renew_collab, RenewCollab.Repo,
   database: Path.expand("../renew_collab_dev.db", __DIR__),
   pool_size: 1,
   stacktrace: true,
-  priv: "priv/repo",
   show_sensitive_data_on_connection_error: true
 
 config :renew_collab, RenewCollabSim.Repo,
@@ -14,7 +13,6 @@ config :renew_collab, RenewCollabSim.Repo,
   database: Path.expand("../renew_collab_sim_dev.db", __DIR__),
   pool_size: 1,
   stacktrace: true,
-  priv: "priv/repo_sim",
   show_sensitive_data_on_connection_error: true
 
 config :renew_collab, RenewCollabAuth.Repo,
@@ -22,7 +20,6 @@ config :renew_collab, RenewCollabAuth.Repo,
   database: Path.expand("../renew_collab_auth_dev.db", __DIR__),
   pool_size: 1,
   stacktrace: true,
-  priv: "priv/repo_auth",
   show_sensitive_data_on_connection_error: true
 
 config :renew_collab, RenewCollab.TextMeasure.MeasureServer,

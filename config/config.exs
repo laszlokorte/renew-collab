@@ -8,18 +8,33 @@
 import Config
 
 defmodule DbAdapter do
-  def choose do
-    Ecto.Adapters.SQLite3
+  @choices %{
+    "postgresql" => Ecto.Adapters.Postgres,
+    "mysql" => Ecto.Adapters.MyXQL,
+    "sqlite" => Ecto.Adapters.SQLite3,
+    nil => Ecto.Adapters.SQLite3
+  }
+
+  def choose(env_name) do
+    env_value = System.get_env(env_name)
+
+    Map.get(@choices, env_value) || raise "Unknownm db adapter #{env_name}=#{env_value}"
   end
 end
 
-config :renew_collab, :db_adapter, DbAdapter.choose()
-config :renew_collab, :db_auth_adapter, DbAdapter.choose()
-config :renew_collab, :db_sim_adapter, DbAdapter.choose()
+config :renew_collab, :db_adapter, DbAdapter.choose("RENEW_DOCS_DB_TYPE")
+config :renew_collab, :db_auth_adapter, DbAdapter.choose("RENEW_ACCOUNT_DB_TYPE")
+config :renew_collab, :db_sim_adapter, DbAdapter.choose("RENEW_SIM_DB_TYPE")
 
 config :renew_collab,
   ecto_repos: [RenewCollab.Repo, RenewCollabSim.Repo, RenewCollabAuth.Repo],
   generators: [timestamp_type: :utc_datetime, binary_id: true]
+
+config :renew_collab, RenewCollab.Repo, priv: "priv/repo"
+
+config :renew_collab, RenewCollabSim.Repo, priv: "priv/repo_sim"
+
+config :renew_collab, RenewCollabAuth.Repo, priv: "priv/repo_auth"
 
 # Configures the endpoint
 config :renew_collab, RenewCollabWeb.Endpoint,

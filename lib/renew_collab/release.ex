@@ -26,7 +26,8 @@ defmodule RenewCollab.Release do
       %RenewCollabAuth.Entites.Account{}
       |> RenewCollabAuth.Entites.Account.changeset(%{
         "email" => email,
-        "new_password" => password
+        "new_password" => password,
+        "is_admin" => true
       })
       |> r.insert()
     end)

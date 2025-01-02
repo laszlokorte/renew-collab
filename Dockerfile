@@ -23,6 +23,11 @@ ARG JAVA_BUILDER_IMAGE="eclipse-temurin:${JAVA_VERSION}"
 
 FROM ${BUILDER_IMAGE} AS builder
 
+
+ARG RENEW_DOCS_DB_TYPE="sqlite"
+ARG RENEW_ACCOUNT_DB_TYPE="sqlite"
+ARG RENEW_SIM_DB_TYPE="sqlite"
+
 # install build dependencies
 RUN apt-get update -y && apt-get install -y build-essential git \
     && apt-get clean && rm -f /var/lib/apt/lists/*_*
@@ -36,6 +41,9 @@ RUN mix local.hex --force && \
 
 # set build ENV
 ENV MIX_ENV="prod"
+ENV RENEW_DOCS_DB_TYPE=${RENEW_DOCS_DB_TYPE}
+ENV RENEW_ACCOUNT_DB_TYPE=${RENEW_ACCOUNT_DB_TYPE}
+ENV RENEW_SIM_DB_TYPE=${RENEW_SIM_DB_TYPE}
 
 # install mix dependencies
 COPY mix.exs mix.lock ./

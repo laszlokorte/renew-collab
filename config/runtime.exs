@@ -23,97 +23,88 @@ end
 maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
 if config_env() == :prod do
+  read_db_config = fn adapter, prefix ->
+    case adapter do
+      Ecto.Adapters.SQLite3 ->
+        [
+          pool_size: 1,
+          database: System.get_env("#{prefix}_PATH") || raise("#{prefix}_PATH is missing")
+        ]
+
+      Ecto.Adapters.Postgres ->
+        [
+          pool_size: 3,
+          socket_dir:
+            System.get_env("#{prefix}_SOCKET_DIR") ||
+              raise("#{prefix}_SOCKET_DIR is missing"),
+          hostname: System.get_env("#{prefix}_HOST") || raise("#{prefix}_HOST is missing"),
+          username: System.get_env("#{prefix}_USER") || raise("#{prefix}_USER is missing"),
+          password:
+            System.get_env("#{prefix}_PASSWORD") ||
+              raise("#{prefix}_PASSWORD is missing"),
+          database:
+            System.get_env("#{prefix}_DATABASE") ||
+              raise("#{prefix}_DATABASE is missing")
+        ]
+
+      Ecto.Adapters.MyXQL ->
+        [
+          pool_size: 3,
+          socket:
+            System.get_env("#{prefix}_SOCKET") ||
+              raise("#{prefix}_SOCKET is missing"),
+          hostname: System.get_env("#{prefix}_HOST") || raise("#{prefix}_HOST is missing"),
+          username: System.get_env("#{prefix}_USER") || raise("#{prefix}_USER is missing"),
+          password:
+            System.get_env("#{prefix}_PASSWORD") ||
+              raise("#{prefix}_PASSWORD is missing"),
+          database:
+            System.get_env("#{prefix}_DATABASE") ||
+              raise("#{prefix}_DATABASE is missing")
+        ]
+
+      _ ->
+        raise "Unexpected adapter for #{prefix}"
+    end
+  end
+
   config :renew_collab,
          RenewCollab.Repo,
          [
            adapter: Application.compile_env(:renew_collab, :db_adapter),
-           pool_size: 1,
            stacktrace: false,
-           priv: "priv/repo",
            show_sensitive_data_on_connection_error: false
          ]
          |> Keyword.merge(
-           case Application.compile_env(:renew_collab, :db_adapter) do
-             Ecto.Adapters.SQLite3 ->
-               [
-                 database:
-                   System.get_env("RENEW_DOCS_DB_PATH") || raise("RENEW_DOCS_DB_PATH is missing")
-               ]
-
-             Ecto.Adapters.Postgres ->
-               [
-                 socket_dir:
-                   System.get_env("RENEW_DOCS_DB_SOCKET_DIR") ||
-                     raise("RENEW_DOCS_DB_SOCKET_DIR is missing"),
-                 hostname:
-                   System.get_env("RENEW_DOCS_DB_HOST") || raise("RENEW_DOCS_DB_HOST is missing"),
-                 username:
-                   System.get_env("RENEW_DOCS_DB_USER") || raise("RENEW_DOCS_DB_USER is missing"),
-                 password:
-                   System.get_env("RENEW_DOCS_DB_PASSWORD") ||
-                     raise("RENEW_DOCS_DB_PASSWORD is missing"),
-                 database:
-                   System.get_env("RENEW_DOCS_DB_DATABASe") ||
-                     raise("RENEW_DOCS_DB_DATABASe is missing")
-               ]
-
-             Ecto.Adapters.MyXQL ->
-               [
-                 socket:
-                   System.get_env("RENEW_DOCS_DB_SOCKET") ||
-                     raise("RENEW_DOCS_DB_SOCKET is missing"),
-                 hostname:
-                   System.get_env("RENEW_DOCS_DB_HOST") || raise("RENEW_DOCS_DB_HOST is missing"),
-                 username:
-                   System.get_env("RENEW_DOCS_DB_USER") || raise("RENEW_DOCS_DB_USER is missing"),
-                 password:
-                   System.get_env("RENEW_DOCS_DB_PASSWORD") ||
-                     raise("RENEW_DOCS_DB_PASSWORD is missing"),
-                 database:
-                   System.get_env("RENEW_DOCS_DB_DATABASe") ||
-                     raise("RENEW_DOCS_DB_DATABASe is missing")
-               ]
-           end
+           read_db_config.(Application.compile_env(:renew_collab, :db_adapter), "RENEW_DOCS_DB")
          )
 
   config :renew_collab,
          RenewCollabAuth.Repo,
          [
            adapter: Application.compile_env(:renew_collab, :db_auth_adapter),
-           pool_size: 1,
            stacktrace: false,
-           priv: "priv/repo_auth",
            show_sensitive_data_on_connection_error: false
          ]
          |> Keyword.merge(
-           case Application.compile_env(:renew_collab, :db_auth_adapter) do
-             Ecto.Adapters.SQLite3 ->
-               [
-                 database:
-                   System.get_env("RENEW_ACCOUNT_DB_PATH") ||
-                     raise("RENEW_ACCOUNT_DB_PATH is missing")
-               ]
-           end
+           read_db_config.(
+             Application.compile_env(:renew_collab, :db_auth_adapter),
+             "RENEW_ACCOUNT_DB"
+           )
          )
 
   config :renew_collab,
          RenewCollabSim.Repo,
          [
            adapter: Application.compile_env(:renew_collab, :db_sim_adapter),
-           pool_size: 1,
            stacktrace: false,
-           priv: "priv/repo_sim",
            show_sensitive_data_on_connection_error: false
          ]
          |> Keyword.merge(
-           case Application.compile_env(:renew_collab, :db_sim_adapter) do
-             Ecto.Adapters.SQLite3 ->
-               [
-                 database:
-                   System.get_env("RENEW_SIM_DB_PATH") ||
-                     raise("RENEW_SIM_DB_PATH is missing")
-               ]
-           end
+           read_db_config.(
+             Application.compile_env(:renew_collab, :db_sim_adapter),
+             "RENEW_SIM_DB"
+           )
          )
 
   # The secret key base is used to sign/encrypt cookies and other secrets.
@@ -132,16 +123,12 @@ if config_env() == :prod do
   is_local = host == "localhost"
 
   port = String.to_integer(System.get_env("PORT") || "4000")
-  ssl_port = String.to_integer(System.get_env("SSL_PORT") || "443")
+  external_port = String.to_integer(System.get_env("PORT_EXTERNAL") || "#{port}")
 
   config :renew_collab, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
   config :renew_collab, RenewCollabWeb.Endpoint,
-    url:
-      if(is_local,
-        do: [host: host, port: port, scheme: "http"],
-        else: [host: host, port: ssl_port, scheme: "https"]
-      ),
+    url: [host: host, port: external_port, scheme: if(is_local, do: "http", else: "https")],
     http: [
       # Enable IPv6 and bind on all interfaces.
       # Set it to  {0, 0, 0, 0, 0, 0, 0, 1} for local network only access.
@@ -162,6 +149,22 @@ if config_env() == :prod do
 
   config :renew_collab, RenewCollab.TextMeasure.MeasureServer,
     script: System.get_env("RENEW_TEXT_MEASURE") || raise("RENEW_TEXT_MEASURE is missing")
+
+  ssl_key_path = System.get_env("RENEW_SSL_KEY_PATH")
+  ssl_cert_path = System.get_env("RENEW_SSL_CERT_PATH")
+  ssl_port = String.to_integer(System.get_env("SSL_PORT") || "443")
+
+  if ssl_key_path && ssl_cert_path do
+    config :renew_collab, RenewCollabWeb.Endpoint,
+      https: [
+        port: ssl_port,
+        cipher_suite: :strong,
+        keyfile: ssl_key_path,
+        certfile: ssl_cert_path
+      ]
+
+    config :renew_collab, RenewCollabWeb.Endpoint, force_ssl: [hsts: true]
+  end
 
   # ## SSL Support
   #
