@@ -14,7 +14,7 @@ defmodule RenewCollabAuth.Entites.SessionToken do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "session_token" do
-    field :token, :binary
+    field :token, :string
     field :context, :string
     field :sent_to, :string
     belongs_to :account, RenewCollabAuth.Entites.Account
@@ -23,7 +23,7 @@ defmodule RenewCollabAuth.Entites.SessionToken do
   end
 
   def build_session_token(account) do
-    token = :crypto.strong_rand_bytes(@rand_size)
+    token = :crypto.strong_rand_bytes(@rand_size) |> Base.encode64()
     {token, %SessionToken{token: token, context: "session", account_id: account.id}}
   end
 
@@ -42,7 +42,7 @@ defmodule RenewCollabAuth.Entites.SessionToken do
   end
 
   defp build_hashed_token(account, context, sent_to) do
-    token = :crypto.strong_rand_bytes(@rand_size)
+    token = :crypto.strong_rand_bytes(@rand_size) |> Base.encode64()
     hashed_token = :crypto.hash(@hash_algorithm, token)
 
     {Base.url_encode64(token, padding: false),

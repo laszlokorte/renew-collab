@@ -5,7 +5,7 @@ defmodule RenewCollab.Repo.Migrations.CreateSessionToken do
     create table(:session_token, primary_key: false) do
       add :id, :binary_id, primary_key: true, null: false
       add :account_id, references(:account, on_delete: :delete_all, type: :binary_id), null: false
-      add :token, :binary, null: false, size: 64
+      add :token, :string, null: false, size: 48
       add :context, :string, null: false
       add :sent_to, :string
 

@@ -25,9 +25,7 @@ defmodule RenewCollab.MixProject do
   def application do
     [
       mod: {RenewCollab.Application, []},
-      extra_applications:
-        [:logger, :runtime_tools] ++
-          if(use_postgresql(), do: [:postgrex], else: [])
+      extra_applications: [:logger, :runtime_tools]
     ]
   end
 
