@@ -136,7 +136,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
       from(s in RenewCollabSim.Entites.Simulation,
         where: s.id == ^simulation_id,
         select: %{
-          id: ^Ecto.UUID.bingenerate(),
+          id: ^Repo.dump_uuid(Ecto.UUID.generate()),
           simulation_id: s.id,
           content: ^"simulation stopped",
           inserted_at: ^now,
@@ -178,7 +178,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
       from(s in RenewCollabSim.Entites.Simulation,
         where: s.id == ^simulation_id,
         select: %{
-          id: ^Ecto.UUID.bingenerate(),
+          id: ^Repo.dump_uuid(Ecto.UUID.generate()),
           simulation_id: s.id,
           content: ^"simulation process exit: #{status}",
           inserted_at: ^now,
@@ -372,7 +372,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
                join: sim in RenewCollabSim.Entites.Simulation,
                on: sim.id == ^simulation_id,
                select: %{
-                 id: ^Ecto.UUID.bingenerate(),
+                 id: ^Repo.dump_uuid(Ecto.UUID.generate()),
                  simulation_id: sim.id,
                  label: ^"#{instance_name}[#{instance_number}]",
                  shadow_net_system_id: sn.shadow_net_system_id,
@@ -418,7 +418,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
                  n.label == ^"#{instance_name}[#{instance_number}]" and
                    n.simulation_id == ^simulation_id,
                select: %{
-                 id: ^Ecto.UUID.bingenerate(),
+                 id: ^Repo.dump_uuid(Ecto.UUID.generate()),
                  simulation_id: n.simulation_id,
                  simulation_net_instance_id: n.id,
                  place_id: ^place_id,
@@ -448,7 +448,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
                  n.label == ^"#{instance_name}[#{instance_number}]" and
                    n.simulation_id == ^simulation_id,
                select: %{
-                 id: ^Ecto.UUID.bingenerate(),
+                 id: ^Repo.dump_uuid(Ecto.UUID.generate()),
                  simulation_id: n.simulation_id,
                  simulation_net_instance_id: n.id,
                  place_id: ^place_id,
@@ -512,7 +512,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
                  n.label == ^"#{instance_name}[#{instance_number}]" and
                    n.simulation_id == ^simulation_id,
                select: %{
-                 id: ^Ecto.UUID.bingenerate(),
+                 id: ^Repo.dump_uuid(Ecto.UUID.generate()),
                  simulation_id: n.simulation_id,
                  simulation_net_instance_id: n.id,
                  transition_id: ^transition_id,
