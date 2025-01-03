@@ -28,7 +28,7 @@ defmodule RenewCollab.Commands.UpdateLayerStyle do
     Ecto.Multi.new()
     |> Ecto.Multi.put(:document_id, document_id)
     |> Ecto.Multi.one(:layer, from(l in Layer, where: l.id == ^layer_id))
-    |> RenewCollab.Compatiblity.Multi.insert(
+    |> RenewCollab.Compatibility.Multi.insert(
       :style,
       fn %{layer: layer} ->
         Ecto.build_assoc(layer, :style)

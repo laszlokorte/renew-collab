@@ -32,7 +32,7 @@ defmodule RenewCollab.Commands.UpdateLayerTextStyle do
       :text,
       from(l in Layer, join: e in assoc(l, :text), where: l.id == ^layer_id, select: e)
     )
-    |> RenewCollab.Compatiblity.Multi.insert(
+    |> RenewCollab.Compatibility.Multi.insert(
       :style,
       fn %{text: text} ->
         Ecto.build_assoc(text, :style)

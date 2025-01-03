@@ -1,4 +1,4 @@
-defmodule RenewCollab.Compatiblity.Multi do
+defmodule RenewCollab.Compatibility.Multi do
   def insert(multi, name, changeset_or_struct_or_fun, opts \\ []) do
     Ecto.Multi.insert(multi, name, changeset_or_struct_or_fun, adjust_options(opts))
   end

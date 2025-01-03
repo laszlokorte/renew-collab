@@ -31,7 +31,7 @@ defmodule RenewCollab.Commands.UpdateLayerEdgeStyle do
       :edge,
       from(l in Layer, join: e in assoc(l, :edge), where: l.id == ^layer_id, select: e)
     )
-    |> RenewCollab.Compatiblity.Multi.insert(
+    |> RenewCollab.Compatibility.Multi.insert(
       :style,
       fn %{edge: edge} ->
         Ecto.build_assoc(edge, :style)

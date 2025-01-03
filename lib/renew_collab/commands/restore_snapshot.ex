@@ -61,7 +61,7 @@ defmodule RenewCollab.Commands.RestoreSnapshot do
       end)
 
     multi
-    |> RenewCollab.Compatiblity.Multi.insert(
+    |> RenewCollab.Compatibility.Multi.insert(
       :new_latest_snapshot,
       fn %{document_id: document_id} ->
         %LatestSnapshot{

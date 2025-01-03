@@ -36,7 +36,7 @@ defmodule RenewCollab.Commands.CreateDocument do
       %Document{id: id}
       |> Document.changeset(content)
     )
-    |> RenewCollab.Compatiblity.Multi.insert_all(
+    |> RenewCollab.Compatibility.Multi.insert_all(
       :insert_parenthoods,
       LayerParenthood,
       fn %{insert_document: new_document} ->
