@@ -1,5 +1,36 @@
 defmodule RenewCollabWeb.RenewComponents do
   use Phoenix.Component
+  use RenewCollabWeb, :verified_routes
+
+  attr :blank, :boolean, default: false
+  attr :logout, :boolean, default: false
+
+  def app_header(assigns) do
+    ~H"""
+    <header style="background: #333; color: #fff; padding: 1em; display: flex; justify-content: space-between; font-family: monospace;">
+      <.link style="color: white; align-self: center; text-decoration: none" navigate={~p"/"}>
+        <h1 style="margin: 0; font-size: 1.3em; display: flex; align-items: center; gap: 1ex">
+          <img src="/favicon.svg" style="width: 1.5em; height: 1.5em" /> Petri Station Admin Panel
+        </h1>
+      </.link>
+      <%= if not @blank do %>
+        <div style="display: flex; gap: 2em; align-items: stretch;">
+          <.link style="color: white; align-self: center;" navigate={~p"/documents"}>Documents</.link>
+          <.link style="color: white; align-self: center;" navigate={~p"/shadow_nets"}>
+            Simulations
+          </.link>
+          <.link style="color: white; align-self: center;" navigate={~p"/"}>Dashboard</.link>
+        </div>
+      <% end %>
+
+      <%= if @logout do %>
+        <.link style="color: white; align-self: center;" href={~p"/logout"} method="delete">
+          Log out
+        </.link>
+      <% end %>
+    </header>
+    """
+  end
 
   attr :document, :map, required: true
   attr :filter, :atom, default: nil

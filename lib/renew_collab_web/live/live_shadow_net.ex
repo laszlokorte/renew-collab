@@ -57,12 +57,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
   def render(assigns) do
     ~H"""
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
-      <header style="background: #333; color: #fff; padding: 1em; display: flex; justify-content: space-between;">
-        <h1 style="margin: 0; font-size: 1.3em; display: flex; align-items: center; gap: 1ex">
-          <img src="/favicon.svg" style="width: 1.5em; height: 1.5em" /> Renew Web Editor
-        </h1>
-        <.link style="color: white; align-self: center;" navigate={~p"/"}>Dashboard</.link>
-      </header>
+      <RenewCollabWeb.RenewComponents.app_header />
 
       <div style="padding: 1em">
         <.link navigate={~p"/shadow_nets"}>Back</.link>

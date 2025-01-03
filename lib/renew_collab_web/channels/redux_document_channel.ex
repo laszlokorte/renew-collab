@@ -343,6 +343,24 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
 
   @impl true
   def handle_event(
+        "insert_document",
+        params = %{
+          "document_id" => document_id
+        },
+        %{},
+        socket
+      ) do
+    RenewCollab.Commands.InsertDocument.new(%{
+      target_document_id: socket.assigns.document_id,
+      source_document_id: document_id
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :ack
+  end
+
+  @impl true
+  def handle_event(
         "change_style",
         %{"type" => "text", "attr" => style_attr, "layer_id" => layer_id, "val" => value},
         %{},

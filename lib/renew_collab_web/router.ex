@@ -47,10 +47,17 @@ defmodule RenewCollabWeb.Router do
   end
 
   scope "/api", RenewCollabWeb do
-    pipe_through :protected_api
+    if Application.compile_env(:renew_collab, :dev_routes) do
+      pipe_through :api
+    else
+      pipe_through :protected_api
+    end
+
     get "/symbols", SymbolController, :index
     get "/socket_schemas", SocketSchemaController, :index
     get "/semantic_tags", SemanticTagController, :index
+    get "/primitives", BlueprintController, :primitives
+    get "/blueprints", BlueprintController, :index
 
     scope "/documents" do
       post "/import", DocumentController, :import
@@ -114,6 +121,19 @@ defmodule RenewCollabWeb.Router do
       live "/shadow_nets", LiveShadowNets
       live "/shadow_net/:id", LiveShadowNet
       live "/simulation/:id", LiveSimulation
+    end
+  end
+
+  scope "/", RenewCollabWeb do
+    pipe_through [:browser, :authenticated, :is_admin]
+
+    live_session :require_admin,
+      on_mount: [
+        {RenewCollabWeb.Auth, :ensure_authenticated},
+        {RenewCollabWeb.Auth, :ensure_admin}
+      ] do
+      live "/socket_schemas", LiveSocketSchemas
+      live "/icons", LiveIcons
     end
   end
 

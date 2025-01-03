@@ -121,6 +121,23 @@ defmodule RenewCollabWeb.Auth do
     end
   end
 
+  def on_mount(:ensure_admin, _params, session, socket) do
+    socket = mount_current_account(socket, session)
+
+    case socket.assigns.current_account do
+      %{is_admin: true} ->
+        {:cont, socket}
+
+      _ ->
+        socket =
+          socket
+          |> Phoenix.LiveView.put_flash(:error, "You must log in to access this page.")
+          |> Phoenix.LiveView.redirect(to: ~p"/")
+
+        {:halt, socket}
+    end
+  end
+
   def on_mount(:redirect_if_account_is_authenticated, _params, session, socket) do
     socket = mount_current_account(socket, session)
 

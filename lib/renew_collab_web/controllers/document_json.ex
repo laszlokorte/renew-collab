@@ -106,6 +106,14 @@ defmodule RenewCollabWeb.DocumentJSON do
           href: url(~p"/api/semantic_tags"),
           method: "get"
         },
+        blueprints: %{
+          href: url(~p"/api/blueprints"),
+          method: "get"
+        },
+        primitives: %{
+          href: url(~p"/api/primitives"),
+          method: "get"
+        },
         export: %{
           href: url(~p"/api/documents/#{document.id}/export"),
           method: "get"
