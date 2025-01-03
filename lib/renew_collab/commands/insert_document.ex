@@ -63,7 +63,7 @@ defmodule RenewCollab.Commands.InsertDocument do
         %Layer{document_id: document_id} |> Layer.changeset(layer)
       )
     end)
-    |> Ecto.Multi.insert_all(
+    |> RenewCollab.Compatiblity.Multi.insert_all(
       :insert_parenthoods,
       LayerParenthood,
       Enum.map(

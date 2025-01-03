@@ -61,7 +61,7 @@ defmodule RenewCollab.Commands.RestoreSnapshot do
       end)
 
     multi
-    |> Ecto.Multi.insert(
+    |> RenewCollab.Compatiblity.Multi.insert(
       :new_latest_snapshot,
       fn %{document_id: document_id} ->
         %LatestSnapshot{

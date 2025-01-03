@@ -27,7 +27,7 @@ defmodule RenewCollab.Commands.NormalizeZIndex do
       ) do
     Ecto.Multi.new()
     |> Ecto.Multi.put({cmd, :document_id}, document_id)
-    |> Ecto.Multi.insert_all(
+    |> RenewCollab.Compatiblity.Multi.insert_all(
       {cmd, :normalize_z_index},
       Layer,
       fn

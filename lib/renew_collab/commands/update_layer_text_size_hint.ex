@@ -23,7 +23,7 @@ defmodule RenewCollab.Commands.UpdateLayerTextSizeHint do
       {cmd, :text},
       from(l in Layer, join: e in assoc(l, :text), where: l.id == ^layer_id, select: e)
     )
-    |> Ecto.Multi.insert(
+    |> RenewCollab.Compatiblity.Multi.insert(
       {cmd, :hint},
       fn %{{^cmd, :text} => text} ->
         Ecto.build_assoc(text, :size_hint)

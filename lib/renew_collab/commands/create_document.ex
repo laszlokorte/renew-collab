@@ -36,7 +36,7 @@ defmodule RenewCollab.Commands.CreateDocument do
       %Document{id: id}
       |> Document.changeset(content)
     )
-    |> Ecto.Multi.insert_all(
+    |> RenewCollab.Compatiblity.Multi.insert_all(
       :insert_parenthoods,
       LayerParenthood,
       fn %{insert_document: new_document} ->

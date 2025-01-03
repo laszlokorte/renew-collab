@@ -65,7 +65,7 @@ defmodule RenewCollab.Commands.CreateSnapshot do
       end,
       []
     )
-    |> Ecto.Multi.insert(
+    |> RenewCollab.Compatiblity.Multi.insert(
       :new_snapshot,
       fn %{
            ids: %{
@@ -82,7 +82,7 @@ defmodule RenewCollab.Commands.CreateSnapshot do
       on_conflict: {:replace, [:id, :updated_at]},
       conflict_target: [:document_id, :inserted_at]
     )
-    |> Ecto.Multi.insert(
+    |> RenewCollab.Compatiblity.Multi.insert(
       :new_snapshot_content,
       fn %{
            ids: %{
@@ -102,7 +102,7 @@ defmodule RenewCollab.Commands.CreateSnapshot do
       on_conflict: {:replace, [:content]},
       conflict_target: [:snapshot_id]
     )
-    |> Ecto.Multi.insert(
+    |> RenewCollab.Compatiblity.Multi.insert(
       :new_latest_snapshot,
       fn %{
            ids: %{

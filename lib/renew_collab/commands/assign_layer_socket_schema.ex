@@ -41,7 +41,7 @@ defmodule RenewCollab.Commands.AssignLayerSocketSchema do
 
     if socket_schema_id do
       multi
-      |> Ecto.Multi.insert(
+      |> RenewCollab.Compatiblity.Multi.insert(
         :insert_interface,
         fn %{layer: layer} ->
           %Interface{}
