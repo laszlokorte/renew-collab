@@ -243,7 +243,7 @@ defmodule RenewCollab.Blueprints do
     %TransientDocument{
       content: %{
         name: "Example",
-        kind: "CH.ifa.draw.standard.StandardDrawing",
+        kind: "de.renew.gui.CPNDrawing",
         id: "5fb5c0ea-0e46-4d45-a943-a68306cb67b1",
         layers: [
           %{
@@ -454,7 +454,7 @@ defmodule RenewCollab.Blueprints do
     %TransientDocument{
       content: %{
         name: "Transition",
-        kind: "CH.ifa.draw.standard.StandardDrawing",
+        kind: "de.renew.gui.CPNDrawing",
         id: "a2138eef-3348-466a-822d-8a5897edf961",
         layers: [
           %{
@@ -486,7 +486,7 @@ defmodule RenewCollab.Blueprints do
     %TransientDocument{
       content: %{
         name: "Place",
-        kind: "CH.ifa.draw.standard.StandardDrawing",
+        kind: "de.renew.gui.CPNDrawing",
         id: "75af7642-ddea-4485-9020-d578beae2bee",
         layers: [
           %{
