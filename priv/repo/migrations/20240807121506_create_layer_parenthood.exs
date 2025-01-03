@@ -19,5 +19,6 @@ defmodule RenewCollab.Repo.Migrations.CreateLayerParenthood do
     create index(:layer_parenthood, [:ancestor_id])
     create index(:layer_parenthood, [:descendant_id])
     create unique_index(:layer_parenthood, [:descendant_id, :ancestor_id])
+    create unique_index(:layer_parenthood, [:descendant_id, :depth])
   end
 end

@@ -37,7 +37,8 @@ defmodule RenewCollab.Commands.UpdateLayerEdgeStyle do
         Ecto.build_assoc(edge, :style)
         |> EdgeStyle.changeset(%{style_attr => value})
       end,
-      on_conflict: {:replace, [style_attr]}
+      on_conflict: {:replace, [style_attr]},
+      conflict_target: [:edge_id]
     )
   end
 

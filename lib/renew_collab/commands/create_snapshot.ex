@@ -79,7 +79,8 @@ defmodule RenewCollab.Commands.CreateSnapshot do
           predecessor_id: predecessor_id
         })
       end,
-      on_conflict: {:replace, [:id, :updated_at]}
+      on_conflict: {:replace, [:id, :updated_at]},
+      conflict_target: [:document_id, :inserted_at]
     )
     |> Ecto.Multi.insert(
       :new_snapshot_content,
@@ -98,7 +99,8 @@ defmodule RenewCollab.Commands.CreateSnapshot do
             |> Map.new()
         })
       end,
-      on_conflict: {:replace, [:content]}
+      on_conflict: {:replace, [:content]},
+      conflict_target: [:snapshot_id]
     )
     |> Ecto.Multi.insert(
       :new_latest_snapshot,
@@ -112,7 +114,8 @@ defmodule RenewCollab.Commands.CreateSnapshot do
           snapshot_id: new_id
         }
       end,
-      on_conflict: {:replace, [:snapshot_id]}
+      on_conflict: {:replace, [:snapshot_id]},
+      conflict_target: [:document_id]
     )
   end
 end

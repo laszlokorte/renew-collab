@@ -69,7 +69,8 @@ defmodule RenewCollab.Commands.RestoreSnapshot do
           snapshot_id: snapshot_id
         }
       end,
-      on_conflict: {:replace, [:snapshot_id]}
+      on_conflict: {:replace, [:snapshot_id]},
+      conflict_target: [:document_id]
     )
   end
 end

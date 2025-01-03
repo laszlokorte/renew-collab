@@ -34,7 +34,8 @@ defmodule RenewCollab.Commands.UpdateLayerStyle do
         Ecto.build_assoc(layer, :style)
         |> LayerStyle.changeset(%{style_attr => value})
       end,
-      on_conflict: {:replace, [style_attr]}
+      on_conflict: {:replace, [style_attr]},
+      conflict_target: [:layer_id]
     )
   end
 

@@ -29,7 +29,8 @@ defmodule RenewCollab.Commands.UpdateLayerTextSizeHint do
         Ecto.build_assoc(text, :size_hint)
         |> TextSizeHint.changeset(box)
       end,
-      on_conflict: {:replace, [:position_x, :position_y, :width, :height]}
+      on_conflict: {:replace, [:position_x, :position_y, :width, :height]},
+      conflict_target: [:text_id]
     )
     |> Ecto.Multi.all(
       :affected_bond_ids,

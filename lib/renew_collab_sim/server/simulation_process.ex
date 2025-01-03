@@ -127,24 +127,13 @@ defmodule RenewCollabSim.Server.SimulationProcess do
     import Ecto.Query
     Process.exit(sim_process, :kill)
 
-    now = DateTime.utc_now()
-
     open_multi
-    |> Ecto.Multi.one(
-      {om_counter, :sim_for_log_entry},
-      from(s in RenewCollabSim.Entites.Simulation,
-        where: s.id == ^simulation_id
-      )
-    )
     |> Ecto.Multi.insert(
       {om_counter, :make_log_entry},
-      fn
-        %{{^om_counter, :sim_for_log_entry} => sim} ->
-          %RenewCollabSim.Entites.SimulationLogEntry{
-            simulation_id: simulation_id,
-            content: "simulation stopped"
-          }
-      end
+      %RenewCollabSim.Entites.SimulationLogEntry{
+        simulation_id: simulation_id,
+        content: "simulation stopped"
+      }
     )
     |> Ecto.Multi.delete_all(
       {om_counter, :delete_net_instances},
@@ -171,24 +160,14 @@ defmodule RenewCollabSim.Server.SimulationProcess do
         state = %{simulation_id: simulation_id, open_multi: {om_counter, open_multi}}
       ) do
     import Ecto.Query
-    now = DateTime.utc_now()
 
     open_multi
-    |> Ecto.Multi.one(
-      {om_counter, :sim_for_log_entry},
-      from(s in RenewCollabSim.Entites.Simulation,
-        where: s.id == ^simulation_id
-      )
-    )
     |> Ecto.Multi.insert(
       {om_counter, :make_log_entry},
-      fn
-        %{{^om_counter, :sim_for_log_entry} => sim} ->
-          %RenewCollabSim.Entites.SimulationLogEntry{
-            simulation_id: simulation_id,
-            content: "simulation process exit: #{status}"
-          }
-      end
+      %RenewCollabSim.Entites.SimulationLogEntry{
+        simulation_id: simulation_id,
+        content: "simulation process exit: #{status}"
+      }
     )
     |> Ecto.Multi.delete_all(
       {om_counter, :delete_net_instances},

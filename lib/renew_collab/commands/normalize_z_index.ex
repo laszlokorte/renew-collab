@@ -45,7 +45,8 @@ defmodule RenewCollab.Commands.NormalizeZIndex do
             windows: [par: [partition_by: dp.id, order_by: [asc: l.z_index]]]
           )
       end,
-      on_conflict: {:replace, [:z_index]}
+      on_conflict: {:replace, [:z_index]},
+      conflict_target: [:id]
     )
   end
 end

@@ -70,7 +70,7 @@ defmodule RenewCollab.Commands.CreateLayerEdgeWaypoint do
           left_join: w3 in assoc(e, :waypoints),
           where: l.id == ^layer_id,
           order_by: [asc: w2.sort],
-          group_by: [w2.id, e.id],
+          group_by: [w2.id, e.id, w.id],
           limit: 1,
           select: {e, w, w2, max(w3.sort)}
         )
@@ -79,16 +79,22 @@ defmodule RenewCollab.Commands.CreateLayerEdgeWaypoint do
     |> Ecto.Multi.update_all(
       :increment_future_waypoints,
       fn
+        %{edge: {_, _, _, nil}} ->
+          from(w in Waypoint,
+            where: false,
+            update: [inc: [sort: 0]]
+          )
+
         %{edge: {edge, nil, _, max_sort}} ->
           from(w in Waypoint,
             where: w.edge_id == ^edge.id,
-            update: [inc: [sort: 1 + ^max_sort * 2]]
+            update: [inc: [sort: ^(1 + max_sort * 2)]]
           )
 
-        %{edge: {edge, prev_waypoint_id, _, max_sort}} ->
+        %{edge: {edge, prev_waypoint, _, max_sort}} ->
           from(w in Waypoint,
-            where: w.edge_id == ^edge.id and w.sort > ^prev_waypoint_id.sort,
-            update: [inc: [sort: 1 + ^max_sort * 2]]
+            where: w.edge_id == ^edge.id and w.sort > ^prev_waypoint.sort,
+            update: [inc: [sort: ^(1 + max_sort * 2)]]
           )
       end,
       []
@@ -96,16 +102,22 @@ defmodule RenewCollab.Commands.CreateLayerEdgeWaypoint do
     |> Ecto.Multi.update_all(
       :offset_waypoints,
       fn
+        %{edge: {_, _, _, nil}} ->
+          from(w in Waypoint,
+            where: false,
+            update: [inc: [sort: 0]]
+          )
+
         %{edge: {edge, nil, _, max_sort}} ->
           from(w in Waypoint,
             where: w.edge_id == ^edge.id,
-            update: [inc: [sort: -(^max_sort) * 2]]
+            update: [inc: [sort: ^(-max_sort * 2)]]
           )
 
-        %{edge: {edge, prev_waypoint_id, _, max_sort}} ->
+        %{edge: {edge, prev_waypoint, _, max_sort}} ->
           from(w in Waypoint,
-            where: w.edge_id == ^edge.id and w.sort > ^prev_waypoint_id.sort,
-            update: [inc: [sort: -(^max_sort) * 2]]
+            where: w.edge_id == ^edge.id and w.sort > ^prev_waypoint.sort,
+            update: [inc: [sort: ^(-max_sort * 2)]]
           )
       end,
       []

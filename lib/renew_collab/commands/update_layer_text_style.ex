@@ -38,7 +38,8 @@ defmodule RenewCollab.Commands.UpdateLayerTextStyle do
         Ecto.build_assoc(text, :style)
         |> TextStyle.changeset(%{style_attr => value})
       end,
-      on_conflict: {:replace, [style_attr]}
+      on_conflict: {:replace, [style_attr]},
+      conflict_target: [:text_id]
     )
     |> Ecto.Multi.delete_all(
       :delete_size_hint,

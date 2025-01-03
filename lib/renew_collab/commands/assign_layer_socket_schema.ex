@@ -50,7 +50,8 @@ defmodule RenewCollab.Commands.AssignLayerSocketSchema do
             socket_schema_id: socket_schema_id
           })
         end,
-        on_conflict: {:replace, [:socket_schema_id]}
+        on_conflict: {:replace, [:socket_schema_id]},
+        conflict_target: [:layer_id]
       )
     else
       multi

@@ -19,22 +19,23 @@ defmodule RenewCollab.Commands.PruneSnapshots do
   def multi(%__MODULE__{document_id: document_id}) do
     Ecto.Multi.new()
     |> Ecto.Multi.put(:document_id, document_id)
-    |> Ecto.Multi.insert_all(
+    |> Ecto.Multi.one(
+      :find_latest,
+      from(l in LatestSnapshot,
+        where: l.document_id == ^document_id,
+        join: s in assoc(l, :snapshot),
+        select: s.id
+      )
+    )
+    |> Ecto.Multi.insert(
       :new_auto_label,
-      SnapshotLabel,
-      fn %{document_id: document_id} ->
-        from(l in LatestSnapshot,
-          where: l.document_id == ^document_id,
-          join: s in assoc(l, :snapshot),
-          left_join: lbl in assoc(s, :label),
-          where: is_nil(lbl.id),
-          select: %{
-            id: ^Ecto.UUID.generate(),
-            snapshot_id: l.snapshot_id,
-            description: "(auto)"
-          }
-        )
-      end
+      fn %{find_latest: latest_id} ->
+        %SnapshotLabel{
+          snapshot_id: latest_id,
+          description: "(auto)"
+        }
+      end,
+      on_conflict: :nothing
     )
     |> Ecto.Multi.update_all(
       :update_predecessors,

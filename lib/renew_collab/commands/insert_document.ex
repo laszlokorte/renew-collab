@@ -77,7 +77,8 @@ defmodule RenewCollab.Commands.InsertDocument do
           }
         end
       ),
-      on_conflict: {:replace, [:depth, :ancestor_id, :descendant_id]}
+      on_conflict: {:replace, [:depth, :ancestor_id, :descendant_id]},
+      conflict_target: [:descendant_id, :ancestor_id]
     )
     |> Ecto.Multi.insert_all(
       :insert_hyperlinks,
