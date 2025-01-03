@@ -163,6 +163,47 @@ If you change the database schema during development you should generate the plo
 schemacrawler --info-level=standard --command=schema --output-format=svg --portable-names --server sqlite --database ./renew_collab_dev.db --output-file=guides/db_schema.svg
 ```
 
+## Other Database Backends
+
+When build the docker image (or running `mix compile`) you can specify what kind of SQL database should be used to store user accounts, documents, and simulation state. You can chose between `mysql`, `sqlite`, and `postgresql` for each.
+
+In the example below MySQL is used to store user accounts, PostgreSQL is used to store the documents and SQLite is used for storing the simulation states:
+
+```sh
+docker build \
+--build-arg RENEW_ACCOUNT_DB_TYPE=mysql \
+--build-arg RENEW_DOCS_DB_TYPE=postgresql \
+--build-arg RENEW_SIM_DB_TYPE=sqlite 
+-t renew_collab_mixed_db:latest .
+```
+
+The *kind* of databases must be determined at compile time (when building the Docker image). But the exact databases to be used are configured at run time (when container is started).
+
+```sh 
+docker run\
+-e PHX_HOST="localhost"\
+-e PORT="8080"\
+-e PORT_EXTERNAL="9000"\
+-e RENEW_ADMIN_EMAIL="your@email.net"\
+-e RENEW_ADMIN_PASSWORD="your_password"\
+-e SECRET_KEY_BASE="$(mix phx.gen.secret)"\
+-e RENEW_ACCOUNT_DB_URL="mysql://myuser:mypass@mysqlhost:3306/renew_accounts"\
+-e RENEW_DOCS_DB_URL="postgresql://pguser:pgpass@pghost:5432/renew_documents"\
+-e RENEW_SIM_DB_PATH="/data/renew_sim.db"\
+--net renew-network
+-p 9000:8080\
+-it renew_collab
+```
+
+In the command above the environment variables `RENEW_ACCOUNT_DB_URL` and `RENEW_DOCS_DB_URL` are set to contain the credentials for the MySql and PostgreSQL databases respectively. Additionally the `RENEW_SIM_DB_PATH` is set to file location inside the container at which the SQLite database should be stored. The SQLite storage location could also be ommited and will default to the `/data` directory inside the container.
+
+**Important (1)**: As explained above, the *kind* of database to be used is determined at compile/build time. The credentials are provided at startup time. Which credentials must be provided at startup time depends on the kind of database selected at build time.
+
+Setting `RENEW_ACCOUNT_DB_TYPE` to `mysql` or `postgresql` *requires* `RENEW_ACCOUNT_DB_URL` to be set.
+Setting `RENEW_ACCOUNT_DB_TYPE` to `sqlite` allows `RENEW_ACCOUNT_DB_PATH` to be set, but falls back to default value `/data/renew_auth.db`.
+
+**Important (2)**: Make sure that the database server is on the same network as the application container.
+
 ---
 
 [www.laszlokorte.de](//www.laszlokorte.de)
