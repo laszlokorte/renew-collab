@@ -8,9 +8,6 @@ defmodule RenewCollab.Document.TransientDocument do
   end
 
   def shift_positions(%__MODULE__{content: content} = doc, dx, dy) do
-    dbg(dx)
-    dbg(dy)
-
     %__MODULE__{
       doc
       | content:

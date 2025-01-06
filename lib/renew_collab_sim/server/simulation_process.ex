@@ -469,9 +469,6 @@ defmodule RenewCollabSim.Server.SimulationProcess do
         "rm_place_id" => place_id
       }
       when "" != time_number ->
-        dbg(place_id)
-        dbg(simulation_id)
-
         {:noreply,
          state
          |> append_multi(
@@ -489,7 +486,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
                    i.label == ^"#{instance_name}[#{instance_number}]"
              )
              |> then(fn q ->
-               Ecto.Adapters.SQL.to_sql(:all, Repo, q) |> dbg
+               Ecto.Adapters.SQL.to_sql(:all, Repo, q)
 
                q
              end)
@@ -503,8 +500,6 @@ defmodule RenewCollabSim.Server.SimulationProcess do
                  )
 
                %{{^om_counter, :find_remove_tokens} => to_delete} ->
-                 dbg(to_delete)
-
                  from(dt in RenewCollabSim.Entites.SimulationNetToken,
                    where: dt.id == ^to_delete
                  )

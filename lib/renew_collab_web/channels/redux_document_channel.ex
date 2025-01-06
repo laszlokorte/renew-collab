@@ -432,7 +432,6 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
       attributes: attributes
     })
     |> RenewCollab.Commander.run_document_command()
-    |> dbg
 
     :silent
   end
