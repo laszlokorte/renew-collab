@@ -345,14 +345,16 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
   def handle_event(
         "insert_document",
         params = %{
-          "document_id" => document_id
+          "document_id" => document_id,
+          "position" => %{"x" => x, "y" => y}
         },
         %{},
         socket
       ) do
     RenewCollab.Commands.InsertDocument.new(%{
       target_document_id: socket.assigns.document_id,
-      source_document_id: document_id
+      source_document_id: document_id,
+      position: {x, y}
     })
     |> RenewCollab.Commander.run_document_command()
 

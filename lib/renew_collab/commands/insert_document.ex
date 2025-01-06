@@ -7,10 +7,29 @@ defmodule RenewCollab.Commands.InsertDocument do
   alias RenewCollab.Connection.Bond
   alias RenewCollab.Element.Edge
 
-  defstruct [:source_document_id, :target_document_id]
+  defstruct [:source_document_id, :target_document_id, :position]
 
-  def new(%{target_document_id: target_document_id, source_document_id: source_document_id}) do
-    %__MODULE__{target_document_id: target_document_id, source_document_id: source_document_id}
+  def new(%{
+        target_document_id: target_document_id,
+        source_document_id: source_document_id,
+        position: {x, y}
+      }) do
+    %__MODULE__{
+      target_document_id: target_document_id,
+      source_document_id: source_document_id,
+      position: {x, y}
+    }
+  end
+
+  def new(%{
+        target_document_id: target_document_id,
+        source_document_id: source_document_id
+      }) do
+    %__MODULE__{
+      target_document_id: target_document_id,
+      source_document_id: source_document_id,
+      position: {0, 0}
+    }
   end
 
   def tags(%__MODULE__{target_document_id: target_document_id}),
@@ -20,7 +39,8 @@ defmodule RenewCollab.Commands.InsertDocument do
 
   def multi(%__MODULE__{
         source_document_id: source_document_id,
-        target_document_id: target_document_id
+        target_document_id: target_document_id,
+        position: {dx, dy}
       }) do
     RenewCollab.Queries.StrippedDocument.new(%{document_id: source_document_id})
     |> RenewCollab.Queries.StrippedDocument.multi()
@@ -39,7 +59,7 @@ defmodule RenewCollab.Commands.InsertDocument do
       insert_into_document_multi(
         document_id,
         now,
-        stripped_document
+        stripped_document |> TransientDocument.shift_positions(dx, dy)
       )
     end)
   end
