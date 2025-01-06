@@ -5,7 +5,7 @@ defmodule RenewCollabWeb.DocumentController do
   alias RenewCollab.Document.Document
   alias RenewCollab.Import.DocumentImport
 
-  action_fallback RenewCollabWeb.FallbackController
+  action_fallback(RenewCollabWeb.FallbackController)
 
   def index(conn, _params) do
     documents = Renew.list_documents()
@@ -78,7 +78,7 @@ defmodule RenewCollabWeb.DocumentController do
         |> halt()
 
       document ->
-        {:ok, output} = RenewCollab.Export.DocumentExport.export(document)
+        {:ok, output} = RenewCollab.Export.DocumentExport.export(document, synthetic: true)
 
         conn
         |> put_resp_header(

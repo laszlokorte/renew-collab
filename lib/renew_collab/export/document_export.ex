@@ -5,7 +5,7 @@ defmodule RenewCollab.Export.DocumentExport do
   alias Renewex.Hierarchy
   alias RenewCollab.Document.Document
 
-  def export(%Document{} = document, opts \\ [syntetic: false]) do
+  def export(%Document{} = document, opts \\ [synthetic: false]) do
     grammar = Grammar.new(11)
     sockets = RenewCollab.Sockets.all_socket_by_id()
 
@@ -30,8 +30,8 @@ defmodule RenewCollab.Export.DocumentExport do
       end)
 
     refs =
-      if Keyword.get(opts, :syntetic, false) do
-        refs |> attach_syntetic_labels
+      if Keyword.get(opts, :synthetic, false) do
+        refs |> attach_synthetic_labels
       else
         refs
       end
@@ -625,52 +625,60 @@ defmodule RenewCollab.Export.DocumentExport do
     end
   end
 
-  defp attach_syntetic_labels(refs) do
-    refs
-    |> Enum.concat(
-      for {%Storable{class_name: class_name, fields: %{_gen_id: gen_id}}, index} <-
-            Enum.with_index(refs),
-          class_name == "de.renew.gui.TransitionFigure" or
-            class_name == "de.renew.gui.PlaceFigure" do
-        %Renewex.Storable{
-          class_name: "de.renew.gui.CPNTextFigure",
-          fields: %{
-            _root: true,
-            attributes: %Renewex.Storable{
-              class_name: "CH.ifa.draw.figures.FigureAttributes",
-              fields: %{
-                attributes: [
-                  {"Visible", "Boolean", true}
-                ]
-              }
-            },
-            fOriginX: 0,
-            fOriginY: 0,
-            text: gen_id,
-            fCurrentFontName: "monospaced",
-            fCurrentFontStyle: 0,
-            fCurrentFontSize: 2,
-            fIsReadOnly: 0,
-            fParent: {:ref, index},
-            fLocator: %Renewex.Storable{
-              class_name: "CH.ifa.draw.standard.OffsetLocator",
-              fields: %{
-                fOffsetY: 0,
-                fOffsetX: 0,
-                fBase: %Renewex.Storable{
-                  class_name: "CH.ifa.draw.standard.RelativeLocator",
-                  fields: %{
-                    fOffsetY: 0.5,
-                    fOffsetX: 0.5
-                  }
+  defp attach_synthetic_labels(orig_refs) do
+    for {%Storable{class_name: class_name, fields: %{_gen_id: gen_id}}, index} <-
+          Enum.with_index(orig_refs),
+        class_name == "de.renew.gui.TransitionFigure" or
+          class_name == "de.renew.gui.PlaceFigure",
+        reduce: orig_refs do
+      refs ->
+        {refs, locator_base} =
+          create_ref(refs, %Renewex.Storable{
+            class_name: "CH.ifa.draw.standard.RelativeLocator",
+            fields: %{
+              fOffsetY: 0.5,
+              fOffsetX: 0.5
+            }
+          })
+
+        {refs, locator_ref} =
+          create_ref(refs, %Renewex.Storable{
+            class_name: "CH.ifa.draw.standard.OffsetLocator",
+            fields: %{
+              fOffsetY: 0,
+              fOffsetX: 0,
+              fBase: locator_base
+            }
+          })
+
+        {refs, _} =
+          create_ref(refs, %Renewex.Storable{
+            class_name: "de.renew.gui.CPNTextFigure",
+            fields: %{
+              _root: true,
+              attributes: %Renewex.Storable{
+                class_name: "CH.ifa.draw.figures.FigureAttributes",
+                fields: %{
+                  attributes: [
+                    {"Visible", "Boolean", true}
+                  ]
                 }
-              }
-            },
-            fType: 2
-          }
-        }
-      end
-    )
+              },
+              fOriginX: 0,
+              fOriginY: 0,
+              text: gen_id,
+              fCurrentFontName: "monospaced",
+              fCurrentFontStyle: 0,
+              fCurrentFontSize: 2,
+              fIsReadOnly: 0,
+              fParent: {:ref, index},
+              fLocator: locator_ref,
+              fType: 2
+            }
+          })
+
+        refs
+    end
   end
 
   defp export_attributes(:box, layer) do

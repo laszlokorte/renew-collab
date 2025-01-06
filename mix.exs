@@ -59,10 +59,10 @@ defmodule RenewCollab.MixProject do
         {:corsica, "~> 2.0"},
         {:live_state, "~> 0.7"},
         {:pbkdf2_elixir, "~> 2.2"},
-        {:renewex, "~> 0.14.0"},
+        {:renewex, "~> 0.15.0"},
         {:renewex_iconset, "~> 0.2.0"},
         {:renewex_routing, "~> 0.2.0"},
-        {:renewex_converter, "~> 0.4.0"},
+        {:renewex_converter, "~> 0.5.0"},
         {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
       ]
   end
