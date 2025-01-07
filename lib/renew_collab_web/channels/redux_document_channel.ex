@@ -33,10 +33,14 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
 
   @impl true
   def handle_message({:document_changed, document_id}, _state) do
-    {:noreply,
-     RenewCollabWeb.DocumentJSON.show_content(
-       RenewCollab.Renew.get_document_with_elements(document_id)
-     )}
+    RenewCollab.Renew.get_document_with_elements(document_id)
+    |> case do
+      nil ->
+        :stop
+
+      doc ->
+        {:noreply, RenewCollabWeb.DocumentJSON.show_content(doc)}
+    end
   end
 
   @impl true
@@ -344,7 +348,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
   @impl true
   def handle_event(
         "insert_document",
-        params = %{
+        %{
           "document_id" => document_id,
           "position" => %{"x" => x, "y" => y}
         },

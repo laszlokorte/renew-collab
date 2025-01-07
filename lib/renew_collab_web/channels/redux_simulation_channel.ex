@@ -37,22 +37,34 @@ defmodule RenewCollabWeb.ReduxSimulationChannel do
 
   @impl true
   def handle_message({:simulation_change, simulation_id, {_event, is_playing}}, _state) do
-    {:noreply,
-     RenewCollabWeb.SimulationJSON.show_content(
-       RenewCollabSim.Simulator.find_simulation_simple(simulation_id),
-       RenewCollabSim.Server.SimulationServer.exists(simulation_id),
-       is_playing
-     )}
+    case RenewCollabSim.Simulator.find_simulation_simple(simulation_id) do
+      nil ->
+        :stop
+
+      sim ->
+        {:noreply,
+         RenewCollabWeb.SimulationJSON.show_content(
+           sim,
+           RenewCollabSim.Server.SimulationServer.exists(simulation_id),
+           is_playing
+         )}
+    end
   end
 
   @impl true
   def handle_message({:simulation_change, simulation_id, _event}, _state) do
-    {:noreply,
-     RenewCollabWeb.SimulationJSON.show_content(
-       RenewCollabSim.Simulator.find_simulation_simple(simulation_id),
-       RenewCollabSim.Server.SimulationServer.exists(simulation_id),
-       false
-     )}
+    case RenewCollabSim.Simulator.find_simulation_simple(simulation_id) do
+      nil ->
+        :stop
+
+      sim ->
+        {:noreply,
+         RenewCollabWeb.SimulationJSON.show_content(
+           sim,
+           RenewCollabSim.Server.SimulationServer.exists(simulation_id),
+           false
+         )}
+    end
   end
 
   @impl true

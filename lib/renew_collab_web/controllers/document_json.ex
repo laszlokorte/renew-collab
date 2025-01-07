@@ -118,6 +118,14 @@ defmodule RenewCollabWeb.DocumentJSON do
           href: url(~p"/api/documents/#{document.id}/export"),
           method: "get"
         },
+        download_json: %{
+          href: url(~p"/api/documents/#{document.id}/download.json"),
+          method: "get"
+        },
+        download_struct: %{
+          href: url(~p"/api/documents/#{document.id}/download.iex"),
+          method: "get"
+        },
         duplicate: %{
           href: url(~p"/api/documents/#{document.id}/duplicate"),
           method: "post"

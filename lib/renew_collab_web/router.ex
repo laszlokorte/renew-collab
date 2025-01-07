@@ -62,6 +62,8 @@ defmodule RenewCollabWeb.Router do
     scope "/documents" do
       post "/import", DocumentController, :import
       get "/:id/export", DocumentController, :export
+      get "/:id/download.iex", DocumentController, :inspect
+      get "/:id/download.json", DocumentController, :show
       post "/:id/duplicate", DocumentController, :duplicate
 
       resources "/", DocumentController, except: [:new, :edit]
@@ -133,7 +135,9 @@ defmodule RenewCollabWeb.Router do
         {RenewCollabWeb.Auth, :ensure_admin}
       ] do
       live "/socket_schemas", LiveSocketSchemas
+      live "/socket_schema/:id", LiveSocketSchema
       live "/icons", LiveIcons
+      live "/icon/:id", LiveIcon
     end
   end
 

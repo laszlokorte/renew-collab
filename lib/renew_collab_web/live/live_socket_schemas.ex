@@ -2,9 +2,7 @@ defmodule RenewCollabWeb.LiveSocketSchemas do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
-  alias RenewCollab.Renew
-
-  @topic "icons"
+  @topic "socket_schema"
 
   def mount(_params, _session, socket) do
     RenewCollabWeb.Endpoint.subscribe(@topic)
@@ -18,12 +16,14 @@ defmodule RenewCollabWeb.LiveSocketSchemas do
 
   def render(assigns) do
     assigns =
-      assign(assigns, :bounds, %{
-        position_x: 0,
-        position_y: 0,
-        width: 100,
-        height: 60
-      })
+      assign(assigns,
+        bounds: %{
+          position_x: 0,
+          position_y: 0,
+          width: 100,
+          height: 60
+        }
+      )
 
     ~H"""
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">

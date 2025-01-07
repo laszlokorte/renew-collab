@@ -260,7 +260,7 @@ defmodule RenewCollabSim.Simulator do
           {document.name, rnw, json}
         end)
       rescue
-        e ->
+        _e ->
           :export_error
       end
 

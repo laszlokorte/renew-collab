@@ -2,8 +2,6 @@ defmodule RenewCollabWeb.LiveIcons do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
-  alias RenewCollab.Renew
-
   @topic "icons"
 
   def mount(_params, _session, socket) do

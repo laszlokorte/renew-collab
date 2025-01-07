@@ -80,6 +80,8 @@ defmodule RenewCollabSim.Server.SimulationProcess do
 
   @impl true
   def init(%{simulation_id: simulation_id}) do
+    import Ecto.Query
+
     try do
       simulation = RenewCollabSim.Simulator.find_simulation(simulation_id)
       {sim_process, directory} = init_process(simulation)
@@ -95,7 +97,29 @@ defmodule RenewCollabSim.Server.SimulationProcess do
          playing: false,
          scheduled: false,
          logging: true,
-         open_multi: {0, Ecto.Multi.new()}
+         open_multi:
+           {0,
+            Ecto.Multi.new()
+            |> Ecto.Multi.delete_all(
+              :reset_net_instances_initial,
+              from(n in RenewCollabSim.Entites.SimulationNetInstance,
+                where: n.simulation_id == ^simulation_id
+              )
+            )
+            |> Ecto.Multi.delete_all(
+              :reset_logs_initial,
+              from(l in RenewCollabSim.Entites.SimulationLogEntry,
+                where: l.simulation_id == ^simulation_id
+              )
+            )
+            |> Ecto.Multi.update_all(
+              :reset_timestep_initial,
+              from(sim in RenewCollabSim.Entites.Simulation,
+                where: sim.id == ^simulation_id,
+                update: [set: [timestep: 0]]
+              ),
+              []
+            )}
        }}
     rescue
       _ ->
