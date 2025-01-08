@@ -52,6 +52,31 @@ defmodule RenewCollabWeb.HierarchyLayerBoxComponent do
               </g>
           <% end %>
           <% else _ -> %>
+            <rect
+              id={"_loading-#{@layer.box.id}"}
+              x={@layer.box.position_x}
+              y={@layer.box.position_y}
+              width={@layer.box.width}
+              height={@layer.box.height}
+              fill-opacity="0.4"
+              stroke="black"
+              opacity="0.5"
+              stroke-width="3"
+              vector-effect="non-scaling-stroke"
+              stroke-dasharray="4 4"
+            >
+            </rect>
+            <text
+              x={@layer.box.position_x + @layer.box.width / 2}
+              y={@layer.box.position_y + @layer.box.height / 2}
+              font-size="12"
+              text-anchor="middle"
+              dominant-baseline="center"
+              font-family="monospace"
+              pointer-events="none"
+            >
+              Loading Shape
+            </text>
         <% end %>
       <% else %>
         <%= case style_or_default(@layer, :background_url) do %>

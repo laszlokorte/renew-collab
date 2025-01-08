@@ -150,7 +150,7 @@ defmodule RenewCollabWeb.LiveDocument do
                             <% end %>
                           </select>
                           <% else _ -> %>
-                            Loading
+                            Loading...
                         <% end %>
                       </div>
                     </th>
@@ -184,7 +184,7 @@ defmodule RenewCollabWeb.LiveDocument do
                                     <% end %>
                                   </select>
                                   <% else _ -> %>
-                                    Loading
+                                    Loading...
                                 <% end %>
 
                                 <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: socket_schemas} <- @socket_schemas do %>
@@ -198,7 +198,7 @@ defmodule RenewCollabWeb.LiveDocument do
                                     <% end %>
                                   </select>
                                   <% else _ -> %>
-                                    Loading
+                                    Loading...
                                 <% end %>
                                 <button>Connect</button>
                               </form>
@@ -286,6 +286,24 @@ defmodule RenewCollabWeb.LiveDocument do
           Make Space
         </button>
 
+        <div style="display: flex; gap: 1ex; padding: 1ex 0; height: 2em; box-sizing: border-box">
+          <form target="" phx-change="insert_document">
+            <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: other_documents} <- @other_documents do %>
+              <select name="document_id" onchange="this.value=''">
+                <option value="" selected>Insert Other Document</option>
+
+                <%= for doc <- other_documents, doc.id != @document.id do %>
+                  <option value={doc.id}>{doc.name}</option>
+                <% end %>
+              </select>
+              <% else _ -> %>
+                <select readonly="readonly" disabled="disabled" inert>
+                  <option value="" selected disabled="disabled">Loading Document Picker...</option>
+                </select>
+            <% end %>
+          </form>
+        </div>
+
         <div style="display: flex; gap: 1ex; padding: 1ex 0">
           <button
             type="button"
@@ -322,20 +340,6 @@ defmodule RenewCollabWeb.LiveDocument do
           >
             Create Line
           </button>
-
-          <form target="" phx-change="insert_document">
-            <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: other_documents} <- @other_documents do %>
-              <select name="document_id" onchange="this.value=''">
-                <option value="" selected>Insert Other Document</option>
-
-                <%= for doc <- other_documents, doc.id != @document.id do %>
-                  <option value={doc.id}>{doc.name}</option>
-                <% end %>
-              </select>
-              <% else _ -> %>
-                Loading...
-            <% end %>
-          </form>
         </div>
 
         <div style="display: flex; gap: 1ex; padding: 1ex 0">

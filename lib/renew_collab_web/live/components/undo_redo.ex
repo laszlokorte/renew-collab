@@ -41,7 +41,7 @@ defmodule RenewCollabWeb.UndoRedoComponent do
                 Redo
               </button>
             <% more -> %>
-              <div style="display: flex; flex-direction: column; gap: 0.5ex; align-self: stretch;">
+              <div style="max-height: 2em; overflow: visible; position: relative; z-index: 3; display: flex; flex-direction: column; gap: 0.5ex; align-self: stretch;">
                 <%= for {suc_id, i} <- more|>Enum.with_index do %>
                   <button
                     style="flex-grow: 1;width: 6em; justify-content: stretch; cursor: pointer;padding: 0.3ex 1ex; border: none; background: #eff; color: #000"

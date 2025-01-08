@@ -212,7 +212,8 @@ defmodule RenewCollabSim.Server.SimulationServer do
   @impl true
   # handle the trapped exit call
   def handle_info({:EXIT, _from, reason}, state) do
-    cleanup(reason, state)
+    dbg("xxx")
+    # cleanup(reason, state)
     # see GenServer docs for other return types
     {:stop, reason, state}
   end
