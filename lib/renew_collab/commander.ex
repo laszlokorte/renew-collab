@@ -88,6 +88,9 @@ defmodule RenewCollab.Commander do
 
             {:ok, values}
         end
+
+      other ->
+        other
     end
   end
 end

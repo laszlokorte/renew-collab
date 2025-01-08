@@ -35,10 +35,14 @@ defmodule RenewCollab.Commands.ReorderLayerRelative do
       relative: relative_direction
     })
     |> RenewCollab.Queries.LayerHierarchyRelative.multi()
-    |> Ecto.Multi.merge(fn
-      %{result: nil} ->
-        raise "can not move"
+    |> Ecto.Multi.run(:valid_move, fn
+      _, %{result: nil} ->
+        {:error, :not_valid}
 
+      _, %{result: _target_id} ->
+        {:ok, true}
+    end)
+    |> Ecto.Multi.merge(fn
       %{result: target_id} ->
         RenewCollab.Commands.ReorderLayer.new(%{
           document_id: document_id,
