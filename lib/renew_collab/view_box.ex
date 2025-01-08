@@ -52,26 +52,15 @@ defmodule RenewCollab.ViewBox do
             nil ->
               []
 
-            b ->
-              keep_blanks =
-                get_in(b, [Access.key(:style, %{}), Access.key(:blank_lines, %{})]) || false
-
+            %{size_hint: hint} = t ->
               [
-                {b.position_x, b.position_y},
-                {b.position_x,
-                 b.position_y +
-                   (get_in(b, [Access.key(:style, %{}), Access.key(:font_size, %{})]) || 12) * 1.5 *
-                     (b.body
-                      |> String.split("\n")
-                      |> Enum.filter(&(keep_blanks || not blank?(&1)))
-                      |> Enum.count())},
-                {b.position_x +
-                   (get_in(b, [Access.key(:style, %{}), Access.key(:font_size, %{})]) || 12) *
-                     (b.body
-                      |> String.split("\n")
-                      |> Enum.map(&String.length(&1))
-                      |> Enum.max()), b.position_y}
+                {t.position_x, t.position_y},
+                {hint.position_x + hint.width, hint.position_y + hint.height},
+                {hint.position_x, hint.position_y}
               ]
+
+            t = %{} ->
+              [{t.position_x, t.position_y}]
           end)
 
         points = Enum.concat([text_points, edge_points, box_points])
