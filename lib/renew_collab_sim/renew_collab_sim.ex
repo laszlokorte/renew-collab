@@ -181,6 +181,21 @@ defmodule RenewCollabSim.Simulator do
     end
   end
 
+  def create_simulation(shadow_net_system_id) do
+    %RenewCollabSim.Entites.Simulation{
+      shadow_net_system_id: shadow_net_system_id
+    }
+    |> Repo.insert()
+    |> tap(fn
+      {:ok, %{id: simulation_id}} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "simulations",
+          {:simulation_change, simulation_id, :state}
+        )
+    end)
+  end
+
   def change_main_net(sns_id, main_net_name) do
     find_shadow_net_system(sns_id)
     |> Ecto.Changeset.change(%{main_net_name: main_net_name})

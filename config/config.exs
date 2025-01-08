@@ -22,6 +22,8 @@ defmodule DbAdapter do
   end
 end
 
+config :renew_collab, :app_titel, System.get_env("RENEW_APP_TITEL") || "Renew Web Editor (Dev)"
+
 config :renew_collab, :db_adapter, DbAdapter.choose("RENEW_DOCS_DB_TYPE")
 config :renew_collab, :db_auth_adapter, DbAdapter.choose("RENEW_ACCOUNT_DB_TYPE")
 config :renew_collab, :db_sim_adapter, DbAdapter.choose("RENEW_SIM_DB_TYPE")

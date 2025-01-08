@@ -2,6 +2,11 @@ defmodule RenewCollabWeb.RenewComponents do
   use Phoenix.Component
   use RenewCollabWeb, :verified_routes
 
+  @app_titel Application.compile_env(:renew_collab, :app_titel)
+  defp app_titel() do
+    @app_titel
+  end
+
   attr :blank, :boolean, default: false
   attr :logout, :boolean, default: false
 
@@ -10,7 +15,7 @@ defmodule RenewCollabWeb.RenewComponents do
     <header style="background: #333; color: #fff; padding: 1em; display: flex; justify-content: space-between; font-family: monospace;">
       <.link style="color: white; align-self: center; text-decoration: none" navigate={~p"/"}>
         <h1 style="margin: 0; font-size: 1.3em; display: flex; align-items: center; gap: 1ex">
-          <img src="/favicon.svg" style="width: 1.5em; height: 1.5em" /> Petri Station Admin Panel
+          <img src="/favicon.svg" style="width: 1.5em; height: 1.5em" /> {app_titel()}
         </h1>
       </.link>
       <%= if not @blank do %>

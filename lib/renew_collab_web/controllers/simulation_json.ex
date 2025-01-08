@@ -58,6 +58,14 @@ defmodule RenewCollabWeb.SimulationJSON do
         socket_schemas: %{
           href: url(~p"/api/socket_schemas"),
           method: "GET"
+        },
+        shadow_net_compiled: %{
+          href: url(~p"/api/shadow_net_system/#{simulation.shadow_net_system_id}/download"),
+          method: "GET"
+        },
+        duplicate: %{
+          href: url(~p"/api/shadow_net_system/#{simulation.shadow_net_system_id}/simulate"),
+          method: "POST"
         }
       },
       content: show_content(simulation, running, nil)
@@ -182,6 +190,14 @@ defmodule RenewCollabWeb.SimulationJSON do
         delete: %{
           href: url(~p"/api/simulations/#{simulation}"),
           method: "DELETE"
+        },
+        shadow_net_compiled: %{
+          href: url(~p"/api/shadow_net_system/#{simulation.shadow_net_system_id}/download"),
+          method: "GET"
+        },
+        duplicate: %{
+          href: url(~p"/api/shadow_net_system/#{simulation.shadow_net_system_id}/simulate"),
+          method: "POST"
         }
       },
       content: %{

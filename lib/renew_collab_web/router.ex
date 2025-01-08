@@ -81,6 +81,8 @@ defmodule RenewCollabWeb.Router do
     end
 
     get "/shadow_net_system/:id", SimulationController, :show_sns
+    get "/shadow_net_system/:id/download", ShadowNetController, :download
+    post "/shadow_net_system/:id/simulate", ShadowNetController, :create_simulation
   end
 
   scope "/", RenewCollabWeb do

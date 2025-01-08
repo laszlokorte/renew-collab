@@ -87,7 +87,4 @@ defmodule RenewCollab.ViewBox do
   def into_string(%ViewBox{x: x, y: y, width: width, height: height}) do
     "#{x} #{y} #{width} #{height}"
   end
-
-  defp blank?(str_or_nil),
-    do: "" == str_or_nil |> to_string() |> String.trim()
 end
