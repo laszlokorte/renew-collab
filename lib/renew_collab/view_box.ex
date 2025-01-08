@@ -52,7 +52,7 @@ defmodule RenewCollab.ViewBox do
             nil ->
               []
 
-            %{size_hint: hint} = t ->
+            %{size_hint: %{}} = t ->
               [
                 {t.position_x, t.position_y},
                 {hint.position_x + hint.width, hint.position_y + hint.height},
