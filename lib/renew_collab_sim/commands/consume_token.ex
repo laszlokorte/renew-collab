@@ -42,11 +42,6 @@ defmodule RenewCollabSim.Commands.ConsumeToken do
             t.simulation_id == ^simulation_id and
             i.label == ^"#{instance_name}[#{instance_number}]"
       )
-      |> then(fn q ->
-        Ecto.Adapters.SQL.to_sql(:all, Repo, q)
-
-        q
-      end)
     )
     |> Ecto.Multi.delete_all(
       {step_counter, :remove_tokens},
