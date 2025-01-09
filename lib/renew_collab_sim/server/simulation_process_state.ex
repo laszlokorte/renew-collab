@@ -1,4 +1,6 @@
 defmodule RenewCollabSim.Server.SimulationProcess.State do
+  alias RenewCollabSim.Repo
+
   defstruct [
     :simulation,
     :simulation_id,
@@ -34,19 +36,19 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
             |> Ecto.Multi.delete_all(
               :reset_net_instances_initial,
               from(n in RenewCollabSim.Entites.SimulationNetInstance,
-                where: n.simulation_id == ^(simulation.id)
+                where: n.simulation_id == ^simulation.id
               )
             )
             |> Ecto.Multi.delete_all(
               :reset_logs_initial,
               from(l in RenewCollabSim.Entites.SimulationLogEntry,
-                where: l.simulation_id == ^(simulation.id)
+                where: l.simulation_id == ^simulation.id
               )
             )
             |> Ecto.Multi.update_all(
               :reset_timestep_initial,
               from(sim in RenewCollabSim.Entites.Simulation,
-                where: sim.id == ^(simulation.id),
+                where: sim.id == ^simulation.id,
                 update: [set: [timestep: 0]]
               ),
               []
@@ -97,5 +99,34 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
 
   def step(%__MODULE__{sim_process: sim_process}) do
     send(sim_process, {:command, "simulation step\n"})
+  end
+
+  def append_command(
+        state = %{open_multi: {om_counter, open_multi}},
+        %{__struct__: module} = command
+      ) do
+    new_multi =
+      module
+      |> apply(:multi, [command, om_counter])
+      |> Ecto.Multi.prepend(open_multi)
+
+    %{state | open_multi: {om_counter + 1, new_multi}}
+  end
+
+  def commit(state, mode \\ :strict)
+
+  def commit(%{open_multi: {_, open_multi}} = state, :strict) do
+    open_multi |> Repo.transaction()
+    %{state | open_multi: {0, Ecto.Multi.new()}}
+  end
+
+  def commit(%{open_multi: {_, open_multi}} = state, :try) do
+    try do
+      open_multi |> Repo.transaction()
+    rescue
+      Ecto.ConstraintError -> {}
+    end
+
+    %{state | open_multi: {0, Ecto.Multi.new()}}
   end
 end
