@@ -10,6 +10,8 @@ if test -n "${RENEW_ADMIN_EMAIL-""}" && test -n "${RENEW_ADMIN_PASSWORD-""}"; th
 ./renew_collab eval "RenewCollab.Release.create_account(\"$RENEW_ADMIN_EMAIL\", \"$RENEW_ADMIN_PASSWORD\")"
 fi
 
+[ -e /tmp/.X23-lock ] && rm -f /tmp/.X23-lock
+
 /usr/bin/Xvfb "$SIM_XVBF_DISPLAY" -screen 0 640x480x8 -nolisten tcp &
 
 
