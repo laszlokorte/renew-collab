@@ -142,6 +142,7 @@ RUN chmod +x /app/bin/server
 RUN chmod +x /app/bin/migrate
 RUN chmod +x /text_metrics/TextMeasure.java
 
+VOLUME ["${DATA_ROOT_PATH}"]
 
 RUN mkdir "${DATA_ROOT_PATH}"
 RUN chown -R nobody:nogroup "${DATA_ROOT_PATH}"
