@@ -1,6 +1,8 @@
 docker-build:
   # Use the official docker image.
   image: docker:cli
+  tags:
+    - docker
   stage: build
   services:
     - docker:dind
