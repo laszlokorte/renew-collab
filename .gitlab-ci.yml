@@ -1,4 +1,7 @@
-docker-build:
+stages:
+  - build
+
+build-sqlite-all:
   # Use the official docker image.
   image: docker:cli
   tags:
@@ -7,18 +10,77 @@ docker-build:
   services:
     - docker:dind
   variables:
-    DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+    DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE:sqlite-all-$CI_COMMIT_REF_SLUG
+    CI_REGISTRY_IMAGE_LATEST: $CI_REGISTRY_IMAGE:sqlite-all-latest
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
   # All branches are tagged with $DOCKER_IMAGE_NAME (defaults to commit ref slug)
   # Default branch is also tagged with `latest`
   script:
-    - docker build --build-arg RENEW_ACCOUNT_DB_TYPE=sqlite  --build-arg RENEW_DOCS_DB_TYPE=sqlite  --build-arg RENEW_SIM_DB_TYPE=sqlite --pull -t "$DOCKER_IMAGE_NAME" .
+    - docker build --build-arg RENEW_ACCOUNT_DB_TYPE=sqlite --build-arg RENEW_DOCS_DB_TYPE=sqlite  --build-arg RENEW_SIM_DB_TYPE=sqlite --pull -t "$DOCKER_IMAGE_NAME" .
     - docker push "$DOCKER_IMAGE_NAME"
     - |
       if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
-        docker tag "$DOCKER_IMAGE_NAME" "$CI_REGISTRY_IMAGE:latest"
-        docker push "$CI_REGISTRY_IMAGE:latest"
+        docker tag "$DOCKER_IMAGE_NAME" "$CI_REGISTRY_IMAGE_LATEST"
+        docker push "$CI_REGISTRY_IMAGE_LATEST"
+      fi
+  # Run this job in a branch where a Dockerfile exists
+  rules:
+    - if: $CI_COMMIT_BRANCH
+      exists:
+        - Dockerfile
+
+build-mysql-all:
+  # Use the official docker image.
+  image: docker:cli
+  tags:
+    - docker
+  stage: build
+  services:
+    - docker:dind
+  variables:
+    DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE:mysql-all-$CI_COMMIT_REF_SLUG
+    CI_REGISTRY_IMAGE_LATEST: $CI_REGISTRY_IMAGE:mysql-all-latest
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+  # All branches are tagged with $DOCKER_IMAGE_NAME (defaults to commit ref slug)
+  # Default branch is also tagged with `latest`
+  script:
+    - docker build --build-arg RENEW_ACCOUNT_DB_TYPE=mysql --build-arg RENEW_DOCS_DB_TYPE=mysql  --build-arg RENEW_SIM_DB_TYPE=mysql --pull -t "$DOCKER_IMAGE_NAME" .
+    - docker push "$DOCKER_IMAGE_NAME"
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        docker tag "$DOCKER_IMAGE_NAME" "$CI_REGISTRY_IMAGE_LATEST"
+        docker push "$CI_REGISTRY_IMAGE_LATEST"
+      fi
+  # Run this job in a branch where a Dockerfile exists
+  rules:
+    - if: $CI_COMMIT_BRANCH
+      exists:
+        - Dockerfile
+
+build-postgresql-all:
+  # Use the official docker image.
+  image: docker:cli
+  tags:
+    - docker
+  stage: build
+  services:
+    - docker:dind
+  variables:
+    DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE:postgresql-all-$CI_COMMIT_REF_SLUG
+    CI_REGISTRY_IMAGE_LATEST: $CI_REGISTRY_IMAGE:postgresql-all-latest
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+  # All branches are tagged with $DOCKER_IMAGE_NAME (defaults to commit ref slug)
+  # Default branch is also tagged with `latest`
+  script:
+    - docker build --build-arg RENEW_ACCOUNT_DB_TYPE=postgresql --build-arg RENEW_DOCS_DB_TYPE=postgresql  --build-arg RENEW_SIM_DB_TYPE=postgresql --pull -t "$DOCKER_IMAGE_NAME" .
+    - docker push "$DOCKER_IMAGE_NAME"
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        docker tag "$DOCKER_IMAGE_NAME" "$CI_REGISTRY_IMAGE_LATEST"
+        docker push "$CI_REGISTRY_IMAGE_LATEST"
       fi
   # Run this job in a branch where a Dockerfile exists
   rules:
