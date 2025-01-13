@@ -144,7 +144,7 @@ RUN chmod +x /text_metrics/TextMeasure.java
 
 VOLUME ["${DATA_ROOT_PATH}"]
 
-RUN mkdir "${DATA_ROOT_PATH}"
+RUN mkdir -p "${DATA_ROOT_PATH}"
 RUN chown -R nobody:nogroup "${DATA_ROOT_PATH}"
 RUN chmod 1777 /tmp
 RUN mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix && chown root:root /tmp/.X11-unix
