@@ -1,89 +1,93 @@
 stages:
-  - build
+   - build
 
 build-sqlite-all:
-  # Use the official docker image.
-  image: docker:cli
-  tags:
-    - docker
   stage: build
-  services:
-    - docker:dind
+  image:
+    name: gcr.io/kaniko-project/executor:v1.23.2-debug
+    entrypoint: [""]
   variables:
-    DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE:sqlite-all-$CI_COMMIT_REF_SLUG
-    CI_REGISTRY_IMAGE_LATEST: $CI_REGISTRY_IMAGE:sqlite-all-latest
-  before_script:
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-  # All branches are tagged with $DOCKER_IMAGE_NAME (defaults to commit ref slug)
-  # Default branch is also tagged with `latest`
+    RENEW_ACCOUNT_DB_TYPE: sqlite
+    RENEW_DOCS_DB_TYPE: sqlite
+    RENEW_SIM_DB_TYPE: sqlite
+
+    IMAGE_TAG: $CI_REGISTRY_IMAGE:sqlite-all-latest
+    DOCKER_FILE: Dockerfile
+
+    KANIKO_REGISTRY_CREDS: >-
+      {"auths":{
+        "$CI_REGISTRY":{
+          "username": "$CI_REGISTRY_USER",
+          "password": "$CI_REGISTRY_PASSWORD"}}}
   script:
-    - docker build --build-arg RENEW_ACCOUNT_DB_TYPE=sqlite --build-arg RENEW_DOCS_DB_TYPE=sqlite  --build-arg RENEW_SIM_DB_TYPE=sqlite --pull -t "$DOCKER_IMAGE_NAME" .
-    - docker push "$DOCKER_IMAGE_NAME"
-    - |
-      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
-        docker tag "$DOCKER_IMAGE_NAME" "$CI_REGISTRY_IMAGE_LATEST"
-        docker push "$CI_REGISTRY_IMAGE_LATEST"
-      fi
-  # Run this job in a branch where a Dockerfile exists
-  rules:
-    - if: $CI_COMMIT_BRANCH
-      exists:
-        - Dockerfile
+    - echo "$KANIKO_REGISTRY_CREDS" > /kaniko/.docker/config.json
+    - /kaniko/executor
+      --context "$CI_PROJECT_DIR"
+      --build-arg "RENEW_ACCOUNT_DB_TYPE=$RENEW_ACCOUNT_DB_TYPE"
+      --build-arg "RENEW_DOCS_DB_TYPE=$RENEW_DOCS_DB_TYPE"
+      --build-arg "RENEW_SIM_DB_TYPE=$RENEW_SIM_DB_TYPE"
+      --dockerfile "$DOCKER_FILE"
+      --destination "$IMAGE_TAG"
+  tags:
+    - tgi
 
 build-mysql-all:
-  # Use the official docker image.
-  image: docker:cli
-  tags:
-    - docker
   stage: build
-  services:
-    - docker:dind
+  image:
+    name: gcr.io/kaniko-project/executor:v1.23.2-debug
+    entrypoint: [""]
   variables:
-    DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE:mysql-all-$CI_COMMIT_REF_SLUG
-    CI_REGISTRY_IMAGE_LATEST: $CI_REGISTRY_IMAGE:mysql-all-latest
-  before_script:
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-  # All branches are tagged with $DOCKER_IMAGE_NAME (defaults to commit ref slug)
-  # Default branch is also tagged with `latest`
+    RENEW_ACCOUNT_DB_TYPE: mysql
+    RENEW_DOCS_DB_TYPE: mysql
+    RENEW_SIM_DB_TYPE: mysql
+
+    IMAGE_TAG: $CI_REGISTRY_IMAGE:mysql-all-latest
+    DOCKER_FILE: Dockerfile
+
+    KANIKO_REGISTRY_CREDS: >-
+      {"auths":{
+        "$CI_REGISTRY":{
+          "username": "$CI_REGISTRY_USER",
+          "password": "$CI_REGISTRY_PASSWORD"}}}
   script:
-    - docker build --build-arg RENEW_ACCOUNT_DB_TYPE=mysql --build-arg RENEW_DOCS_DB_TYPE=mysql  --build-arg RENEW_SIM_DB_TYPE=mysql --pull -t "$DOCKER_IMAGE_NAME" .
-    - docker push "$DOCKER_IMAGE_NAME"
-    - |
-      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
-        docker tag "$DOCKER_IMAGE_NAME" "$CI_REGISTRY_IMAGE_LATEST"
-        docker push "$CI_REGISTRY_IMAGE_LATEST"
-      fi
-  # Run this job in a branch where a Dockerfile exists
-  rules:
-    - if: $CI_COMMIT_BRANCH
-      exists:
-        - Dockerfile
+    - echo "$KANIKO_REGISTRY_CREDS" > /kaniko/.docker/config.json
+    - /kaniko/executor
+      --context "$CI_PROJECT_DIR"
+      --build-arg "RENEW_ACCOUNT_DB_TYPE=$RENEW_ACCOUNT_DB_TYPE"
+      --build-arg "RENEW_DOCS_DB_TYPE=$RENEW_DOCS_DB_TYPE"
+      --build-arg "RENEW_SIM_DB_TYPE=$RENEW_SIM_DB_TYPE"
+      --dockerfile "$DOCKER_FILE"
+      --destination "$IMAGE_TAG"
+  tags:
+    - tgi
+
 
 build-postgresql-all:
-  # Use the official docker image.
-  image: docker:cli
-  tags:
-    - docker
   stage: build
-  services:
-    - docker:dind
+  image:
+    name: gcr.io/kaniko-project/executor:v1.23.2-debug
+    entrypoint: [""]
   variables:
-    DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE:postgresql-all-$CI_COMMIT_REF_SLUG
-    CI_REGISTRY_IMAGE_LATEST: $CI_REGISTRY_IMAGE:postgresql-all-latest
-  before_script:
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-  # All branches are tagged with $DOCKER_IMAGE_NAME (defaults to commit ref slug)
-  # Default branch is also tagged with `latest`
+    RENEW_ACCOUNT_DB_TYPE: postgresql
+    RENEW_DOCS_DB_TYPE: postgresql
+    RENEW_SIM_DB_TYPE: postgresql
+
+    IMAGE_TAG: $CI_REGISTRY_IMAGE:postgresql-all-latest
+    DOCKER_FILE: Dockerfile
+
+    KANIKO_REGISTRY_CREDS: >-
+      {"auths":{
+        "$CI_REGISTRY":{
+          "username": "$CI_REGISTRY_USER",
+          "password": "$CI_REGISTRY_PASSWORD"}}}
   script:
-    - docker build --build-arg RENEW_ACCOUNT_DB_TYPE=postgresql --build-arg RENEW_DOCS_DB_TYPE=postgresql  --build-arg RENEW_SIM_DB_TYPE=postgresql --pull -t "$DOCKER_IMAGE_NAME" .
-    - docker push "$DOCKER_IMAGE_NAME"
-    - |
-      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
-        docker tag "$DOCKER_IMAGE_NAME" "$CI_REGISTRY_IMAGE_LATEST"
-        docker push "$CI_REGISTRY_IMAGE_LATEST"
-      fi
-  # Run this job in a branch where a Dockerfile exists
-  rules:
-    - if: $CI_COMMIT_BRANCH
-      exists:
-        - Dockerfile
+    - echo "$KANIKO_REGISTRY_CREDS" > /kaniko/.docker/config.json
+    - /kaniko/executor
+      --context "$CI_PROJECT_DIR"
+      --build-arg "RENEW_ACCOUNT_DB_TYPE=$RENEW_ACCOUNT_DB_TYPE"
+      --build-arg "RENEW_DOCS_DB_TYPE=$RENEW_DOCS_DB_TYPE"
+      --build-arg "RENEW_SIM_DB_TYPE=$RENEW_SIM_DB_TYPE"
+      --dockerfile "$DOCKER_FILE"
+      --destination "$IMAGE_TAG"
+  tags:
+    - tgi
