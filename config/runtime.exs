@@ -182,6 +182,12 @@ if config_env() == :prod do
     config :renew_collab, RenewCollabWeb.Endpoint, force_ssl: [hsts: true]
   end
 
+  app_title = System.get_env("RENEW_APP_TITEL")
+
+  if app_title do
+    config :renew_collab, :app_titel, app_title
+  end
+
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key

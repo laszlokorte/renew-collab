@@ -2,9 +2,8 @@ defmodule RenewCollabWeb.RenewComponents do
   use Phoenix.Component
   use RenewCollabWeb, :verified_routes
 
-  @app_titel Application.compile_env(:renew_collab, :app_titel)
   defp app_titel() do
-    @app_titel
+    Application.get_env(:renew_collab, :app_titel)
   end
 
   attr :blank, :boolean, default: false
