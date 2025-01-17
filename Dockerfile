@@ -20,6 +20,7 @@ ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
 
 ARG JAVA_VERSION="17"
 ARG JAVA_BUILDER_IMAGE="eclipse-temurin:${JAVA_VERSION}"
+ARG RENEW_IMAGE="git.informatik.uni-hamburg.de:4567/tgi/paose/renew:modular"
 
 FROM ${BUILDER_IMAGE} AS builder
 
@@ -85,13 +86,15 @@ ADD priv/simulation/manifest.txt manifest.txt
 RUN javac Interceptor.java && jar cmf manifest.txt Interceptor.jar Interceptor.class
 RUN java -jar Interceptor.jar echo
 
+FROM ${RENEW_IMAGE} AS renew_build
+
 # start a new build stage so that the final image will only contain
 # the compiled release and other runtime necessities
 FROM ${RUNNER_IMAGE}
 
 
-ARG RENEW_DOWNLOAD_URL="https://www2.informatik.uni-hamburg.de/TGI/renew/4.1/renew4.1base.zip"
-ARG RENEW_DOWNLOAD_TARGET="/tmp/renew-download.zip"
+# ARG RENEW_DOWNLOAD_URL="https://www2.informatik.uni-hamburg.de/TGI/renew/4.1/renew4.1base.zip"
+# ARG RENEW_DOWNLOAD_TARGET="/tmp/renew-download.zip"
 ARG JAVA_VERSION="17"
 
 ARG DATA_ROOT_PATH="/data"
@@ -111,16 +114,17 @@ ENV PATH="$JAVA_HOME/bin:$PATH"
 
 RUN java --version
 
-COPY --from=java_builder /interceptor/Interceptor.jar "./Interceptor.jar"
+COPY --chmod=0755 --from=java_builder /interceptor/Interceptor.jar "./Interceptor.jar"
 COPY priv/simulation/log4j.properties "./log4j.properties"
 
-RUN mkdir -p ./renew && \
-    wget ${RENEW_DOWNLOAD_URL} -O ${RENEW_DOWNLOAD_TARGET} && \
-    unzip ${RENEW_DOWNLOAD_TARGET} -d ./renew && \
-    rm ${RENEW_DOWNLOAD_TARGET} && chown -R nobody:nogroup .
+COPY --from=renew_build --chmod=0755 /opt/ART/Renew/dist ./renew
+# RUN mkdir -p ./renew && \
+#     wget ${RENEW_DOWNLOAD_URL} -O ${RENEW_DOWNLOAD_TARGET} && \
+#     unzip ${RENEW_DOWNLOAD_TARGET} -d ./renew && \
+#     rm ${RENEW_DOWNLOAD_TARGET} && chown -R nobody:nogroup .
 
 WORKDIR /text_metrics
-COPY --chown=nobody:root priv/text_metrics/TextMeasure.java "./TextMeasure.java"
+COPY --chmod=0755 priv/text_metrics/TextMeasure.java "./TextMeasure.java"
 
 # Set the locale
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
@@ -136,7 +140,7 @@ RUN chown nobody:nogroup /app
 ENV MIX_ENV="prod"
 
 # Only copy the final release from the build stage
-COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/renew_collab ./
+COPY --from=builder /app/_build/${MIX_ENV}/rel/renew_collab ./
 
 RUN chmod +x /app/bin/server
 RUN chmod +x /app/bin/migrate

@@ -68,7 +68,7 @@ defmodule RenewCollabSim.Script.Runner do
                   do: [{to_charlist("DISPLAY"), to_charlist(xvbf_display)}],
                   else: []
                 ),
-              cd: Path.dirname(Path.absname(renew_path)),
+              cd: "/tmp",
               args:
                 [
                   "-jar",
@@ -134,7 +134,7 @@ defmodule RenewCollabSim.Script.Runner do
                 do: [{to_charlist("DISPLAY"), to_charlist(xvbf_display)}],
                 else: []
               ),
-            cd: Path.dirname(Path.absname(renew_path)),
+            cd: "/tmp",
             args:
               [
                 "-jar",

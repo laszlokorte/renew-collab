@@ -18,14 +18,14 @@ docker build -t renew_collab:latest .
 ### Run Container
 
 ```sh 
-docker run\
--e PHX_HOST="localhost"\
--e PORT="8080"\
--e PORT_EXTERNAL="9000"\
--e RENEW_ADMIN_EMAIL="your@email.net"\
--e RENEW_ADMIN_PASSWORD="your_password"\
--e SECRET_KEY_BASE="$(mix phx.gen.secret)"\
--p 9000:8080\
+docker run \
+-e PHX_HOST="localhost" \
+-e PORT="8080" \
+-e PORT_EXTERNAL="9000" \
+-e RENEW_ADMIN_EMAIL="your@email.net" \
+-e RENEW_ADMIN_PASSWORD="your_password" \
+-e SECRET_KEY_BASE="yLJm+iFU1ExOHIT3lSSafaC+XCTYklG67xDI2Qd6eAMD3XulUUYfg181Jci8idqN" \
+-p 9000:8080 \
 -it renew_collab
 ```
 
