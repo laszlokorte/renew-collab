@@ -17,4 +17,15 @@ defmodule RenewCollabWeb.HealthController do
       simulation_count: RenewCollabSim.Server.SimulationServer.count()
     )
   end
+
+  def simulator(conn, _params) do
+    RenewCollabSim.Script.Runner.check_status()
+    |> case do
+      {:ok, status, output} ->
+        render(conn, :simulator, %{
+          status: status,
+          output: output
+        })
+    end
+  end
 end

@@ -35,6 +35,16 @@
 
   <dd>{@number_of_media}</dd>
 
+  <dt>Java Simulator</dt>
+
+  <dd>
+    <.form :let={form} action={~p"/health/simulator"} method="post" for={%{}}>
+      <.button style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff">
+        Check
+      </.button>
+    </.form>
+  </dd>
+
   <dt>Hierarchy</dt>
 
   <dd>

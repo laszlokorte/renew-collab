@@ -1,0 +1,25 @@
+<RenewCollabWeb.RenewComponents.app_header />
+
+<div style="text-align: center; margin-top: 1em;">
+  <a href={~p"/health"}>Back</a>
+
+  <h2>Java Simulator Installation Status</h2>
+</div>
+
+<div style="margin: 1em">
+  <dl style="display: grid; grid-template-columns: auto auto; font-size: 1.2em; justify-content: start; gap: 1em">
+    <dt style="margin: 0">Process Exit Status:</dt>
+    <dd style="margin: 0">{@status}</dd>
+  </dl>
+
+  <div style="background: #333; color: #fff; font-family: monospace; margin: 0; padding: 1em;line-height: 1.7;">
+    <%= for o <- @output do %>
+      <%= case o do %>
+        <% {:eol, line} -> %>
+          {line}<br />
+        <% {:noeol, line} -> %>
+          {line}
+      <% end %>
+    <% end %>
+  </div>
+</div>

@@ -85,8 +85,9 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
     File.write!(sns_path, simulation.shadow_net_system.compiled)
 
     sim_process =
-      RenewCollabSim.Script.Runner.start_and_collect(script_path, fn log ->
+      RenewCollabSim.Script.Runner.start_and_collect(script_path, fn log, _ ->
         GenServer.cast(slf, {:log, log})
+        nil
       end)
 
     {sim_process, output_root}

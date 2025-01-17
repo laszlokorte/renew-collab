@@ -6,6 +6,7 @@ defmodule RenewCollabWeb.Router do
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
+    plug Plug.CSRFProtection
     plug :fetch_live_flash
     plug :put_root_layout, html: {RenewCollabWeb.Layouts, :root}
     plug :protect_from_forgery
@@ -108,6 +109,7 @@ defmodule RenewCollabWeb.Router do
     pipe_through [:browser, :authenticated, :is_admin]
 
     get "/health", HealthController, :index
+    post "/health/simulator", HealthController, :simulator
     get "/accounts", AccountsController, :index
     post "/accounts", AccountsController, :create
     delete "/accounts/:id", AccountsController, :delete

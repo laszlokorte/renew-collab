@@ -3,7 +3,7 @@ defmodule RenewCollabSim.Script.Runner do
     s = self()
 
     spawn_link(fn ->
-      result = exec(script_path)
+      {result, _} = exec(["script", script_path])
 
       send(s, {:finished, result})
     end)
@@ -14,11 +14,26 @@ defmodule RenewCollabSim.Script.Runner do
     end
   end
 
-  def start_and_collect(script_path, collector) do
+  def check_status(cmd \\ "packageCount") do
     s = self()
 
     spawn_link(fn ->
-      result = exec(script_path, collector)
+      {status, acc} = exec([cmd], nil, [])
+
+      send(s, {:finished, status, acc})
+    end)
+
+    receive do
+      {:finished, status, output} ->
+        {:ok, status, output}
+    end
+  end
+
+  def start_and_collect(script_path, collector, acc \\ nil) do
+    s = self()
+
+    spawn_link(fn ->
+      result = exec(["script", script_path], collector, acc)
       send(s, {:port, result})
     end)
 
@@ -28,7 +43,7 @@ defmodule RenewCollabSim.Script.Runner do
     end
   end
 
-  defp exec(script_path, collector \\ nil) do
+  defp exec(renew_cmd, collector \\ nil, acc \\ nil) do
     separator =
       case :os.type() do
         {:win32, _} -> ";"
@@ -47,6 +62,47 @@ defmodule RenewCollabSim.Script.Runner do
 
     # dbg(module_path)
 
+    port_config = [
+      :binary,
+      :eof,
+      :stream,
+      :stderr_to_stdout,
+      :exit_status,
+      :use_stdio,
+      :hide,
+      line: 2048,
+      env:
+        if(xvbf_display,
+          do: [{to_charlist("DISPLAY"), to_charlist(xvbf_display)}],
+          else: []
+        ),
+      cd: "/tmp",
+      args:
+        [
+          "-jar",
+          interceptor_path,
+          if(xvbf_path, do: xvbf_path, else: nil),
+          "java",
+          "-Dde.renew.plugin=ERROR,nullAppender",
+          "-Dlog4j.appender.nullAppender=org.apache.log4j.varia.NullAppender",
+          "-Dlog4j.configuration=#{log_conf_path}",
+          "-Djline.terminal=off",
+          "-Dorg.jline.terminal.dumb=true",
+          "-Dde.renew.splashscreen.enabled=false",
+          "-Dde.renew.gui.autostart=false",
+          "-Dde.renew.simulatorMode=-1",
+          "-Dde.renew.plugin.autoLoad=false",
+          "-Dde.renew.plugin.load=Renew Util, Renew Simulator, Renew Formalism, Renew Misc, Renew PTChannel, Renew Remote, Renew Window Management, Renew JHotDraw, Renew Gui, Renew Formalism Gui, Renew Logging, Renew NetComponents, Renew Console, Renew FreeHep Export",
+          # "-Dlog4j.debug=true",
+          "-p",
+          module_path,
+          "-m",
+          "de.renew.loader"
+          | renew_cmd
+        ]
+        |> Enum.reject(&is_nil/1)
+    ]
+
     if collector do
       slf = self()
 
@@ -54,47 +110,7 @@ defmodule RenewCollabSim.Script.Runner do
         port =
           Port.open(
             {:spawn_executable, System.find_executable("java")},
-            [
-              :binary,
-              :eof,
-              :stream,
-              :stderr_to_stdout,
-              :exit_status,
-              :use_stdio,
-              :hide,
-              line: 2048,
-              env:
-                if(xvbf_display,
-                  do: [{to_charlist("DISPLAY"), to_charlist(xvbf_display)}],
-                  else: []
-                ),
-              cd: "/tmp",
-              args:
-                [
-                  "-jar",
-                  interceptor_path,
-                  if(xvbf_path, do: xvbf_path, else: nil),
-                  "java",
-                  "-Dde.renew.plugin=ERROR,nullAppender",
-                  "-Dlog4j.appender.nullAppender=org.apache.log4j.varia.NullAppender",
-                  "-Dlog4j.configuration=#{log_conf_path}",
-                  "-Djline.terminal=off",
-                  "-Dorg.jline.terminal.dumb=true",
-                  "-Dde.renew.splashscreen.enabled=false",
-                  "-Dde.renew.gui.autostart=false",
-                  "-Dde.renew.simulatorMode=-1",
-                  "-Dde.renew.plugin.autoLoad=false",
-                  "-Dde.renew.plugin.load=Renew Util, Renew Simulator, Renew Formalism, Renew Misc, Renew PTChannel, Renew Remote, Renew Window Management, Renew JHotDraw, Renew Gui, Renew Formalism Gui, Renew Logging, Renew NetComponents, Renew Console, Renew FreeHep Export",
-                  # "-Dlog4j.debug=true",
-                  "-p",
-                  module_path,
-                  "-m",
-                  "de.renew.loader",
-                  "script",
-                  script_path
-                ]
-                |> Enum.reject(&is_nil/1)
-            ]
+            port_config
           )
 
         Process.link(port)
@@ -109,7 +125,7 @@ defmodule RenewCollabSim.Script.Runner do
 
         send(slf, {:commander, commander})
 
-        handle_output(port, 0, collector)
+        handle_output(port, 0, collector, acc)
       end)
 
       receive do
@@ -120,100 +136,63 @@ defmodule RenewCollabSim.Script.Runner do
       port =
         Port.open(
           {:spawn_executable, System.find_executable("java")},
-          [
-            :binary,
-            :eof,
-            :stream,
-            :stderr_to_stdout,
-            :exit_status,
-            :use_stdio,
-            :hide,
-            line: 2048,
-            env:
-              if(xvbf_display,
-                do: [{to_charlist("DISPLAY"), to_charlist(xvbf_display)}],
-                else: []
-              ),
-            cd: "/tmp",
-            args:
-              [
-                "-jar",
-                interceptor_path,
-                if(xvbf_path, do: xvbf_path, else: nil),
-                "java",
-                "-Dde.renew.plugin=ERROR,nullAppender",
-                "-Dlog4j.appender.nullAppender=org.apache.log4j.varia.NullAppender",
-                "-Dlog4j.configuration=#{log_conf_path}",
-                "-Djline.terminal=off",
-                "-Dorg.jline.terminal.dumb=true",
-                "-Dde.renew.splashscreen.enabled=false",
-                "-Dde.renew.gui.autostart=false",
-                "-Dde.renew.simulatorMode=-1",
-                "-Dde.renew.plugin.autoLoad=false",
-                "-Dde.renew.plugin.load=Renew Util, Renew Simulator, Renew Formalism, Renew Misc, Renew PTChannel, Renew Remote, Renew Window Management, Renew JHotDraw, Renew Gui, Renew Formalism Gui, Renew Logging, Renew NetComponents, Renew Console, Renew FreeHep Export",
-                # "-Dlog4j.debug=true",
-                "-p",
-                module_path,
-                "-m",
-                "de.renew.loader",
-                "script",
-                script_path
-              ]
-              |> Enum.reject(&is_nil/1)
-          ]
+          port_config
         )
 
       Process.link(port)
 
       Port.monitor(port)
-      handle_output(port, 0, collector)
+      handle_output(port, 0, collector, acc)
     end
   end
 
-  def handle_output(port, return \\ nil, collector \\ nil) do
+  def handle_output(port, return \\ nil, collector \\ nil, acc \\ nil) do
     receive do
       {^port, {:data, "ERROR: " <> _d} = data} ->
         # dbg("ABC1")
-        collect(collector, data)
         # dbg(data)
-        handle_output(port, 1, collector)
+        handle_output(port, 1, collector, collect(collector, data, acc))
 
       {^port, {:data, "Error occurred" <> _d} = data} ->
         # dbg("ABC2")
-        collect(collector, data)
         # dbg(data)
-        handle_output(port, 1, collector)
+        handle_output(port, 1, collector, collect(collector, data, acc))
 
       {^port, {:data, data}} ->
         # dbg("ABC3")
-        collect(collector, data)
+
         # dbg(data)
         # IO.write(data)
-        handle_output(port, return, collector)
+        handle_output(port, return, collector, collect(collector, data, acc))
 
       {^port, {:exit_status, status}} ->
         # dbg("ABC4")
-        handle_output(port, status, collector)
+        handle_output(port, status, collector, acc)
 
       {^port, :eof} ->
-        collect(collector, {:exit, return})
+        collect(collector, {:exit, return}, acc)
         # dbg("EXIT1")
-        return
+        {return, acc}
 
       {:EXIT, _, :normal} ->
         # dbg("EXIT2")
-        return
+        {return, acc}
 
       e ->
-        {:unexpected, e}
+        {:unexpected, e, acc}
     end
   end
 
-  defp collect(nil, _) do
+  defp collect(nil, _, nil) do
+    nil
   end
 
-  defp collect(func, data) do
-    func.(data)
+  defp collect(nil, data, acc) when is_list(acc) do
+    [data | acc]
+  end
+
+  defp collect(func, data, acc) do
+    func.(data, acc)
   end
 
   defp read_loop(port, s) do
