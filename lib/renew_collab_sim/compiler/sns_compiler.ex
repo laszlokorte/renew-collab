@@ -18,8 +18,9 @@ defmodule RenewCollabSim.Compiler.SnsCompiler do
 
       paths =
         for {name, content} <- nets do
-          {:ok, name} = Path.safe_relative_to(name, output_root_upload)
-          net_file_name = Path.absname(name, output_root_upload)
+          normalized_name = normalize_net_name(name)
+          {:ok, name} = Path.safe_relative_to(normalized_name, output_root_upload)
+          net_file_name = Path.absname(normalized_name, output_root_upload)
           File.write(net_file_name, content)
 
           net_file_name
@@ -44,5 +45,9 @@ defmodule RenewCollabSim.Compiler.SnsCompiler do
     after
       File.rm_rf(output_root_upload)
     end
+  end
+
+  def normalize_net_name(name) do
+    String.split(name, ".") |> List.first() |> String.trim()
   end
 end
