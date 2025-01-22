@@ -1,31 +1,43 @@
 defmodule RenewCollabSim.Script.Runner do
+  @timeout 10_000
+
   def start_and_wait(script_path) do
     s = self()
 
-    spawn_link(fn ->
-      {result, _} = exec(["script", script_path])
+    pid =
+      spawn_link(fn ->
+        {result, _} = exec(["script", script_path])
 
-      send(s, {:finished, result})
-    end)
+        send(s, {:finished, result})
+      end)
 
     receive do
       {:finished, result} ->
         {:ok, result}
+    after
+      @timeout ->
+        Process.exit(pid, :kill)
+        :timedout
     end
   end
 
-  def check_status(cmd \\ ["packageCount"]) do
+  def check_status(cmd \\ ["packageCount"], time_limit_ms \\ @timeout) do
     s = self()
 
-    spawn_link(fn ->
-      {status, acc} = exec(cmd, nil, [])
+    pid =
+      spawn_link(fn ->
+        {status, acc} = exec(cmd, nil, [])
 
-      send(s, {:finished, status, Enum.reverse(acc)})
-    end)
+        send(s, {:finished, status, Enum.reverse(acc)})
+      end)
 
     receive do
       {:finished, status, output} ->
         {:ok, status, output}
+    after
+      time_limit_ms ->
+        Process.exit(pid, :kill)
+        :timedout
     end
   end
 
