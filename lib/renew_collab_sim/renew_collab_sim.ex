@@ -12,6 +12,8 @@ defmodule RenewCollabSim.Simulator do
   alias RenewCollabSim.Entites.Simulation
   alias RenewCollabSim.Repo
 
+  @rnw_suffix ".rnw"
+
   def list_shadow_net_systems do
     Repo.all(
       from(s in ShadowNetSystem,
@@ -291,11 +293,11 @@ defmodule RenewCollabSim.Simulator do
       end
 
     with [{default_main_name, _, _} | _] <- nets,
-         main_name <- main_net_name || default_main_name,
+         main_name <- Path.rootname(main_net_name || default_main_name, @rnw_suffix),
          {:ok, content} <-
            RenewCollabSim.Compiler.SnsCompiler.compile(
              nets
-             |> Enum.map(fn {name, rnw, _} -> {name, rnw} end)
+             |> Enum.map(fn {name, rnw, _} -> {Path.rootname(name, @rnw_suffix), rnw} end)
            ),
          {:ok, %{id: sns_id}} <-
            %RenewCollabSim.Entites.ShadowNetSystem{}
