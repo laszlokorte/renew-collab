@@ -4,14 +4,20 @@ defmodule RenewCollabWeb.LiveShadowNets do
 
   @topic "shadow_nets"
 
+  @file_count_limit 10
+
+  def file_count_limit, do: @file_count_limit
+
   def mount(_params, _session, socket) do
     RenewCollabWeb.Endpoint.subscribe(@topic)
 
     socket =
       socket
       |> assign(:shadow_net_systems, RenewCollabSim.Simulator.list_shadow_net_systems())
-      |> assign(import_form: to_form(%{"main_net" => nil}))
-      |> allow_upload(:import_file, accept: ~w(.rnw), max_entries: 10)
+      |> assign(import_rnw_form: to_form(%{"main_net" => nil}))
+      |> assign(import_sns_form: to_form(%{"main_net" => nil}))
+      |> allow_upload(:import_rnw_file, accept: ~w(.rnw), max_entries: @file_count_limit)
+      |> allow_upload(:import_sns_file, accept: ~w(.sns), max_entries: 1)
 
     {:ok, socket}
   end
@@ -39,23 +45,23 @@ defmodule RenewCollabWeb.LiveShadowNets do
           </legend>
 
           <p>
-            Select up to 10 Renew files from your computer:
+            Select up to {file_count_limit()} Renew (.rnw) files from your computer:
           </p>
 
-          <.form for={@import_form} phx-submit="import_document" phx-change="validate">
+          <.form for={@import_rnw_form} phx-submit="import_rnw" phx-change="validate_rnw">
             <.live_file_input
-              upload={@uploads.import_file}
+              upload={@uploads.import_rnw_file}
               style="padding: 0.5em; background: #666; color: #fff; width: 100%; box-sizing: border-box;"
             />
-            <%= unless Enum.empty?(@uploads.import_file.entries) do %>
+            <%= unless Enum.empty?(@uploads.import_rnw_file.entries) do %>
               <dl style="display: grid; grid-template-columns: auto auto auto; justify-content: start; gap: 2px ; align-items: center">
-                <%= for entry <- @uploads.import_file.entries do %>
+                <%= for entry <- @uploads.import_rnw_file.entries do %>
                   <dt style="grid-column: 1; display: flex; gap: 1em">
                     <input
                       type="radio"
                       name="main_net"
                       value={entry.ref}
-                      checked={entry.ref == @import_form[:main_net].value}
+                      checked={entry.ref == @import_rnw_form[:main_net].value}
                     />
                     <button
                       style="justify-content: center; text-align: center; font-weight: bold; cursor: pointer; width: 1.8em; height: 1.8em; display: flex; place-items: center; border: none; background: #a33; color: #fff; border-radius: 100%;"
@@ -76,7 +82,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
 
                   <dd style="grid-column: 1 / span 3;">
                     <ul>
-                      <%= for err <- upload_errors(@uploads.import_file, entry) do %>
+                      <%= for err <- upload_errors(@uploads.import_rnw_file, entry) do %>
                         <li class="alert alert-danger">{error_to_string(err)}</li>
                       <% end %>
                     </ul>
@@ -86,12 +92,80 @@ defmodule RenewCollabWeb.LiveShadowNets do
             <% end %>
 
             <ul style="margin: 0; padding: 0;">
-              <%= for err <- upload_errors(@uploads.import_file) do %>
+              <%= for err <- upload_errors(@uploads.import_rnw_file) do %>
                 <li class="alert alert-danger">{error_to_string(err)}</li>
               <% end %>
             </ul>
 
-            <%= if @import_form[:main_net].value != nil and Enum.count(@uploads.import_file.entries) > 0 and Enum.count(@uploads.import_file.errors) == 0 do %>
+            <%= if @import_rnw_form[:main_net].value != nil and Enum.count(@uploads.import_rnw_file.entries) > 0 and Enum.count(@uploads.import_rnw_file.errors) == 0 do %>
+              <button
+                type="submit"
+                style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff; padding: 1ex"
+              >
+                Import
+              </button>
+            <% end %>
+          </.form>
+        </fieldset>
+
+        <fieldset style="margin-bottom: 1em">
+          <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
+            Import Shadow Net (.sns) File to Simulate
+          </legend>
+
+          <p>
+            Select a single Shadow Net System (sns) file<br />from your computer to import:
+          </p>
+
+          <.form for={@import_sns_form} phx-submit="import_sns" phx-change="validate_sns">
+            <.live_file_input
+              upload={@uploads.import_sns_file}
+              style="padding: 0.5em; background: #666; color: #fff; width: 100%; box-sizing: border-box;"
+            />
+            <%= unless Enum.empty?(@uploads.import_sns_file.entries) do %>
+              <dl style="display: grid; grid-template-columns: auto auto auto; justify-content: start; gap: 2px ; align-items: center">
+                <%= for entry <- @uploads.import_sns_file.entries do %>
+                  <dt style="grid-column: 1; display: flex; gap: 1em">
+                    <button
+                      style="justify-content: center; text-align: center; font-weight: bold; cursor: pointer; width: 1.8em; height: 1.8em; display: flex; place-items: center; border: none; background: #a33; color: #fff; border-radius: 100%;"
+                      type="button"
+                      phx-click="cancel-upload"
+                      phx-value-ref={entry.ref}
+                      aria-label="cancel"
+                    >
+                      &times;
+                    </button>
+                    {entry.client_name}
+                  </dt>
+
+                  <dd>
+                    <%!-- entry.progress will update automatically for in-flight entries --%>
+                    <progress value={entry.progress} max="100">{entry.progress}%</progress>
+                  </dd>
+
+                  <dd style="grid-column: 1 / span 3;">
+                    <ul>
+                      <%= for err <- upload_errors(@uploads.import_sns_file, entry) do %>
+                        <li class="alert alert-danger">{error_to_string(err)}</li>
+                      <% end %>
+                    </ul>
+                  </dd>
+                <% end %>
+              </dl>
+            <% end %>
+
+            <ul style="margin: 0; padding: 0;">
+              <%= for err <- upload_errors(@uploads.import_sns_file) do %>
+                <li class="alert alert-danger">{error_to_string(err)}</li>
+              <% end %>
+            </ul>
+
+            <label>
+              Main Net Name <br /> (required for running the simulation):
+              <.input field={@import_sns_form[:main_net]} />
+            </label>
+
+            <%= if @import_sns_form[:main_net].value != "" and Enum.count(@uploads.import_sns_file.entries) > 0 and Enum.count(@uploads.import_sns_file.errors) == 0 do %>
               <button
                 type="submit"
                 style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff; padding: 1ex"
@@ -196,9 +270,9 @@ defmodule RenewCollabWeb.LiveShadowNets do
     """
   end
 
-  def handle_event("validate", params, socket) do
+  def handle_event("validate_rnw", params, socket) do
     default_main =
-      socket.assigns.uploads.import_file.entries
+      socket.assigns.uploads.import_rnw_file.entries
       |> Enum.at(0)
       |> case do
         nil ->
@@ -211,7 +285,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
     {:noreply,
      socket
      |> assign(
-       import_form:
+       import_rnw_form:
          to_form(
            Map.update(params, "main_net", default_main, fn
              "" -> default_main
@@ -221,19 +295,25 @@ defmodule RenewCollabWeb.LiveShadowNets do
      )}
   end
 
+  def handle_event("validate_sns", params, socket) do
+    {:noreply,
+     socket
+     |> assign(import_sns_form: to_form(params))}
+  end
+
   def handle_event("cancel-upload", %{"ref" => ref}, socket) do
     new_socket =
       socket
-      |> cancel_upload(:import_file, ref)
+      |> cancel_upload(:import_rnw_file, ref)
 
-    if(socket.assigns.import_form.params["main_net"] == ref) do
+    if(socket.assigns.import_rnw_form.params["main_net"] == ref) do
       {:noreply,
        new_socket
        |> assign(
-         import_form:
+         import_rnw_form:
            to_form(%{
              "main_net" =>
-               new_socket.assigns.uploads.import_file.entries
+               new_socket.assigns.uploads.import_rnw_file.entries
                |> Enum.at(0)
                |> case do
                  nil ->
@@ -249,9 +329,9 @@ defmodule RenewCollabWeb.LiveShadowNets do
     end
   end
 
-  def handle_event("import_document", %{"main_net" => main_net_ref}, socket) do
+  def handle_event("import_rnw", %{"main_net" => main_net_ref}, socket) do
     main_net_name =
-      Enum.find_value(socket.assigns.uploads.import_file.entries, nil, fn
+      Enum.find_value(socket.assigns.uploads.import_rnw_file.entries, nil, fn
         %{ref: ^main_net_ref, client_name: client_name} ->
           Path.rootname(Path.basename(client_name))
 
@@ -260,10 +340,10 @@ defmodule RenewCollabWeb.LiveShadowNets do
       end)
 
     paths =
-      consume_uploaded_entries(socket, :import_file, fn %{path: path},
-                                                        %{
-                                                          client_name: filename
-                                                        } ->
+      consume_uploaded_entries(socket, :import_rnw_file, fn %{path: path},
+                                                            %{
+                                                              client_name: filename
+                                                            } ->
         {:ok, file_content} = File.read(path)
         {:ok, {Path.basename(filename), file_content}}
       end)
@@ -271,6 +351,20 @@ defmodule RenewCollabWeb.LiveShadowNets do
     RenewCollabSim.Simulator.compile_rnws_to_ssn(paths, main_net_name)
 
     {:noreply, socket}
+  end
+
+  def handle_event("import_sns", %{"main_net" => main_net_name}, socket) do
+    [_sns] =
+      consume_uploaded_entries(socket, :import_sns_file, fn %{path: path}, %{} ->
+        {:ok, file_content} = File.read(path)
+
+        RenewCollabSim.Simulator.create_shadow_net(file_content, main_net_name, [
+          %{"name" => main_net_name}
+        ])
+        |> dbg
+      end)
+
+    {:noreply, socket |> assign(import_sns_form: to_form(%{"main_net" => nil}))}
   end
 
   def handle_event("delete", %{"id" => sns_id}, socket) do

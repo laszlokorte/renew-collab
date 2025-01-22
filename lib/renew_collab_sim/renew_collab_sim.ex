@@ -16,7 +16,7 @@ defmodule RenewCollabSim.Simulator do
     Repo.all(
       from(s in ShadowNetSystem,
         as: :ssn,
-        join: nets in assoc(s, :nets),
+        left_join: nets in assoc(s, :nets),
         left_join: sims in assoc(s, :simulations),
         order_by: [desc: s.inserted_at],
         preload: [nets: nets],
@@ -37,7 +37,7 @@ defmodule RenewCollabSim.Simulator do
   def find_shadow_net_system(id) do
     Repo.one(
       from(s in ShadowNetSystem,
-        join: nets in assoc(s, :nets),
+        left_join: nets in assoc(s, :nets),
         left_join: sims in assoc(s, :simulations),
         where: s.id == ^id,
         order_by: [desc: s.inserted_at, asc: sims.inserted_at],
@@ -60,7 +60,7 @@ defmodule RenewCollabSim.Simulator do
     Repo.one(
       from(s in Simulation,
         join: sns in assoc(s, :shadow_net_system),
-        join: nets in assoc(sns, :nets),
+        left_join: nets in assoc(sns, :nets),
         left_join: ins in assoc(s, :net_instances),
         left_join: net in assoc(ins, :shadow_net),
         left_join: tokens in assoc(ins, :tokens),
@@ -79,7 +79,7 @@ defmodule RenewCollabSim.Simulator do
     Repo.one(
       from(s in Simulation,
         join: sns in assoc(s, :shadow_net_system),
-        join: nets in assoc(sns, :nets),
+        left_join: nets in assoc(sns, :nets),
         left_join: ins in assoc(s, :net_instances),
         left_join: net in assoc(ins, :shadow_net),
         where: s.id == ^id,
@@ -247,20 +247,31 @@ defmodule RenewCollabSim.Simulator do
 
   def compile_rnws_to_ssn(paths, main_net_name) do
     with {:ok, content} <- RenewCollabSim.Compiler.SnsCompiler.compile(paths) do
+      create_shadow_net(
+        content,
+        main_net_name,
+        Enum.map(paths, &%{"name" => Path.rootname(Path.basename(elem(&1, 0)))})
+      )
+    end
+  end
+
+  def create_shadow_net(content, main_net_name, nets) do
+    sns =
       %RenewCollabSim.Entites.ShadowNetSystem{}
       |> RenewCollabSim.Entites.ShadowNetSystem.changeset(%{
         "compiled" => content,
         "main_net_name" => main_net_name,
-        "nets" => Enum.map(paths, &%{"name" => Path.rootname(Path.basename(elem(&1, 0)))})
+        "nets" => nets
       })
       |> Repo.insert()
 
-      Phoenix.PubSub.broadcast(
-        RenewCollab.PubSub,
-        "shadow_nets",
-        :any
-      )
-    end
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "shadow_nets",
+      :any
+    )
+
+    sns
   end
 
   def create_simulation_from_documents(document_ids, main_net_name \\ nil) do
