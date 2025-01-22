@@ -20,7 +20,7 @@ defmodule RenewCollabSim.Script.Runner do
     spawn_link(fn ->
       {status, acc} = exec(cmd, nil, [])
 
-      send(s, {:finished, status, acc})
+      send(s, {:finished, status, Enum.reverse(acc)})
     end)
 
     receive do
