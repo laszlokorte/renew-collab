@@ -2,9 +2,9 @@ defmodule RenewCollabSim.Server.SimulationParser do
   @prompt "Renew > "
 
   @new_instance ~r/\((?<ni_time_number>\d+)\)New net instance (?<ni_instance_name>[^\[]+)\[(?<ni_instance_number>\d+)\] created\./
-  @init_token ~r/\((?<it_time_number>\d+)\)Initializing (?<it_value>\S+) into (?<it_instance_name>[^\[]+)\[(?<it_instance_number>\d+)\].(?<it_place_id>\S+)/
-  @putting ~r/\((?<pt_time_number>\d+)\)Putting (?<pt_value>\S+) into (?<pt_instance_name>[^\[]+)\[(?<pt_instance_number>\d+)\].(?<pt_place_id>\S+)/
-  @removing ~r/\((?<rm_time_number>\d+)\)Removing (?<rm_value>\S+) in (?<rm_instance_name>[^\[]+)\[(?<rm_instance_number>\d+)\].(?<rm_place_id>\S+)/
+  @init_token ~r/\((?<it_time_number>\d+)\)Initializing (?<it_value>.+) into (?<it_instance_name>[^\[]+)\[(?<it_instance_number>\d+)\].(?<it_place_id>\S+)/
+  @putting ~r/\((?<pt_time_number>\d+)\)Putting (?<pt_value>.+) into (?<pt_instance_name>[^\[]+)\[(?<pt_instance_number>\d+)\].(?<pt_place_id>\S+)/
+  @removing ~r/\((?<rm_time_number>\d+)\)Removing (?<rm_value>.+) in (?<rm_instance_name>[^\[]+)\[(?<rm_instance_number>\d+)\].(?<rm_place_id>\S+)/
   @firing ~r/\((?<fr_time_number>\d+)\)Firing (?<fr_instance_name>[^\[]+)\[(?<fr_instance_number>\d+)\].(?<fr_transition_id>\S+)/
   @sync ~r/\((?<sc_time_number>\d+)\)-------- Synchronously --------/
   @setup ~r/(?<setup>Simulation set up,\s+)/
