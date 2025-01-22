@@ -14,11 +14,11 @@ defmodule RenewCollabSim.Script.Runner do
     end
   end
 
-  def check_status(cmd \\ "packageCount") do
+  def check_status(cmd \\ ["packageCount"]) do
     s = self()
 
     spawn_link(fn ->
-      {status, acc} = exec([cmd], nil, [])
+      {status, acc} = exec(cmd, nil, [])
 
       send(s, {:finished, status, acc})
     end)

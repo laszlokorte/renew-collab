@@ -18,13 +18,16 @@ defmodule RenewCollabWeb.HealthController do
     )
   end
 
-  def simulator(conn, _params) do
-    RenewCollabSim.Script.Runner.check_status()
+  def simulator(conn, params) do
+    command = Map.get(params, "renew_command", "help") |> String.split(" ")
+
+    RenewCollabSim.Script.Runner.check_status(command)
     |> case do
       {:ok, status, output} ->
         render(conn, :simulator, %{
           status: status,
-          output: output
+          output: output,
+          current_command: command
         })
     end
   end

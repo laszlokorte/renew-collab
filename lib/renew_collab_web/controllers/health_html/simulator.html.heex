@@ -12,6 +12,21 @@
     <dd style="margin: 0">{@status}</dd>
   </dl>
 
+  <.form action={~p"/health/simulator"} method="post" for={%{}}>
+    <div style="display: flex; gap: 1ex; padding: 1ex">
+      <input
+        placeholder="help"
+        style="cursor: text; padding: 1ex; border: none; background: #333; color: #fff; flex-grow: 1;"
+        type="text"
+        name="renew_command"
+        value={@current_command |> Enum.join(" ")}
+      />
+      <.button style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff">
+        Check
+      </.button>
+    </div>
+  </.form>
+
   <div style="background: #333; color: #fff; font-family: monospace; margin: 0; padding: 1em;line-height: 1.7;">
     <%= for o <- @output do %>
       <%= case o do %>

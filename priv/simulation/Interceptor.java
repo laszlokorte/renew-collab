@@ -1,5 +1,7 @@
 import java.io.*;
 import java.util.concurrent.*;
+import java.util.Map;
+import java.util.Set;
 
 public class Interceptor {
     public static void main(String[] args) {
@@ -10,6 +12,14 @@ public class Interceptor {
 
         Process childProcess = null;
         final ProcessBuilder processBuilder = new ProcessBuilder(args);
+
+        final Set<String> variablesToKeep = Set.of("DISPLAY");
+        final Map<String, String> env = processBuilder.environment();
+        final Map<String, String> filteredEnv = env.entrySet().stream()
+            .filter(entry -> variablesToKeep.contains(entry.getKey()))
+            .collect(java.util.stream.Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        env.clear();
+        env.putAll(filteredEnv);
 
         try {
             final Process process = processBuilder.start();
