@@ -285,6 +285,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
          |> State.append_command(
            RenewCollabSim.Commands.FireTransition.new(%{
              simulation_id: simulation_id,
+             shadow_net_system_id: simulation.shadow_net_system_id,
              instance_name: instance_name,
              instance_number: instance_number,
              transition_id: transition_id,

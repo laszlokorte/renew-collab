@@ -51,14 +51,19 @@ defmodule RenewCollabSim.Commands.CreateNetInstance do
              net_id: net_id
            }
          } ->
-        %RenewCollabSim.Entites.SimulationNetInstance{
+        %RenewCollabSim.Entites.SimulationNetInstance{}
+        |> Ecto.Changeset.change(%{
           simulation_id: sim_id,
           label: "#{instance_name}[#{instance_number}]",
           shadow_net_system_id: sns_id,
           shadow_net_id: net_id,
           integer_id: String.to_integer(instance_number)
-        }
-      end
+        })
+        |> Ecto.Changeset.unique_constraint(:label,
+          name: :simulation_net_instance_simulation_id_label_index
+        )
+      end,
+      on_conflict: :nothing
     )
     |> Ecto.Multi.delete_all(
       {step_counter, :delete_old_tokens},
