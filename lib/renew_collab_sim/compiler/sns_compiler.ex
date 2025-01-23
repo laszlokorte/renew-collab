@@ -20,7 +20,7 @@ defmodule RenewCollabSim.Compiler.SnsCompiler do
         for {name, content} <- nets do
           normalized_name = normalize_net_name(name)
           {:ok, name} = Path.safe_relative_to(normalized_name, output_root_upload)
-          net_file_name = Path.absname(normalized_name, output_root_upload)
+          net_file_name = Path.absname(name, output_root_upload)
           File.write(net_file_name, content)
 
           net_file_name
