@@ -3,6 +3,9 @@ defmodule RenewCollab.Bonding do
   alias RenewCollab.Connection.Waypoint
   alias RenewCollab.Connection.Bond
   alias RenewCollab.Element.Edge
+  alias RenewCollab.Connection.Hyperlink
+  alias RenewCollab.Element.Text
+  alias RenewCollab.Style.TextSizeHint
 
   def reposition_multi() do
     Ecto.Multi.new()
@@ -35,6 +38,20 @@ defmodule RenewCollab.Bonding do
         from(w in Waypoint,
           where: w.edge_id in ^Enum.map(affected_bonds, & &1.bond.element_edge_id),
           order_by: [asc: w.sort]
+        )
+      end
+    )
+    |> Ecto.Multi.all(
+      :edge_centers_before,
+      fn %{affected_bonds: affected_bonds} ->
+        from(e in Edge,
+          left_join: w in assoc(e, :waypoints),
+          where: e.id in ^Enum.map(affected_bonds, & &1.bond.element_edge_id),
+          select:
+            {e.layer_id,
+             {coalesce(avg(w.position_x), (e.source_x + e.target_x) / 2),
+              coalesce(avg(w.position_y), (e.source_y + e.target_y) / 2)}},
+          group_by: e.layer_id
         )
       end
     )
@@ -144,5 +161,63 @@ defmodule RenewCollab.Bonding do
         end)
       end
     )
+    |> Ecto.Multi.all(
+      :edge_centers_after,
+      fn %{affected_bonds: affected_bonds} ->
+        from(e in Edge,
+          left_join: w in assoc(e, :waypoints),
+          where: e.id in ^Enum.map(affected_bonds, & &1.bond.element_edge_id),
+          select:
+            {e.layer_id,
+             {coalesce(avg(w.position_x), (e.source_x + e.target_x) / 2),
+              coalesce(avg(w.position_y), (e.source_y + e.target_y) / 2)}},
+          group_by: e.layer_id
+        )
+      end
+    )
+    |> Ecto.Multi.merge(fn
+      %{
+        edge_centers_before: edge_centers_before,
+        edge_centers_after: edge_centers_after
+      } ->
+        Map.merge(Map.new(edge_centers_before), Map.new(edge_centers_after), fn _k,
+                                                                                {xa, ya},
+                                                                                {xb, yb} ->
+          {xb - xa, yb - ya}
+        end)
+        |> Enum.reduce(Ecto.Multi.new(), fn {layer_id, {dx, dy}}, m ->
+          m
+          |> Ecto.Multi.update_all(
+            {:update_linked_textes, layer_id},
+            from(t in Text,
+              update: [inc: [position_x: ^dx, position_y: ^dy]],
+              where:
+                t.layer_id in subquery(
+                  from(h in Hyperlink,
+                    select: h.source_layer_id,
+                    where: h.target_layer_id == ^layer_id
+                  )
+                )
+            ),
+            []
+          )
+          |> Ecto.Multi.update_all(
+            {:update_linked_textes_size_hint, layer_id},
+            from(h in TextSizeHint,
+              update: [inc: [position_x: ^dx, position_y: ^dy]],
+              where:
+                h.text_id in subquery(
+                  from(h in Hyperlink,
+                    join: l in assoc(h, :source_layer),
+                    join: t in assoc(l, :text),
+                    select: t.id,
+                    where: h.target_layer_id == ^layer_id
+                  )
+                )
+            ),
+            []
+          )
+        end)
+    end)
   end
 end

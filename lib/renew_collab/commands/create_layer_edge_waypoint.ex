@@ -3,6 +3,9 @@ defmodule RenewCollab.Commands.CreateLayerEdgeWaypoint do
   alias RenewCollab.Hierarchy.Layer
   alias RenewCollab.Connection.Waypoint
   alias RenewCollab.Connection.Bond
+  alias RenewCollab.Connection.Hyperlink
+  alias RenewCollab.Element.Text
+  alias RenewCollab.Style.TextSizeHint
 
   defstruct [:document_id, :layer_id, :prev_waypoint_id, :position]
 
@@ -75,6 +78,17 @@ defmodule RenewCollab.Commands.CreateLayerEdgeWaypoint do
           select: {e, w, w2, max(w3.sort)}
         )
       end
+    )
+    |> Ecto.Multi.one(
+      :edge_center,
+      from(l in Layer,
+        join: e in assoc(l, :edge),
+        left_join: w in assoc(e, :waypoints),
+        where: l.id == ^layer_id,
+        select:
+          {coalesce(avg(w.position_x), (e.source_x + e.target_x) / 2),
+           coalesce(avg(w.position_y), (e.source_y + e.target_y) / 2)}
+      )
     )
     |> Ecto.Multi.update_all(
       :increment_future_waypoints,
@@ -174,6 +188,53 @@ defmodule RenewCollab.Commands.CreateLayerEdgeWaypoint do
           select: bond.id
         )
       end
+    )
+    |> Ecto.Multi.one(
+      :edge_center_delta,
+      fn %{edge_center: {old_x, old_y}} ->
+        from(l in Layer,
+          join: e in assoc(l, :edge),
+          left_join: w in assoc(e, :waypoints),
+          where: l.id == ^layer_id,
+          select:
+            {coalesce(avg(w.position_x), (e.source_x + e.target_x) / 2) - ^old_x,
+             coalesce(avg(w.position_y), (e.source_y + e.target_y) / 2) - ^old_y}
+        )
+      end
+    )
+    |> Ecto.Multi.update_all(
+      :update_linked_textes,
+      fn %{edge_center_delta: {dx, dy}} ->
+        from(t in Text,
+          update: [inc: [position_x: ^dx, position_y: ^dy]],
+          where:
+            t.layer_id in subquery(
+              from(h in Hyperlink,
+                select: h.source_layer_id,
+                where: h.target_layer_id == ^layer_id
+              )
+            )
+        )
+      end,
+      []
+    )
+    |> Ecto.Multi.update_all(
+      :update_linked_textes_size_hint,
+      fn %{edge_center_delta: {dx, dy}} ->
+        from(h in TextSizeHint,
+          update: [inc: [position_x: ^dx, position_y: ^dy]],
+          where:
+            h.text_id in subquery(
+              from(h in Hyperlink,
+                join: l in assoc(h, :source_layer),
+                join: t in assoc(l, :text),
+                select: t.id,
+                where: h.target_layer_id == ^layer_id
+              )
+            )
+        )
+      end,
+      []
     )
     |> Ecto.Multi.append(RenewCollab.Bonding.reposition_multi())
   end
