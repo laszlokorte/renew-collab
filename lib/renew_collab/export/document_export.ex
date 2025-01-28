@@ -243,86 +243,104 @@ defmodule RenewCollab.Export.DocumentExport do
 
       Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "CH.ifa.draw.figures.PolyLineFigure") ->
         {storables, source_arrow_ref} =
-          create_ref(
-            storables,
-            case layer.edge.style.source_tip_symbol_shape_id do
-              nil ->
-                nil
+          layer.edge.style
+          |> case do
+            nil ->
+              {storables, nil}
 
-              _ ->
-                %Renewex.Storable{
-                  class_name: "CH.ifa.draw.figures.ArrowTip",
-                  fields: %{
-                    angle: 0.4,
-                    outer_radius: 8.0,
-                    inner_radius: 8.0,
-                    filled: true
-                  }
-                }
-            end
-          )
+            edge_style ->
+              create_ref(
+                storables,
+                case edge_style.source_tip_symbol_shape_id do
+                  nil ->
+                    nil
+
+                  _ ->
+                    %Renewex.Storable{
+                      class_name: "CH.ifa.draw.figures.ArrowTip",
+                      fields: %{
+                        angle: 0.4,
+                        outer_radius: 8.0,
+                        inner_radius: 8.0,
+                        filled: true
+                      }
+                    }
+                end
+              )
+          end
 
         {storables, target_arrow_ref} =
-          create_ref(
-            storables,
-            case layer.edge.style.target_tip_symbol_shape_id do
-              nil ->
-                nil
+          layer.edge.style
+          |> case do
+            nil ->
+              {storables, nil}
 
-              _ ->
-                %Renewex.Storable{
-                  class_name: "CH.ifa.draw.figures.ArrowTip",
-                  fields: %{
-                    angle: 0.4,
-                    outer_radius: 8.0,
-                    inner_radius: 8.0,
-                    filled: true
-                  }
-                }
-            end
-          )
+            edge_style ->
+              create_ref(
+                storables,
+                case edge_style.target_tip_symbol_shape_id do
+                  nil ->
+                    nil
+
+                  _ ->
+                    %Renewex.Storable{
+                      class_name: "CH.ifa.draw.figures.ArrowTip",
+                      fields: %{
+                        angle: 0.4,
+                        outer_radius: 8.0,
+                        inner_radius: 8.0,
+                        filled: true
+                      }
+                    }
+                end
+              )
+          end
 
         {storables, start_ref} =
-          create_ref(
-            storables,
-            case layer.edge.source_bond do
-              %{layer_id: layer_id} ->
-                {:ref,
-                 target_index =
-                   Enum.find_index(storables, fn
-                     %{fields: %{_gen_id: ^layer_id}} -> true
-                     _ -> false
-                   end)}
+          case layer.edge.source_bond do
+            %{layer_id: layer_id} ->
+              target_index =
+                Enum.find_index(storables, fn
+                  %{fields: %{_gen_id: ^layer_id}} -> true
+                  _ -> false
+                end)
 
+              create_ref(
+                storables,
                 %Renewex.Storable{
                   class_name: bond_to_connector(layer.edge.source_bond, sockets),
                   fields: %{
                     owner: {:ref, target_index}
                   }
                 }
-            end
-          )
+              )
+
+            nil ->
+              {storables, nil}
+          end
 
         {storables, end_ref} =
-          create_ref(
-            storables,
-            case layer.edge.target_bond do
-              %{layer_id: layer_id} ->
-                {:ref,
-                 target_index =
-                   Enum.find_index(storables, fn
-                     %{fields: %{_gen_id: ^layer_id}} -> true
-                     _ -> false
-                   end)}
+          case layer.edge.target_bond do
+            %{layer_id: layer_id} ->
+              target_index =
+                Enum.find_index(storables, fn
+                  %{fields: %{_gen_id: ^layer_id}} -> true
+                  _ -> false
+                end)
 
+              create_ref(
+                storables,
                 %Renewex.Storable{
                   class_name: bond_to_connector(layer.edge.target_bond, sockets),
                   fields: %{
                     owner: {:ref, target_index}
                   }
                 }
-            end
-          )
+              )
+
+            nil ->
+              {storables, nil}
+          end
 
         storables
         |> Enum.concat([
