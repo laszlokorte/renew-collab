@@ -1,5 +1,7 @@
 import Config
 
+config :renew_collab, :editor_url, "http://localhost:5173"
+
 # Configure your database
 config :renew_collab, RenewCollab.Repo,
   adapter: Ecto.Adapters.SQLite3,

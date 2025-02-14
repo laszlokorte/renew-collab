@@ -188,6 +188,12 @@ if config_env() == :prod do
     config :renew_collab, :app_titel, app_title
   end
 
+  editor_url = System.get_env("RENEW_EDITOR_URL")
+
+  if editor_url do
+    config :renew_collab, :editor_url, editor_url
+  end
+
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key
