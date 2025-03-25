@@ -254,6 +254,8 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
             Edge Path
           </legend>
 
+          <button phx-click="update_edge_flip" phx-value-id={@layer.id}>Reverse Edge</button>
+
           <form
             phx-hook="RenewEdgePosition"
             id={"layer-edge-position-#{@layer.id}"}

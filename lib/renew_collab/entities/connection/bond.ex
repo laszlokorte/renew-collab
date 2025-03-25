@@ -21,6 +21,18 @@ defmodule RenewCollab.Connection.Bond do
     |> unique_constraint([:element_edge_id, :kind])
   end
 
+  def flip(%__MODULE__{kind: old_kind} = b) do
+    %__MODULE__{
+      b
+      | kind:
+          case old_kind do
+            :source -> :target
+            :target -> :source
+            o -> o
+          end
+    }
+  end
+
   defmodule Snapshotter do
     alias RenewCollab.Connection.Bond
     @behaviour RenewCollab.Versioning.SnapshotterBehavior

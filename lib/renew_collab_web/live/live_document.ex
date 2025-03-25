@@ -934,6 +934,22 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def handle_event(
+        "update_edge_flip",
+        %{
+          "id" => layer_id
+        },
+        socket
+      ) do
+    RenewCollab.Commands.UpdateLayerEdgeReverseDirection.new(%{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
         "update_waypoint_position",
         %{
           "layer_id" => layer_id,
