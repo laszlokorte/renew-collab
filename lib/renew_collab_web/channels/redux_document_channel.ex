@@ -442,6 +442,23 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
 
   @impl true
   def handle_event(
+        "change_edge_direction",
+        %{"layer_id" => layer_id},
+        %{},
+        socket
+      )
+      when is_binary(layer_id) do
+    RenewCollab.Commands.UpdateLayerEdgeReverseDirection.new(%{
+      document_id: socket.assigns.document_id,
+      layer_id: layer_id
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    :silent
+  end
+
+  @impl true
+  def handle_event(
         "change_text_body",
         %{"layer_id" => layer_id, "val" => new_body},
         %{},
