@@ -13,4 +13,8 @@ defmodule RenewCollabWeb.SemanticTagController do
         end
     )
   end
+
+  def rules(conn, _params) do
+    render(conn, :rules, %{})
+  end
 end
