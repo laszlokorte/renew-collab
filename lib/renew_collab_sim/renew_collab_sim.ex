@@ -11,6 +11,7 @@ defmodule RenewCollabSim.Simulator do
   alias RenewCollabSim.Entites.ShadowNetSystem
   alias RenewCollabSim.Entites.Simulation
   alias RenewCollabSim.Repo
+  alias RenewCollab.Simulation.SimulationLink
 
   def list_shadow_net_systems do
     Repo.all(
@@ -283,19 +284,20 @@ defmodule RenewCollabSim.Simulator do
           {:ok, rnw} = RenewCollab.Export.DocumentExport.export(document, synthetic: true)
           {:ok, json} = RenewCollabWeb.DocumentJSON.show_content(document) |> Jason.encode()
 
-          {RenewCollabSim.Compiler.SnsCompiler.normalize_net_name(document.name), rnw, json}
+          {RenewCollabSim.Compiler.SnsCompiler.normalize_net_name(document.name), rnw, json,
+           {document.id, document.current_snaptshot.id}}
         end)
       rescue
         _e ->
           :export_error
       end
 
-    with [{default_main_name, _, _} | _] <- nets,
+    with [{default_main_name, _, _, _} | _] <- nets,
          main_name <- main_net_name || default_main_name,
          {:ok, content} <-
            RenewCollabSim.Compiler.SnsCompiler.compile(
              nets
-             |> Enum.map(fn {name, rnw, _} -> {name, rnw} end)
+             |> Enum.map(fn {name, rnw, _, _} -> {name, rnw} end)
            ),
          {:ok, %{id: sns_id}} <-
            %RenewCollabSim.Entites.ShadowNetSystem{}
@@ -304,7 +306,7 @@ defmodule RenewCollabSim.Simulator do
              "main_net_name" => main_name,
              "nets" =>
                nets
-               |> Enum.map(fn {name, _, json} ->
+               |> Enum.map(fn {name, _, json, _} ->
                  %{
                    "name" => name,
                    "document_json" => json
@@ -331,6 +333,30 @@ defmodule RenewCollabSim.Simulator do
             "simulations",
             {:simulation_change, sim_id, :created}
           )
+
+          now = DateTime.truncate(DateTime.utc_now(), :second)
+
+          links =
+            nets
+            |> Enum.map(fn {_, _, _, {doc_id, snapshot_id}} ->
+              %{
+                document_id: doc_id,
+                snapshot_id: snapshot_id,
+                simulation_id: sim_id,
+                inserted_at: now,
+                updated_at: now
+              }
+            end)
+
+          RenewCollab.Repo.insert_all(SimulationLink, links)
+
+          for %{document_id: document_id} <- links do
+            Phoenix.PubSub.broadcast(
+              RenewCollab.PubSub,
+              "document:#{document_id}",
+              {:document_simulated, document_id}
+            )
+          end
 
           simulation
 

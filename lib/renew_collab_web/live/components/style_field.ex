@@ -134,6 +134,12 @@ defmodule RenewCollabWeb.HierarchyStyleField do
   def attrs(_el, :opacity, :number),
     do: [step: 0.01, min: 0, max: 1, style: "width: 3em; padding: 0.5ex"]
 
+  def attrs(_el, :source_tip_size, :number),
+    do: [step: 0.01, min: 0, max: 5, style: "width: 7em; padding: 0.5ex"]
+
+  def attrs(_el, :target_tip_size, :number),
+    do: [step: 0.01, min: 0, max: 5, style: "width: 7em; padding: 0.5ex"]
+
   def attrs(_el, :border_width, :number), do: [step: 1, min: 0]
   def attrs(_el, :font_size, :number), do: [step: 1, min: 0]
   def attrs(_el, _attr, _type), do: []

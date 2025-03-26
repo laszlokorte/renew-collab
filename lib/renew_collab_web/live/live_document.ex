@@ -29,7 +29,8 @@ defmodule RenewCollabWeb.LiveDocument do
             :other_documents,
             :snapshots,
             :hierachy_missing,
-            :hierachy_invalid
+            :hierachy_invalid,
+            :simulation_links
           ],
           fn ->
             {:ok,
@@ -40,7 +41,8 @@ defmodule RenewCollabWeb.LiveDocument do
                socket_schemas: Sockets.all_socket_schemas(),
                symbols: Symbols.list_shapes() |> Enum.map(fn s -> {s.id, s} end) |> Map.new(),
                hierachy_missing: RenewCollab.Hierarchy.find_missing(id),
-               hierachy_invalid: RenewCollab.Hierarchy.find_invalids(id)
+               hierachy_invalid: RenewCollab.Hierarchy.find_invalids(id),
+               simulation_links: Renew.list_simulation_links(document.id)
              }}
           end
         )
@@ -49,6 +51,7 @@ defmodule RenewCollabWeb.LiveDocument do
         |> assign(:show_selected, false)
         |> assign(:show_snapshots, false)
         |> assign(:show_health, false)
+        |> assign(:show_simulations, false)
         |> assign(:show_meta, false)
         |> assign(:show_grid, false)
         |> assign(:viewbox, viewbox(document))
@@ -676,6 +679,36 @@ defmodule RenewCollabWeb.LiveDocument do
             </dl>
           </div>
         <% end %>
+
+        <h2 style="cursor: pointer;" phx-click="toggle-simulations">
+          <span>{if(@show_simulations, do: "▼", else: "►")}</span> Simulations
+        </h2>
+
+        <%= if @show_simulations do %>
+          <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: simulation_links} <- @simulation_links do %>
+            <%= if Enum.count(simulation_links)> 0 do %>
+              <ul style="list-style: none; padding: 0; margin: 0">
+                <%= for lnk <- simulation_links do %>
+                  <li style={"opacity: #{if(lnk.snapshot_id == @document.current_snaptshot.id, do: 1, else: 0.5)}"}>
+                    <.link navigate={~p"/simulation/#{lnk.simulation_id}"}>
+                      {lnk.inserted_at}<br />
+                      <small>{lnk.simulation_id}</small>
+                    </.link>
+                  </li>
+                <% end %>
+              </ul>
+            <% end %>
+          <% end %>
+          <button
+            type="button"
+            phx-click="simulate"
+            phx-value-redirect="no"
+            phx-disable-with="Compiling..."
+            style="cursor: pointer;padding: 1ex; border: none; background: #a3a; color: #fff;"
+          >
+            Simulate
+          </button>
+        <% end %>
       </div>
     </div>
     """
@@ -721,6 +754,10 @@ defmodule RenewCollabWeb.LiveDocument do
 
   def handle_event("toggle-health", %{}, socket) do
     {:noreply, socket |> update(:show_health, &(not &1))}
+  end
+
+  def handle_event("toggle-simulations", %{}, socket) do
+    {:noreply, socket |> update(:show_simulations, &(not &1))}
   end
 
   def handle_event("update-viewbox", %{}, socket) do
@@ -1627,14 +1664,20 @@ defmodule RenewCollabWeb.LiveDocument do
     move_relative(socket, {:sibling, :prev}, {:above, :inside})
   end
 
-  def handle_event("simulate", %{}, socket) do
+  def handle_event("simulate", %{} = params, socket) do
     RenewCollabSim.Simulator.create_simulation_from_documents(
       [socket.assigns.document.id],
       socket.assigns.document.name
     )
     |> case do
       %RenewCollabSim.Entites.Simulation{} = sim ->
-        {:noreply, redirect(socket, to: ~p"/simulation/#{sim.id}")}
+        case params do
+          %{"redirect" => "no"} ->
+            {:noreply, socket}
+
+          _ ->
+            {:noreply, redirect(socket, to: ~p"/simulation/#{sim.id}")}
+        end
 
       _e ->
         {:noreply, socket}
@@ -1671,6 +1714,22 @@ defmodule RenewCollabWeb.LiveDocument do
            )
            |> assign(:document, doc)}
       end
+    end
+  end
+
+  def handle_info({:document_simulated, document_id}, socket) do
+    if document_id == socket.assigns.document.id do
+      {:noreply,
+       socket
+       |> assign_async(
+         [:simulation_links],
+         fn ->
+           {:ok,
+            %{
+              simulation_links: Renew.list_simulation_links(document_id)
+            }}
+         end
+       )}
     end
   end
 

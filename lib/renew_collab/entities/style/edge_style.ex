@@ -15,6 +15,9 @@ defmodule RenewCollab.Style.EdgeStyle do
     belongs_to :source_tip_symbol_shape, RenewCollab.Symbol.Shape
     belongs_to :target_tip_symbol_shape, RenewCollab.Symbol.Shape
 
+    field :source_tip_size, :float, default: 1.0
+    field :target_tip_size, :float, default: 1.0
+
     belongs_to :edge, RenewCollab.Element.Edge
 
     timestamps(type: :utc_datetime)
@@ -31,7 +34,9 @@ defmodule RenewCollab.Style.EdgeStyle do
       :stroke_dash_array,
       :smoothness,
       :source_tip_symbol_shape_id,
-      :target_tip_symbol_shape_id
+      :target_tip_symbol_shape_id,
+      :source_tip_size,
+      :target_tip_size
     ])
     # |> validate_required([:stroke_width, :stroke_color, :stroke_join, :stroke_cap, :stroke_dash_array, :source_tip, :target_tip, :smoothness])
     |> unique_constraint(:element_connection_id)
@@ -62,6 +67,8 @@ defmodule RenewCollab.Style.EdgeStyle do
           smoothness: s.smoothness,
           source_tip_symbol_shape_id: s.source_tip_symbol_shape_id,
           target_tip_symbol_shape_id: s.target_tip_symbol_shape_id,
+          source_tip_size: s.source_tip_size,
+          target_tip_size: s.target_tip_size,
           edge_id: s.edge_id,
           inserted_at: s.inserted_at,
           updated_at: s.updated_at

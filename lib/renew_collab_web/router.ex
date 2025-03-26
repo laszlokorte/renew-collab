@@ -66,6 +66,7 @@ defmodule RenewCollabWeb.Router do
       get "/:id/download.iex", DocumentController, :inspect
       get "/:id/download.json", DocumentController, :show
       post "/:id/duplicate", DocumentController, :duplicate
+      get "/:id/simulations", SimulationLinksController, :index
 
       resources "/", DocumentController, except: [:new, :edit]
     end

@@ -13,6 +13,10 @@ defmodule RenewCollab.Document.Document do
       preload_order: [asc: :z_index]
 
     has_many :snapshots, RenewCollab.Versioning.Snapshot
+
+    has_many :simulation_links, RenewCollab.Simulation.SimulationLink,
+      preload_order: [desc: :inserted_at]
+
     has_one :latest_snapshot_marker, RenewCollab.Versioning.LatestSnapshot
     has_one :current_snaptshot, through: [:latest_snapshot_marker, :snapshot]
 

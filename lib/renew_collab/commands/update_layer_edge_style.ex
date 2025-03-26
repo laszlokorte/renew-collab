@@ -50,4 +50,6 @@ defmodule RenewCollab.Commands.UpdateLayerEdgeStyle do
   defp attr_key("smoothness"), do: :smoothness
   defp attr_key("source_tip_symbol_shape_id"), do: :source_tip_symbol_shape_id
   defp attr_key("target_tip_symbol_shape_id"), do: :target_tip_symbol_shape_id
+  defp attr_key("source_tip_size"), do: :source_tip_size
+  defp attr_key("target_tip_size"), do: :target_tip_size
 end

@@ -133,6 +133,10 @@ defmodule RenewCollabWeb.DocumentJSON do
         duplicate: %{
           href: url(~p"/api/documents/#{document.id}/duplicate"),
           method: "post"
+        },
+        linked_simulations: %{
+          href: url(~p"/api/documents/#{document.id}/simulations"),
+          method: "get"
         }
       },
       content: show_content(document)
@@ -288,6 +292,8 @@ defmodule RenewCollabWeb.DocumentJSON do
                       "stroke_dash_array" => v.stroke_dash_array,
                       "source_tip_symbol_shape_id" => v.source_tip_symbol_shape_id,
                       "target_tip_symbol_shape_id" => v.target_tip_symbol_shape_id,
+                      "source_tip_size" => v.source_tip_size,
+                      "target_tip_size" => v.target_tip_size,
                       "smoothness" => v.smoothness
                     }
                 end

@@ -51,7 +51,7 @@ defmodule RenewCollab.Commands.UpdateLayerEdgeReverseDirection do
       fn %{edge: edge} ->
         from(w in Waypoint,
           where: w.edge_id == ^edge.id,
-          select: count(w.id)
+          select: max(w.sort)
         )
       end
     )
@@ -70,7 +70,7 @@ defmodule RenewCollab.Commands.UpdateLayerEdgeReverseDirection do
     |> Ecto.Multi.insert_all(
       :recreate_bonds,
       Bond,
-      fn %{edge: edge, old_bonds: bonds} ->
+      fn %{old_bonds: bonds} ->
         bonds
         |> Enum.map(&Bond.flip/1)
         |> Enum.map(fn %{
@@ -96,12 +96,12 @@ defmodule RenewCollab.Commands.UpdateLayerEdgeReverseDirection do
     )
     |> Ecto.Multi.update_all(
       :update_waypoints,
-      fn %{edge: edge} ->
+      fn %{edge: edge, waypoint_count: wc} ->
         from(w in Waypoint,
           where: w.edge_id == ^edge.id,
           update: [
             set: [
-              sort: -w.sort - 1
+              sort: ^wc * 10 - w.sort
             ]
           ]
         )
@@ -115,7 +115,7 @@ defmodule RenewCollab.Commands.UpdateLayerEdgeReverseDirection do
           where: w.edge_id == ^edge.id,
           update: [
             inc: [
-              sort: ^wc
+              sort: ^(wc * -9)
             ]
           ]
         )

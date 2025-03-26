@@ -9,6 +9,7 @@ defmodule RenewCollab.Renew do
 
   alias RenewCollab.Document.Document
   alias RenewCollab.Document.TransientDocument
+  alias RenewCollab.Simulation.SimulationLink
 
   def list_documents do
     RenewCollab.Queries.DocumentList.new()
@@ -41,5 +42,14 @@ defmodule RenewCollab.Renew do
     |> case do
       {:ok, %{insert_document: insert_document}} -> {:ok, insert_document}
     end
+  end
+
+  def list_simulation_links(document_id) do
+    Repo.all(
+      from(l in SimulationLink,
+        where: l.document_id == ^document_id,
+        order_by: [desc: l.inserted_at]
+      )
+    )
   end
 end

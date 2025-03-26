@@ -590,7 +590,9 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
               stroke_dash_array: :text,
               smoothness: :text,
               source_tip_symbol_shape_id: :symbol,
-              target_tip_symbol_shape_id: :symbol
+              target_tip_symbol_shape_id: :symbol,
+              source_tip_size: :number,
+              target_tip_size: :number
             ]}
             symbols={@symbols}
             element={@layer.edge}

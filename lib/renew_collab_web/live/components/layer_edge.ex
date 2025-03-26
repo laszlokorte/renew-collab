@@ -21,7 +21,8 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
 
         <%= if style_or_default(@layer.edge, :source_tip_symbol_shape_id) do %>
           <g
-            fill={style_or_default(@layer, :background_color)}
+            fill={style_or_default(@layer, :tip_color)}
+            stroke={style_or_default(@layer.edge, :stroke_color)}
             id={"edge-#{@layer.edge.id}-source-tip"}
             transform={"rotate(#{edge_angle(:source, @layer.edge)} #{@layer.edge.source_x} #{@layer.edge.source_y})"}
           >
@@ -36,12 +37,18 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
                       %{
                         position_x:
                           @layer.edge.source_x -
-                            style_or_default(@layer.edge, :stroke_width),
+                            style_or_default(@layer.edge, :stroke_width) *
+                              style_or_default(@layer.edge, :source_tip_size),
                         position_y:
                           @layer.edge.source_y -
-                            style_or_default(@layer.edge, :stroke_width),
-                        width: style_or_default(@layer.edge, :stroke_width) * 2,
-                        height: style_or_default(@layer.edge, :stroke_width) * 2
+                            style_or_default(@layer.edge, :stroke_width) *
+                              style_or_default(@layer.edge, :source_tip_size),
+                        width:
+                          style_or_default(@layer.edge, :stroke_width) *
+                            style_or_default(@layer.edge, :source_tip_size) * 2,
+                        height:
+                          style_or_default(@layer.edge, :stroke_width) *
+                            style_or_default(@layer.edge, :source_tip_size) * 2
                       },
                       path
                     )
@@ -56,7 +63,8 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
 
         <%= if style_or_default(@layer.edge, :target_tip_symbol_shape_id) do %>
           <g
-            fill={style_or_default(@layer, :background_color)}
+            fill={style_or_default(@layer, :tip_color)}
+            stroke={style_or_default(@layer.edge, :stroke_color)}
             id={"edge-#{@layer.edge.id}-target-tip"}
             transform={"rotate(#{edge_angle(:target, @layer.edge)} #{@layer.edge.target_x} #{@layer.edge.target_y})"}
           >
@@ -71,12 +79,18 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
                       %{
                         position_x:
                           @layer.edge.target_x -
-                            style_or_default(@layer.edge, :stroke_width),
+                            style_or_default(@layer.edge, :stroke_width) *
+                              style_or_default(@layer.edge, :target_tip_size),
                         position_y:
                           @layer.edge.target_y -
-                            style_or_default(@layer.edge, :stroke_width),
-                        width: style_or_default(@layer.edge, :stroke_width) * 2,
-                        height: style_or_default(@layer.edge, :stroke_width) * 2
+                            style_or_default(@layer.edge, :stroke_width) *
+                              style_or_default(@layer.edge, :target_tip_size),
+                        width:
+                          style_or_default(@layer.edge, :stroke_width) *
+                            style_or_default(@layer.edge, :target_tip_size) * 2,
+                        height:
+                          style_or_default(@layer.edge, :stroke_width) *
+                            style_or_default(@layer.edge, :target_tip_size) * 2
                       },
                       path
                     )
@@ -255,6 +269,19 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
     """
   end
 
+  defp style_or_default(%{:style => nil, :edge => edge}, :tip_color) do
+    style_or_default(edge, :stroke_color)
+  end
+
+  defp style_or_default(%{:style => %{background_color: bg}, :edge => edge}, :tip_color)
+       when bg == "transparent" or is_nil(bg) do
+    style_or_default(edge, :stroke_color)
+  end
+
+  defp style_or_default(layer = %{:style => _}, :tip_color) do
+    style_or_default(layer, :background_color)
+  end
+
   defp style_or_default(%{:style => nil}, style_key) do
     default_style(style_key)
   end
@@ -270,6 +297,8 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
   defp default_style(:smoothness), do: :linear
   defp default_style(:stroke_color), do: :black
   defp default_style(:stroke_width), do: 1
+  defp default_style(:source_tip_size), do: 1
+  defp default_style(:target_tip_size), do: 1
   defp default_style(_style_key), do: nil
 
   defp edge_path(edge, :linear) do
