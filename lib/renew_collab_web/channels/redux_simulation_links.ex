@@ -4,7 +4,7 @@ defmodule RenewCollabWeb.ReduxSimulationLinksChannel do
   alias RenewCollab.Renew
 
   @impl true
-  def init("redux_simulation_links:" <> document_id, _params, socket) do
+  def init("redux_simulation_links:" <> document_id, _params, _socket) do
     Phoenix.PubSub.subscribe(RenewCollab.PubSub, "document:#{document_id}")
 
     {:ok,

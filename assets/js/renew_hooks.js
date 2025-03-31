@@ -1307,16 +1307,10 @@ export const Hooks = {
         evt.preventDefault()
         const rnwDocumentId = this.el.getAttribute('rnw-document-id')
 
-        const {
-          name,
-          kind,
-        } = Object.fromEntries(new FormData(evt.currentTarget))
+        const meta = Object.fromEntries(new FormData(evt.currentTarget))
 
         console.log("update_document_meta")
-        this.pushEvent("update_document_meta", {
-          name,
-          kind
-        })
+        this.pushEvent("update_document_meta", meta)
       })
     },
     beforeUpdate() { },

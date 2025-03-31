@@ -143,6 +143,7 @@ defmodule RenewCollabWeb.Router do
       live "/socket_schema/:id", LiveSocketSchema
       live "/icons", LiveIcons
       live "/icon/:id", LiveIcon
+      live "/syntax", LiveSyntax
     end
   end
 

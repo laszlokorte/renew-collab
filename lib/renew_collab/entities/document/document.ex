@@ -19,6 +19,7 @@ defmodule RenewCollab.Document.Document do
 
     has_one :latest_snapshot_marker, RenewCollab.Versioning.LatestSnapshot
     has_one :current_snaptshot, through: [:latest_snapshot_marker, :snapshot]
+    belongs_to :syntax, RenewCollab.Syntax.SyntaxType
 
     timestamps(type: :utc_datetime)
   end
@@ -26,7 +27,7 @@ defmodule RenewCollab.Document.Document do
   @doc false
   def changeset(document, attrs) do
     document
-    |> cast(attrs, [:name, :kind])
+    |> cast(attrs, [:name, :kind, :syntax_id])
     |> cast_assoc(:layers)
     |> validate_required([:name, :kind])
     |> unique_constraint(:id)
@@ -35,6 +36,16 @@ defmodule RenewCollab.Document.Document do
   @doc false
   def changeset_meta(document, attrs) do
     document
-    |> cast(attrs, [:name, :kind])
+    |> cast(attrs, [:name, :kind, :syntax_id])
+    |> maybe_force_nil(:syntax_id)
+    |> dbg()
+  end
+
+  defp maybe_force_nil(changeset, field) do
+    if get_change(changeset, field) == nil do
+      force_change(changeset, field, nil)
+    else
+      changeset
+    end
   end
 end

@@ -2,6 +2,7 @@ defmodule RenewCollab.Init do
   alias RenewCollab.Symbol.Shape
   alias RenewCollab.Connection.SocketSchema
   alias RenewCollab.Versioning
+  alias RenewCollab.Syntax.SyntaxType
   import Ecto.Query, warn: false
 
   def reset(repo \\ RenewCollab.Repo) do
@@ -29,6 +30,19 @@ defmodule RenewCollab.Init do
               {:insert_socket_schema, Map.get(socket_schema, :name)},
               %SocketSchema{id: Map.get(socket_schema, :id)}
               |> SocketSchema.changeset(socket_schema),
+              on_conflict: :nothing
+            )
+          end))
+      )
+      |> then(
+        &(RenewCollab.Syntax.Predefined.all()
+          |> Enum.reduce(&1, fn syntax_type, m ->
+            m
+            |> Ecto.Multi.insert_or_update(
+              {:insert_syntax_type, Map.get(syntax_type, :name)},
+              %SyntaxType{id: Map.get(syntax_type, :id)}
+              |> SyntaxType.changeset(syntax_type)
+              |> dbg,
               on_conflict: :nothing
             )
           end))

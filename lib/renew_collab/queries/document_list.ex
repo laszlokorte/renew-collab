@@ -14,7 +14,11 @@ defmodule RenewCollab.Queries.DocumentList do
     Ecto.Multi.new()
     |> Ecto.Multi.all(
       :result,
-      from(Document, order_by: [desc: :inserted_at, desc: :id])
+      from(d in Document,
+        left_join: s in assoc(d, :syntax),
+        preload: [syntax: s],
+        order_by: [desc: :inserted_at, desc: :id]
+      )
     )
   end
 end

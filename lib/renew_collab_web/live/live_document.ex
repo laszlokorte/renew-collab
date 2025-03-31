@@ -7,6 +7,7 @@ defmodule RenewCollabWeb.LiveDocument do
   alias RenewCollab.Versioning
   alias RenewCollab.Renew
   alias RenewCollab.Symbols
+  alias RenewCollab.Syntax
   alias RenewCollab.Sockets
   alias RenewCollab.Queries
 
@@ -21,6 +22,7 @@ defmodule RenewCollabWeb.LiveDocument do
       socket =
         socket
         |> assign(:document, document)
+        |> assign(:syntax_types, Syntax.find_all())
         |> assign_async(
           [
             :symbols,
@@ -432,6 +434,21 @@ defmodule RenewCollabWeb.LiveDocument do
                     style="padding: 1ex; box-sizing:border-box; width: 100%;"
                     list="all-semantic-tags"
                   />
+                </dd>
+
+                <dt style="margin: 0; text-align: right;">Syntax</dt>
+
+                <dd style="margin: 0;">
+                  <select
+                    type="text"
+                    name="syntax_id"
+                    style="padding: 1ex; box-sizing:border-box; width: 100%;"
+                  >
+                    <option value="">None</option>
+                    <%= for s <-  @syntax_types do %>
+                      <option selected={@document.syntax_id == s.id} value={s.id}>{s.name}</option>
+                    <% end %>
+                  </select>
                 </dd>
 
                 <dt style="margin: 0; text-align: right;"></dt>

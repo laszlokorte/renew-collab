@@ -129,6 +129,8 @@ defmodule RenewCollabWeb.LiveDocuments do
             <tr>
               <th style="border-bottom: 1px solid #333;" align="left" width="1000">Name</th>
 
+              <th style="border-bottom: 1px solid #333;" align="left" width="200">Syntax</th>
+
               <th style="border-bottom: 1px solid #333;" align="left" width="200">Created</th>
 
               <th style="border-bottom: 1px solid #333;" align="left" width="200">Last Updated</th>
@@ -142,7 +144,7 @@ defmodule RenewCollabWeb.LiveDocuments do
           <tbody>
             <%= if Enum.empty?(@documents) do %>
               <tr>
-                <td colspan="6">
+                <td colspan="8">
                   <div style="padding: 2em; border: 3px dashed #aaa; text-align: center; font-style: italic;">
                     No Documents yet.
                   </div>
@@ -156,6 +158,8 @@ defmodule RenewCollabWeb.LiveDocuments do
                       {document.name}
                     </.link>
                   </td>
+
+                  <td>{if(document.syntax, do: document.syntax.name, else: "-")}</td>
 
                   <td>{document.inserted_at |> Calendar.strftime("%Y-%m-%d %H:%M")}</td>
 
