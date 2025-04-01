@@ -44,6 +44,11 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
   end
 
   @impl true
+  def handle_message(_, state) do
+    {:noreply, state}
+  end
+
+  @impl true
   def handle_event("cursor", %{"x" => x, "y" => y}, _state, socket) do
     account_id = socket.assigns.current_account.account_id
 

@@ -444,7 +444,7 @@ defmodule RenewCollabWeb.LiveDocument do
                     name="syntax_id"
                     style="padding: 1ex; box-sizing:border-box; width: 100%;"
                   >
-                    <option value="">None</option>
+                    <option value="none">None</option>
                     <%= for s <-  @syntax_types do %>
                       <option selected={@document.syntax_id == s.id} value={s.id}>{s.name}</option>
                     <% end %>

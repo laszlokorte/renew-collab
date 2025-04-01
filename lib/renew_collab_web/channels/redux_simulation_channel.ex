@@ -68,6 +68,11 @@ defmodule RenewCollabWeb.ReduxSimulationChannel do
   end
 
   @impl true
+  def handle_message(_, state) do
+    {:noreply, state}
+  end
+
+  @impl true
   def handle_event("step", %{}, _state, socket) do
     RenewCollabSim.Server.SimulationServer.step(socket.assigns.simulation_id)
 

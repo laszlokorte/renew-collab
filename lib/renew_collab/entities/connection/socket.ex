@@ -36,7 +36,6 @@ defmodule RenewCollab.Connection.Socket do
     socket
     |> cast(attrs, [
       :id,
-      :socket_schema_id,
       :name,
       :x_value,
       :x_unit,
@@ -51,6 +50,7 @@ defmodule RenewCollab.Connection.Socket do
       :y_offset_dynamic_value,
       :y_offset_dynamic_unit
     ])
+    |> unique_constraint([:socket_schema_id, :name], error_key: :name)
     |> validate_required([:id, :name])
   end
 end

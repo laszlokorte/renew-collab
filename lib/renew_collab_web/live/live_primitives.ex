@@ -73,7 +73,7 @@ defmodule RenewCollabWeb.LivePrimitives do
               </tr>
             </tbody>
           <% else %>
-            <%= for {group, si} <- @primitive_groups |> Enum.with_index do %>
+            <%= for group <- @primitive_groups do %>
               <thead>
                 <tr {[style: "background-color:#333;color: #fff"]}>
                   <th align="left">Icon</th>

@@ -12,6 +12,8 @@ defmodule RenewCollab.Init do
       |> Ecto.Multi.delete_all(:delete_documents, RenewCollab.Document.Document)
       |> Ecto.Multi.delete_all(:delete_shapes, RenewCollab.Symbol.Shape)
       |> Ecto.Multi.delete_all(:delete_socketschemas, RenewCollab.Connection.SocketSchema)
+      |> Ecto.Multi.delete_all(:delete_syntax, SyntaxType)
+      |> Ecto.Multi.delete_all(:delete_primitives, PredefinedPrimitiveGroup)
       |> then(
         &(RenewexIconset.Predefined.all()
           |> Enum.reduce(&1, fn shape, m ->
@@ -42,8 +44,7 @@ defmodule RenewCollab.Init do
             |> Ecto.Multi.insert_or_update(
               {:insert_syntax_type, Map.get(syntax_type, :name)},
               %SyntaxType{id: Map.get(syntax_type, :id)}
-              |> SyntaxType.changeset(syntax_type)
-              |> dbg,
+              |> SyntaxType.changeset(syntax_type),
               on_conflict: :nothing
             )
           end))
@@ -55,8 +56,7 @@ defmodule RenewCollab.Init do
             |> Ecto.Multi.insert_or_update(
               {:insert_primitive, Map.get(primitive, :name)},
               %PredefinedPrimitiveGroup{id: Map.get(primitive, :id)}
-              |> PredefinedPrimitiveGroup.changeset(primitive)
-              |> dbg,
+              |> PredefinedPrimitiveGroup.changeset(primitive),
               on_conflict: :nothing
             )
           end))

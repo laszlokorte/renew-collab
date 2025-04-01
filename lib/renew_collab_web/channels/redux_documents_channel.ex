@@ -31,6 +31,11 @@ defmodule RenewCollabWeb.ReduxDocumentsChannel do
   end
 
   @impl true
+  def handle_message(_, state) do
+    {:noreply, state}
+  end
+
+  @impl true
   def handle_event("delete_document", %{"id" => document_id}, state) do
     RenewCollab.Commands.DeleteDocument.new(%{
       document_id: document_id

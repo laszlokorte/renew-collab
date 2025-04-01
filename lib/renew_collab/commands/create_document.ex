@@ -31,10 +31,18 @@ defmodule RenewCollab.Commands.CreateDocument do
     now = DateTime.utc_now() |> DateTime.truncate(:second)
 
     Ecto.Multi.new()
+    |> Ecto.Multi.one(
+      :default_syntax,
+      from(ds in RenewCollab.Syntax.SyntaxDefault, select: ds.syntax_id, limit: 1)
+    )
     |> Ecto.Multi.insert(
       :insert_document,
-      %Document{id: id}
-      |> Document.changeset(content)
+      fn %{default_syntax: ds} ->
+        dbg(ds)
+
+        %Document{id: id, syntax_id: ds}
+        |> Document.changeset(content)
+      end
     )
     |> RenewCollab.Compatibility.Multi.insert_all(
       :insert_parenthoods,

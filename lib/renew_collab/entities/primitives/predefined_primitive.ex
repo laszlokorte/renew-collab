@@ -15,8 +15,8 @@ defmodule RenewCollab.Primitives.PredefinedPrimitive do
   end
 
   @doc false
-  def changeset(path, attrs) do
-    path
+  def changeset(primitive, attrs) do
+    primitive
     |> cast(attrs, [:name, :data, :icon])
     |> validate_required([:name, :data, :icon])
     |> unique_constraint(:name)

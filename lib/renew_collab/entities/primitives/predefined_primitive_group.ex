@@ -12,8 +12,8 @@ defmodule RenewCollab.Primitives.PredefinedPrimitiveGroup do
   end
 
   @doc false
-  def changeset(path, attrs) do
-    path
+  def changeset(group, attrs) do
+    group
     |> cast(attrs, [:name])
     |> cast_assoc(:primitives)
     |> validate_required([:name])

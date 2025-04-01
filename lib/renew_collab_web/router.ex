@@ -56,7 +56,7 @@ defmodule RenewCollabWeb.Router do
     get "/symbols", SymbolController, :index
     get "/socket_schemas", SocketSchemaController, :index
     get "/semantic_tags", SemanticTagController, :index
-    get "/semantic_rules", SemanticTagController, :rules
+    get "/syntax/:id", SyntaxController, :rules
     get "/primitives", BlueprintController, :primitives
     get "/blueprints", BlueprintController, :index
 

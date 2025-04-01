@@ -13,14 +13,16 @@ defmodule RenewCollab.Syntax.SyntaxEdgeWhitelist do
   end
 
   @doc false
-  def changeset(path, attrs) do
-    path
+  def changeset(whitelist, attrs) do
+    whitelist
     |> cast(attrs, [
+      :syntax_id,
       :source_semantic_tag,
       :target_semantic_tag,
       :edge_semantic_tag
     ])
     |> unique_constraint([
+      :syntax_id,
       :source_semantic_tag,
       :target_semantic_tag,
       :edge_semantic_tag

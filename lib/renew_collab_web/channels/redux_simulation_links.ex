@@ -20,4 +20,9 @@ defmodule RenewCollabWeb.ReduxSimulationLinksChannel do
        links: Renew.list_simulation_links(document_id)
      })}
   end
+
+  @impl true
+  def handle_message(_, state) do
+    {:noreply, state}
+  end
 end

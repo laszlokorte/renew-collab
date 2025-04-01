@@ -51,7 +51,7 @@ defmodule RenewCollab.Commands.UpdateLayerEdgeReverseDirection do
       fn %{edge: edge} ->
         from(w in Waypoint,
           where: w.edge_id == ^edge.id,
-          select: max(w.sort)
+          select: coalesce(max(w.sort), 0)
         )
       end
     )

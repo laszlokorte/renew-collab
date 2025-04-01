@@ -19,8 +19,8 @@ defmodule RenewCollab.Syntax.SyntaxEdgeAutoTarget do
   end
 
   @doc false
-  def changeset(path, attrs) do
-    path
+  def changeset(auto_target, attrs) do
+    auto_target
     |> cast(attrs, [
       :source_semantic_tag,
       :target_semantic_tag,

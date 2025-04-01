@@ -26,4 +26,9 @@ defmodule RenewCollabWeb.ReduxSimulationNetInstanceChannel do
         {:noreply, RenewCollabWeb.SimulationJSON.show_instance_content(ni)}
     end
   end
+
+  @impl true
+  def handle_message(_, state) do
+    {:noreply, state}
+  end
 end

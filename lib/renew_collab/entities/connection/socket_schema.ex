@@ -17,6 +17,7 @@ defmodule RenewCollab.Connection.SocketSchema do
     socket_schema
     |> cast(attrs, [:name, :stencil])
     |> cast_assoc(:sockets)
+    |> unique_constraint([:name])
     |> validate_required([:name])
   end
 end

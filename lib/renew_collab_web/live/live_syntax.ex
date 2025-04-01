@@ -72,6 +72,10 @@ defmodule RenewCollabWeb.LiveSyntax do
                 <tr {if(rem(si, 2) == 0, do: [style: "background-color:#f5f5f5;"], else: [])}>
                   <td colspan="2">
                     {syntax.name}
+
+                    <%= if syntax.default do %>
+                      (default)
+                    <% end %>
                   </td>
 
                   <td width="50">

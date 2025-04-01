@@ -42,7 +42,7 @@ defmodule RenewCollab.Document.Document do
   end
 
   defp maybe_force_nil(changeset, field) do
-    if get_change(changeset, field) == nil do
+    if get_change(changeset, field) == "none" do
       force_change(changeset, field, nil)
     else
       changeset

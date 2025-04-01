@@ -14,8 +14,8 @@ defmodule RenewCollab.Simulation.SimulationLink do
   end
 
   @doc false
-  def changeset(path, attrs) do
-    path
+  def changeset(sim_link, attrs) do
+    sim_link
     |> cast(attrs, [:document_id, :snapshot_id, :simulation_id])
     |> validate_required([:document_id, :snapshot_id, :simulation_id])
   end
