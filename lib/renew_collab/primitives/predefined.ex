@@ -82,6 +82,33 @@ defmodule RenewCollab.Primitives.Predefined do
               |> html_to_string
           }
         ]
+      },
+      %{
+        id: "c32a1e6a-9935-45e0-9060-b124a10a478b",
+        name: "FA",
+        primitives: [
+          %{
+            name: "State",
+            data: %{
+              content: %{
+                semantic_tag: "de.renew.fa.figures.FAStateFigure",
+                shape_id: "3B66E69A-057A-40B9-A1A0-9DB44EF5CE42",
+                socket_schema_id: "2C5DE751-2FB8-48DE-99B6-D99648EBDFFC",
+                style: %{
+                  background_color: "white",
+                  border_color: "black",
+                  border_width: "2"
+                }
+              },
+              mimeType: "application/json+renewex-layer",
+              alignX: 0.5,
+              alignY: 0.5
+            },
+            icon:
+              ~H(<circle fill="#fff" cx="16" cy="16" r="16" stroke="#111" stroke-width="2" />)
+              |> html_to_string
+          }
+        ]
       }
     ]
   end

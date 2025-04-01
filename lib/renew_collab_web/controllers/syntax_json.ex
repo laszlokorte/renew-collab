@@ -5,45 +5,39 @@ defmodule RenewCollabWeb.SyntaxJSON do
     %{
       items:
         for s <- syntaxes do
-          %{id: s.id, name: s.name, href: ~p"/api/syntax/#{s.id}"}
+          %{id: s.id, name: s.name, href: url(~p"/api/syntax/#{s.id}")}
         end
     }
   end
 
-  def rules(%{}) do
+  def rules(%{syntax: syntax}) do
     %{
-      "edgeWhitelist" => %{
-        "de.renew.gui.TransitionFigure" => ["de.renew.gui.PlaceFigure"],
-        "de.renew.gui.PlaceFigure" => ["de.renew.gui.TransitionFigure"]
-      },
-      "autoEdgeNode" => %{
-        "de.renew.gui.TransitionFigure" => %{
-          "target" => %{
-            "shape_id" => "3B66E69A-057A-40B9-A1A0-9DB44EF5CE42",
-            "semantic_tag" => "de.renew.gui.PlaceFigure",
-            "socket_schema_id" => "2C5DE751-2FB8-48DE-99B6-D99648EBDFFC"
-          },
-          "edge" => %{
-            "target" => %{
-              "socket_id" => "9BE09A98-DECF-4D38-8A06-5381B51D7538"
-            },
-            "source" => %{"socket_id" => "88E32BDC-3DA6-4FBB-9CC8-334B6D6048FD"}
-          }
-        },
-        "de.renew.gui.PlaceFigure" => %{
-          "target" => %{
-            "shape_id" => "2DD432FE-CC8A-4259-8A84-63F75AF0ECE0",
-            "semantic_tag" => "de.renew.gui.TransitionFigure",
-            "socket_schema_id" => "4FDF577B-DB81-462E-971E-FA842F0ABA1E"
-          },
-          "edge" => %{
-            "target" => %{
-              "socket_id" => "88E32BDC-3DA6-4FBB-9CC8-334B6D6048FD"
-            },
-            "source" => %{"socket_id" => "9BE09A98-DECF-4D38-8A06-5381B51D7538"}
-          }
-        }
-      }
+      "edgeWhitelist" =>
+        syntax.edge_whitelists
+        |> Enum.group_by(
+          & &1.source_semantic_tag,
+          & &1.target_semantic_tag
+        ),
+      "autoEdgeNode" =>
+        syntax.edge_auto_targets
+        |> Enum.map(fn t ->
+          {t.source_semantic_tag,
+           %{
+             "target" => %{
+               "shape_id" => t.target_shape_id,
+               "semantic_tag" => t.target_semantic_tag,
+               "socket_schema_id" => t.target_socket.socket_schema_id
+             },
+             "edge" => %{
+               "target" => %{
+                 "socket_id" => t.target_socket_id
+               },
+               "source" => %{"socket_id" => t.source_socket_id},
+               "semantic_tag" => t.edge_semantic_tag
+             }
+           }}
+        end)
+        |> Map.new()
     }
   end
 end

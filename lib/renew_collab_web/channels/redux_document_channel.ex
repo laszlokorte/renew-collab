@@ -138,18 +138,22 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         %{},
         socket
       ) do
+    width = Map.get(params, "width", 50)
+    height = Map.get(params, "height", 50)
+
     RenewCollab.Commands.CreateLayer.new(%{
       base_layer_id: Map.get(params, "base_layer_id", nil),
       document_id: socket.assigns.document_id,
       attrs: %{
         "semantic_tag" => Map.get(params, "semantic_tag", nil),
         "box" => %{
-          "position_x" => cx - 25,
-          "position_y" => cy - 25,
-          "width" => 50,
-          "height" => 50,
+          "position_x" => cx - width / 2,
+          "position_y" => cy - height / 2,
+          "width" => width,
+          "height" => height,
           "symbol_shape_id" => shape_id
         },
+        "style" => Map.get(params, "style", default_style(Map.get(params, "semantic_tag", nil))),
         "interface" =>
           case Map.get(params, "socket_schema_id", nil) do
             nil ->
@@ -168,6 +172,15 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         {:reply, %{id: layer.id}, socket}
     end
   end
+
+  defp default_style("de.renew.fa.figures.FAStateFigure"),
+    do: %{
+      background_color: "white",
+      border_color: "black",
+      border_width: "2"
+    }
+
+  defp default_style(_), do: nil
 
   @impl true
   def handle_event(

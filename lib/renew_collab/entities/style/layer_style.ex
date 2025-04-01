@@ -5,7 +5,7 @@ defmodule RenewCollab.Style.LayerStyle do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "layer_style" do
-    field :opacity, :float
+    field :opacity, :float, default: 1.0
     field :background_color, :string
     field :background_url, :string
     field :border_color, :string

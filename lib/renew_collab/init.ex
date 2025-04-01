@@ -9,11 +9,9 @@ defmodule RenewCollab.Init do
   def reset(repo \\ RenewCollab.Repo) do
     try do
       Ecto.Multi.new()
-      |> Ecto.Multi.delete_all(:delete_documents, RenewCollab.Document.Document)
-      |> Ecto.Multi.delete_all(:delete_shapes, RenewCollab.Symbol.Shape)
-      |> Ecto.Multi.delete_all(:delete_socketschemas, RenewCollab.Connection.SocketSchema)
-      |> Ecto.Multi.delete_all(:delete_syntax, SyntaxType)
-      |> Ecto.Multi.delete_all(:delete_primitives, PredefinedPrimitiveGroup)
+      # |> Ecto.Multi.delete_all(:delete_documents, RenewCollab.Document.Document)
+      # |> Ecto.Multi.delete_all(:delete_shapes, RenewCollab.Symbol.Shape)
+      # |> Ecto.Multi.delete_all(:delete_socketschemas, RenewCollab.Connection.SocketSchema)
       |> then(
         &(RenewexIconset.Predefined.all()
           |> Enum.reduce(&1, fn shape, m ->
@@ -37,6 +35,15 @@ defmodule RenewCollab.Init do
             )
           end))
       )
+      |> repo.transaction()
+    rescue
+      e -> dbg(e)
+    end
+
+    try do
+      Ecto.Multi.new()
+      |> Ecto.Multi.delete_all(:delete_syntax, SyntaxType)
+      |> Ecto.Multi.delete_all(:delete_primitives, PredefinedPrimitiveGroup)
       |> then(
         &(RenewCollab.Syntax.Predefined.all()
           |> Enum.reduce(&1, fn syntax_type, m ->

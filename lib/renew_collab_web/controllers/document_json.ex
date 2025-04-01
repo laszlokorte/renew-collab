@@ -59,7 +59,7 @@ defmodule RenewCollabWeb.DocumentJSON do
     %{
       name: document.name,
       kind: document.kind,
-      syntax_id: document.syntax_id,
+      syntax: syntax_data(document.syntax_id),
       viewbox: viewbox_data(RenewCollab.ViewBox.calculate(document)),
       snapshot: snapshot_data(document),
       layers:
@@ -67,6 +67,15 @@ defmodule RenewCollabWeb.DocumentJSON do
           %Ecto.Association.NotLoaded{} -> %{}
           _ -> %{items: document.layers |> Enum.map(&layer_data(&1))}
         end
+    }
+  end
+
+  defp syntax_data(nil), do: nil
+
+  defp syntax_data(syntax_id) do
+    %{
+      id: syntax_id,
+      href: url(~p"/api/syntax/#{syntax_id}")
     }
   end
 

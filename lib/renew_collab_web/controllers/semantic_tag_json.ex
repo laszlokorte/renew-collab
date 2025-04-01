@@ -3,7 +3,7 @@ defmodule RenewCollabWeb.SemanticTagJSON do
 
   def index(%{semantic_tags: semantic_tags}) do
     %{
-      semantic_tags: semantic_tags
+      semantic_tags: semantic_tags |> Enum.sort()
     }
   end
 
