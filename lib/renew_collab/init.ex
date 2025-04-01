@@ -3,14 +3,15 @@ defmodule RenewCollab.Init do
   alias RenewCollab.Connection.SocketSchema
   alias RenewCollab.Versioning
   alias RenewCollab.Syntax.SyntaxType
+  alias RenewCollab.Primitives.PredefinedPrimitiveGroup
   import Ecto.Query, warn: false
 
   def reset(repo \\ RenewCollab.Repo) do
     try do
       Ecto.Multi.new()
-      # |> Ecto.Multi.delete_all(:delete_documents, RenewCollab.Document.Document)
-      # |> Ecto.Multi.delete_all(:delete_shapes, RenewCollab.Symbol.Shape)
-      # |> Ecto.Multi.delete_all(:delete_socketschemas, RenewCollab.Connection.SocketSchema)
+      |> Ecto.Multi.delete_all(:delete_documents, RenewCollab.Document.Document)
+      |> Ecto.Multi.delete_all(:delete_shapes, RenewCollab.Symbol.Shape)
+      |> Ecto.Multi.delete_all(:delete_socketschemas, RenewCollab.Connection.SocketSchema)
       |> then(
         &(RenewexIconset.Predefined.all()
           |> Enum.reduce(&1, fn shape, m ->
@@ -47,9 +48,22 @@ defmodule RenewCollab.Init do
             )
           end))
       )
+      |> then(
+        &(RenewCollab.Primitives.Predefined.all()
+          |> Enum.reduce(&1, fn primitive, m ->
+            m
+            |> Ecto.Multi.insert_or_update(
+              {:insert_primitive, Map.get(primitive, :name)},
+              %PredefinedPrimitiveGroup{id: Map.get(primitive, :id)}
+              |> PredefinedPrimitiveGroup.changeset(primitive)
+              |> dbg,
+              on_conflict: :nothing
+            )
+          end))
+      )
       |> repo.transaction()
     rescue
-      _e -> nil
+      e -> dbg(e)
     end
 
     for transient_doc = %{content: %{id: pre_id}} <- RenewCollab.Blueprints.all() do

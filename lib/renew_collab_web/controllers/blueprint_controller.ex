@@ -2,6 +2,7 @@ defmodule RenewCollabWeb.BlueprintController do
   use RenewCollabWeb, :controller
 
   alias RenewCollab.Renew
+  alias RenewCollab.Primitives
 
   action_fallback RenewCollabWeb.FallbackController
 
@@ -11,6 +12,6 @@ defmodule RenewCollabWeb.BlueprintController do
   end
 
   def primitives(conn, _params) do
-    render(conn, :primitives)
+    render(conn, :primitives, groups: Primitives.find_all())
   end
 end

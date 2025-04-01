@@ -144,6 +144,7 @@ defmodule RenewCollabWeb.Router do
       live "/icons", LiveIcons
       live "/icon/:id", LiveIcon
       live "/syntax", LiveSyntax
+      live "/primitives", LivePrimitives
     end
   end
 
