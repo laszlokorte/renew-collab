@@ -59,6 +59,7 @@ defmodule RenewCollabWeb.DocumentJSON do
     %{
       name: document.name,
       kind: document.kind,
+      syntax_id: document.syntax_id,
       viewbox: viewbox_data(RenewCollab.ViewBox.calculate(document)),
       snapshot: snapshot_data(document),
       layers:

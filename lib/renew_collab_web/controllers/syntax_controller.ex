@@ -3,7 +3,13 @@ defmodule RenewCollabWeb.SyntaxController do
 
   action_fallback RenewCollabWeb.FallbackController
 
-  def rules(conn, %{"id" => _id}) do
-    render(conn, :rules, %{})
+  def list(conn, %{}) do
+    render(conn, :list, %{
+      syntaxes: RenewCollab.Syntax.find_all()
+    })
+  end
+
+  def rules(conn, %{"id" => id}) do
+    render(conn, :rules, %{syntax: RenewCollab.Syntax.find(id)})
   end
 end

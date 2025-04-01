@@ -16,4 +16,19 @@ defmodule RenewCollab.Syntax do
     )
     |> Repo.all()
   end
+
+  def find(id) do
+    from(s in SyntaxType,
+      left_join: at in assoc(s, :edge_whitelists),
+      left_join: wl in assoc(s, :edge_auto_targets),
+      left_join: d in assoc(s, :default),
+      preload: [
+        edge_whitelists: at,
+        edge_auto_targets: wl,
+        default: d
+      ],
+      where: s.id == ^id
+    )
+    |> Repo.one()
+  end
 end

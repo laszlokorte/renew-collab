@@ -1,6 +1,15 @@
 defmodule RenewCollabWeb.SyntaxJSON do
   use RenewCollabWeb, :verified_routes
 
+  def list(%{syntaxes: syntaxes}) do
+    %{
+      items:
+        for s <- syntaxes do
+          %{id: s.id, name: s.name, href: ~p"/api/syntax/#{s.id}"}
+        end
+    }
+  end
+
   def rules(%{}) do
     %{
       "edgeWhitelist" => %{
