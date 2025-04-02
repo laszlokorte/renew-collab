@@ -52,7 +52,10 @@ defmodule RenewCollab.Primitives.Predefined do
             data: %{
               content: %{
                 body: "Text",
-                semantic_tag: "CH.ifa.draw.figures.TextFigure"
+                semantic_tag: "CH.ifa.draw.figures.TextFigure",
+                style: %{
+                  :font_size => 20
+                }
               },
               mimeType: "application/json+renewex-layer",
               alignX: 0.5,
@@ -68,7 +71,10 @@ defmodule RenewCollab.Primitives.Predefined do
               content: %{
                 body: "[]",
                 hyperlink: true,
-                semantic_tag: "de.renew.gui.CPNTextFigure"
+                semantic_tag: "de.renew.gui.CPNTextFigure",
+                style: %{
+                  :font_size => 20
+                }
               },
               mimeType: "application/json+renewex-layer",
               alignX: 0.5,

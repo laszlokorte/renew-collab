@@ -14,9 +14,14 @@ defmodule RenewCollabWeb.LivePrimitives do
     {:ok, load_data(socket)}
   end
 
+  def handle_info({_, _}, socket) do
+    {:noreply, load_data(socket)}
+  end
+
   defp load_data(socket) do
     socket
     |> assign(:primitive_groups, Primitives.find_all())
+    |> assign(:create_form, to_form(%{"name" => nil}, as: :create_group))
     |> assign_async(
       [
         :symbols,
@@ -37,7 +42,16 @@ defmodule RenewCollabWeb.LivePrimitives do
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
       <RenewCollabWeb.RenewComponents.app_header />
       <div style="padding: 1em">
-        <h2 style="margin: 0;">Primitives Rules</h2>
+        <h2 style="margin: 0;">Predefined Primitives</h2>
+
+        <.form for={@create_form} phx-change="validate" phx-submit="save">
+          <div style="display: flex; gap: 1ex; align-items: stretch">
+            <.input style="padding: 1ex" type="text" field={@create_form[:name]} />
+            <button style="background: #333; color: #fff; padding: 1ex; border: none">
+              Create Group
+            </button>
+          </div>
+        </.form>
 
         <table style="width: 100%;" cellpadding="5">
           <thead>
@@ -85,7 +99,14 @@ defmodule RenewCollabWeb.LivePrimitives do
                   <th></th>
 
                   <th align="left" width="50">
-                    <button type="button">Delete</button>
+                    <button
+                      type="button"
+                      value={group.id}
+                      phx-click="delete_group"
+                      style="cursor: pointer; background: #a00; color: #fff; padding: 1ex; border: none"
+                    >
+                      Delete
+                    </button>
                   </th>
                 </tr>
               </thead>
@@ -113,25 +134,103 @@ defmodule RenewCollabWeb.LivePrimitives do
                       </td>
 
                       <td align="left" colspan="1">
-                        <textarea rows="5" cols="40">{primitive.icon}</textarea>
+                        <textarea readonly rows="5" cols="40">{primitive.icon}</textarea>
                       </td>
 
                       <td align="left" colspan="1">
-                        <textarea rows="5" cols="40">{Jason.encode!(primitive.data)}</textarea>
+                        <textarea readonly rows="5" cols="40">{Jason.encode!(primitive.data)}</textarea>
                       </td>
 
                       <td align="left" width="50">
-                        <button type="button">Delete</button>
+                        <button
+                          type="button"
+                          value={primitive.id}
+                          phx-click="delete_primitive"
+                          style="cursor: pointer; background: #a00; color: #fff; padding: 1ex; border: none"
+                        >
+                          Delete
+                        </button>
                       </td>
                     </tr>
                   <% end %>
                 <% end %>
               </tbody>
+              <tr>
+                <td valign="top">Add Primitive</td>
+                <td valign="top">
+                  <input
+                    style="padding: 1ex"
+                    form={"add_primitive-#{group.id}"}
+                    type="text"
+                    name="name"
+                  />
+                </td>
+                <td valign="top">
+                  <textarea form={"add_primitive-#{group.id}"} name="icon" rows="5" cols="40"></textarea>
+                </td>
+                <td valign="top">
+                  <textarea form={"add_primitive-#{group.id}"} name="data" rows="5" cols="40"></textarea>
+                </td>
+                <td valign="top">
+                  <form id={"add_primitive-#{group.id}"} phx-submit="add_primitive">
+                    <input type="hidden" name="group_id" value={group.id} />
+                    <button
+                      type="submit"
+                      style="cursor: pointer; background: #0a0; color: #fff; padding: 1ex; border: none"
+                    >
+                      add
+                    </button>
+                  </form>
+                </td>
+              </tr>
             <% end %>
           <% end %>
         </table>
       </div>
     </div>
     """
+  end
+
+  def handle_event("validate", %{"create_group" => %{"name" => name}}, socket) do
+    {:noreply, socket |> assign(:create_form, to_form(%{"name" => name}, as: :create_group))}
+  end
+
+  def handle_event("save", %{"create_group" => params}, socket) do
+    Primitives.create(params)
+    |> case do
+      {:ok, _} ->
+        {:noreply, socket |> assign(:create_form, to_form(%{"name" => ""}, as: :create_group))}
+
+      _ ->
+        {:noreply, socket}
+    end
+  end
+
+  def handle_event("delete_group", %{"value" => syntax_id}, socket) do
+    Primitives.delete_group(syntax_id)
+    {:noreply, socket}
+  end
+
+  def handle_event("delete_primitive", %{"value" => syntax_id}, socket) do
+    Primitives.delete_primitive(syntax_id)
+    {:noreply, socket}
+  end
+
+  def handle_event("add_primitive", params, socket) do
+    Primitives.create_primitive(
+      params
+      |> Map.update("data", nil, fn
+        "" ->
+          nil
+
+        s ->
+          case Jason.decode(s) do
+            {:ok, j} -> j
+            _ -> s
+          end
+      end)
+    )
+
+    {:noreply, socket}
   end
 end

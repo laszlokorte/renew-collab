@@ -26,7 +26,8 @@ defmodule RenewCollabWeb.SyntaxJSON do
              "target" => %{
                "shape_id" => t.target_shape_id,
                "semantic_tag" => t.target_semantic_tag,
-               "socket_schema_id" => t.target_socket.socket_schema_id
+               "socket_schema_id" => t.target_socket.socket_schema_id,
+               "style" => t.style
              },
              "edge" => %{
                "target" => %{

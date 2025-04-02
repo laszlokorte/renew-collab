@@ -38,8 +38,6 @@ defmodule RenewCollab.Commands.CreateDocument do
     |> Ecto.Multi.insert(
       :insert_document,
       fn %{default_syntax: ds} ->
-        dbg(ds)
-
         %Document{id: id, syntax_id: ds}
         |> Document.changeset(content)
       end

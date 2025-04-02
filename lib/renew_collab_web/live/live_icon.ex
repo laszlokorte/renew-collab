@@ -43,7 +43,7 @@ defmodule RenewCollabWeb.LiveIcon do
             style="height: 100%;"
             viewBox={"#{@bounds.position_x - @padding} #{@bounds.position_y - @padding} #{@bounds.width + 2* @padding} #{@bounds.height + 2* @padding}"}
           >
-            <g style="color: red" stroke-width="2">
+            <g style="color: red" stroke-width="2" fill="white" stroke="black">
               <%= for path <- @icon.paths do %>
                 <path
                   stroke-linejoin="bevel"

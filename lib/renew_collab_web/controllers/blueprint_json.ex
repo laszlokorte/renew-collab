@@ -15,6 +15,7 @@ defmodule RenewCollabWeb.BlueprintJSON do
     %{
       groups:
         groups
+        |> Enum.filter(&(Enum.count(&1.primitives) > 0))
         |> Enum.map(fn g ->
           %{
             name: g.name,

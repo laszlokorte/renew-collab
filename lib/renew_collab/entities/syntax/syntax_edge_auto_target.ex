@@ -16,6 +16,7 @@ defmodule RenewCollab.Syntax.SyntaxEdgeAutoTarget do
     field :source_semantic_tag, :string
     field :target_semantic_tag, :string
     field :edge_semantic_tag, :string
+    field :style, :map
   end
 
   @doc false
@@ -29,7 +30,8 @@ defmodule RenewCollab.Syntax.SyntaxEdgeAutoTarget do
       :target_shape_id,
       :target_socket_id,
       :edge_source_tip_id,
-      :edge_target_tip_id
+      :edge_target_tip_id,
+      :style
     ])
     |> validate_required([
       :source_semantic_tag,

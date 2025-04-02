@@ -67,7 +67,12 @@ defmodule RenewCollab.Syntax.Predefined do
             :target_semantic_tag => "de.renew.fa.figures.FAStateFigure",
             :edge_semantic_tag => "de.renew.fa.figures.FAArcConnection",
             :edge_source_tip_id => nil,
-            :edge_target_tip_id => "84DC6617-D555-4BAB-BA33-04A5FA442F00"
+            :edge_target_tip_id => "84DC6617-D555-4BAB-BA33-04A5FA442F00",
+            :style => %{
+              background_color: "white",
+              border_color: "black",
+              border_width: "2"
+            }
           }
         ]
       }

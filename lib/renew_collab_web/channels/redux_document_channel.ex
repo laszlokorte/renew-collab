@@ -153,7 +153,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "height" => height,
           "symbol_shape_id" => shape_id
         },
-        "style" => Map.get(params, "style", default_style(Map.get(params, "semantic_tag", nil))),
+        "style" => Map.get(params, "style", nil),
         "interface" =>
           case Map.get(params, "socket_schema_id", nil) do
             nil ->
@@ -172,15 +172,6 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         {:reply, %{id: layer.id}, socket}
     end
   end
-
-  defp default_style("de.renew.fa.figures.FAStateFigure"),
-    do: %{
-      background_color: "white",
-      border_color: "black",
-      border_width: "2"
-    }
-
-  defp default_style(_), do: nil
 
   @impl true
   def handle_event(
@@ -238,6 +229,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "target_x" => target_x,
           "target_y" => target_y,
           "cyclic" => Map.get(params, "cyclic", false),
+          "style" => Map.get(params, "style", nil),
           "waypoints" =>
             points
             |> Enum.drop(1)
@@ -276,9 +268,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "position_x" => position_x,
           "position_y" => position_y,
           "body" => body,
-          "style" => %{
-            "font_size" => 20
-          }
+          "style" => Map.get(params, "style", nil)
         },
         "outgoing_link" =>
           case Map.get(params, "hyperlink", nil) do
