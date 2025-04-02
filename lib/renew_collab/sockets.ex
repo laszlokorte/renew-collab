@@ -31,4 +31,55 @@ defmodule RenewCollab.Sockets do
       )
     )
   end
+
+  def change_schema(schema_id, params) do
+    RenewCollab.Connection.SocketSchema
+    |> RenewCollab.Repo.get!(schema_id)
+    |> RenewCollab.Connection.SocketSchema.changeset(params)
+    |> RenewCollab.Repo.update()
+    |> case do
+      {:ok, _} ->
+        RenewCollab.SimpleCache.delete_tags([:sockets])
+    end
+  end
+
+  def delete_socket(socket_id) do
+    RenewCollab.Connection.Socket
+    |> RenewCollab.Repo.get!(socket_id)
+    |> RenewCollab.Repo.delete()
+    |> case do
+      {:ok, _} ->
+        RenewCollab.SimpleCache.delete_tags([:sockets])
+    end
+  end
+
+  def create_socket(params) do
+    %RenewCollab.Connection.Socket{}
+    |> RenewCollab.Connection.Socket.changeset(params)
+    |> RenewCollab.Repo.insert()
+    |> case do
+      {:ok, _} ->
+        RenewCollab.SimpleCache.delete_tags([:sockets])
+    end
+  end
+
+  def create_socket_schema(params) do
+    %RenewCollab.Connection.SocketSchema{}
+    |> RenewCollab.Connection.SocketSchema.changeset(params)
+    |> RenewCollab.Repo.insert()
+    |> case do
+      {:ok, _} ->
+        RenewCollab.SimpleCache.delete_tags([:sockets])
+    end
+  end
+
+  def delete_socket_schema(socket_schema_id) do
+    RenewCollab.Connection.SocketSchema
+    |> RenewCollab.Repo.get!(socket_schema_id)
+    |> RenewCollab.Repo.delete()
+    |> case do
+      {:ok, _} ->
+        RenewCollab.SimpleCache.delete_tags([:sockets])
+    end
+  end
 end

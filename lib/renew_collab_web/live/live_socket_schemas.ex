@@ -31,6 +31,13 @@ defmodule RenewCollabWeb.LiveSocketSchemas do
       <div style="padding: 1em">
         <h2 style="margin: 0;">Socket Schemas</h2>
 
+        <form phx-submit="create">
+          <div style="display: flex; gap: 1ex; align-items: stretch">
+            <input name="name" style="padding: 1ex" type="text" />
+            <button style="background: #333; color: #fff; padding: 1ex; border: none">Create</button>
+          </div>
+        </form>
+
         <table style="width: 100%;" cellpadding="5">
           <thead>
             <tr>
@@ -152,7 +159,9 @@ defmodule RenewCollabWeb.LiveSocketSchemas do
                       {schema.name}
                     </.link>
                   </td>
-                  <td width="50"></td>
+                  <td width="50">
+                    <button type="button" phx-click="delete" value={schema.id}>Delete</button>
+                  </td>
                 </tr>
               <% end %>
             <% end %>
@@ -161,5 +170,17 @@ defmodule RenewCollabWeb.LiveSocketSchemas do
       </div>
     </div>
     """
+  end
+
+  def handle_event("create", params, socket) do
+    RenewCollab.Sockets.create_socket_schema(params)
+
+    {:noreply, load_data(socket)}
+  end
+
+  def handle_event("delete", %{"value" => id}, socket) do
+    RenewCollab.Sockets.delete_socket_schema(id)
+
+    {:noreply, load_data(socket)}
   end
 end

@@ -9,7 +9,7 @@ defmodule RenewCollab.Queries.SocketSchemasByName do
     %__MODULE__{}
   end
 
-  def tags(%__MODULE__{}), do: [:symbols]
+  def tags(%__MODULE__{}), do: [:sockets]
 
   def multi(%__MODULE__{}) do
     Ecto.Multi.new()
