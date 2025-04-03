@@ -32,6 +32,16 @@ defmodule RenewCollab.Sockets do
     )
   end
 
+  def find_socket(id) do
+    import Ecto.Query
+
+    RenewCollab.Repo.one(
+      from(s in RenewCollab.Connection.Socket,
+        where: s.id == ^id
+      )
+    )
+  end
+
   def change_schema(schema_id, params) do
     RenewCollab.Connection.SocketSchema
     |> RenewCollab.Repo.get!(schema_id)

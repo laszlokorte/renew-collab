@@ -11,7 +11,12 @@ defmodule RenewCollabWeb.LiveSocketSchema do
   def funcs(), do: @funcs
 
   def mount(%{"id" => socket_schema_id}, _session, socket) do
-    socket = assign(socket, :socket_schema_id, socket_schema_id)
+    socket =
+      socket
+      |> assign(:socket_schema_id, socket_schema_id)
+      |> assign(:icons, RenewCollab.Symbols.list_shapes())
+      |> assign(:icon, nil)
+      |> assign(:preview, %RenewCollab.Connection.Socket{})
 
     RenewCollabWeb.Endpoint.subscribe("#{@topic}-socket_schema_id")
 
@@ -43,99 +48,175 @@ defmodule RenewCollabWeb.LiveSocketSchema do
         <h2 style="margin: 0;">Socket Schema</h2>
 
         <div style="display: grid; grid-template-columns: 20em 1fr;">
-          <svg viewBox={"#{@bounds.position_x - 10} #{@bounds.position_y - 10} #{@bounds.width + 20} #{@bounds.height + 20}"}>
-            <g fill="#ddd">
-              <%= case @schema.stencil do %>
-                <% :ellipse -> %>
-                  <ellipse
-                    stroke-width="3"
-                    pointer-events="none"
-                    stroke-opacity="0.5"
-                    fill-opacity="0.1"
-                    cx={@bounds.position_x + @bounds.width / 2}
-                    cy={@bounds.position_y + @bounds.height / 2}
-                    fill="purple"
-                    stroke="purple"
-                    rx={@bounds.width / 2}
-                    ry={@bounds.height / 2}
-                  />
-                <% :rect -> %>
-                  <rect
-                    stroke-width="3"
-                    pointer-events="none"
-                    stroke-opacity="0.5"
-                    fill-opacity="0.1"
-                    x={@bounds.position_x}
-                    y={@bounds.position_y}
-                    fill="purple"
-                    stroke="purple"
-                    width={@bounds.width}
-                    height={@bounds.height}
-                  />
-                <% _ -> %>
-                  <rect
-                    stroke-width="3"
-                    pointer-events="none"
-                    stroke-opacity="0.5"
-                    fill-opacity="0.5"
-                    x={@bounds.position_x}
-                    y={@bounds.position_y}
-                    width={@bounds.width}
-                    height={@bounds.height}
-                  />
+          <div>
+            <svg viewBox={"#{@bounds.position_x - 10} #{@bounds.position_y - 10} #{@bounds.width + 20} #{@bounds.height + 20}"}>
+              <%= if @icon do %>
+                <g opacity="0.3" style="color: red" stroke-width="2" fill="white" stroke="black">
+                  <%= for path <- @icon.paths do %>
+                    <path
+                      stroke-linejoin="bevel"
+                      stroke={path.stroke_color}
+                      fill={path.fill_color}
+                      d={RenewexIconset.Builder.build_symbol_path(@bounds, path)}
+                      fill-rule="evenodd"
+                    />
+                  <% end %>
+                </g>
               <% end %>
-            </g>
-            <%= for s <- @schema.sockets do %>
-              <g pointer-events="all" fill="transparent">
-                <circle
-                  cx={
-                    RenewexIconset.Position.build_coord(
-                      @bounds,
-                      :x,
-                      false,
-                      RenewexIconset.Position.unify_coord(:x, s)
-                    )
-                  }
-                  cy={
-                    RenewexIconset.Position.build_coord(
-                      @bounds,
-                      :y,
-                      false,
-                      RenewexIconset.Position.unify_coord(:y, s)
-                    )
-                  }
-                  fill="white"
-                  stroke="purple"
-                  opacity="0.4"
-                  pointer-events="none"
-                  r={4}
-                />
-                <circle
-                  cx={
-                    RenewexIconset.Position.build_coord(
-                      @bounds,
-                      :x,
-                      false,
-                      RenewexIconset.Position.unify_coord(:x, s)
-                    )
-                  }
-                  cy={
-                    RenewexIconset.Position.build_coord(
-                      @bounds,
-                      :y,
-                      false,
-                      RenewexIconset.Position.unify_coord(:y, s)
-                    )
-                  }
-                  pointer-events="all"
-                  title={s.name}
-                  r={6}
-                >
-                  <title>{s.name}</title>
-                </circle>
+
+              <g fill="#ddd">
+                <%= case @schema.stencil do %>
+                  <% :ellipse -> %>
+                    <ellipse
+                      stroke-width="3"
+                      pointer-events="none"
+                      stroke-opacity="0.5"
+                      fill-opacity="0.1"
+                      cx={@bounds.position_x + @bounds.width / 2}
+                      cy={@bounds.position_y + @bounds.height / 2}
+                      fill="purple"
+                      stroke="purple"
+                      rx={@bounds.width / 2}
+                      ry={@bounds.height / 2}
+                    />
+                  <% :rect -> %>
+                    <rect
+                      stroke-width="3"
+                      pointer-events="none"
+                      stroke-opacity="0.5"
+                      fill-opacity="0.1"
+                      x={@bounds.position_x}
+                      y={@bounds.position_y}
+                      fill="purple"
+                      stroke="purple"
+                      width={@bounds.width}
+                      height={@bounds.height}
+                    />
+                  <% _ -> %>
+                    <rect
+                      stroke-width="3"
+                      pointer-events="none"
+                      stroke-opacity="0.5"
+                      fill-opacity="0.5"
+                      x={@bounds.position_x}
+                      y={@bounds.position_y}
+                      width={@bounds.width}
+                      height={@bounds.height}
+                    />
+                <% end %>
               </g>
-            <% end %>
-          </svg>
+              <%= for s <- @schema.sockets do %>
+                <g pointer-events="all" fill="transparent">
+                  <circle
+                    cx={
+                      RenewexIconset.Position.build_coord(
+                        @bounds,
+                        :x,
+                        false,
+                        RenewexIconset.Position.unify_coord(:x, s)
+                      )
+                    }
+                    cy={
+                      RenewexIconset.Position.build_coord(
+                        @bounds,
+                        :y,
+                        false,
+                        RenewexIconset.Position.unify_coord(:y, s)
+                      )
+                    }
+                    fill="white"
+                    stroke="purple"
+                    opacity="0.4"
+                    pointer-events="none"
+                    r={4}
+                  />
+                  <circle
+                    cx={
+                      RenewexIconset.Position.build_coord(
+                        @bounds,
+                        :x,
+                        false,
+                        RenewexIconset.Position.unify_coord(:x, s)
+                      )
+                    }
+                    cy={
+                      RenewexIconset.Position.build_coord(
+                        @bounds,
+                        :y,
+                        false,
+                        RenewexIconset.Position.unify_coord(:y, s)
+                      )
+                    }
+                    pointer-events="all"
+                    title={s.name}
+                    r={6}
+                  >
+                    <title>{s.name}</title>
+                  </circle>
+                </g>
+              <% end %>
+
+              <%= with s when @preview.name != nil <- @preview do %>
+                <g pointer-events="all" fill="transparent">
+                  <circle
+                    cx={
+                      RenewexIconset.Position.build_coord(
+                        @bounds,
+                        :x,
+                        false,
+                        RenewexIconset.Position.unify_coord(:x, s)
+                      )
+                    }
+                    cy={
+                      RenewexIconset.Position.build_coord(
+                        @bounds,
+                        :y,
+                        false,
+                        RenewexIconset.Position.unify_coord(:y, s)
+                      )
+                    }
+                    fill="white"
+                    stroke="#1abc9c"
+                    opacity="0.9"
+                    pointer-events="none"
+                    r={4}
+                  />
+                  <circle
+                    cx={
+                      RenewexIconset.Position.build_coord(
+                        @bounds,
+                        :x,
+                        false,
+                        RenewexIconset.Position.unify_coord(:x, s)
+                      )
+                    }
+                    cy={
+                      RenewexIconset.Position.build_coord(
+                        @bounds,
+                        :y,
+                        false,
+                        RenewexIconset.Position.unify_coord(:y, s)
+                      )
+                    }
+                    pointer-events="all"
+                    title={s.name}
+                    r={6}
+                  >
+                    <title>{s.name}</title>
+                  </circle>
+                </g>
+                <% else _ -> %>
+              <% end %>
+            </svg>
+            <form phx-change="change_preview">
+              <select name="icon_id">
+                <option value="">None</option>
+                <%= for i <- @icons do %>
+                  <option value={i.id}>{i.name}</option>
+                <% end %>
+              </select>
+            </form>
+          </div>
           <div>
             <h3>Stencil</h3>
             <form id="stencil_form" phx-change="change_stencil">
@@ -200,35 +281,36 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                     <td>{s.y_offset_dynamic_unit}</td>
                     <td>
                       <button type="button" phx-click="delete_socket" value={s.id}>Delete</button>
+                      <button type="button" phx-click="copy_socket" value={s.id}>Copy</button>
                     </td>
                   </tr>
                 <% end %>
               </tbody>
               <tfoot>
                 <tr>
-                  <td><input form="create_form" type="text" name="name" /></td>
+                  <td><input form="create_form" type="text" name="name" value={@preview.name} /></td>
 
                   <td>
                     <input
                       form="create_form"
                       type="number"
-                      value="0.0"
                       step="0.01"
                       size="4"
                       name="x_value"
+                      value={@preview.x_value}
                     />
                   </td>
                   <td>
                     <select form="create_form" name="x_unit">
                       <%= for d <- dims() do %>
-                        <option>{d}</option>
+                        <option selected={d == @preview.x_unit}>{d}</option>
                       <% end %>
                     </select>
                   </td>
                   <td>
                     <select form="create_form" name="x_offset_operation">
                       <%= for f <- funcs() do %>
-                        <option>{f}</option>
+                        <option selected={f == @preview.x_offset_operation}>{f}</option>
                       <% end %>
                     </select>
                   </td>
@@ -236,26 +318,26 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                     <input
                       form="create_form"
                       type="number"
-                      value="0.0"
                       step="0.01"
                       size="4"
                       name="x_offset_value_static"
+                      value={@preview.x_offset_value_static}
                     />
                   </td>
                   <td>
                     <input
                       form="create_form"
                       type="number"
-                      value="0.0"
                       step="0.01"
                       size="4"
                       name="x_offset_dynamic_value"
+                      value={@preview.x_offset_dynamic_value}
                     />
                   </td>
                   <td>
                     <select form="create_form" name="x_offset_dynamic_unit">
                       <%= for d <- dims() do %>
-                        <option>{d}</option>
+                        <option selected={d == @preview.x_offset_dynamic_unit}>{d}</option>
                       <% end %>
                     </select>
                   </td>
@@ -263,23 +345,23 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                     <input
                       form="create_form"
                       type="number"
-                      value="0.0"
                       step="0.01"
                       size="4"
                       name="y_value"
+                      value={@preview.y_value}
                     />
                   </td>
                   <td>
                     <select form="create_form" name="y_unit">
                       <%= for d <- dims() do %>
-                        <option>{d}</option>
+                        <option selected={d == @preview.y_unit}>{d}</option>
                       <% end %>
                     </select>
                   </td>
                   <td>
                     <select form="create_form" name="y_offset_operation">
                       <%= for f <- funcs() do %>
-                        <option>{f}</option>
+                        <option selected={f == @preview.y_offset_operation}>{f}</option>
                       <% end %>
                     </select>
                   </td>
@@ -287,31 +369,31 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                     <input
                       form="create_form"
                       type="number"
-                      value="0.0"
                       step="0.01"
                       size="4"
                       name="y_offset_value_static"
+                      value={@preview.y_offset_value_static}
                     />
                   </td>
                   <td>
                     <input
                       form="create_form"
                       type="number"
-                      value="0.0"
                       step="0.01"
                       size="4"
                       name="y_offset_dynamic_value"
+                      value={@preview.y_offset_dynamic_value}
                     />
                   </td>
                   <td>
-                    <select form="create_form" name="y_offset_dynamic_uit">
+                    <select form="create_form" name="y_offset_dynamic_unit">
                       <%= for d <- dims() do %>
-                        <option>{d}</option>
+                        <option selected={d == @preview.y_offset_dynamic_unit}>{d}</option>
                       <% end %>
                     </select>
                   </td>
                   <td>
-                    <form id="create_form" phx-submit="create_socket">
+                    <form id="create_form" phx-submit="create_socket" phx-change="preview_socket">
                       <input type="hidden" name="socket_schema_id" value={@schema.id} />
                       <button type="submit">Create</button>
                     </form>
@@ -319,6 +401,11 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                 </tr>
               </tfoot>
             </table>
+
+            <details>
+              <summary>Export</summary>
+              <textarea style="width: 50%; min-height: 12em;" readonly>{inspect(@schema, pretty: true)}</textarea>
+            </details>
           </div>
         </div>
       </div>
@@ -338,9 +425,50 @@ defmodule RenewCollabWeb.LiveSocketSchema do
     {:noreply, load_data(socket)}
   end
 
+  def handle_event("copy_socket", %{"value" => id}, socket) do
+    {:noreply,
+     update(
+       socket,
+       :preview,
+       fn s ->
+         s
+         |> RenewCollab.Connection.Socket.changeset(
+           RenewCollab.Sockets.find_socket(id)
+           |> Map.from_struct()
+           |> Map.delete(:id)
+           |> Map.delete(:name)
+         )
+         |> Ecto.Changeset.apply_changes()
+       end
+     )}
+  end
+
   def handle_event("create_socket", params, socket) do
     RenewCollab.Sockets.create_socket(params)
 
-    {:noreply, load_data(socket)}
+    {:noreply,
+     load_data(socket)
+     |> assign(:preview, %RenewCollab.Connection.Socket{})}
+  end
+
+  def handle_event("preview_socket", params, socket) do
+    {:noreply,
+     update(
+       socket,
+       :preview,
+       fn s ->
+         s
+         |> RenewCollab.Connection.Socket.changeset(params)
+         |> Ecto.Changeset.apply_changes()
+       end
+     )}
+  end
+
+  def handle_event("change_preview", %{"icon_id" => ""}, socket) do
+    {:noreply, socket |> assign(:icon, nil)}
+  end
+
+  def handle_event("change_preview", %{"icon_id" => icon_id}, socket) do
+    {:noreply, socket |> assign(:icon, RenewCollab.Symbols.find_symbol(icon_id))}
   end
 end
