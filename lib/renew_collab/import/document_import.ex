@@ -219,8 +219,8 @@ defmodule RenewCollab.Import.DocumentImport do
                     %{
                       "stroke_width" => "1",
                       "stroke_color" => "black",
-                      "stroke_join" => "rect",
-                      "stroke_cap" => "rect",
+                      "stroke_join" => "miter",
+                      "stroke_cap" => "butt",
                       "stroke_dash_array" => nil,
                       "smoothness" => convert_smoothness(0)
                     }
@@ -229,8 +229,8 @@ defmodule RenewCollab.Import.DocumentImport do
                     %{
                       "stroke_width" => convert_border_width(Map.get(attrs, "LineWidth", 1)),
                       "stroke_color" => convert_color(Map.get(attrs, "FrameColor", "black")),
-                      "stroke_join" => "rect",
-                      "stroke_cap" => "rect",
+                      "stroke_join" => "miter",
+                      "stroke_cap" => "butt",
                       "stroke_dash_array" => convert_line_style(Map.get(attrs, "LineStyle")),
                       "smoothness" => convert_smoothness(Map.get(attrs, "LineShape", 0))
                     }

@@ -87,6 +87,9 @@ defmodule RenewCollab.Commander do
             end
 
             {:ok, values}
+
+          oo ->
+            dbg(oo)
         end
 
       other ->

@@ -34,7 +34,9 @@ defmodule RenewCollabWeb.SyntaxJSON do
                  "socket_id" => t.target_socket_id
                },
                "source" => %{"socket_id" => t.source_socket_id},
-               "semantic_tag" => t.edge_semantic_tag
+               "semantic_tag" => t.edge_semantic_tag,
+               "source_tip_symbol_shape_id" => t.edge_source_tip_id,
+               "target_tip_symbol_shape_id" => t.edge_target_tip_id
              }
            }}
         end)

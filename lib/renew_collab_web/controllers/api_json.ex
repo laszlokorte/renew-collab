@@ -8,6 +8,10 @@ defmodule RenewCollabWeb.ApiJSON do
           method: "POST",
           href: url(~p"/api/auth")
         },
+        backend: %{
+          method: "GET",
+          href: url(~p"/")
+        },
         documents: %{
           method: "GET",
           href: url(~p"/api/documents")

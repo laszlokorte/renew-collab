@@ -134,6 +134,53 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
   @impl true
   def handle_event(
         "create_layer",
+        params = %{
+          "pos" => %{"x" => cx, "y" => cy},
+          "shape_id" => shape_id,
+          "with_edge" => with_edge
+        },
+        %{},
+        socket
+      ) do
+    width = Map.get(params, "width", 50)
+    height = Map.get(params, "height", 50)
+
+    RenewCollab.Commands.CreateLayerWithEdge.new(%{
+      base_layer_id: Map.get(params, "base_layer_id", nil),
+      document_id: socket.assigns.document_id,
+      edge: with_edge,
+      attrs: %{
+        "semantic_tag" => Map.get(params, "semantic_tag", nil),
+        "box" => %{
+          "position_x" => cx - width / 2,
+          "position_y" => cy - height / 2,
+          "width" => width,
+          "height" => height,
+          "symbol_shape_id" => shape_id
+        },
+        "style" => Map.get(params, "style", nil),
+        "interface" =>
+          case Map.get(params, "socket_schema_id", nil) do
+            nil ->
+              nil
+
+            id ->
+              %{
+                "socket_schema_id" => id
+              }
+          end
+      }
+    })
+    |> RenewCollab.Commander.run_document_command_sync()
+    |> case do
+      {:ok, %{layer: layer}} ->
+        {:reply, %{id: layer.id}, socket}
+    end
+  end
+
+  @impl true
+  def handle_event(
+        "create_layer",
         params = %{"pos" => %{"x" => cx, "y" => cy}, "shape_id" => shape_id},
         %{},
         socket
