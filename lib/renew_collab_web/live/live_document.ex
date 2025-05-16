@@ -376,14 +376,27 @@ defmodule RenewCollabWeb.LiveDocument do
             Create Inscription
           </button>
 
-          <button
-            type="button"
-            phx-click="simulate"
-            phx-disable-with="Compiling..."
-            style="cursor: pointer;padding: 1ex; border: none; background: #a3a; color: #fff;"
-          >
-            Simulate
-          </button>
+          <form phx-submit="simulate">
+            <label style="display: grid; grid-template-columns: 6em;">
+              <button
+                type="submit"
+                phx-disable-with="Compiling..."
+                style="grid-area: 1/1/-1/-1;cursor: pointer; padding: 1ex; border: none; background: #a3a; color: #fff"
+              >
+                Simulate
+              </button>
+              <select
+                onchange="this.previousElementSibling.click()"
+                name="formalism"
+                style="cursor: pointer; grid-area: 1/1/-1/-1;opacity: 0; stretch; align-self: stretch;"
+              >
+                <option selected>---cancel---</option>
+                <%= for f <- RenewCollabSim.Compiler.SnsCompiler.formalisms() do %>
+                  <option>{f}</option>
+                <% end %>
+              </select>
+            </label>
+          </form>
         </div>
 
         <h2 style="cursor: pointer;" phx-click="toggle-meta">
@@ -716,15 +729,29 @@ defmodule RenewCollabWeb.LiveDocument do
               </ul>
             <% end %>
           <% end %>
-          <button
-            type="button"
-            phx-click="simulate"
-            phx-value-redirect="no"
-            phx-disable-with="Compiling..."
-            style="cursor: pointer;padding: 1ex; border: none; background: #a3a; color: #fff;"
-          >
-            Simulate
-          </button>
+
+          <form phx-submit="simulate">
+            <input type="hidden" name="redirect" value="no" />
+            <label style="display: grid; grid-template-columns: 6em;">
+              <button
+                type="submit"
+                phx-disable-with="Compiling..."
+                style="grid-area: 1/1/-1/-1;cursor: pointer; padding: 1ex; border: none; background: #a3a; color: #fff"
+              >
+                Simulate
+              </button>
+              <select
+                onchange="this.previousElementSibling.click()"
+                name="formalism"
+                style="cursor: pointer; grid-area: 1/1/-1/-1;opacity: 0; justify-self: stretch; align-self: stretch; "
+              >
+                <option selected>---cancel---</option>
+                <%= for f <- RenewCollabSim.Compiler.SnsCompiler.formalisms() do %>
+                  <option>{f}</option>
+                <% end %>
+              </select>
+            </label>
+          </form>
         <% end %>
       </div>
     </div>
@@ -1682,7 +1709,10 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def handle_event("simulate", %{} = params, socket) do
+    formalism = RenewCollabSim.Compiler.SnsCompiler.default_formalism()
+
     RenewCollabSim.Simulator.create_simulation_from_documents(
+      formalism,
       [socket.assigns.document.id],
       socket.assigns.document.name
     )

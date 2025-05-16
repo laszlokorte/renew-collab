@@ -83,7 +83,7 @@ export const Hooks = {
       this.el.addEventListener(eventType, (evt) => {
         const newValue = ['radio', 'checkbox'].indexOf(evt.currentTarget.type) > -1 ? evt.currentTarget.checked : evt.currentTarget.value
 
-        console.log("update_style")
+        //console.log("update_style")
         this.pushEvent("update_style", {
           value: newValue,
           element: rnwElement,
@@ -111,7 +111,7 @@ export const Hooks = {
         } = Object.fromEntries(new FormData(evt.currentTarget))
         const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
 
-        console.log("update_box_size")
+        //console.log("update_box_size")
         this.pushEvent("update_box_size", {
           value: {
             position_x,
@@ -138,7 +138,7 @@ export const Hooks = {
         const body = evt.currentTarget.value
         const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
 
-        console.log("update_text_body")
+        //console.log("update_text_body")
         this.pushEvent("update_text_body", {
           value: body,
           layer_id: rnwLayerId,
@@ -161,7 +161,7 @@ export const Hooks = {
         } = Object.fromEntries(new FormData(evt.currentTarget))
         const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
 
-        console.log("update_text_position")
+        //console.log("update_text_position")
         this.pushEvent("update_text_position", {
           value: {
             position_x,
@@ -187,7 +187,7 @@ export const Hooks = {
         const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
         const newValue = evt.currentTarget.valueAsNumber
 
-        console.log("update_z_index")
+        //console.log("update_z_index")
         this.pushEvent("update_z_index", {
           value: newValue,
           layer_id: rnwLayerId,
@@ -215,7 +215,7 @@ export const Hooks = {
         } = Object.fromEntries(new FormData(evt.currentTarget))
         const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
 
-        console.log("update_edge_position")
+        //console.log("update_edge_position")
         this.pushEvent("update_edge_position", {
           value: {
             source_x,
@@ -243,7 +243,7 @@ export const Hooks = {
         const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
         const rnwWaypointId = evt.currentTarget.getAttribute('rnw-waypoint-id')
 
-        console.log("create_waypoint")
+        //console.log("create_waypoint")
         this.pushEvent("create_waypoint", {
           layer_id: rnwLayerId,
           after_waypoint_id: rnwWaypointId,
@@ -270,7 +270,7 @@ export const Hooks = {
         const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
         const rnwWaypointId = evt.currentTarget.getAttribute('rnw-waypoint-id')
 
-        console.log("update_waypoint_position")
+        //console.log("update_waypoint_position")
         this.pushEvent("update_waypoint_position", {
           value: {
             position_x,
@@ -297,7 +297,7 @@ export const Hooks = {
         const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
         const rnwWaypointId = evt.currentTarget.getAttribute('rnw-waypoint-id')
 
-        console.log("delete_waypoint")
+        //console.log("delete_waypoint")
         this.pushEvent("delete_waypoint", {
           layer_id: rnwLayerId,
           waypoint_id: rnwWaypointId,
@@ -319,7 +319,7 @@ export const Hooks = {
       this.el.addEventListener('click', (evt) => {
         const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
 
-        console.log("clear_waypoints")
+        //console.log("clear_waypoints")
         this.pushEvent("clear_waypoints", {
           layer_id: rnwLayerId,
         })
@@ -341,7 +341,7 @@ export const Hooks = {
         const semanticTag = evt.currentTarget.value
         const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
 
-        console.log("update_semantic_tag")
+        //console.log("update_semantic_tag")
         this.pushEvent("update_semantic_tag", {
           value: semanticTag,
           layer_id: rnwLayerId,
@@ -367,7 +367,7 @@ export const Hooks = {
         } = Object.fromEntries(new FormData(evt.currentTarget))
         const rnwLayerId = evt.currentTarget.getAttribute('rnw-layer-id')
 
-        console.log("update_shape")
+        //console.log("update_shape")
         this.pushEvent("update_shape", {
           value: {
             shape_id: shape_id || null,
@@ -399,7 +399,7 @@ export const Hooks = {
         } = Object.fromEntries(new FormData(evt.currentTarget))
 
         if (layer_id && socket_id) {
-          console.log("create_edge_bond")
+          //console.log("create_edge_bond")
           this.pushEvent("create_edge_bond", {
             edge_id: rnwEdgeId,
             kind: bondKind,
@@ -431,7 +431,7 @@ export const Hooks = {
         } = Object.fromEntries(new FormData(evt.currentTarget))
 
         if (target) {
-          console.log("link_layer")
+          //console.log("link_layer")
           this.pushEvent("link_layer", {
             source_layer_id: rnwLayerId,
             target_layer_id: target,
@@ -457,13 +457,13 @@ export const Hooks = {
         const socket_schema_id = evt.currentTarget.value
 
         if (socket_schema_id) {
-          console.log("assign_layer_socket_schema")
+          //console.log("assign_layer_socket_schema")
           this.pushEvent("assign_layer_socket_schema", {
             layer_id: rnwLayerId,
             socket_schema_id: socket_schema_id,
           })
         } else {
-          console.log("remove_layer_socket_schema")
+          //console.log("remove_layer_socket_schema")
           this.pushEvent("remove_layer_socket_schema", {
             layer_id: rnwLayerId,
           })
@@ -490,7 +490,7 @@ export const Hooks = {
         } = Object.fromEntries(new FormData(evt.currentTarget))
 
 
-        console.log("create_snapshot_label")
+        //console.log("create_snapshot_label")
         this.pushEvent("create_snapshot_label", {
           snapshot_id: rnwSnapshotId,
           description: description,
@@ -540,20 +540,20 @@ export const Hooks = {
           const xB = bboxB.x + bboxB.width / 2
           const yB = bboxB.y + bboxB.height / 2
 
-          console.log("create_edge", {
-            source_x: xA,
-            source_y: yA,
-            target_x: xB,
-            target_y: yB,
-            source_bond: {
-              socket_id: this.el.getAttribute('rnw-socket-id'),
-              layer_id: this.el.getAttribute('rnw-layer-id'),
-            },
-            target_bond: {
-              socket_id: snapped.getAttribute('rnw-socket-id'),
-              layer_id: snapped.getAttribute('rnw-layer-id'),
-            }
-          })
+          //console.log("create_edge", {
+          //   source_x: xA,
+          //   source_y: yA,
+          //   target_x: xB,
+          //   target_y: yB,
+          //   source_bond: {
+          //     socket_id: this.el.getAttribute('rnw-socket-id'),
+          //     layer_id: this.el.getAttribute('rnw-layer-id'),
+          //   },
+          //   target_bond: {
+          //     socket_id: snapped.getAttribute('rnw-socket-id'),
+          //     layer_id: snapped.getAttribute('rnw-layer-id'),
+          //   }
+          // })
 
           this.pushEvent("create_edge", {
             source_x: xA,
@@ -706,7 +706,7 @@ export const Hooks = {
           return
         }
 
-        console.log("move_layer")
+        //console.log("move_layer")
         this.pushEvent("move_layer", {
           target_layer_id: targetId,
           layer_id: subjectId,
@@ -757,7 +757,7 @@ export const Hooks = {
 
 
         if(Math.hypot(dx, dy) >= 1){
-          console.log("update_box_size")
+          //console.log("update_box_size")
             const bbox = this.el.getBBox()
             this.pushEvent("update_box_size", {
               value: {
@@ -834,7 +834,7 @@ export const Hooks = {
         const dx = p.x - x
         const dy = p.y - y
         if(Math.hypot(dx, dy) >= 1){
-          console.log("update_box_size")
+          //console.log("update_box_size")
           const bbox = this.el.previousElementSibling.getBBox()
           this.pushEvent("update_box_size", {
             value: {
@@ -915,7 +915,7 @@ export const Hooks = {
 
         const p = cursorPoint(evt)
         if (moved > 2) {
-          console.log("update_edge_position")
+          //console.log("update_edge_position")
           this.pushEvent("update_edge_position", {
             value: {
               [`${rnwEdgeSide}_x`]: p.x,
@@ -995,7 +995,7 @@ export const Hooks = {
 
         const p = cursorPoint(evt)
         if (moved > 2) {
-          console.log("update_waypoint_position")
+          //console.log("update_waypoint_position")
           this.pushEvent("update_waypoint_position", {
             value: {
               position_x: p.x,
@@ -1035,7 +1035,7 @@ export const Hooks = {
           return
         }
 
-        console.log("delete_waypoint")
+        //console.log("delete_waypoint")
         this.pushEvent("delete_waypoint", {
           layer_id: rnwLayerId,
           waypoint_id: rnwWaypointId,
@@ -1087,7 +1087,7 @@ export const Hooks = {
         const rnwLayerId = this.el.getAttribute('rnw-layer-id')
         const rnwWaypointId = this.el.getAttribute('rnw-waypoint-id')
 
-        console.log("create_waypoint")
+        //console.log("create_waypoint")
         this.pushEvent("create_waypoint", {
           layer_id: rnwLayerId,
           after_waypoint_id: rnwWaypointId,
@@ -1309,7 +1309,7 @@ export const Hooks = {
 
         const meta = Object.fromEntries(new FormData(evt.currentTarget))
 
-        console.log("update_document_meta")
+        //console.log("update_document_meta")
         this.pushEvent("update_document_meta", meta)
       })
     },

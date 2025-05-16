@@ -14,7 +14,13 @@ defmodule RenewCollabWeb.LiveShadowNets do
     socket =
       socket
       |> assign(:shadow_net_systems, RenewCollabSim.Simulator.list_shadow_net_systems())
-      |> assign(import_rnw_form: to_form(%{"main_net" => nil}))
+      |> assign(
+        import_rnw_form:
+          to_form(%{
+            "main_net" => nil,
+            "formalism" => RenewCollabSim.Compiler.SnsCompiler.default_formalism()
+          })
+      )
       |> assign(import_sns_form: to_form(%{"main_net" => nil}))
       |> allow_upload(:import_rnw_file, accept: ~w(.rnw), max_entries: @file_count_limit)
       |> allow_upload(:import_sns_file, accept: ~w(.sns), max_entries: 1)
@@ -98,12 +104,21 @@ defmodule RenewCollabWeb.LiveShadowNets do
             </ul>
 
             <%= if @import_rnw_form[:main_net].value != nil and Enum.count(@uploads.import_rnw_file.entries) > 0 and Enum.count(@uploads.import_rnw_file.errors) == 0 do %>
-              <button
-                type="submit"
-                style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff; padding: 1ex"
-              >
-                Import
-              </button>
+              <p>
+                <select name="formalism">
+                  <%= for f <- RenewCollabSim.Compiler.SnsCompiler.formalisms() do %>
+                    <option selected={@import_rnw_form[:formalism].value == f}>{f}</option>
+                  <% end %>
+                </select>
+              </p>
+              <p>
+                <button
+                  type="submit"
+                  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff; padding: 1ex"
+                >
+                  Import
+                </button>
+              </p>
             <% end %>
           </.form>
         </fieldset>
@@ -287,9 +302,13 @@ defmodule RenewCollabWeb.LiveShadowNets do
      |> assign(
        import_rnw_form:
          to_form(
-           Map.update(params, "main_net", default_main, fn
+           params
+           |> Map.update("main_net", default_main, fn
              "" -> default_main
              v -> v
+           end)
+           |> Map.update("formalism", RenewCollabSim.Compiler.SnsCompiler.default_formalism(), fn
+             f -> RenewCollabSim.Compiler.SnsCompiler.compiler_name(f)
            end)
          )
      )}
@@ -312,6 +331,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
        |> assign(
          import_rnw_form:
            to_form(%{
+             "formalism" => RenewCollabSim.Compiler.SnsCompiler.default_formalism(),
              "main_net" =>
                new_socket.assigns.uploads.import_rnw_file.entries
                |> Enum.at(0)
@@ -329,7 +349,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
     end
   end
 
-  def handle_event("import_rnw", %{"main_net" => main_net_ref}, socket) do
+  def handle_event("import_rnw", %{"main_net" => main_net_ref, "formalism" => formalism}, socket) do
     main_net_name =
       Enum.find_value(socket.assigns.uploads.import_rnw_file.entries, nil, fn
         %{ref: ^main_net_ref, client_name: client_name} ->
@@ -348,7 +368,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
         {:ok, {Path.basename(filename), file_content}}
       end)
 
-    RenewCollabSim.Simulator.compile_rnws_to_ssn(paths, main_net_name)
+    RenewCollabSim.Simulator.compile_rnws_to_ssn(formalism, paths, main_net_name)
 
     {:noreply, socket}
   end

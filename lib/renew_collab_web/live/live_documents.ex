@@ -166,14 +166,28 @@ defmodule RenewCollabWeb.LiveDocuments do
                   <td>{document.updated_at |> Calendar.strftime("%Y-%m-%d %H:%M")}</td>
 
                   <td width="50">
-                    <button
-                      phx-click="compile"
-                      phx-value-id={document.id}
-                      phx-disable-with="Compiling..."
-                      style="cursor: pointer; padding: 1ex; border: none; background: #a3a; color: #fff"
-                    >
-                      Simulate
-                    </button>
+                    <form phx-submit="compile">
+                      <input type="hidden" name="document_id" value={document.id} />
+                      <label style="display: grid;">
+                        <button
+                          type="submit"
+                          phx-disable-with="Compiling..."
+                          style="grid-area: 1/1/-1/-1;cursor: pointer; padding: 1ex; border: none; background: #a3a; color: #fff"
+                        >
+                          Simulate
+                        </button>
+                        <select
+                          onchange="this.previousElementSibling.click()"
+                          name="formalism"
+                          style="cursor: pointer; grid-area: 1/1/-1/-1;opacity: 0; width: 100%; "
+                        >
+                          <option selected>---cancel---</option>
+                          <%= for f <- RenewCollabSim.Compiler.SnsCompiler.formalisms() do %>
+                            <option>{f}</option>
+                          <% end %>
+                        </select>
+                      </label>
+                    </form>
                   </td>
 
                   <td width="50">
@@ -325,8 +339,8 @@ defmodule RenewCollabWeb.LiveDocuments do
     {:noreply, socket}
   end
 
-  def handle_event("compile", %{"id" => document_id}, socket) do
-    RenewCollabSim.Simulator.create_simulation_from_documents([document_id])
+  def handle_event("compile", %{"document_id" => document_id, "formalism" => formalism}, socket) do
+    RenewCollabSim.Simulator.create_simulation_from_documents(formalism, [document_id])
     |> case do
       %RenewCollabSim.Entites.Simulation{} = sim ->
         {:noreply, redirect(socket, to: ~p"/simulation/#{sim.id}")}

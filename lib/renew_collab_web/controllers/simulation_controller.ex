@@ -15,7 +15,10 @@ defmodule RenewCollabWeb.SimulationController do
 
   def create(conn, params = %{"document_ids" => document_ids})
       when is_list(document_ids) do
+    formalism = RenewCollabSim.Compiler.SnsCompiler.default_formalism()
+
     case RenewCollabSim.Simulator.create_simulation_from_documents(
+           formalism,
            document_ids,
            Map.get(params, "main_net_name")
          ) do

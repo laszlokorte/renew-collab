@@ -1,5 +1,16 @@
 defmodule RenewCollabSim.Compiler.SnsCompiler do
-  def compile(nets) do
+  @formalisms [
+    "P/T Net Compiler",
+    "P/T Net in Net Compiler",
+    "Java Net Compiler",
+    "Bool Net Compiler",
+    "Timed Java Compiler",
+    "Single P/T Net with Channel Compiler"
+  ]
+
+  def compile(formalism, nets) do
+    {:ok, compiler} = compiler_name(formalism)
+
     uuid_dir = "renew-ssn-compilation-#{UUID.uuid4(:default)}"
     {:ok, output_root} = Path.safe_relative_to(uuid_dir, System.tmp_dir!())
     output_root = Path.absname(output_root, System.tmp_dir!())
@@ -28,7 +39,7 @@ defmodule RenewCollabSim.Compiler.SnsCompiler do
 
       script_content =
         [
-          "setFormalism Java Net Compiler",
+          "setFormalism #{compiler}",
           "ex ShadowNetSystem -a #{Enum.join(paths |> Enum.map(&"\"#{&1}\""), " ")} -o \"#{output_path}\""
         ]
         |> Enum.join("\n")
@@ -46,6 +57,13 @@ defmodule RenewCollabSim.Compiler.SnsCompiler do
       File.rm_rf(output_root_upload)
     end
   end
+
+  def compiler_name(c) when c in @formalisms, do: {:ok, c}
+  def compiler_name(c), do: {:error, c}
+
+  def formalisms(), do: @formalisms
+
+  def default_formalism(), do: @formalisms |> List.first()
 
   def normalize_net_name(name) do
     String.split(name, ".") |> List.first() |> String.trim()
