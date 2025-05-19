@@ -76,6 +76,16 @@ defmodule RenewCollabSim.Simulator do
     |> Repo.preload(net_instances: :firings)
   end
 
+  def find_simulation_log_entries(id) do
+    Repo.all(
+      from(sl in SimulationLogEntry,
+        where: sl.simulation_id == ^id,
+        order_by: [desc: sl.inserted_at],
+        limit: 10
+      )
+    )
+  end
+
   def find_simulation_simple(id) do
     Repo.one(
       from(s in Simulation,

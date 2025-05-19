@@ -36,6 +36,10 @@ defmodule RenewCollabWeb.ApiJSON do
           method: "GET",
           href: url(~p"/api/simulations/:id")
         },
+        formalisms: %{
+          method: "GET",
+          href: url(~p"/api/formalisms")
+        },
         syntax: %{
           method: "GET",
           href: url(~p"/api/syntax")

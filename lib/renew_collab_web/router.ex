@@ -79,9 +79,12 @@ defmodule RenewCollabWeb.Router do
     scope "/simulations" do
       resources "/", SimulationController, except: [:new, :edit]
       get "/:id/instance/:net_name/:integer_id", SimulationController, :show_instance
+      get "/:id/log", SimulationController, :log
       post "/:id/step", SimulationController, :step
       delete "/:id/process", SimulationController, :terminate
     end
+
+    get "/formalisms", SimulationController, :formalisms
 
     get "/shadow_net_system/:id", SimulationController, :show_sns
     get "/shadow_net_system/:id/download", ShadowNetController, :download

@@ -15,7 +15,8 @@ defmodule RenewCollabWeb.SimulationController do
 
   def create(conn, params = %{"document_ids" => document_ids})
       when is_list(document_ids) do
-    formalism = RenewCollabSim.Compiler.SnsCompiler.default_formalism()
+    formalism =
+      Map.get(params, "formalism", RenewCollabSim.Compiler.SnsCompiler.default_formalism())
 
     case RenewCollabSim.Simulator.create_simulation_from_documents(
            formalism,
@@ -61,6 +62,13 @@ defmodule RenewCollabWeb.SimulationController do
     )
   end
 
+  def log(conn, %{"id" => simulation_id}) do
+    render(conn, :log,
+      simulation_id: simulation_id,
+      log_entries: RenewCollabSim.Simulator.find_simulation_log_entries(simulation_id)
+    )
+  end
+
   def show_sns(conn, %{"id" => sns_id}) do
     render(conn, :show_sns, sns: RenewCollabSim.Simulator.find_shadow_net_system(sns_id))
   end
@@ -82,5 +90,9 @@ defmodule RenewCollabWeb.SimulationController do
       net_instance:
         RenewCollabSim.Simulator.find_simulation_net_instance(simulation_id, net_name, integer_id)
     )
+  end
+
+  def formalisms(conn, %{}) do
+    render(conn, :formalisms, formalisms: RenewCollabSim.Compiler.SnsCompiler.formalisms())
   end
 end

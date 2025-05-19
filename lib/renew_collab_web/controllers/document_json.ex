@@ -133,6 +133,10 @@ defmodule RenewCollabWeb.DocumentJSON do
           href: url(~p"/api/primitives"),
           method: "get"
         },
+        formalisms: %{
+          method: "GET",
+          href: url(~p"/api/formalisms")
+        },
         export: %{
           href: url(~p"/api/documents/#{document.id}/export"),
           method: "get"

@@ -13,6 +13,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
 
     socket =
       socket
+      |> assign(:is_admin, is_admin(socket))
       |> assign(:shadow_net_systems, RenewCollabSim.Simulator.list_shadow_net_systems())
       |> assign(
         import_rnw_form:
@@ -123,73 +124,75 @@ defmodule RenewCollabWeb.LiveShadowNets do
           </.form>
         </fieldset>
 
-        <fieldset style="margin-bottom: 1em">
-          <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
-            Import Shadow Net (.sns) File to Simulate
-          </legend>
+        <%= if @is_admin do %>
+          <fieldset style="margin-bottom: 1em">
+            <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
+              Import Shadow Net (.sns) File to Simulate
+            </legend>
 
-          <p>
-            Select a single Shadow Net System (sns) file<br />from your computer to import:
-          </p>
+            <p>
+              Select a single Shadow Net System (sns) file<br />from your computer to import:
+            </p>
 
-          <.form for={@import_sns_form} phx-submit="import_sns" phx-change="validate_sns">
-            <.live_file_input
-              upload={@uploads.import_sns_file}
-              style="padding: 0.5em; background: #666; color: #fff; width: 100%; box-sizing: border-box;"
-            />
-            <%= unless Enum.empty?(@uploads.import_sns_file.entries) do %>
-              <dl style="display: grid; grid-template-columns: auto auto auto; justify-content: start; gap: 2px ; align-items: center">
-                <%= for entry <- @uploads.import_sns_file.entries do %>
-                  <dt style="grid-column: 1; display: flex; gap: 1em">
-                    <button
-                      style="justify-content: center; text-align: center; font-weight: bold; cursor: pointer; width: 1.8em; height: 1.8em; display: flex; place-items: center; border: none; background: #a33; color: #fff; border-radius: 100%;"
-                      type="button"
-                      phx-click="cancel-upload"
-                      phx-value-ref={entry.ref}
-                      aria-label="cancel"
-                    >
-                      &times;
-                    </button>
-                    {entry.client_name}
-                  </dt>
+            <.form for={@import_sns_form} phx-submit="import_sns" phx-change="validate_sns">
+              <.live_file_input
+                upload={@uploads.import_sns_file}
+                style="padding: 0.5em; background: #666; color: #fff; width: 100%; box-sizing: border-box;"
+              />
+              <%= unless Enum.empty?(@uploads.import_sns_file.entries) do %>
+                <dl style="display: grid; grid-template-columns: auto auto auto; justify-content: start; gap: 2px ; align-items: center">
+                  <%= for entry <- @uploads.import_sns_file.entries do %>
+                    <dt style="grid-column: 1; display: flex; gap: 1em">
+                      <button
+                        style="justify-content: center; text-align: center; font-weight: bold; cursor: pointer; width: 1.8em; height: 1.8em; display: flex; place-items: center; border: none; background: #a33; color: #fff; border-radius: 100%;"
+                        type="button"
+                        phx-click="cancel-upload"
+                        phx-value-ref={entry.ref}
+                        aria-label="cancel"
+                      >
+                        &times;
+                      </button>
+                      {entry.client_name}
+                    </dt>
 
-                  <dd>
-                    <%!-- entry.progress will update automatically for in-flight entries --%>
-                    <progress value={entry.progress} max="100">{entry.progress}%</progress>
-                  </dd>
+                    <dd>
+                      <%!-- entry.progress will update automatically for in-flight entries --%>
+                      <progress value={entry.progress} max="100">{entry.progress}%</progress>
+                    </dd>
 
-                  <dd style="grid-column: 1 / span 3;">
-                    <ul>
-                      <%= for err <- upload_errors(@uploads.import_sns_file, entry) do %>
-                        <li class="alert alert-danger">{error_to_string(err)}</li>
-                      <% end %>
-                    </ul>
-                  </dd>
-                <% end %>
-              </dl>
-            <% end %>
-
-            <ul style="margin: 0; padding: 0;">
-              <%= for err <- upload_errors(@uploads.import_sns_file) do %>
-                <li class="alert alert-danger">{error_to_string(err)}</li>
+                    <dd style="grid-column: 1 / span 3;">
+                      <ul>
+                        <%= for err <- upload_errors(@uploads.import_sns_file, entry) do %>
+                          <li class="alert alert-danger">{error_to_string(err)}</li>
+                        <% end %>
+                      </ul>
+                    </dd>
+                  <% end %>
+                </dl>
               <% end %>
-            </ul>
 
-            <label>
-              Main Net Name <br /> (required for running the simulation):
-              <.input field={@import_sns_form[:main_net]} />
-            </label>
+              <ul style="margin: 0; padding: 0;">
+                <%= for err <- upload_errors(@uploads.import_sns_file) do %>
+                  <li class="alert alert-danger">{error_to_string(err)}</li>
+                <% end %>
+              </ul>
 
-            <%= if @import_sns_form[:main_net].value != "" and Enum.count(@uploads.import_sns_file.entries) > 0 and Enum.count(@uploads.import_sns_file.errors) == 0 do %>
-              <button
-                type="submit"
-                style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff; padding: 1ex"
-              >
-                Import
-              </button>
-            <% end %>
-          </.form>
-        </fieldset>
+              <label>
+                Main Net Name <br /> (required for running the simulation):
+                <.input field={@import_sns_form[:main_net]} />
+              </label>
+
+              <%= if @import_sns_form[:main_net].value != "" and Enum.count(@uploads.import_sns_file.entries) > 0 and Enum.count(@uploads.import_sns_file.errors) == 0 do %>
+                <button
+                  type="submit"
+                  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff; padding: 1ex"
+                >
+                  Import
+                </button>
+              <% end %>
+            </.form>
+          </fieldset>
+        <% end %>
       </div>
 
       <div style="padding: 1em">
@@ -374,17 +377,21 @@ defmodule RenewCollabWeb.LiveShadowNets do
   end
 
   def handle_event("import_sns", %{"main_net" => main_net_name}, socket) do
-    [_sns] =
-      consume_uploaded_entries(socket, :import_sns_file, fn %{path: path}, %{} ->
-        {:ok, file_content} = File.read(path)
+    if socket.assigns.is_admin do
+      [_sns] =
+        consume_uploaded_entries(socket, :import_sns_file, fn %{path: path}, %{} ->
+          {:ok, file_content} = File.read(path)
 
-        RenewCollabSim.Simulator.create_shadow_net(file_content, main_net_name, [
-          %{"name" => main_net_name}
-        ])
-        |> dbg
-      end)
+          RenewCollabSim.Simulator.create_shadow_net(file_content, main_net_name, [
+            %{"name" => main_net_name}
+          ])
+          |> dbg
+        end)
 
-    {:noreply, socket |> assign(import_sns_form: to_form(%{"main_net" => nil}))}
+      {:noreply, socket |> assign(import_sns_form: to_form(%{"main_net" => nil}))}
+    else
+      {:noreply, socket}
+    end
   end
 
   def handle_event("delete", %{"id" => sns_id}, socket) do

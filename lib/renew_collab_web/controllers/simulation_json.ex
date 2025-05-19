@@ -16,6 +16,10 @@ defmodule RenewCollabWeb.SimulationJSON do
     }
   end
 
+  def formalisms(%{formalisms: formalisms}) do
+    %{formalisms: formalisms |> Enum.map(&%{id: &1, label: &1})}
+  end
+
   def created(%{simulation: simulation}) do
     %{id: simulation.id}
   end
@@ -39,6 +43,10 @@ defmodule RenewCollabWeb.SimulationJSON do
       topic: "redux_simulation:#{simulation.id}",
       id: simulation.id,
       links: %{
+        log: %{
+          href: url(~p"/api/simulations/#{simulation}/log"),
+          method: "GET"
+        },
         step: %{
           href: url(~p"/api/simulations/#{simulation}/step"),
           method: "POST"
@@ -208,6 +216,24 @@ defmodule RenewCollabWeb.SimulationJSON do
             map -> MapSet.member?(map, simulation.id)
           end
       }
+    }
+  end
+
+  def log(%{simulation_id: simulation_id, log_entries: log_entries}) do
+    %{
+      href: url(~p"/api/simulations/#{simulation_id}"),
+      topic: "redux_simulation_log:#{simulation_id}",
+      content: show_log_content(log_entries)
+    }
+  end
+
+  def show_log_content(log_entries) do
+    %{
+      log_entries:
+        log_entries
+        |> Enum.map(fn log ->
+          %{content: log.content}
+        end)
     }
   end
 end

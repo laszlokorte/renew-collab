@@ -9,6 +9,7 @@ defmodule RenewCollabWeb.ReduxSocket do
 
   channel "redux_net_instance:*", RenewCollabWeb.ReduxSimulationNetInstanceChannel
   channel "redux_simulation_links:*", RenewCollabWeb.ReduxSimulationLinksChannel
+  channel "redux_simulation_log:*", RenewCollabWeb.ReduxSimulationLogChannel
 
   @impl true
   def connect(%{"token" => token}, socket, _connect_info) do
