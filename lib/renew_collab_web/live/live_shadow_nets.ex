@@ -124,12 +124,12 @@ defmodule RenewCollabWeb.LiveShadowNets do
           </.form>
         </fieldset>
 
-        <%= if @is_admin do %>
-          <fieldset style="margin-bottom: 1em">
-            <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
-              Import Shadow Net (.sns) File to Simulate
-            </legend>
+        <fieldset style="margin-bottom: 1em">
+          <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
+            Import Shadow Net (.sns) File to Simulate
+          </legend>
 
+          <%= if @is_admin do %>
             <p>
               Select a single Shadow Net System (sns) file<br />from your computer to import:
             </p>
@@ -191,8 +191,12 @@ defmodule RenewCollabWeb.LiveShadowNets do
                 </button>
               <% end %>
             </.form>
-          </fieldset>
-        <% end %>
+          <% else %>
+            <p>
+              Only admins can import SNS files
+            </p>
+          <% end %>
+        </fieldset>
       </div>
 
       <div style="padding: 1em">

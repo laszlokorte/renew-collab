@@ -1,8 +1,6 @@
 defmodule RenewCollabWeb.ReduxSimulationLogChannel do
   use RenewCollabWeb.StateChannel, web_module: RenewCollabWeb
 
-  alias RenewCollabWeb.Presence
-
   @impl true
   def init("redux_simulation_log:" <> simulation_id, _params, socket) do
     case RenewCollabSim.Simulator.find_simulation_simple(simulation_id) do
@@ -10,7 +8,7 @@ defmodule RenewCollabWeb.ReduxSimulationLogChannel do
         {:error, %{reason: "not found"}}
 
       sim ->
-        Phoenix.PubSub.subscribe(RenewCollab.PubSub, "simulation:#{simulation_id}")
+        Phoenix.PubSub.subscribe(RenewCollab.PubSub, "simulation:#{sim.id}")
 
         {:ok,
          RenewCollabSim.Simulator.find_simulation_log_entries(simulation_id)
@@ -27,7 +25,7 @@ defmodule RenewCollabWeb.ReduxSimulationLogChannel do
 
       sim ->
         {:noreply,
-         RenewCollabSim.Simulator.find_simulation_log_entries(simulation_id)
+         RenewCollabSim.Simulator.find_simulation_log_entries(sim.id)
          |> RenewCollabWeb.SimulationJSON.show_log_content()}
     end
   end

@@ -56,10 +56,20 @@ defmodule RenewCollabWeb.SimulationController do
   end
 
   def show(conn, %{"id" => simulation_id}) do
-    render(conn, :show,
-      simulation: RenewCollabSim.Simulator.find_simulation(simulation_id),
-      running: RenewCollabSim.Server.SimulationServer.exists(simulation_id)
-    )
+    RenewCollabSim.Simulator.find_simulation(simulation_id)
+    |> case do
+      nil ->
+        conn
+        |> put_status(:not_found)
+        |> Phoenix.Controller.json(%{message: "Simulation not found"})
+        |> halt()
+
+      sim ->
+        render(conn, :show,
+          simulation: sim,
+          running: RenewCollabSim.Server.SimulationServer.exists(simulation_id)
+        )
+    end
   end
 
   def log(conn, %{"id" => simulation_id}) do

@@ -1,13 +1,4 @@
 defmodule RenewCollabSim.Compiler.SnsCompiler do
-  @formalisms [
-    "P/T Net Compiler",
-    "P/T Net in Net Compiler",
-    "Java Net Compiler",
-    "Bool Net Compiler",
-    "Timed Java Compiler",
-    "Single P/T Net with Channel Compiler"
-  ]
-
   def compile(formalism, nets) do
     {:ok, compiler} = compiler_name(formalism)
 
@@ -58,12 +49,17 @@ defmodule RenewCollabSim.Compiler.SnsCompiler do
     end
   end
 
-  def compiler_name(c) when c in @formalisms, do: {:ok, c}
-  def compiler_name(c), do: {:error, c}
+  def compiler_name(c) do
+    if Enum.member?(formalisms(), c) do
+      {:ok, c}
+    else
+      {:error, :c}
+    end
+  end
 
-  def formalisms(), do: @formalisms
+  def formalisms(), do: Application.fetch_env!(:renew_collab, :formalisms)
 
-  def default_formalism(), do: @formalisms |> List.first()
+  def default_formalism(), do: formalisms() |> List.first()
 
   def normalize_net_name(name) do
     String.split(name, ".") |> List.first() |> String.trim()

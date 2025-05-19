@@ -35,6 +35,10 @@ config :renew_collab, RenewCollabSim.Repo, priv: "priv/repo_sim"
 
 config :renew_collab, RenewCollabAuth.Repo, priv: "priv/repo_auth"
 
+config :renew_collab,
+       :formalisms,
+       (System.get_env("RENEW_FORMALISMS") || "") |> String.split(";") |> Enum.map(&String.trim/1)
+
 # Configures the endpoint
 config :renew_collab, RenewCollabWeb.Endpoint,
   url: [host: "localhost"],

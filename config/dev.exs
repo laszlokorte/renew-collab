@@ -27,6 +27,15 @@ config :renew_collab, RenewCollabAuth.Repo,
 config :renew_collab, RenewCollab.TextMeasure.MeasureServer,
   script: "priv/text_metrics/TextMeasure.java"
 
+config :renew_collab, :formalisms, [
+  "P/T Net Compiler",
+  "P/T Net in Net Compiler",
+  "Java Net Compiler",
+  "Bool Net Compiler",
+  "Timed Java Compiler",
+  "Single P/T Net with Channel Compiler"
+]
+
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #
