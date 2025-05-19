@@ -194,6 +194,13 @@ if config_env() == :prod do
     config :renew_collab, :editor_url, editor_url
   end
 
+  config :renew_collab,
+         :formalisms,
+         (System.get_env("RENEW_FORMALISMS") || "")
+         |> String.split(";")
+         |> Enum.map(&String.trim/1)
+         |> Enum.filter(&(&1 != ""))
+
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key
