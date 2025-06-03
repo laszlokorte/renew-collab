@@ -26,6 +26,13 @@ defmodule RenewCollabWeb.LiveProject do
 
       <div style="padding: 1em">
         <h2 style="margin: 0;">Project: {@project.name}</h2>
+
+        <h3>Members</h3>
+        <ul>
+          <%= for m <- @project.members do %>
+            <li>{m.account.email}</li>
+          <% end %>
+        </ul>
       </div>
     </div>
     """

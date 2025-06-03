@@ -60,6 +60,9 @@ defmodule RenewCollabWeb.LiveProjects do
               <th style="border-bottom: 1px solid #333;" align="left" width="200">Created</th>
 
               <th style="border-bottom: 1px solid #333;" align="left" width="200">Last Updated</th>
+              <th style="border-bottom: 1px solid #333;" align="left" width="10">Document</th>
+              <th style="border-bottom: 1px solid #333;" align="left" width="10">Simulations</th>
+              <th style="border-bottom: 1px solid #333;" align="left" width="10">Members</th>
 
               <th style="border-bottom: 1px solid #333;" align="left" width="100" colspan="3">
                 Actions
@@ -89,8 +92,11 @@ defmodule RenewCollabWeb.LiveProjects do
 
                   <td>{project.updated_at |> Calendar.strftime("%Y-%m-%d %H:%M")}</td>
 
-                  <td width="50"></td>
+                  <td width="50">{project.documents |> Enum.count()}</td>
 
+                  <td width="50">{project.simulations |> Enum.count()}</td>
+                  <td width="50">{project.members |> Enum.count()}</td>
+                  <td width="50"></td>
                   <td width="50"></td>
 
                   <td width="50">

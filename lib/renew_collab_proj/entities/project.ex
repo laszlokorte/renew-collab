@@ -7,6 +7,10 @@ defmodule RenewCollabProj.Entites.Project do
   schema "project" do
     field :name, :string
 
+    has_many :documents, RenewCollabProj.Entites.ProjectDocument
+    has_many :simulations, RenewCollabProj.Entites.ProjectSimulation
+    has_many :members, RenewCollabProj.Entites.ProjectMember
+
     timestamps(type: :utc_datetime)
   end
 
