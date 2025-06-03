@@ -24,9 +24,10 @@ config :renew_collab, :app_titel, System.get_env("RENEW_APP_TITEL") || "Renew We
 config :renew_collab, :db_adapter, choose_db.("RENEW_DOCS_DB_TYPE")
 config :renew_collab, :db_auth_adapter, choose_db.("RENEW_ACCOUNT_DB_TYPE")
 config :renew_collab, :db_sim_adapter, choose_db.("RENEW_SIM_DB_TYPE")
+config :renew_collab, :db_proj_adapter, choose_db.("RENEW_PROJ_DB_TYPE")
 
 config :renew_collab,
-  ecto_repos: [RenewCollab.Repo, RenewCollabSim.Repo, RenewCollabAuth.Repo],
+  ecto_repos: [RenewCollab.Repo, RenewCollabSim.Repo, RenewCollabAuth.Repo, RenewCollabProj.Repo],
   generators: [timestamp_type: :utc_datetime, binary_id: true]
 
 config :renew_collab, RenewCollab.Repo, priv: "priv/repo"
@@ -34,6 +35,8 @@ config :renew_collab, RenewCollab.Repo, priv: "priv/repo"
 config :renew_collab, RenewCollabSim.Repo, priv: "priv/repo_sim"
 
 config :renew_collab, RenewCollabAuth.Repo, priv: "priv/repo_auth"
+
+config :renew_collab, RenewCollabProj.Repo, priv: "priv/repo_proj"
 
 # Configures the endpoint
 config :renew_collab, RenewCollabWeb.Endpoint,

@@ -12,6 +12,7 @@ defmodule RenewCollab.Application do
       RenewCollab.Repo,
       RenewCollabSim.Repo,
       RenewCollabAuth.Repo,
+      RenewCollabProj.Repo,
       {Ecto.Migrator,
        repos: Application.fetch_env!(:renew_collab, :ecto_repos), skip: skip_migrations?()},
       {DNSCluster, query: Application.get_env(:renew_collab, :dns_cluster_query) || :ignore},

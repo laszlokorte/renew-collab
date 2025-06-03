@@ -24,6 +24,13 @@ config :renew_collab, RenewCollabAuth.Repo,
   stacktrace: true,
   show_sensitive_data_on_connection_error: true
 
+config :renew_collab, RenewCollabProj.Repo,
+  adapter: Ecto.Adapters.SQLite3,
+  database: Path.expand("../renew_collab_proj_dev.db", __DIR__),
+  pool_size: 1,
+  stacktrace: true,
+  show_sensitive_data_on_connection_error: true
+
 config :renew_collab, RenewCollab.TextMeasure.MeasureServer,
   script: "priv/text_metrics/TextMeasure.java"
 

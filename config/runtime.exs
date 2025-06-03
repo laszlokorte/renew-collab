@@ -123,6 +123,20 @@ if config_env() == :prod do
            )
          )
 
+  config :renew_collab,
+         RenewCollabProj.Repo,
+         [
+           adapter: Application.compile_env(:renew_collab, :db_proj_adapter),
+           stacktrace: false,
+           show_sensitive_data_on_connection_error: false
+         ]
+         |> Keyword.merge(
+           read_db_config.(
+             Application.compile_env(:renew_collab, :db_proj_adapter),
+             "RENEW_PROJ_DB"
+           )
+         )
+
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you
   # want to use a different value for prod and you most likely don't want
