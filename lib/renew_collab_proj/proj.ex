@@ -33,6 +33,51 @@ defmodule RenewCollabProj.Projects do
     )
   end
 
+  def list_own_projects(nil), do: []
+
+  def list_own_projects(account_id) do
+    Repo.all(
+      from(p in Project,
+        left_join: m in assoc(p, :members),
+        left_join: o in assoc(p, :ownerships),
+        left_join: d in assoc(p, :documents),
+        left_join: s in assoc(p, :simulations),
+        inner_join: mm in assoc(p, :members),
+        where: mm.account_id == ^account_id,
+        order_by: [desc: :inserted_at],
+        preload: [
+          ownerships: o,
+          members: m,
+          documents: d,
+          simulations: s
+        ]
+      )
+    )
+  end
+
+  def find_own_project(account_id, project_id) do
+    Repo.one(
+      from(
+        p in Project,
+        left_join: m in assoc(p, :members),
+        left_join: d in assoc(p, :documents),
+        left_join: s in assoc(p, :simulations),
+        inner_join: mm in assoc(p, :members),
+        where: p.id == ^project_id,
+        where: mm.account_id == ^account_id,
+        order_by: [asc: m.inserted_at, asc: d.inserted_at, asc: s.inserted_at],
+        preload: [
+          members: m,
+          documents: d,
+          simulations: s
+        ]
+      )
+    )
+    |> RenewCollab.Repo.preload(documents: [:document])
+    |> RenewCollabAuth.Repo.preload(members: [:account])
+    |> RenewCollabSim.Repo.preload(simulations: [:simulation])
+  end
+
   def find_project(id) do
     Repo.one(
       from(

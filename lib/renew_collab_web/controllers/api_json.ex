@@ -28,6 +28,10 @@ defmodule RenewCollabWeb.ApiJSON do
           method: "GET",
           href: url(~p"/api/simulations")
         },
+        projects: %{
+          method: "GET",
+          href: url(~p"/api/projects")
+        },
         document: %{
           method: "GET",
           href: url(~p"/api/documents/:id")

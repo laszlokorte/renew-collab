@@ -24,6 +24,15 @@ defmodule RenewCollabWeb.Router do
     plug :require_authenticated_account, false
   end
 
+  if Application.compile_env(:renew_collab, :dev_routes) do
+    pipeline :debug_protected_api do
+      plug :fetch_session
+      plug :accepts, ["json"]
+      plug :debug_fetch_admin_account_by_header
+      plug :require_authenticated_account, false
+    end
+  end
+
   pipeline :authenticated do
     plug :require_authenticated_account
   end
@@ -48,7 +57,7 @@ defmodule RenewCollabWeb.Router do
 
   scope "/api", RenewCollabWeb do
     if Application.compile_env(:renew_collab, :dev_routes) do
-      pipe_through :api
+      pipe_through :debug_protected_api
     else
       pipe_through :protected_api
     end
@@ -70,6 +79,10 @@ defmodule RenewCollabWeb.Router do
       get "/:id/simulations", SimulationLinksController, :index
 
       resources "/", DocumentController, except: [:new, :edit]
+    end
+
+    scope "/projects" do
+      resources "/", ProjectController, except: [:new, :edit]
     end
 
     scope "/media" do
