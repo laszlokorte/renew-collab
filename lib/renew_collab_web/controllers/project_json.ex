@@ -17,6 +17,50 @@ defmodule RenewCollabWeb.ProjectJSON do
     detail_data(project)
   end
 
+  def export(%{project: project}) do
+    %{
+      href: url(~p"/api/projects/#{project.id}/export"),
+      project: %{
+        href: url(~p"/api/projects/#{project}"),
+        name: project.name,
+        id: project.id
+      }
+    }
+  end
+
+  def projects(%{project: project}) do
+    %{
+      href: url(~p"/api/projects/#{project.id}/documents"),
+      project: %{
+        href: url(~p"/api/projects/#{project}"),
+        name: project.name,
+        id: project.id
+      }
+    }
+  end
+
+  def simulations(%{project: project}) do
+    %{
+      href: url(~p"/api/projects/#{project.id}/simulations"),
+      project: %{
+        href: url(~p"/api/projects/#{project}"),
+        name: project.name,
+        id: project.id
+      }
+    }
+  end
+
+  def members(%{project: project}) do
+    %{
+      href: url(~p"/api/projects/#{project.id}/members"),
+      project: %{
+        href: url(~p"/api/projects/#{project}"),
+        name: project.name,
+        id: project.id
+      }
+    }
+  end
+
   def index_content(%{projects: projects}) do
     %{
       items: for(project <- projects, do: list_data(project))

@@ -82,6 +82,11 @@ defmodule RenewCollabWeb.Router do
     end
 
     scope "/projects" do
+      get "/:id/export", ProjectController, :export
+      get "/:id/members", ProjectController, :members
+      get "/:id/documents", ProjectController, :documents
+      get "/:id/simulations", ProjectController, :simulations
+
       resources "/", ProjectController, except: [:new, :edit]
     end
 
