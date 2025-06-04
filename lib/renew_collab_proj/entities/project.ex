@@ -10,6 +10,7 @@ defmodule RenewCollabProj.Entites.Project do
     has_many :documents, RenewCollabProj.Entites.ProjectDocument
     has_many :simulations, RenewCollabProj.Entites.ProjectSimulation
     has_many :members, RenewCollabProj.Entites.ProjectMember
+    has_many :ownerships, RenewCollabProj.Entites.ProjectMember, where: [role: :owner]
 
     timestamps(type: :utc_datetime)
   end
@@ -18,6 +19,17 @@ defmodule RenewCollabProj.Entites.Project do
   def changeset(project, attrs) do
     project
     |> cast(attrs, [:name])
+    |> validate_required([:name])
+  end
+
+  @doc false
+  def creation_changeset(project, attrs) do
+    project
+    |> cast(attrs, [:name])
+    |> cast_assoc(
+      :ownerships,
+      with: &RenewCollabProj.Entites.ProjectMember.changeset_creation/2
+    )
     |> validate_required([:name])
   end
 end

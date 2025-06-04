@@ -18,6 +18,5 @@ defmodule RenewCollabProj.Repo.Migrations.AddProjectMemberTable do
       timestamps(type: :utc_datetime)
     end
     
-    create unique_index(:project_member, [:account_id])
   end
 end

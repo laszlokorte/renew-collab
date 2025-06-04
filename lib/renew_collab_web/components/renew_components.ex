@@ -26,6 +26,7 @@ defmodule RenewCollabWeb.RenewComponents do
 
       <div style="display: flex; gap: 2em; align-items: stretch;">
         <%= if not @blank do %>
+          <.link style="color: white; align-self: center;" navigate={~p"/projects"}>Projects</.link>
           <.link style="color: white; align-self: center;" navigate={~p"/documents"}>Documents</.link>
           <.link style="color: white; align-self: center;" navigate={~p"/shadow_nets"}>
             Simulations

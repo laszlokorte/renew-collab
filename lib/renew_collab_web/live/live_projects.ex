@@ -12,7 +12,13 @@ defmodule RenewCollabWeb.LiveProjects do
     socket =
       socket
       |> assign(:projects, Projects.list_all_projects())
-      |> assign(create_form: to_form(%{}))
+      |> assign(:accounts, Projects.find_accounts())
+      |> assign(
+        create_form:
+          to_form(%{
+            "owner" => socket.assigns.current_account.id
+          })
+      )
 
     {:ok, socket}
   end
@@ -22,15 +28,23 @@ defmodule RenewCollabWeb.LiveProjects do
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
       <RenewCollabWeb.RenewComponents.app_header />
       <div style="padding: 1em 1em 0; display: flex; align-items: start; gap: 1em">
-        <fieldset style="margin-bottom: 1em">
-          <p>Create a new Project</p>
-
+        <fieldset style="margin-bottom: 1em; width: 30%">
           <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
             New Project
           </legend>
 
           <.form for={@create_form} phx-submit="create_project" phx-change="validate_project">
-            <div style="display: flex; align-items: stretch; gap: 0.1em">
+            <div style="display: flex; align-items: stretch; gap: 0.1em; flex-direction: column;">
+              <input type="hidden" name="ownerships[0][role]" value="owner" />
+              <label>
+                Owner:
+                <.input
+                  field={@create_form[:owner]}
+                  name="ownerships[0][account_id]"
+                  type="select"
+                  options={@accounts |> Enum.map(&{&1.email, &1.id})}
+                />
+              </label>
               <input
                 type="text"
                 name="name"
@@ -38,6 +52,7 @@ defmodule RenewCollabWeb.LiveProjects do
                 value={@create_form[:name].value}
                 id={@create_form[:name].id}
               />
+
               <button
                 type="submit"
                 style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff; padding: 1ex"
@@ -62,7 +77,7 @@ defmodule RenewCollabWeb.LiveProjects do
               <th style="border-bottom: 1px solid #333;" align="left" width="200">Last Updated</th>
               <th style="border-bottom: 1px solid #333;" align="left" width="10">Document</th>
               <th style="border-bottom: 1px solid #333;" align="left" width="10">Simulations</th>
-              <th style="border-bottom: 1px solid #333;" align="left" width="10">Members</th>
+              <th style="border-bottom: 1px solid #333;" align="left" width="10">Owners/Members</th>
 
               <th style="border-bottom: 1px solid #333;" align="left" width="100" colspan="3">
                 Actions
@@ -95,7 +110,9 @@ defmodule RenewCollabWeb.LiveProjects do
                   <td width="50">{project.documents |> Enum.count()}</td>
 
                   <td width="50">{project.simulations |> Enum.count()}</td>
-                  <td width="50">{project.members |> Enum.count()}</td>
+                  <td width="50">
+                    {project.ownerships |> Enum.count()} / {project.members |> Enum.count()}
+                  </td>
                   <td width="50"></td>
                   <td width="50"></td>
 

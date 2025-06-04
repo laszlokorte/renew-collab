@@ -12,17 +12,19 @@ defmodule RenewCollabProj.Projects do
   import Ecto.Query, warn: false
 
   def create_project(params) do
-    %Project{} |> Project.changeset(params) |> Repo.insert()
+    %Project{} |> Project.creation_changeset(params) |> dbg |> Repo.insert() |> dbg
   end
 
   def list_all_projects() do
     Repo.all(
       from(p in Project,
         left_join: m in assoc(p, :members),
+        left_join: o in assoc(p, :ownerships),
         left_join: d in assoc(p, :documents),
         left_join: s in assoc(p, :simulations),
-        order_by: [asc: :inserted_at],
+        order_by: [desc: :inserted_at],
         preload: [
+          ownerships: o,
           members: m,
           documents: d,
           simulations: s
@@ -115,4 +117,6 @@ defmodule RenewCollabProj.Projects do
   def update_project(%Project{} = project, params) do
     project |> Project.changeset(params) |> Repo.update()
   end
+
+  def member_roles(), do: RenewCollabProj.Entites.ProjectMember.roles()
 end

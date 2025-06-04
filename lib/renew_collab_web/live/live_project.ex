@@ -43,6 +43,7 @@ defmodule RenewCollabWeb.LiveProject do
             <%= for m <- @project.members do %>
               <%= with acc = %{} <- m.account do %>
                 <li>
+                  [{m.role}]
                   <button type="button" phx-click="remove_member" phx-value-id={m.id}>Remove</button> {acc.email}
                 </li>
                 <% else nil -> %>
@@ -50,7 +51,7 @@ defmodule RenewCollabWeb.LiveProject do
                     <button type="button" phx-click="remove_member" phx-value-id={m.id}>
                       Remove
                     </button>
-                    <em>Account deleted</em>
+                    [{m.role}] <em>Account deleted</em>
                     (ID: <code>{m.account_id}</code>)
                   </li>
               <% end %>
@@ -69,7 +70,14 @@ defmodule RenewCollabWeb.LiveProject do
               </option>
             <% end %>
           </select>
-          <button type="submit">Add</button>
+          <select name="role">
+            <%= for r <- RenewCollabProj.Projects.member_roles() do %>
+              <option value={r}>
+                {r}
+              </option>
+            <% end %>
+          </select>
+          <button type="submit">Invite</button>
         </form>
 
         <h3>Documents</h3>
@@ -105,7 +113,7 @@ defmodule RenewCollabWeb.LiveProject do
               <option value={d.id} disabled={d.project_assignment != nil}>{d.name}</option>
             <% end %>
           </select>
-          <button type="submit">Add</button>
+          <button type="submit">Assign</button>
         </form>
 
         <h3>Simulations</h3>
@@ -141,7 +149,7 @@ defmodule RenewCollabWeb.LiveProject do
               <option value={s.id} disabled={s.project_assignment != nil}>{s.id}</option>
             <% end %>
           </select>
-          <button type="submit">Add</button>
+          <button type="submit">Assign</button>
         </form>
 
         <h3>Delete Project</h3>
