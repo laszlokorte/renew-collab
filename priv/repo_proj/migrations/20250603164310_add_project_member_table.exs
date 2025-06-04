@@ -13,13 +13,7 @@ defmodule RenewCollabProj.Repo.Migrations.AddProjectMemberTable do
           ),
           null: false
 
-      add :account_id,
-          references(:account,
-            on_delete: :delete_all,
-            on_update: :update_all,
-            type: :binary_id
-          ),
-          null: false
+      add :account_id, :binary_id, null: false
 
       timestamps(type: :utc_datetime)
     end

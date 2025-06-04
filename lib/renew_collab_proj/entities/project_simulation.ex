@@ -10,4 +10,11 @@ defmodule RenewCollabProj.Entites.ProjectSimulation do
 
     timestamps(type: :utc_datetime)
   end
+
+  @doc false
+  def changeset(sim, attrs) do
+    sim
+    |> cast(attrs, [:simulation_id])
+    |> validate_required([:project_id, :simulation_id])
+  end
 end

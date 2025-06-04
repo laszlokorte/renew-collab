@@ -10,4 +10,11 @@ defmodule RenewCollabProj.Entites.ProjectMember do
 
     timestamps(type: :utc_datetime)
   end
+
+  @doc false
+  def changeset(member, attrs) do
+    member
+    |> cast(attrs, [:account_id])
+    |> validate_required([:project_id, :account_id])
+  end
 end

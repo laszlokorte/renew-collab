@@ -13,13 +13,8 @@ defmodule RenewCollabProj.Repo.Migrations.AddProjectSimulation do
           ),
           null: false
 
-      add :simulation_id,
-          references(:simulation,
-            on_delete: :delete_all,
-            on_update: :update_all,
-            type: :binary_id
-          ),
-          null: false
+      add :simulation_id, :binary_id, null: false
+
 
       timestamps(type: :utc_datetime)
     end

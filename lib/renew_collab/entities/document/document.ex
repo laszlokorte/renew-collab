@@ -21,6 +21,9 @@ defmodule RenewCollab.Document.Document do
     has_one :current_snaptshot, through: [:latest_snapshot_marker, :snapshot]
     belongs_to :syntax, RenewCollab.Syntax.SyntaxType
 
+    has_one :project_assignment, RenewCollabProj.Entites.ProjectDocument
+    has_one :project, through: [:project_assignment, :project]
+
     timestamps(type: :utc_datetime)
   end
 

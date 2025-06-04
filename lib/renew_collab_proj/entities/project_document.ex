@@ -10,4 +10,11 @@ defmodule RenewCollabProj.Entites.ProjectDocument do
 
     timestamps(type: :utc_datetime)
   end
+
+  @doc false
+  def changeset(doc, attrs) do
+    doc
+    |> cast(attrs, [:document_id])
+    |> validate_required([:project_id, :document_id])
+  end
 end

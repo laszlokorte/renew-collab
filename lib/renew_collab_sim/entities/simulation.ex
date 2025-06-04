@@ -14,6 +14,9 @@ defmodule RenewCollabSim.Entites.Simulation do
 
     field :timestep, :integer, default: 0
 
+    has_one :project_assignment, RenewCollabProj.Entites.ProjectSimulation
+    has_one :project, through: [:project_assignment, :project]
+
     timestamps(type: :utc_datetime)
   end
 end

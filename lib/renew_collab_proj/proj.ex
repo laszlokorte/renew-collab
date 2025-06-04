@@ -5,6 +5,9 @@ defmodule RenewCollabProj.Projects do
 
   alias RenewCollabProj.Entites.Project
   alias RenewCollabProj.Repo
+  alias RenewCollabProj.Entites.ProjectMember
+  alias RenewCollabProj.Entites.ProjectDocument
+  alias RenewCollabProj.Entites.ProjectSimulation
 
   import Ecto.Query, warn: false
 
@@ -36,7 +39,7 @@ defmodule RenewCollabProj.Projects do
         left_join: d in assoc(p, :documents),
         left_join: s in assoc(p, :simulations),
         where: p.id == ^id,
-        order_by: [asc: :inserted_at],
+        order_by: [asc: m.inserted_at, asc: d.inserted_at, asc: s.inserted_at],
         preload: [
           members: m,
           documents: d,
@@ -51,5 +54,65 @@ defmodule RenewCollabProj.Projects do
 
   def delete_project(id) do
     Repo.delete_all(from(p in Project, where: p.id == ^id))
+  end
+
+  def find_documents() do
+    from(d in RenewCollab.Document.Document)
+    |> RenewCollab.Repo.all()
+    |> Repo.preload(project_assignment: [])
+  end
+
+  def find_simulations() do
+    from(s in RenewCollabSim.Entites.Simulation)
+    |> RenewCollabSim.Repo.all()
+    |> Repo.preload(project_assignment: [])
+  end
+
+  def find_accounts() do
+    from(a in RenewCollabAuth.Entites.Account)
+    |> RenewCollabAuth.Repo.all()
+  end
+
+  def add_member(%Project{id: project_id}, member) do
+    %ProjectMember{
+      project_id: project_id
+    }
+    |> ProjectMember.changeset(member)
+    |> Repo.insert()
+  end
+
+  def add_document(%Project{id: project_id}, document) do
+    %ProjectDocument{
+      project_id: project_id
+    }
+    |> ProjectDocument.changeset(document)
+    |> Repo.insert()
+  end
+
+  def add_simulation(%Project{id: project_id}, simulation) do
+    %ProjectSimulation{
+      project_id: project_id
+    }
+    |> ProjectSimulation.changeset(simulation)
+    |> Repo.insert()
+  end
+
+  def remove_member(%Project{id: project_id}, member_id) do
+    from(m in ProjectMember, where: m.id == ^member_id and m.project_id == ^project_id)
+    |> Repo.delete_all()
+  end
+
+  def remove_document(%Project{id: project_id}, document_id) do
+    from(m in ProjectDocument, where: m.id == ^document_id and m.project_id == ^project_id)
+    |> Repo.delete_all()
+  end
+
+  def remove_simulation(%Project{id: project_id}, simulation_id) do
+    from(m in ProjectSimulation, where: m.id == ^simulation_id and m.project_id == ^project_id)
+    |> Repo.delete_all()
+  end
+
+  def update_project(%Project{} = project, params) do
+    project |> Project.changeset(params) |> Repo.update()
   end
 end
