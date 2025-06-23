@@ -10,6 +10,7 @@ build-sqlite-all:
     RENEW_ACCOUNT_DB_TYPE: sqlite
     RENEW_DOCS_DB_TYPE: sqlite
     RENEW_SIM_DB_TYPE: sqlite
+    RENEW_PROJ_DB_TYPE: sqlite
 
     IMAGE_TAG: $CI_REGISTRY_IMAGE:sqlite-all-latest
     DOCKER_FILE: Dockerfile
@@ -26,6 +27,7 @@ build-sqlite-all:
       --build-arg "RENEW_ACCOUNT_DB_TYPE=$RENEW_ACCOUNT_DB_TYPE"
       --build-arg "RENEW_DOCS_DB_TYPE=$RENEW_DOCS_DB_TYPE"
       --build-arg "RENEW_SIM_DB_TYPE=$RENEW_SIM_DB_TYPE"
+      --build-arg "RENEW_PROJ_DB_TYPE=$RENEW_PROJ_DB_TYPE"
       --dockerfile "$DOCKER_FILE"
       --destination "$IMAGE_TAG"
   tags:
@@ -40,6 +42,7 @@ build-mysql-all:
     RENEW_ACCOUNT_DB_TYPE: mysql
     RENEW_DOCS_DB_TYPE: mysql
     RENEW_SIM_DB_TYPE: mysql
+    RENEW_PROJ_DB_TYPE: mysql
 
     IMAGE_TAG: $CI_REGISTRY_IMAGE:mysql-all-latest
     DOCKER_FILE: Dockerfile
@@ -56,6 +59,7 @@ build-mysql-all:
       --build-arg "RENEW_ACCOUNT_DB_TYPE=$RENEW_ACCOUNT_DB_TYPE"
       --build-arg "RENEW_DOCS_DB_TYPE=$RENEW_DOCS_DB_TYPE"
       --build-arg "RENEW_SIM_DB_TYPE=$RENEW_SIM_DB_TYPE"
+      --build-arg "RENEW_PROJ_DB_TYPE=$RENEW_PROJ_DB_TYPE"
       --dockerfile "$DOCKER_FILE"
       --destination "$IMAGE_TAG"
   tags:
@@ -71,6 +75,7 @@ build-postgresql-all:
     RENEW_ACCOUNT_DB_TYPE: postgresql
     RENEW_DOCS_DB_TYPE: postgresql
     RENEW_SIM_DB_TYPE: postgresql
+    RENEW_PROJ_DB_TYPE: postgresql
 
     IMAGE_TAG: $CI_REGISTRY_IMAGE:postgresql-all-latest
     DOCKER_FILE: Dockerfile
@@ -87,6 +92,7 @@ build-postgresql-all:
       --build-arg "RENEW_ACCOUNT_DB_TYPE=$RENEW_ACCOUNT_DB_TYPE"
       --build-arg "RENEW_DOCS_DB_TYPE=$RENEW_DOCS_DB_TYPE"
       --build-arg "RENEW_SIM_DB_TYPE=$RENEW_SIM_DB_TYPE"
+      --build-arg "RENEW_PROJ_DB_TYPE=$RENEW_PROJ_DB_TYPE"
       --dockerfile "$DOCKER_FILE"
       --destination "$IMAGE_TAG"
   tags:

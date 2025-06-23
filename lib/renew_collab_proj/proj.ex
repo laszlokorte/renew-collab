@@ -15,6 +15,10 @@ defmodule RenewCollabProj.Projects do
     %Project{} |> Project.creation_changeset(params) |> dbg |> Repo.insert() |> dbg
   end
 
+  def count_projects() do
+    Repo.one(from(p in Project, select: count(p.id)))
+  end
+
   def list_all_projects() do
     Repo.all(
       from(p in Project,

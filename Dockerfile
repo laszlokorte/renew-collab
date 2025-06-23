@@ -28,6 +28,7 @@ FROM ${BUILDER_IMAGE} AS builder
 ARG RENEW_DOCS_DB_TYPE="sqlite"
 ARG RENEW_ACCOUNT_DB_TYPE="sqlite"
 ARG RENEW_SIM_DB_TYPE="sqlite"
+ARG RENEW_PROJ_DB_TYPE="sqlite"
 
 # install build dependencies
 RUN apt-get update -y && apt-get install -y build-essential git \
