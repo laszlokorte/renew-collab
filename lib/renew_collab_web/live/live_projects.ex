@@ -35,7 +35,7 @@ defmodule RenewCollabWeb.LiveProjects do
 
           <.form for={@create_form} phx-submit="create_project" phx-change="validate_project">
             <div style="display: flex; align-items: stretch; gap: 0.1em; flex-direction: column;">
-              <input type="hidden" name="ownerships[0][role]" value="owner" />
+              <%!-- <input type="hidden" name="ownerships[0][role]" value="owner" />
               <label>
                 Owner:
                 <.input
@@ -44,7 +44,7 @@ defmodule RenewCollabWeb.LiveProjects do
                   type="select"
                   options={@accounts |> Enum.map(&{&1.email, &1.id})}
                 />
-              </label>
+              </label> --%>
               <input
                 type="text"
                 name="name"
@@ -117,14 +117,16 @@ defmodule RenewCollabWeb.LiveProjects do
                   <td width="50"></td>
 
                   <td width="50">
-                    <button
-                      type="button"
-                      phx-click="delete_project"
-                      phx-value-id={project.id}
-                      style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
-                    >
-                      Delete
-                    </button>
+                    <%= if Projects.can_delete(@current_account.id, project) do %>
+                      <button
+                        type="button"
+                        phx-click="delete_project"
+                        phx-value-id={project.id}
+                        style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
+                      >
+                        Delete
+                      </button>
+                    <% end %>
                   </td>
                 </tr>
               <% end %>
@@ -139,6 +141,7 @@ defmodule RenewCollabWeb.LiveProjects do
   def handle_event("create_project", params, socket) do
     with {:ok, %RenewCollabProj.Entites.Project{}} <-
            Projects.create_project(
+             socket.assigns.current_account.id,
              params
              |> Map.update("name", "", fn
                "" -> "untitled"
@@ -157,7 +160,9 @@ defmodule RenewCollabWeb.LiveProjects do
   end
 
   def handle_event("delete_project", %{"id" => id}, socket) do
-    Projects.delete_project(id)
+    if Projects.can_delete(socket.assigns.current_account.id, Projects.find_project(id)) do
+      Projects.delete_project(id)
+    end
 
     socket |> reload()
   end

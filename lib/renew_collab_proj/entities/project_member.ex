@@ -31,4 +31,8 @@ defmodule RenewCollabProj.Entites.ProjectMember do
   end
 
   def roles(), do: @member_roles
+
+  def weaker_roles(:owner), do: [:editor, :reader]
+  def weaker_roles(:editor), do: [:reader]
+  def weaker_roles(_), do: []
 end

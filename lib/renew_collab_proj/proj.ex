@@ -11,8 +11,18 @@ defmodule RenewCollabProj.Projects do
 
   import Ecto.Query, warn: false
 
-  def create_project(params) do
-    %Project{} |> Project.creation_changeset(params) |> dbg |> Repo.insert() |> dbg
+  def create_project(account_id, params) do
+    %Project{}
+    |> Project.creation_changeset(
+      params
+      |> Map.put("ownerships", [
+        %{
+          "role" => "owner",
+          "account_id" => account_id
+        }
+      ])
+    )
+    |> Repo.insert()
   end
 
   def count_projects() do
@@ -149,7 +159,9 @@ defmodule RenewCollabProj.Projects do
   end
 
   def remove_member(%Project{id: project_id}, member_id) do
-    from(m in ProjectMember, where: m.id == ^member_id and m.project_id == ^project_id)
+    from(m in ProjectMember,
+      where: m.id == ^member_id and m.project_id == ^project_id and m.role != :owner
+    )
     |> Repo.delete_all()
   end
 
@@ -168,4 +180,47 @@ defmodule RenewCollabProj.Projects do
   end
 
   def member_roles(), do: RenewCollabProj.Entites.ProjectMember.roles()
+
+  def member_roles(own_account_id, project) do
+    from(m in ProjectMember,
+      where: m.project_id == ^project.id and m.account_id == ^own_account_id,
+      select: m.role
+    )
+    |> Repo.one()
+    |> RenewCollabProj.Entites.ProjectMember.weaker_roles()
+  end
+
+  def can_remove(own_account_id, membership) do
+    from(m in ProjectMember,
+      where:
+        m.project_id == ^membership.project_id and m.account_id == ^own_account_id and
+          ^membership.account_id != ^own_account_id,
+      select: m.role == :owner
+    )
+    |> Repo.one()
+  end
+
+  def can_rename(own_account_id, project) do
+    from(m in ProjectMember,
+      where: m.project_id == ^project.id and m.account_id == ^own_account_id,
+      select: m.role == :owner
+    )
+    |> Repo.one()
+  end
+
+  def can_invite(own_account_id, project) do
+    from(m in ProjectMember,
+      where: m.project_id == ^project.id and m.account_id == ^own_account_id,
+      select: m.role == :owner
+    )
+    |> Repo.one()
+  end
+
+  def can_delete(own_account_id, project) do
+    from(m in ProjectMember,
+      where: m.project_id == ^project.id and m.account_id == ^own_account_id,
+      select: m.role == :owner
+    )
+    |> Repo.one()
+  end
 end

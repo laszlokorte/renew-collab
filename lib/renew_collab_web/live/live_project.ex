@@ -30,12 +30,14 @@ defmodule RenewCollabWeb.LiveProject do
       <div style="padding: 1em">
         <h2 style="margin: 0;">Project: {@project.name}</h2>
 
-        <h3>Rename Project</h3>
+        <%= if Projects.can_rename(@current_account.id, @project) do %>
+          <h3>Rename Project</h3>
 
-        <form method="post" phx-submit="rename" accept-charset="utf-8">
-          <input type="text" name="name" value={@project.name} />
-          <button type="submit">Rename</button>
-        </form>
+          <form method="post" phx-submit="rename" accept-charset="utf-8">
+            <input type="text" name="name" value={@project.name} />
+            <button type="submit">Rename</button>
+          </form>
+        <% end %>
 
         <h3>Members</h3>
         <%= if  not Enum.empty?(@project.members) do %>
@@ -44,7 +46,12 @@ defmodule RenewCollabWeb.LiveProject do
               <%= with acc = %{} <- m.account do %>
                 <li>
                   [{m.role}]
-                  <button type="button" phx-click="remove_member" phx-value-id={m.id}>Remove</button> {acc.email}
+                  <%= if Projects.can_remove(@current_account.id, m) do %>
+                    <button type="button" phx-click="remove_member" phx-value-id={m.id}>
+                      Remove
+                    </button>
+                  <% end %>
+                  {acc.email}
                 </li>
                 <% else nil -> %>
                   <li>
@@ -61,24 +68,29 @@ defmodule RenewCollabWeb.LiveProject do
           <p>None</p>
         <% end %>
 
-        <form method="post" phx-submit="add_member" accept-charset="utf-8">
-          <select name="account_id">
-            <option value="">---</option>
-            <%= for a <- @accounts do %>
-              <option value={a.id} disabled={@project.members |> Enum.any?(&(&1.account_id == a.id))}>
-                {a.email}
-              </option>
-            <% end %>
-          </select>
-          <select name="role">
-            <%= for r <- RenewCollabProj.Projects.member_roles() do %>
-              <option value={r}>
-                {r}
-              </option>
-            <% end %>
-          </select>
-          <button type="submit">Invite</button>
-        </form>
+        <%= if Projects.can_invite(@current_account.id, @project) do %>
+          <form method="post" phx-submit="add_member" accept-charset="utf-8">
+            <select name="account_id">
+              <option value="">---</option>
+              <%= for a <- @accounts do %>
+                <option
+                  value={a.id}
+                  disabled={@project.members |> Enum.any?(&(&1.account_id == a.id))}
+                >
+                  {a.email}
+                </option>
+              <% end %>
+            </select>
+            <select name="role">
+              <%= for r <- RenewCollabProj.Projects.member_roles(@current_account.id, @project) do %>
+                <option value={r}>
+                  {r}
+                </option>
+              <% end %>
+            </select>
+            <button type="submit">Invite</button>
+          </form>
+        <% end %>
 
         <h3>Documents</h3>
         <%= if  not Enum.empty?(@project.documents) do %>
@@ -151,12 +163,13 @@ defmodule RenewCollabWeb.LiveProject do
           </select>
           <button type="submit">Assign</button>
         </form>
+        <%= if Projects.can_delete(@current_account.id, @project) do %>
+          <h3>Delete Project</h3>
 
-        <h3>Delete Project</h3>
-
-        <form method="post" phx-submit="delete" accept-charset="utf-8">
-          <button type="submit">Delete</button>
-        </form>
+          <form method="post" phx-submit="delete" accept-charset="utf-8">
+            <button type="submit">Delete</button>
+          </form>
+        <% end %>
       </div>
     </div>
     """
