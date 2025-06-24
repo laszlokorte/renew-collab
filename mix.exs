@@ -4,7 +4,8 @@ defmodule RenewCollab.MixProject do
   @db_envs [
     "RENEW_DOCS_DB_TYPE",
     "RENEW_ACCOUNT_DB_TYPE",
-    "RENEW_SIM_DB_TYPE"
+    "RENEW_SIM_DB_TYPE",
+    "RENEW_PROJ_DB_TYPE"
   ]
 
   def project do
