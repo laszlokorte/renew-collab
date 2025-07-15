@@ -8,7 +8,7 @@ defmodule RenewCollabWeb.Plug.CORS do
 
   resource("/api/*")
 
-  def valid_origin?(conn, origin) do
+  def valid_origin?(_conn, origin) do
     String.match?(origin, ~r{^https?://.+$})
   end
 end
