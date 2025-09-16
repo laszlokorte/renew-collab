@@ -10,7 +10,7 @@ defmodule RenewCollabSim.Script.Runner do
     "Renew Remote",
     "Renew Window Management",
     "Renew JHotDraw",
-    "Renew Gui",
+    # "Renew Gui",
     "Renew Formalism Gui",
     "Renew Logging",
     "Renew NetComponents",
