@@ -1,6 +1,10 @@
 defmodule RenewCollabSim.Server.SimulationProcess.State do
   alias RenewCollabSim.Repo
 
+  @sim_start_cmd "startsimulator"
+  @sim_cmd "simulator"
+  @sim_cmd_step "step"
+
   defstruct [
     :simulation,
     :simulation_id,
@@ -77,7 +81,7 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
 
     script_content =
       [
-        "startsimulation \"#{sns_path}\" \"#{simulation.shadow_net_system.main_net_name}\" -i"
+        "#{@sim_start_cmd} \"#{sns_path}\" \"#{simulation.shadow_net_system.main_net_name}\" -i"
       ]
       |> Enum.join("\n")
 
@@ -99,7 +103,7 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
   end
 
   def step(%__MODULE__{sim_process: sim_process}) do
-    send(sim_process, {:command, "simulation step\n"})
+    send(sim_process, {:command, "#{@sim_cmd} #{@sim_cmd_step}\n"})
   end
 
   def append_command(
