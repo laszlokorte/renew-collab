@@ -1,5 +1,22 @@
 defmodule RenewCollabSim.Script.Runner do
   @timeout 10_000
+  @renew_plugins [
+    "Renew Util",
+    "Renew SimulatorOntology",
+    "Renew Simulator",
+    "Renew Formalism",
+    "Renew Misc",
+    "Renew PTChannel",
+    "Renew Remote",
+    "Renew Window Management",
+    "Renew JHotDraw",
+    "Renew Gui",
+    "Renew Formalism Gui",
+    "Renew Logging",
+    "Renew NetComponents",
+    "Renew Console",
+    "Renew FreeHep Export"
+  ]
 
   def start_and_wait(script_path) do
     s = self()
@@ -69,6 +86,7 @@ defmodule RenewCollabSim.Script.Runner do
     xvbf_display = Keyword.get(conf, :sim_xvbf_display)
     interceptor_path = Keyword.get(conf, :sim_interceptor_path)
     log_conf_path = Keyword.get(conf, :sim_log_conf_path)
+    renew_plugins = @renew_plugins |> Enum.join(", ")
 
     module_path = "#{renew_path}" <> separator <> "#{renew_path}/libs"
 
@@ -104,7 +122,7 @@ defmodule RenewCollabSim.Script.Runner do
           "-Dde.renew.gui.autostart=false",
           "-Dde.renew.simulatorMode=-1",
           "-Dde.renew.plugin.autoLoad=false",
-          "-Dde.renew.plugin.load=Renew Util, SimulatorOntology, Renew Simulator, Renew Formalism, Renew Misc, Renew PTChannel, Renew Remote, Renew Window Management, Renew JHotDraw, Renew Gui, Renew Formalism Gui, Renew Logging, Renew NetComponents, Renew Console, Renew FreeHep Export",
+          "-Dde.renew.plugin.load=#{renew_plugins}",
           # "-Dlog4j.debug=true",
           "-p",
           module_path,
