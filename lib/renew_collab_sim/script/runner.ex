@@ -104,7 +104,7 @@ defmodule RenewCollabSim.Script.Runner do
           "-Dde.renew.gui.autostart=false",
           "-Dde.renew.simulatorMode=-1",
           "-Dde.renew.plugin.autoLoad=false",
-          "-Dde.renew.plugin.load=Renew Util, Renew Simulator, Renew Formalism, Renew Misc, Renew PTChannel, Renew Remote, Renew Window Management, Renew JHotDraw, Renew Gui, Renew Formalism Gui, Renew Logging, Renew NetComponents, Renew Console, Renew FreeHep Export",
+          "-Dde.renew.plugin.load=Renew Util, SimulatorOntology, Renew Simulator, Renew Formalism, Renew Misc, Renew PTChannel, Renew Remote, Renew Window Management, Renew JHotDraw, Renew Gui, Renew Formalism Gui, Renew Logging, Renew NetComponents, Renew Console, Renew FreeHep Export",
           # "-Dlog4j.debug=true",
           "-p",
           module_path,
