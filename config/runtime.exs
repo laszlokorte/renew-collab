@@ -177,6 +177,14 @@ if config_env() == :prod do
     sim_xvbf_path: System.get_env("SIM_XVBF") || nil,
     sim_xvbf_display: System.get_env("SIM_XVBF_DISPLAY") || nil
 
+  config :renew_collab, RenewCollabSim.Commands,
+    sim_start: System.get_env("SIM_RENEW_CMD_START") || "startsimulation",
+    sim: System.get_env("SIM_RENEW_CMD") || "simulation",
+    sim_step: System.get_env("SIM_RENEW_CMD_STEP") || "step",
+    set_formalism: System.get_env("SIM_RENEW_CMD_SETFORMALISM") || "setFormalism",
+    export: System.get_env("SIM_RENEW_CMD_EXPORT") || "ex",
+    ssn: System.get_env("SIM_RENEW_CMD_SSN") || "ShadowNetSystem"
+
   config :renew_collab, RenewCollab.TextMeasure.MeasureServer,
     script: System.get_env("RENEW_TEXT_MEASURE") || raise("RENEW_TEXT_MEASURE is missing")
 

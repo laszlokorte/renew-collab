@@ -95,10 +95,18 @@ config :exqlite, force_build: false
 priv_path = Path.expand("../priv", __DIR__)
 
 config :renew_collab, RenewCollabSim.Script.Runner,
-  sim_renew_path: Path.join([priv_path, "simulation", "renew41"]),
+  sim_renew_path: Path.join([priv_path, "simulation", "renew42"]),
   sim_interceptor_path: Path.join([priv_path, "simulation", "Interceptor.jar"]),
   sim_log_conf_path: Path.join([priv_path, "simulation", "log4j.properties"]),
   sim_xvbf_path: nil
+
+config :renew_collab, RenewCollabSim.Commands,
+  sim_start: "startsimulation",
+  sim: "simulation",
+  sim_step: "step",
+  set_formalism: "setFormalism",
+  export: "ex",
+  ssn: "ShadowNetSystem"
 
 # Enable dev routes for dashboard and mailbox
 config :renew_collab, dev_routes: true

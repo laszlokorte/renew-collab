@@ -1,10 +1,6 @@
 defmodule RenewCollabSim.Server.SimulationProcess.State do
   alias RenewCollabSim.Repo
 
-  @sim_start_cmd "startsimulator"
-  @sim_cmd "simulator"
-  @sim_cmd_step "step"
-
   defstruct [
     :simulation,
     :simulation_id,
@@ -15,13 +11,23 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
     :playing,
     :scheduled,
     :logging,
-    :open_multi
+    :open_multi,
+    :cmds
   ]
 
   def init(simulation) do
     try do
       import Ecto.Query
-      {sim_process, directory} = init_process(simulation)
+
+      conf = Application.fetch_env!(:renew_collab, RenewCollabSim.Commands)
+
+      cmds = %{
+        sim_start: Keyword.get(conf, :sim_start),
+        sim: Keyword.get(conf, :sim),
+        sim_step: Keyword.get(conf, :sim_step)
+      }
+
+      {sim_process, directory} = init_process(simulation, Map.get(cmds, :sim_start))
 
       {:ok,
        %__MODULE__{
@@ -34,6 +40,7 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
          playing: false,
          scheduled: false,
          logging: true,
+         cmds: cmds,
          open_multi:
            {0,
             Ecto.Multi.new()
@@ -64,7 +71,7 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
     end
   end
 
-  defp init_process(simulation) do
+  defp init_process(simulation, start_command) do
     slf = self()
     uuid_dir = "renew-simulation-#{simulation.id}/#{UUID.uuid4(:default)}"
 
@@ -81,7 +88,7 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
 
     script_content =
       [
-        "#{@sim_start_cmd} \"#{sns_path}\" \"#{simulation.shadow_net_system.main_net_name}\" -i"
+        "#{start_command} \"#{sns_path}\" \"#{simulation.shadow_net_system.main_net_name}\" -i"
       ]
       |> Enum.join("\n")
 
@@ -102,8 +109,8 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
     File.rm_rf(directory)
   end
 
-  def step(%__MODULE__{sim_process: sim_process}) do
-    send(sim_process, {:command, "#{@sim_cmd} #{@sim_cmd_step}\n"})
+  def step(%__MODULE__{sim_process: sim_process, cmds: %{sim: sim_cmd, sim_step: sim_cmd_step}}) do
+    send(sim_process, {:command, "#{sim_cmd} #{sim_cmd_step}\n"})
   end
 
   def append_command(

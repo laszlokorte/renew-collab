@@ -11,7 +11,8 @@ defmodule RenewCollabSim.Script.Runner do
     "Renew Window Management",
     "Renew JHotDraw",
     "Renew Gui",
-    "Renew Formalism Gui",
+    # This Renew Formalism Gui Plugin forces the AWT/Swing Gui to open, stopping Renew from closing
+    # "Renew Formalism Gui",
     "Renew Logging",
     "Renew NetComponents",
     "Renew Console",
@@ -106,7 +107,7 @@ defmodule RenewCollabSim.Script.Runner do
           do: [{to_charlist("DISPLAY"), to_charlist(xvbf_display)}],
           else: []
         ),
-      cd: "/tmp",
+      cd: System.tmp_dir!(),
       args:
         [
           "-jar",
@@ -116,6 +117,7 @@ defmodule RenewCollabSim.Script.Runner do
           "-Dde.renew.plugin=ERROR,nullAppender",
           "-Dlog4j.appender.nullAppender=org.apache.log4j.varia.NullAppender",
           "-Dlog4j.configuration=#{log_conf_path}",
+          "-Djava.io.tmpdir=#{System.tmp_dir!()}",
           "-Djline.terminal=off",
           "-Dorg.jline.terminal.dumb=true",
           "-Dde.renew.splashscreen.enabled=false",
@@ -123,6 +125,7 @@ defmodule RenewCollabSim.Script.Runner do
           "-Dde.renew.simulatorMode=-1",
           "-Dde.renew.plugin.autoLoad=false",
           "-Dde.renew.plugin.load=#{renew_plugins}",
+          "-Dde.renew.console.keepalive=false",
           # "-Dlog4j.debug=true",
           "-p",
           module_path,
@@ -200,8 +203,8 @@ defmodule RenewCollabSim.Script.Runner do
         handle_output(port, status, collector, acc)
 
       {^port, :eof} ->
-        collect(collector, {:exit, return}, acc)
         # dbg("EXIT1")
+        collect(collector, {:exit, return}, acc)
         {return, acc}
 
       {:EXIT, _, :normal} ->
@@ -209,6 +212,7 @@ defmodule RenewCollabSim.Script.Runner do
         {return, acc}
 
       e ->
+        # dbg("unexpected")
         {:unexpected, e, acc}
     end
   end
