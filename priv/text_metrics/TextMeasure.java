@@ -1,14 +1,9 @@
 import java.awt.*;
-import java.awt.font.FontRenderContext;
-import java.awt.font.TextMeasurer;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.text.AttributedString;
-import java.util.regex.Pattern;
-import java.net.URLDecoder;
 import java.io.UnsupportedEncodingException;
-
+import java.net.URLDecoder;
 
 public class TextMeasure {
 
@@ -16,10 +11,14 @@ public class TextMeasure {
 
     public static void main(String[] args) {
         Canvas canvas = new Canvas();
-        try(BufferedReader br = new BufferedReader(new InputStreamReader(System.in))){
-            for(String line; (line = br.readLine()) != null;){
+        try (
+            BufferedReader br = new BufferedReader(
+                new InputStreamReader(System.in)
+            )
+        ) {
+            for (String line; (line = br.readLine()) != null; ) {
                 String[] parts = line.split(":", 4);
-                if(parts.length == 4) {
+                if (parts.length == 4) {
                     String font = parts[0];
                     int style = Integer.parseInt(parts[1]);
                     int size = Integer.parseInt(parts[2]);
@@ -41,16 +40,16 @@ public class TextMeasure {
         }
     }
 
-    static private class Size {
+    private static class Size {
+
         public int x;
         public int y;
     }
 
     private static String[] splitLines(String text) {
         try {
-
             String[] lines = text.split(singleColon, -1);
-            for(int i=0;i<lines.length;i++) {
+            for (int i = 0; i < lines.length; i++) {
                 lines[i] = URLDecoder.decode(lines[i], "UTF-8");
             }
 
@@ -60,7 +59,7 @@ public class TextMeasure {
         }
     }
 
-    static private Size measureBox(FontMetrics metrics, String[] lines) {
+    private static Size measureBox(FontMetrics metrics, String[] lines) {
         Size size = new Size();
 
         for (int i = 0; i < lines.length; i++) {

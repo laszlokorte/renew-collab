@@ -48,10 +48,14 @@ defmodule RenewCollab.TextMeasure.MeasureServer do
         {port, {:data, {:eol, answer}}},
         %{port: port, clients: clients} = state
       ) do
-    {{:value, client}, rem_clients} = :queue.out_r(clients)
-    [width, height] = String.split(answer, ":")
-    GenServer.reply(client, {String.to_integer(width), String.to_integer(height)})
-    {:noreply, %{state | clients: rem_clients}}
+    with [_, width, height] <- Regex.run(~r/^(\d+):(\d+)$/, answer),
+         {{:value, client}, rem_clients} <- :queue.out_r(clients) do
+      GenServer.reply(client, {String.to_integer(width), String.to_integer(height)})
+      {:noreply, %{state | clients: rem_clients}}
+    else
+      _ ->
+        {:noreply, state}
+    end
   end
 
   @impl true
@@ -63,7 +67,6 @@ defmodule RenewCollab.TextMeasure.MeasureServer do
       when is_binary(font) and is_integer(style) and is_integer(size) and is_list(lines) do
     joined_text = lines |> Enum.map(&:uri_string.quote(&1)) |> Enum.join(":")
     Port.command(port, "#{java_font_name(font)}:#{style}:#{size}:#{joined_text}\n")
-    dbg(java_font_name("#{java_font_name(font)}:#{style}:#{round(size)}:#{joined_text}\n"))
     {:noreply, %{state | clients: :queue.in(from, clients)}}
   end
 
@@ -76,7 +79,6 @@ defmodule RenewCollab.TextMeasure.MeasureServer do
       when is_binary(font) and is_integer(style) and is_float(size) and is_list(lines) do
     joined_text = lines |> Enum.map(&:uri_string.quote(&1)) |> Enum.join(":")
     Port.command(port, "#{java_font_name(font)}:#{style}:#{round(size)}:#{joined_text}\n")
-    dbg(java_font_name("#{java_font_name(font)}:#{style}:#{round(size)}:#{joined_text}\n"))
     {:noreply, %{state | clients: :queue.in(from, clients)}}
   end
 

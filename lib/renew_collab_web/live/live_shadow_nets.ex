@@ -389,7 +389,6 @@ defmodule RenewCollabWeb.LiveShadowNets do
           RenewCollabSim.Simulator.create_shadow_net(file_content, main_net_name, [
             %{"name" => main_net_name}
           ])
-          |> dbg
         end)
 
       {:noreply, socket |> assign(import_sns_form: to_form(%{"main_net" => nil}))}
