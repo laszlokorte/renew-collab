@@ -10,6 +10,9 @@ defmodule RenewCollabSim.Entites.ShadowNetSystem do
     has_many :nets, RenewCollabSim.Entites.ShadowNet, preload_order: [asc: :id]
     has_many :simulations, RenewCollabSim.Entites.Simulation, preload_order: [desc: :inserted_at]
 
+    has_one :project_assignment, RenewCollabProj.Entites.ProjectShadowNetSystem
+    has_one :project, through: [:project_assignment, :project]
+
     timestamps(type: :utc_datetime)
   end
 

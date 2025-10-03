@@ -1,4 +1,4 @@
-defmodule RenewCollabWeb.LiveProject do
+defmodule RenewCollabWeb.LiveProjectSettings do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
@@ -6,7 +6,7 @@ defmodule RenewCollabWeb.LiveProject do
 
   @topic "project"
 
-  def mount(%{"id" => id}, _session, socket) do
+  def mount(%{"project_id" => id}, _session, socket) do
     RenewCollabWeb.Endpoint.subscribe(@topic)
 
     socket =
@@ -15,6 +15,7 @@ defmodule RenewCollabWeb.LiveProject do
       |> assign(:accounts, Projects.find_accounts())
       |> assign(:documents, Projects.find_documents())
       |> assign(:simulations, Projects.find_simulations())
+      |> assign(:shadow_net_systems, Projects.find_shadow_net_systems())
 
     {:ok, socket}
   end
@@ -22,7 +23,7 @@ defmodule RenewCollabWeb.LiveProject do
   def render(assigns) do
     ~H"""
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
-      <RenewCollabWeb.RenewComponents.app_header />
+      <RenewCollabWeb.RenewComponents.app_header project_id={@project.id} />
       <div style="padding: 1em">
         <.link navigate={~p"/projects"}>Back</.link>
       </div>
@@ -123,6 +124,41 @@ defmodule RenewCollabWeb.LiveProject do
             <option value="">---</option>
             <%= for d <- @documents do %>
               <option value={d.id} disabled={d.project_assignment != nil}>{d.name}</option>
+            <% end %>
+          </select>
+          <button type="submit">Assign</button>
+        </form>
+        <h3>Shadow Net Systems</h3>
+        <%= if  not Enum.empty?(@project.shadow_net_systems) do %>
+          <ul style="list-style: none; padding: 0; margin: 0">
+            <%= for s <- @project.shadow_net_systems do %>
+              <%= with ssn = %{} <- s.shadow_net_systems do %>
+                <li>
+                  <button type="button" phx-click="remove_ssn" phx-value-id={s.id}>
+                    Remove
+                  </button>
+                  {ssn.id}
+                </li>
+                <% else nil -> %>
+                  <li>
+                    <button type="button" phx-click="remove_ssn" phx-value-id={s.id}>
+                      Remove
+                    </button>
+                    <em>SSN deleted</em>
+                    (ID: <code>{s.document_id}</code>)
+                  </li>
+              <% end %>
+            <% end %>
+          </ul>
+        <% else %>
+          <p>None</p>
+        <% end %>
+
+        <form method="post" phx-submit="add_ssn" accept-charset="utf-8">
+          <select name="shadow_net_system_id">
+            <option value="">---</option>
+            <%= for s <- @shadow_net_systems do %>
+              <option value={s.id} disabled={s.project_assignment != nil}>{s.id}</option>
             <% end %>
           </select>
           <button type="submit">Assign</button>

@@ -9,6 +9,7 @@ defmodule RenewCollabProj.Entites.Project do
 
     has_many :documents, RenewCollabProj.Entites.ProjectDocument
     has_many :simulations, RenewCollabProj.Entites.ProjectSimulation
+    has_many :shadow_net_systems, RenewCollabProj.Entites.ProjectShadowNetSystem
     has_many :members, RenewCollabProj.Entites.ProjectMember
     has_many :ownerships, RenewCollabProj.Entites.ProjectMember, where: [role: :owner]
 

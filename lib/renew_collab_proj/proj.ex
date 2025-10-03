@@ -34,6 +34,7 @@ defmodule RenewCollabProj.Projects do
       from(p in Project,
         left_join: m in assoc(p, :members),
         left_join: o in assoc(p, :ownerships),
+        left_join: ssn in assoc(p, :shadow_net_systems),
         left_join: d in assoc(p, :documents),
         left_join: s in assoc(p, :simulations),
         order_by: [desc: :inserted_at],
@@ -41,6 +42,7 @@ defmodule RenewCollabProj.Projects do
           ownerships: o,
           members: m,
           documents: d,
+          shadow_net_systems: ssn,
           simulations: s
         ]
       )
@@ -55,6 +57,7 @@ defmodule RenewCollabProj.Projects do
         left_join: m in assoc(p, :members),
         left_join: o in assoc(p, :ownerships),
         left_join: d in assoc(p, :documents),
+        left_join: ssn in assoc(p, :shadow_net_systems),
         left_join: s in assoc(p, :simulations),
         inner_join: mm in assoc(p, :members),
         where: mm.account_id == ^account_id,
@@ -63,6 +66,7 @@ defmodule RenewCollabProj.Projects do
           ownerships: o,
           members: m,
           documents: d,
+          shadow_net_systems: ssn,
           simulations: s
         ]
       )
@@ -75,6 +79,7 @@ defmodule RenewCollabProj.Projects do
         p in Project,
         left_join: m in assoc(p, :members),
         left_join: d in assoc(p, :documents),
+        left_join: ssn in assoc(p, :shadow_net_systems),
         left_join: s in assoc(p, :simulations),
         inner_join: mm in assoc(p, :members),
         where: p.id == ^project_id,
@@ -83,6 +88,7 @@ defmodule RenewCollabProj.Projects do
         preload: [
           members: m,
           documents: d,
+          shadow_net_systems: ssn,
           simulations: s
         ]
       )
@@ -98,12 +104,14 @@ defmodule RenewCollabProj.Projects do
         p in Project,
         left_join: m in assoc(p, :members),
         left_join: d in assoc(p, :documents),
+        left_join: ssn in assoc(p, :shadow_net_systems),
         left_join: s in assoc(p, :simulations),
         where: p.id == ^id,
         order_by: [asc: m.inserted_at, asc: d.inserted_at, asc: s.inserted_at],
         preload: [
           members: m,
           documents: d,
+          shadow_net_systems: ssn,
           simulations: s
         ]
       )
@@ -120,6 +128,12 @@ defmodule RenewCollabProj.Projects do
   def find_documents() do
     from(d in RenewCollab.Document.Document)
     |> RenewCollab.Repo.all()
+    |> Repo.preload(project_assignment: [])
+  end
+
+  def find_shadow_net_systems() do
+    from(d in RenewCollabSim.Entites.ShadowNetSystem)
+    |> RenewCollabSim.Repo.all()
     |> Repo.preload(project_assignment: [])
   end
 

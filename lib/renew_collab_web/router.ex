@@ -146,10 +146,10 @@ defmodule RenewCollabWeb.Router do
         {RenewCollabWeb.Auth, :ensure_authenticated}
       ] do
       live "/document/:id", LiveDocument
-      live "/documents", LiveDocuments
+      live "/project/:project_id/documents", LiveDocuments
       live "/projects", LiveProjects
-      live "/project/:id", LiveProject
-      live "/shadow_nets", LiveShadowNets
+      live "/project/:project_id/settings", LiveProjectSettings
+      live "/project/:project_id/shadow_nets", LiveShadowNets
       live "/shadow_net/:id", LiveShadowNet
       live "/simulation/:id", LiveSimulation
     end

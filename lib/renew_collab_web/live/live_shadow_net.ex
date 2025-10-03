@@ -1,4 +1,5 @@
 defmodule RenewCollabWeb.LiveShadowNet do
+  alias RenewCollabProj.Entites.ProjectDocument
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
@@ -60,7 +61,14 @@ defmodule RenewCollabWeb.LiveShadowNet do
       <RenewCollabWeb.RenewComponents.app_header />
 
       <div style="padding: 1em">
-        <.link navigate={~p"/shadow_nets"}>Back</.link>
+        <%= case @shadow_net_system.project_assignment do %>
+          <% %ProjectDocument{project_id: project_id} -> %>
+            <.link navigate={~p"/project/#{project_id}/shadow_nets"} style="color: inherit">
+              Back
+            </.link>
+          <% _ -> %>
+            <.link navigate={~p"/"} style="color: inherit">Back</.link>
+        <% end %>
       </div>
 
       <div style="padding: 1em">

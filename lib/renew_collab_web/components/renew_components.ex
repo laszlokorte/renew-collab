@@ -12,6 +12,7 @@ defmodule RenewCollabWeb.RenewComponents do
 
   attr :blank, :boolean, default: false
   attr :logout, :boolean, default: false
+  attr :project_id, :string, default: nil
 
   def app_header(assigns) do
     assigns = assigns |> assign(:editor_url, editor_url())
@@ -27,10 +28,26 @@ defmodule RenewCollabWeb.RenewComponents do
       <div style="display: flex; gap: 2em; align-items: stretch;">
         <%= if not @blank do %>
           <.link style="color: white; align-self: center;" navigate={~p"/projects"}>Projects</.link>
-          <.link style="color: white; align-self: center;" navigate={~p"/documents"}>Documents</.link>
-          <.link style="color: white; align-self: center;" navigate={~p"/shadow_nets"}>
-            Simulations
-          </.link>
+          <%= if @project_id do %>
+            <.link
+              style="color: white; align-self: center;"
+              navigate={~p"/project/#{@project_id}/documents"}
+            >
+              Documents
+            </.link>
+            <.link
+              style="color: white; align-self: center;"
+              navigate={~p"/project/#{@project_id}/shadow_nets"}
+            >
+              Simulations
+            </.link>
+            <.link
+              style="color: white; align-self: center;"
+              navigate={~p"/project/#{@project_id}/settings"}
+            >
+              Settings
+            </.link>
+          <% end %>
           <.link style="color: white; align-self: center;" navigate={~p"/"}>Dashboard</.link>
         <% end %>
 

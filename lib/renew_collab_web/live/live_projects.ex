@@ -71,6 +71,7 @@ defmodule RenewCollabWeb.LiveProjects do
           <thead>
             <tr>
               <th style="border-bottom: 1px solid #333;" align="left" width="1000">Name</th>
+              <th style="border-bottom: 1px solid #333;" align="left"></th>
 
               <th style="border-bottom: 1px solid #333;" align="left" width="200">Created</th>
 
@@ -88,7 +89,7 @@ defmodule RenewCollabWeb.LiveProjects do
           <tbody>
             <%= if Enum.empty?(@projects) do %>
               <tr>
-                <td colspan="8">
+                <td colspan="9">
                   <div style="padding: 2em; border: 3px dashed #aaa; text-align: center; font-style: italic;">
                     No Projects yet.
                   </div>
@@ -98,8 +99,13 @@ defmodule RenewCollabWeb.LiveProjects do
               <%= for {project, di} <- @projects |> Enum.with_index do %>
                 <tr {if(rem(di, 2) == 0, do: [style: "background-color:#f5f5f5;"], else: [])}>
                   <td>
-                    <.link style="color: #078" navigate={~p"/project/#{project.id}"}>
+                    <.link style="color: #078" navigate={~p"/project/#{project.id}/documents"}>
                       {project.name}
+                    </.link>
+                  </td>
+                  <td>
+                    <.link style="color: #078" navigate={~p"/project/#{project.id}/settings"}>
+                      Settings
                     </.link>
                   </td>
 
