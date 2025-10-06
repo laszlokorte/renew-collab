@@ -4,15 +4,16 @@ defmodule RenewCollabWeb.LiveDocuments do
 
   alias RenewCollab.Renew
 
-  @topic "documents"
-
   def mount(%{"project_id" => project_id}, _session, socket) do
-    RenewCollabWeb.Endpoint.subscribe(@topic)
+    RenewCollabWeb.Endpoint.subscribe("project/#{project_id}/documents")
 
     socket =
       socket
-      |> assign(:project_id, project_id)
-      |> assign(:documents, Renew.list_documents())
+      |> assign(:project, RenewCollabProj.Projects.find_project(project_id))
+      |> assign(
+        :documents,
+        Renew.list_documents(RenewCollabProj.Projects.list_project_documents(project_id))
+      )
       |> assign(create_form: to_form(%{}))
       |> assign(import_form: to_form(%{}))
       |> allow_upload(:import_file, accept: ~w(.rnw .aip), max_entries: 10)
@@ -29,7 +30,7 @@ defmodule RenewCollabWeb.LiveDocuments do
   def render(assigns) do
     ~H"""
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
-      <RenewCollabWeb.RenewComponents.app_header project_id={@project_id} />
+      <RenewCollabWeb.RenewComponents.app_header flash={@flash} project_id={@project.id} />
 
       <div style="padding: 1em 1em 0; display: flex; align-items: start; gap: 1em">
         <fieldset style="margin-bottom: 1em">
@@ -39,7 +40,7 @@ defmodule RenewCollabWeb.LiveDocuments do
             New Empty Document
           </legend>
 
-          <.form for={@create_form} phx-submit="create_document" phx-change="validate">
+          <.form for={@create_form} phx-submit="create_document" phx-change="validate-create">
             <div style="display: flex; align-items: stretch; gap: 0.1em">
               <input
                 type="text"
@@ -67,7 +68,7 @@ defmodule RenewCollabWeb.LiveDocuments do
             Select up to 10 Renew files from your computer:
           </p>
 
-          <.form for={@import_form} phx-submit="import_document" phx-change="validate">
+          <.form for={@import_form} phx-submit="import_document" phx-change="validate-import">
             <.live_file_input
               upload={@uploads.import_file}
               style="padding: 0.5em; background: #666; color: #fff; width: 100%; box-sizing: border-box;"
@@ -226,30 +227,6 @@ defmodule RenewCollabWeb.LiveDocuments do
           </tbody>
         </table>
       </div>
-
-      <div style="padding: 1em">
-        <details>
-          <summary>
-            <h2 style="margin: 0; display: inline; cursor: pointer;">System</h2>
-          </summary>
-
-          <fieldset>
-            <legend>Reset</legend>
-
-            <p>
-              Clear all Documents and reset database content.
-            </p>
-
-            <button
-              type="button"
-              phx-click="reset"
-              style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff"
-            >
-              Reinstall
-            </button>
-          </fieldset>
-        </details>
-      </div>
     </div>
     """
   end
@@ -263,7 +240,11 @@ defmodule RenewCollabWeb.LiveDocuments do
     {:noreply, socket}
   end
 
-  def handle_event("validate", params, socket) do
+  def handle_event("validate-create", params, socket) do
+    {:noreply, assign(socket, create_form: to_form(params))}
+  end
+
+  def handle_event("validate-import", params, socket) do
     {:noreply, assign(socket, import_form: to_form(params))}
   end
 
@@ -286,6 +267,7 @@ defmodule RenewCollabWeb.LiveDocuments do
             }} = RenewCollab.Import.DocumentImport.import(filename, content),
            {:ok, %RenewCollab.Document.Document{} = document} <-
              RenewCollab.Renew.create_document(
+               socket.assigns.project,
                %{"name" => doc_name, "kind" => kind, "layers" => layers},
                hierarchy,
                hyperlinks,
@@ -295,7 +277,10 @@ defmodule RenewCollabWeb.LiveDocuments do
       else
         _ ->
           with {:ok, %RenewCollab.Document.Document{} = document} <-
-                 RenewCollab.Renew.create_document(%{"name" => filename, "kind" => "error"}) do
+                 RenewCollab.Renew.create_document(socket.assigns.project, %{
+                   "name" => filename,
+                   "kind" => "error"
+                 }) do
             {:ok, document}
           end
       end
@@ -307,6 +292,7 @@ defmodule RenewCollabWeb.LiveDocuments do
   def handle_event("create_document", params, socket) do
     with {:ok, %RenewCollab.Document.Document{}} <-
            RenewCollab.Renew.create_document(
+             socket.assigns.project,
              params
              |> Map.update("name", "", fn
                "" -> "untitled"
@@ -316,26 +302,13 @@ defmodule RenewCollabWeb.LiveDocuments do
            ) do
     end
 
-    {:noreply, socket}
-  end
-
-  def handle_event("reset", %{}, socket) do
-    RenewCollab.Init.reset()
-
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "documents",
-      :any
-    )
-
-    {:noreply, socket}
+    {:noreply,
+     socket
+     |> assign(create_form: to_form(%{}))}
   end
 
   def handle_event("delete", %{"id" => document_id}, socket) do
-    RenewCollab.Commands.DeleteDocument.new(%{
-      document_id: document_id
-    })
-    |> RenewCollab.Commander.run_document_command(false)
+    Renew.delete_document(document_id)
 
     {:noreply, socket}
   end
@@ -352,6 +325,13 @@ defmodule RenewCollabWeb.LiveDocuments do
   end
 
   def handle_info(:any, socket) do
-    {:noreply, socket |> assign(:documents, Renew.list_documents())}
+    {:noreply,
+     socket
+     |> assign(
+       :documents,
+       Renew.list_documents(
+         RenewCollabProj.Projects.list_project_documents(socket.assigns.project.id)
+       )
+     )}
   end
 end

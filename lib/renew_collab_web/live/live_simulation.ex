@@ -8,7 +8,7 @@ defmodule RenewCollabWeb.LiveSimulation do
     RenewCollabSim.Simulator.find_simulation(simulation_id)
     |> case do
       nil ->
-        {:ok, socket |> redirect(to: ~p"/shadow_nets")}
+        {:ok, socket |> redirect(to: ~p"/")}
 
       sim ->
         socket =
@@ -57,7 +57,7 @@ defmodule RenewCollabWeb.LiveSimulation do
   def render(assigns) do
     ~H"""
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
-      <RenewCollabWeb.RenewComponents.app_header />
+      <RenewCollabWeb.RenewComponents.app_header flash={@flash} />
 
       <div style="padding: 1em">
         <.link navigate={~p"/shadow_net/#{@simulation.shadow_net_system_id}"}>Back</.link>

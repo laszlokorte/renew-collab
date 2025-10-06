@@ -11,8 +11,10 @@ defmodule RenewCollab.Renew do
   alias RenewCollab.Document.TransientDocument
   alias RenewCollab.Simulation.SimulationLink
 
-  def list_documents do
-    RenewCollab.Queries.DocumentList.new()
+  alias RenewCollabProj.Entites.Project
+
+  def list_documents(%Project{} = project) do
+    RenewCollab.Queries.DocumentList.new(%{project: project})
     |> RenewCollab.Fetcher.fetch()
   end
 
@@ -27,9 +29,10 @@ defmodule RenewCollab.Renew do
     %{document_id: document_id}
     |> RenewCollab.Queries.DocumentWithElements.new()
     |> RenewCollab.Fetcher.fetch()
+    |> RenewCollabProj.Projects.attach_document_project()
   end
 
-  def create_document(attrs \\ %{}, parenthoods \\ [], hyperlinks \\ [], bonds \\ []) do
+  def create_document(project, attrs \\ %{}, parenthoods \\ [], hyperlinks \\ [], bonds \\ []) do
     Commands.CreateDocument.new(%{
       doc: %TransientDocument{
         content: attrs,
@@ -40,7 +43,36 @@ defmodule RenewCollab.Renew do
     })
     |> RenewCollab.Commander.run_document_command_sync()
     |> case do
-      {:ok, %{insert_document: insert_document}} -> {:ok, insert_document}
+      {:ok, %{insert_document: insert_document}} ->
+        RenewCollabProj.Projects.assign_to_project(project, insert_document)
+
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "project/#{project.id}/documents",
+          :any
+        )
+
+        {:ok, insert_document}
+    end
+  end
+
+  def delete_document(document_id) do
+    RenewCollab.Commands.DeleteDocument.new(%{
+      document_id: document_id
+    })
+    |> RenewCollab.Commander.run_document_command(false)
+
+    RenewCollabProj.Projects.delete_document(document_id)
+    |> case do
+      %Project{id: project_id} ->
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "project/#{project_id}/documents",
+          :any
+        )
+
+      _ ->
+        nil
     end
   end
 

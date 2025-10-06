@@ -110,7 +110,7 @@ defmodule RenewCollabSim.Script.Runner do
       cd: System.tmp_dir!(),
       args:
         [
-          "-jar",
+          if(String.ends_with?(interceptor_path, ".jar"), do: "-jar"),
           interceptor_path,
           if(xvbf_path, do: xvbf_path, else: nil),
           "java",

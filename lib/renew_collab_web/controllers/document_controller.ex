@@ -45,10 +45,7 @@ defmodule RenewCollabWeb.DocumentController do
   end
 
   def delete(conn, %{"id" => document_id}) do
-    RenewCollab.Commands.DeleteDocument.new(%{
-      document_id: document_id
-    })
-    |> RenewCollab.Commander.run_document_command_sync(false)
+    Renew.delete_document(document_id)
 
     conn
     |> put_status(:accepted)

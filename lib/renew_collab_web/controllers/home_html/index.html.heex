@@ -1,4 +1,4 @@
-<RenewCollabWeb.RenewComponents.app_header blank={true} logout={true} />
+<RenewCollabWeb.RenewComponents.app_header flash={@flash} blank={true} logout={true} />
 
 <ul style="display: grid; justify-content: center; padding: 1em; list-style: none; gap: 1em; grid-template-columns: repeat(auto-fit, minmax(25em, 1fr));">
   <li style="background-color: #eee;">
@@ -17,6 +17,14 @@
         navigate={~p"/health"}
       >
         Health
+      </.link>
+    </li>
+    <li style="background-color: #eee;">
+      <.link
+        style="text-align: center; padding: 2em; display: block; color: #078"
+        navigate={~p"/system"}
+      >
+        System
       </.link>
     </li>
 

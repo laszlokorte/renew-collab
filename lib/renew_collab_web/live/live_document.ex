@@ -62,7 +62,7 @@ defmodule RenewCollabWeb.LiveDocument do
       RenewCollabWeb.Endpoint.subscribe("document:#{id}")
       {:ok, socket}
     else
-      _ -> {:ok, redirect(socket, to: "/documents")}
+      _ -> {:ok, redirect(socket, to: "/")}
     end
   end
 

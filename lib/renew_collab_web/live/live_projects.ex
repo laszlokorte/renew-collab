@@ -26,7 +26,7 @@ defmodule RenewCollabWeb.LiveProjects do
   def render(assigns) do
     ~H"""
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
-      <RenewCollabWeb.RenewComponents.app_header />
+      <RenewCollabWeb.RenewComponents.app_header flash={@flash} />
       <div style="padding: 1em 1em 0; display: flex; align-items: start; gap: 1em">
         <fieldset style="margin-bottom: 1em; width: 30%">
           <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">

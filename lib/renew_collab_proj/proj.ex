@@ -237,4 +237,44 @@ defmodule RenewCollabProj.Projects do
     )
     |> Repo.one()
   end
+
+  def list_project_documents(project_id) do
+    from(p in Project,
+      left_join: docs in assoc(p, :documents),
+      where: p.id == ^project_id,
+      preload: [
+        documents: docs
+      ]
+    )
+    |> Repo.one()
+  end
+
+  def attach_document_project(doc) do
+    doc |> Repo.preload(project_assignment: [:project])
+  end
+
+  def assign_to_project(project, doc) do
+    %ProjectDocument{project_id: project.id}
+    |> ProjectDocument.changeset(%{
+      "document_id" => doc.id
+    })
+    |> Repo.insert()
+    |> case do
+      _ ->
+        {:ok, doc}
+    end
+  end
+
+  def delete_document(document_id) do
+    result =
+      from(p in Project,
+        join: docs in assoc(p, :documents),
+        where: docs.document_id == ^document_id
+      )
+      |> Repo.one()
+
+    from(d in ProjectDocument, where: d.document_id == ^document_id) |> Repo.delete_all([])
+
+    result
+  end
 end

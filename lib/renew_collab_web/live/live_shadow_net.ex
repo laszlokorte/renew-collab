@@ -9,7 +9,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
     RenewCollabSim.Simulator.find_shadow_net_system(shadow_net_system_id)
     |> case do
       nil ->
-        {:ok, socket |> redirect(to: ~p"/shadow_nets")}
+        {:ok, socket |> redirect(to: ~p"/")}
 
       sns ->
         RenewCollabWeb.Endpoint.subscribe("#{@topic}:#{shadow_net_system_id}")
@@ -58,7 +58,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
   def render(assigns) do
     ~H"""
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
-      <RenewCollabWeb.RenewComponents.app_header />
+      <RenewCollabWeb.RenewComponents.app_header flash={@flash} />
 
       <div style="padding: 1em">
         <%= case @shadow_net_system.project_assignment do %>

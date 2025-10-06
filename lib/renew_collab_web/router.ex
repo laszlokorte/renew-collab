@@ -132,6 +132,8 @@ defmodule RenewCollabWeb.Router do
     pipe_through [:browser, :authenticated, :is_admin]
 
     get "/health", HealthController, :index
+    get "/system", SystemController, :index
+    post "/system/reset", SystemController, :reset
     post "/health/simulator", HealthController, :simulator
     get "/accounts", AccountsController, :index
     post "/accounts", AccountsController, :create

@@ -2,6 +2,8 @@ defmodule RenewCollabWeb.RenewComponents do
   use Phoenix.Component
   use RenewCollabWeb, :verified_routes
 
+  alias Phoenix.LiveView.JS
+
   defp app_titel() do
     Application.get_env(:renew_collab, :app_titel)
   end
@@ -13,6 +15,7 @@ defmodule RenewCollabWeb.RenewComponents do
   attr :blank, :boolean, default: false
   attr :logout, :boolean, default: false
   attr :project_id, :string, default: nil
+  attr :flash, :map, default: nil
 
   def app_header(assigns) do
     assigns = assigns |> assign(:editor_url, editor_url())
@@ -24,6 +27,12 @@ defmodule RenewCollabWeb.RenewComponents do
           <img src="/favicon.svg" style="width: 1.5em; height: 1.5em" /> {app_titel()}
         </h1>
       </.link>
+
+      <div>
+        <%= if @flash do %>
+          <.flash_group flash={@flash} />
+        <% end %>
+      </div>
 
       <div style="display: flex; gap: 2em; align-items: stretch;">
         <%= if not @blank do %>
@@ -114,4 +123,103 @@ defmodule RenewCollabWeb.RenewComponents do
   defp of_type(:edge, layer), do: not is_nil(layer.edge) or is_group(layer)
 
   defp is_group(layer), do: is_nil(layer.box) and is_nil(layer.text) and is_nil(layer.edge)
+
+  @doc """
+  Renders flash notices.
+
+  ## Examples
+
+      <.flash kind={:info} flash={@flash} />
+      <.flash kind={:info} phx-mounted={show("#flash")}>Welcome Back!</.flash>
+  """
+  attr :id, :string, doc: "the optional id of flash container"
+  attr :flash, :map, default: %{}, doc: "the map of flash messages to display"
+  attr :title, :string, default: nil
+  attr :kind, :atom, values: [:info, :error], doc: "used for styling and flash lookup"
+  attr :rest, :global, doc: "the arbitrary HTML attributes to add to the flash container"
+
+  slot :inner_block, doc: "the optional inner block that renders the flash message"
+
+  def flash(assigns) do
+    assigns = assign_new(assigns, :id, fn -> "flash-#{assigns.kind}" end)
+
+    ~H"""
+    <div
+      :if={msg = render_slot(@inner_block) || Phoenix.Flash.get(@flash, @kind)}
+      id={@id}
+      role="alert"
+      class={[
+        "fixed top-2 right-2 mr-2 w-80 sm:w-96 z-50 rounded-lg p-3 ring-1",
+        @kind == :info && "bg-emerald-50 text-emerald-800 ring-emerald-500 fill-cyan-900",
+        @kind == :error && "bg-rose-50 text-rose-900 shadow-md ring-rose-500 fill-rose-900"
+      ]}
+      {@rest}
+    >
+      <p class="mt-2 text-sm leading-5">{msg}</p>
+
+      <button
+        type="button"
+        class="group absolute top-1 right-1 p-2"
+        aria-label="close"
+        phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
+      >
+        Discard
+      </button>
+    </div>
+    """
+  end
+
+  @doc """
+  Shows the flash group with standard titles and content.
+
+  ## Examples
+
+      <.flash_group flash={@flash} />
+  """
+  attr :flash, :map, required: true, doc: "the map of flash messages"
+  attr :id, :string, default: "flash-group", doc: "the optional id of flash container"
+
+  def flash_group(assigns) do
+    ~H"""
+    <div id={@id}>
+      <.flash kind={:info} title="Success!" flash={@flash} />
+      <.flash kind={:error} title="Error!" flash={@flash} />
+      <.flash
+        id="client-error"
+        kind={:error}
+        title="We can't find the internet"
+        phx-disconnected={show(".phx-client-error #client-error")}
+        phx-connected={hide("#client-error")}
+        hidden
+      >
+        {"Attempting to reconnect"}
+      </.flash>
+
+      <.flash
+        id="server-error"
+        kind={:error}
+        title="Something went wrong!"
+        phx-disconnected={show(".phx-server-error #server-error")}
+        phx-connected={hide("#server-error")}
+        hidden
+      >
+        {"Hang in there while we get back on track"}
+      </.flash>
+    </div>
+    """
+  end
+
+  def show(js \\ %JS{}, selector) do
+    JS.show(js,
+      to: selector,
+      time: 300
+    )
+  end
+
+  def hide(js \\ %JS{}, selector) do
+    JS.hide(js,
+      to: selector,
+      time: 200
+    )
+  end
 end

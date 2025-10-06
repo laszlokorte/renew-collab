@@ -30,7 +30,7 @@ defmodule RenewCollabWeb.LiveIcon do
 
     ~H"""
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
-      <RenewCollabWeb.RenewComponents.app_header />
+      <RenewCollabWeb.RenewComponents.app_header flash={@flash} />
       <div style="padding: 1em">
         <.link style="color: #078" navigate={~p"/icons"}>
           Back
