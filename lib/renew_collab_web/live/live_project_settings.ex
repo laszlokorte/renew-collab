@@ -132,7 +132,7 @@ defmodule RenewCollabWeb.LiveProjectSettings do
         <%= if  not Enum.empty?(@project.shadow_net_systems) do %>
           <ul style="list-style: none; padding: 0; margin: 0">
             <%= for s <- @project.shadow_net_systems do %>
-              <%= with ssn = %{} <- s.shadow_net_systems do %>
+              <%= with ssn = %{} <- s.shadow_net_system do %>
                 <li>
                   <button type="button" phx-click="remove_ssn" phx-value-id={s.id}>
                     Remove
@@ -145,7 +145,7 @@ defmodule RenewCollabWeb.LiveProjectSettings do
                       Remove
                     </button>
                     <em>SSN deleted</em>
-                    (ID: <code>{s.document_id}</code>)
+                    (ID: <code>{s.shadow_net_system_id}</code>)
                   </li>
               <% end %>
             <% end %>
@@ -181,7 +181,7 @@ defmodule RenewCollabWeb.LiveProjectSettings do
                       Remove
                     </button>
                     <em>Simulation deleted</em>
-                    (ID: <code>{s.document_id}</code>)
+                    (ID: <code>{s.simulation_id}</code>)
                   </li>
               <% end %>
             <% end %>
@@ -254,6 +254,11 @@ defmodule RenewCollabWeb.LiveProjectSettings do
 
   def handle_event("remove_simulation", %{"id" => proj_simulation_id}, socket) do
     Projects.remove_simulation(socket.assigns.project, proj_simulation_id)
+    reload(socket)
+  end
+
+  def handle_event("remove_ssn", %{"id" => proj_ssn_id}, socket) do
+    Projects.remove_shadow_net_system(socket.assigns.project, proj_ssn_id)
     reload(socket)
   end
 

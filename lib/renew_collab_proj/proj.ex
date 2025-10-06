@@ -120,6 +120,7 @@ defmodule RenewCollabProj.Projects do
     |> RenewCollab.Repo.preload(documents: [:document])
     |> RenewCollabAuth.Repo.preload(members: [:account])
     |> RenewCollabSim.Repo.preload(simulations: [:simulation])
+    |> RenewCollabSim.Repo.preload(shadow_net_systems: [:shadow_net_system])
   end
 
   def delete_project(id) do
@@ -182,6 +183,11 @@ defmodule RenewCollabProj.Projects do
 
   def remove_document(%Project{id: project_id}, document_id) do
     from(m in ProjectDocument, where: m.id == ^document_id and m.project_id == ^project_id)
+    |> Repo.delete_all()
+  end
+
+  def remove_shadow_net_system(%Project{id: project_id}, ssn_id) do
+    from(m in ProjectShadowNetSystem, where: m.id == ^ssn_id and m.project_id == ^project_id)
     |> Repo.delete_all()
   end
 

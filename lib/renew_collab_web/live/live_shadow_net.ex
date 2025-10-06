@@ -14,10 +14,12 @@ defmodule RenewCollabWeb.LiveShadowNet do
       sns ->
         RenewCollabWeb.Endpoint.subscribe("#{@topic}:#{shadow_net_system_id}")
         RenewCollabWeb.Endpoint.subscribe("projects/#{sns.project.id}/simulations")
+        RenewCollabWeb.Endpoint.subscribe("projects/#{sns.project.id}/shadow_net_systems")
 
         socket =
           socket
           |> assign(:shadow_net_system_id, shadow_net_system_id)
+          |> assign(:rename_form, to_form(%{name: nil}))
           |> assign(
             :running,
             RenewCollabSim.Server.SimulationServer.running_ids() |> MapSet.new()
@@ -78,8 +80,36 @@ defmodule RenewCollabWeb.LiveShadowNet do
       </div>
 
       <div style="padding: 1em">
-        <h2 style="margin: 0;">Shadow Net System {@shadow_net_system.id}</h2>
+        <%= if @shadow_net_system.label do %>
+          <h2 style="margin: 0;">
+            Shadow Net System {@shadow_net_system.label} (<small>{@shadow_net_system.id}</small>)
+          </h2>
+        <% else %>
+          <h2 style="margin: 0;">Shadow Net System {@shadow_net_system.id}</h2>
+        <% end %>
+        <fieldset style="margin-bottom: 1em">
+          <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
+            Rename Shadow Net System
+          </legend>
 
+          <.form for={@rename_form} phx-submit="rename" phx-change="validate-rename">
+            <div style="display: flex; align-items: stretch; gap: 0.1em">
+              <input
+                type="text"
+                name="name"
+                placeholder="Untitled"
+                value={@rename_form[:name].value}
+                id={@rename_form[:name].id}
+              />
+              <button
+                type="submit"
+                style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff; padding: 1ex"
+              >
+                Rename
+              </button>
+            </div>
+          </.form>
+        </fieldset>
         <dl style="display: grid; grid-template-columns: auto auto 1fr;">
           <dt>Main Net Name</dt>
 
@@ -193,8 +223,11 @@ defmodule RenewCollabWeb.LiveShadowNet do
                 <tr {if(rem(si, 2) == 0, do: [style: "background-color:#f5f5f5;"], else: [])}>
                   <td>
                     <.link navigate={~p"/simulation/#{sim.id}"}>
-                      {sim.id}
+                      {sim.label || sim.id}
                     </.link>
+                    <%= if sim.label do %>
+                      <br /><small>{sim.id}</small>
+                    <% end %>
                   </td>
 
                   <td>
@@ -275,6 +308,19 @@ defmodule RenewCollabWeb.LiveShadowNet do
       </div>
     </div>
     """
+  end
+
+  def handle_event("validate-rename", %{"name" => new_name}, socket) do
+    {:noreply, socket |> assign(:rename_form, to_form(%{"name" => new_name}))}
+  end
+
+  def handle_event("rename", %{"name" => new_name}, socket) do
+    RenewCollabSim.Simulator.rename_shadow_net_system(
+      socket.assigns.shadow_net_system_id,
+      new_name
+    )
+
+    {:noreply, socket}
   end
 
   def handle_event("delete", %{"id" => simulation_id}, socket) do

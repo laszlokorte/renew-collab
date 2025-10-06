@@ -12,6 +12,7 @@ defmodule RenewCollabSim.Entites.Simulation do
     has_many :net_instances, RenewCollabSim.Entites.SimulationNetInstance,
       preload_order: [asc: :label, asc: :integer_id]
 
+    field :label, :string, default: nil
     field :timestep, :integer, default: 0
 
     has_one :project_assignment, RenewCollabProj.Entites.ProjectSimulation

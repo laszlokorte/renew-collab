@@ -15,6 +15,7 @@ defmodule RenewCollabWeb.LiveSimulation do
         socket =
           socket
           |> assign(:simulation_id, simulation_id)
+          |> assign(:rename_form, to_form(%{"name" => sim.label}))
           |> assign(:show_transitions, false)
           |> assign(:is_active, RenewCollabSim.Server.SimulationServer.exists(simulation_id))
           |> assign(:simulation, sim)
@@ -77,8 +78,34 @@ defmodule RenewCollabWeb.LiveSimulation do
           Simulations
         </.link>
         / Simulation
-        <h2 style="margin: 0;">Simulation {@simulation.id}</h2>
+        <%= if @simulation.label do %>
+          <h2 style="margin: 0;">Simulation {@simulation.label} (<small>{@simulation.id}</small>)</h2>
+        <% else %>
+          <h2 style="margin: 0;">Simulation {@simulation.id}</h2>
+        <% end %>
+        <fieldset style="margin-bottom: 1em">
+          <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
+            Rename Simulation
+          </legend>
 
+          <.form for={@rename_form} phx-submit="rename" phx-change="validate-rename">
+            <div style="display: flex; align-items: stretch; gap: 0.1em">
+              <input
+                type="text"
+                name="name"
+                placeholder="Untitled"
+                value={@rename_form[:name].value}
+                id={@rename_form[:name].id}
+              />
+              <button
+                type="submit"
+                style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff; padding: 1ex"
+              >
+                Rename
+              </button>
+            </div>
+          </.form>
+        </fieldset>
         <dl>
           <dt>Timestep</dt>
 
@@ -261,7 +288,20 @@ defmodule RenewCollabWeb.LiveSimulation do
     """
   end
 
-  def handle_event("debug", %{}, socket) do
+  def handle_event("validate-rename", %{"name" => new_name}, socket) do
+    {:noreply, socket |> assign(:rename_form, to_form(%{"name" => new_name}))}
+  end
+
+  def handle_event("rename", %{"name" => new_name}, socket) do
+    RenewCollabSim.Simulator.rename_simulation(
+      socket.assigns.simulation_id,
+      new_name
+    )
+
+    {:noreply, socket}
+  end
+
+  def eandle_event("debug", %{}, socket) do
     RenewCollabSim.Simulator.add_manual_log_entry(
       socket.assigns.simulation_id,
       "Manual Test Entry"

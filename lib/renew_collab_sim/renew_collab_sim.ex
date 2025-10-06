@@ -160,6 +160,44 @@ defmodule RenewCollabSim.Simulator do
     )
   end
 
+  def rename_shadow_net_system(sns_id, new_name) do
+    {:ok, sns} =
+      find_shadow_net_system(sns_id)
+      |> RenewCollabProj.Projects.attach_project_assignment()
+      |> Ecto.Changeset.cast(%{label: new_name}, [:label], empty_values: [""])
+      |> Repo.update()
+
+    if(sns.project) do
+      Phoenix.PubSub.broadcast(
+        RenewCollab.PubSub,
+        "projects/#{sns.project.id}/shadow_net_systems",
+        {:simulation_change, sns.id, :rename}
+      )
+    end
+  end
+
+  def rename_simulation(simulation_id, new_name) do
+    {:ok, simulation} =
+      find_simulation(simulation_id)
+      |> RenewCollabProj.Projects.attach_project_assignment()
+      |> Ecto.Changeset.cast(%{label: new_name}, [:label], empty_values: [""])
+      |> Repo.update()
+
+    if(simulation.project) do
+      Phoenix.PubSub.broadcast(
+        RenewCollab.PubSub,
+        "projects/#{simulation.project.id}/simulations",
+        {:simulation_change, simulation.id, :rename}
+      )
+
+      Phoenix.PubSub.broadcast(
+        RenewCollab.PubSub,
+        "simulation:#{simulation.id}",
+        {:simulation_change, simulation.id, :label}
+      )
+    end
+  end
+
   def clear_instances(id) do
     Repo.delete_all(
       from(l in SimulationNetInstance,
@@ -306,7 +344,7 @@ defmodule RenewCollabSim.Simulator do
       try do
         document_ids
         |> Enum.map(fn doc_id ->
-          document = RenewCollab.Renew.get_document_with_elements(doc_id)
+          document = RenewCollab.Renew.get_document_with_elements(doc_id) |> dbg
           {:ok, rnw} = RenewCollab.Export.DocumentExport.export(document, synthetic: true)
           {:ok, json} = RenewCollabWeb.DocumentJSON.show_content(document) |> Jason.encode()
 

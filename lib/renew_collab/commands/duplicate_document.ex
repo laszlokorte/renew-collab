@@ -3,17 +3,17 @@ defmodule RenewCollab.Commands.DuplicateDocument do
 
   alias RenewCollab.Document.TransientDocument
 
-  defstruct [:document_id]
+  defstruct [:original_document_id]
 
   def new(%{document_id: document_id}) do
-    %__MODULE__{document_id: document_id}
+    %__MODULE__{original_document_id: document_id}
   end
 
   def tags(%__MODULE__{}), do: [:document_collection]
 
   def auto_snapshot(%__MODULE__{}), do: true
 
-  def multi(%__MODULE__{document_id: id}) do
+  def multi(%__MODULE__{original_document_id: id}) do
     RenewCollab.Queries.StrippedDocument.new(%{document_id: id})
     |> RenewCollab.Queries.StrippedDocument.multi()
     |> Ecto.Multi.run(:stripped_document, fn _, %{result: result} ->

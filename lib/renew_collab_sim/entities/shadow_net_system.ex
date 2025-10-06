@@ -5,6 +5,7 @@ defmodule RenewCollabSim.Entites.ShadowNetSystem do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "shadow_net_system" do
+    field :label, :string, default: nil
     field :compiled, :binary
     field :main_net_name, :string
     has_many :nets, RenewCollabSim.Entites.ShadowNet, preload_order: [asc: :id]
