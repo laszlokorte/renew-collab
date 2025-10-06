@@ -19,7 +19,7 @@ defmodule RenewCollabSim.Simulator do
         as: :ssn,
         left_join: nets in assoc(s, :nets),
         left_join: sims in assoc(s, :simulations),
-        #    where: s.id in ^Enum.map(project.shadow_net_systems, & &1.shadow_net_system_id),
+        where: s.id in ^Enum.map(project.shadow_net_systems, & &1.shadow_net_system_id),
         order_by: [desc: s.inserted_at],
         preload: [nets: nets],
         select: map(s, ^ShadowNetSystem.__schema__(:fields)),
@@ -80,6 +80,7 @@ defmodule RenewCollabSim.Simulator do
     )
     |> Repo.preload(:log_entries)
     |> Repo.preload(net_instances: :firings)
+    |> RenewCollabProj.Projects.attach_project_assignment()
   end
 
   def find_simulation_log_entries(id) do
@@ -178,21 +179,23 @@ defmodule RenewCollabSim.Simulator do
   end
 
   def delete_simulation(id) do
-    Repo.delete(find_simulation(id))
+    simulation = find_simulation(id)
+    simulation |> RenewCollabProj.Projects.attach_project_assignment()
+
+    Repo.delete(simulation)
     RenewCollabSim.Server.SimulationServer.terminate(id)
 
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "simulations",
-      {:simulation_change, id, :delete}
-    )
+    if(simulation.project) do
+      Phoenix.PubSub.broadcast(
+        RenewCollab.PubSub,
+        "projects/#{simulation.project.id}/simulations",
+        {:simulation_change, id, :delete}
+      )
+    end
   end
 
   def create_and_start_simulation(shadow_net_system_id) do
-    %RenewCollabSim.Entites.Simulation{
-      shadow_net_system_id: shadow_net_system_id
-    }
-    |> Repo.insert()
+    create_simulation(shadow_net_system_id)
     |> case do
       {:ok, %{id: id}} -> RenewCollabSim.Server.SimulationServer.setup(id)
     end
@@ -204,10 +207,13 @@ defmodule RenewCollabSim.Simulator do
     }
     |> Repo.insert()
     |> tap(fn
-      {:ok, %{id: simulation_id}} ->
+      {:ok, %{id: simulation_id} = simulation} ->
+        proj = RenewCollabProj.Projects.find_shadow_net_systems_project(shadow_net_system_id)
+        RenewCollabProj.Projects.assign_to_project(proj, simulation)
+
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
-          "simulations",
+          "projects/#{proj.id}/simulations",
           {:simulation_change, simulation_id, :state}
         )
     end)
@@ -262,9 +268,10 @@ defmodule RenewCollabSim.Simulator do
     end
   end
 
-  def compile_rnws_to_ssn(formalism, paths, main_net_name) do
+  def compile_rnws_to_ssn(project, formalism, paths, main_net_name) do
     with {:ok, content} <- RenewCollabSim.Compiler.SnsCompiler.compile(formalism, paths) do
       create_shadow_net(
+        project,
         content,
         main_net_name,
         Enum.map(paths, &%{"name" => Path.rootname(Path.basename(elem(&1, 0)))})
@@ -272,23 +279,26 @@ defmodule RenewCollabSim.Simulator do
     end
   end
 
-  def create_shadow_net(content, main_net_name, nets) do
-    sns =
-      %RenewCollabSim.Entites.ShadowNetSystem{}
-      |> RenewCollabSim.Entites.ShadowNetSystem.changeset(%{
-        "compiled" => content,
-        "main_net_name" => main_net_name,
-        "nets" => nets
-      })
-      |> Repo.insert()
+  def create_shadow_net(project, content, main_net_name, nets) do
+    %RenewCollabSim.Entites.ShadowNetSystem{}
+    |> RenewCollabSim.Entites.ShadowNetSystem.changeset(%{
+      "compiled" => content,
+      "main_net_name" => main_net_name,
+      "nets" => nets
+    })
+    |> Repo.insert()
+    |> case do
+      result = {:ok, sns} ->
+        RenewCollabProj.Projects.assign_to_project(project, sns)
 
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "shadow_nets",
-      :any
-    )
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "projects/#{project.id}/shadow_nets",
+          :any
+        )
 
-    sns
+        result
+    end
   end
 
   def create_simulation_from_documents(project, formalism, document_ids, main_net_name \\ nil) do
@@ -339,17 +349,12 @@ defmodule RenewCollabSim.Simulator do
       |> Repo.insert()
       |> case do
         {:ok, %{id: sim_id} = simulation} ->
+          RenewCollabProj.Projects.assign_to_project(project, simulation)
           RenewCollabSim.Server.SimulationServer.setup(sim_id)
 
           Phoenix.PubSub.broadcast(
             RenewCollab.PubSub,
-            "shadow_net:#{sns_id}",
-            :any
-          )
-
-          Phoenix.PubSub.broadcast(
-            RenewCollab.PubSub,
-            "simulations",
+            "projects/#{project.id}/simulations",
             {:simulation_change, sim_id, :created}
           )
 

@@ -8,7 +8,7 @@ defmodule RenewCollab.Simulation.SimulationLink do
     belongs_to :document, RenewCollab.Document.Document
     belongs_to :snapshot, RenewCollab.Versioning.Snapshot
 
-    field :simulation_id, :binary_id
+    belongs_to :simulation, RenewCollabSim.Entites.Simulation
 
     timestamps(type: :utc_datetime)
   end

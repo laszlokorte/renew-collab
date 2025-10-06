@@ -7,14 +7,13 @@ defmodule RenewCollabWeb.LiveShadowNet do
 
   def mount(%{"id" => shadow_net_system_id}, _session, socket) do
     RenewCollabSim.Simulator.find_shadow_net_system(shadow_net_system_id)
-    |> dbg
     |> case do
       nil ->
         {:ok, socket |> redirect(to: ~p"/")}
 
       sns ->
         RenewCollabWeb.Endpoint.subscribe("#{@topic}:#{shadow_net_system_id}")
-        RenewCollabWeb.Endpoint.subscribe("simulations")
+        RenewCollabWeb.Endpoint.subscribe("projects/#{sns.project.id}/simulations")
 
         socket =
           socket
@@ -29,7 +28,9 @@ defmodule RenewCollabWeb.LiveShadowNet do
           )
           |> assign(
             :documents,
-            RenewCollab.Renew.list_documents()
+            RenewCollab.Renew.list_documents(
+              RenewCollabProj.Projects.list_project_documents(sns.project.id)
+            )
           )
 
         {:ok, socket}
@@ -62,14 +63,18 @@ defmodule RenewCollabWeb.LiveShadowNet do
       <RenewCollabWeb.RenewComponents.app_header flash={@flash} />
 
       <div style="padding: 1em">
+        <.link navigate={~p"/projects"}>
+          Projects
+        </.link>
         <%= case @shadow_net_system.project_assignment do %>
           <% %ProjectShadowNetSystem{project_id: project_id} -> %>
+            /
             <.link navigate={~p"/project/#{project_id}/shadow_nets"} style="color: inherit">
-              Back
+              Shadow Net Systems
             </.link>
           <% _ -> %>
-            <.link navigate={~p"/"} style="color: inherit">Back</.link>
         <% end %>
+        / Simulations
       </div>
 
       <div style="padding: 1em">

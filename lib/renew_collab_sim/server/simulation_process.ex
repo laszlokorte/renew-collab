@@ -36,6 +36,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   defp broadcast_change(
          state = %{
            simulation_id: sim_id,
+           project_id: project_id,
            latest_update: latest_update,
            retry: retry,
            playing: playing
@@ -57,7 +58,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
 
       Phoenix.PubSub.broadcast(
         RenewCollab.PubSub,
-        "simulations",
+        "projects/#{project_id}/simulations",
         {:simulation_change, sim_id, {event, playing}}
       )
 

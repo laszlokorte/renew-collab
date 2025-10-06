@@ -110,5 +110,6 @@ defmodule RenewCollab.Renew do
         order_by: [desc: l.inserted_at]
       )
     )
+    |> RenewCollabSim.Repo.preload([:simulation])
   end
 end

@@ -1,4 +1,5 @@
 defmodule RenewCollabWeb.LiveSimulation do
+  alias RenewCollabProj.Entites.ProjectSimulation
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
@@ -60,7 +61,22 @@ defmodule RenewCollabWeb.LiveSimulation do
       <RenewCollabWeb.RenewComponents.app_header flash={@flash} />
 
       <div style="padding: 1em">
-        <.link navigate={~p"/shadow_net/#{@simulation.shadow_net_system_id}"}>Back</.link>
+        <.link navigate={~p"/projects"}>
+          Projects
+        </.link>
+        <%= case @simulation.project_assignment do %>
+          <% %ProjectSimulation{project_id: project_id} -> %>
+            /
+            <.link navigate={~p"/project/#{project_id}/shadow_nets"} style="color: inherit">
+              Shadow Net Systems
+            </.link>
+          <% _ -> %>
+        <% end %>
+        /
+        <.link navigate={~p"/shadow_net/#{@simulation.shadow_net_system_id}"}>
+          Simulations
+        </.link>
+        / Simulation
         <h2 style="margin: 0;">Simulation {@simulation.id}</h2>
 
         <dl>
@@ -330,18 +346,6 @@ defmodule RenewCollabWeb.LiveSimulation do
     shadow_net_system_id = socket.assigns.simulation.shadow_net_system_id
     RenewCollabSim.Simulator.delete_simulation(socket.assigns.simulation_id)
     RenewCollabSim.Server.SimulationServer.terminate(socket.assigns.simulation.id)
-
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "shadow_net:#{socket.assigns.simulation.shadow_net_system_id}",
-      :any
-    )
-
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "shadow_nets",
-      :any
-    )
 
     {:noreply, socket |> redirect(to: ~p"/shadow_net/#{shadow_net_system_id}")}
   end

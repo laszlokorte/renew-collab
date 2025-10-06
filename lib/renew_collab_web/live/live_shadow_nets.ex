@@ -28,13 +28,19 @@ defmodule RenewCollabWeb.LiveShadowNets do
       |> allow_upload(:import_rnw_file, accept: ~w(.rnw), max_entries: @file_count_limit)
       |> allow_upload(:import_sns_file, accept: ~w(.sns), max_entries: 1)
 
-    RenewCollabWeb.Endpoint.subscribe("project/#{socket.assigns.project.id}")
+    RenewCollabWeb.Endpoint.subscribe("projects/#{socket.assigns.project.id}/shadow_nets")
     {:ok, socket}
   end
 
   def handle_info(:any, socket) do
     {:noreply,
-     socket |> assign(:shadow_net_systems, RenewCollabSim.Simulator.list_shadow_net_systems())}
+     socket
+     |> assign(
+       :shadow_net_systems,
+       RenewCollabSim.Simulator.list_shadow_net_systems(
+         RenewCollabProj.Projects.list_project_shadow_net_systems(socket.assigns.project.id)
+       )
+     )}
   end
 
   defp error_to_string(:too_large), do: "The selected file is too large."
@@ -48,6 +54,12 @@ defmodule RenewCollabWeb.LiveShadowNets do
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
       <RenewCollabWeb.RenewComponents.app_header flash={@flash} project_id={@project.id} />
 
+      <div style="padding: 1em">
+        <.link navigate={~p"/projects"}>
+          Projects
+        </.link>
+        / Shadow Net Systems
+      </div>
       <div style="padding: 1em 1em 0; display: flex; align-items: start; gap: 1em">
         <fieldset style="margin-bottom: 1em">
           <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
@@ -378,7 +390,12 @@ defmodule RenewCollabWeb.LiveShadowNets do
         {:ok, {Path.basename(filename), file_content}}
       end)
 
-    RenewCollabSim.Simulator.compile_rnws_to_ssn(formalism, paths, main_net_name)
+    RenewCollabSim.Simulator.compile_rnws_to_ssn(
+      socket.assigns.project,
+      formalism,
+      paths,
+      main_net_name
+    )
 
     {:noreply, socket}
   end
@@ -389,9 +406,14 @@ defmodule RenewCollabWeb.LiveShadowNets do
         consume_uploaded_entries(socket, :import_sns_file, fn %{path: path}, %{} ->
           {:ok, file_content} = File.read(path)
 
-          RenewCollabSim.Simulator.create_shadow_net(file_content, main_net_name, [
-            %{"name" => main_net_name}
-          ])
+          RenewCollabSim.Simulator.create_shadow_net(
+            socket.assigns.project,
+            file_content,
+            main_net_name,
+            [
+              %{"name" => main_net_name}
+            ]
+          )
         end)
 
       {:noreply, socket |> assign(import_sns_form: to_form(%{"main_net" => nil}))}
@@ -405,7 +427,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
 
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
-      "project/#{socket.assigns.project.id}",
+      "projects/#{socket.assigns.project.id}/shadow_nets",
       :any
     )
 

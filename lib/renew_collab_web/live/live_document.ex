@@ -74,13 +74,16 @@ defmodule RenewCollabWeb.LiveDocument do
     <div style="position: absolute; top:0;left:0;bottom: 0; right:0;display: grid; width: 100vw; height: 100vh; grid-template-rows: [top-start right-start] auto [top-end left-start ] 1fr [left-end right-end]; grid-template-columns: [left-start top-start]1fr [top-end left-end right-start]auto [right-end];">
       <div style="grid-area: top; padding: 1em; background: #333; color: #fff; display: flex; justify-content: space-between; align-items: stretch;">
         <div>
+          <.link navigate={~p"/projects"} style="color: inherit">
+            Projects
+          </.link>
           <%= case @document.project_assignment do %>
             <% %ProjectDocument{project_id: project_id} -> %>
+              /
               <.link navigate={~p"/project/#{project_id}/documents"} style="color: inherit">
-                Back
+                Documents
               </.link>
             <% _ -> %>
-              <.link navigate={~p"/"} style="color: inherit">Back</.link>
           <% end %>
           <h2 style="margin: 0;">{@document.name}</h2>
         </div>
@@ -731,10 +734,15 @@ defmodule RenewCollabWeb.LiveDocument do
               <ul style="list-style: none; padding: 0; margin: 0">
                 <%= for lnk <- simulation_links do %>
                   <li style={"opacity: #{if(lnk.snapshot_id == @document.current_snaptshot.id, do: 1, else: 0.5)}"}>
-                    <.link navigate={~p"/simulation/#{lnk.simulation_id}"}>
+                    <%= if lnk.simulation do %>
+                      <.link navigate={~p"/simulation/#{lnk.simulation_id}"}>
+                        {lnk.inserted_at}<br />
+                        <small>{lnk.simulation_id}</small>
+                      </.link>
+                    <% else %>
                       {lnk.inserted_at}<br />
                       <small>{lnk.simulation_id}</small>
-                    </.link>
+                    <% end %>
                   </li>
                 <% end %>
               </ul>

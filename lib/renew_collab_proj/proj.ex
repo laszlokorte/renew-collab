@@ -261,8 +261,8 @@ defmodule RenewCollabProj.Projects do
     |> Repo.one()
   end
 
-  def attach_project_assignment(doc) do
-    doc |> Repo.preload(project_assignment: [:project], project: [])
+  def attach_project_assignment(object) do
+    object |> Repo.preload(project_assignment: [:project], project: [])
   end
 
   def assign_to_project(project, %RenewCollab.Document.Document{} = document) do
@@ -289,12 +289,33 @@ defmodule RenewCollabProj.Projects do
     end
   end
 
+  def assign_to_project(project, %RenewCollabSim.Entites.Simulation{} = sim) do
+    %ProjectSimulation{project_id: project.id}
+    |> ProjectSimulation.changeset(%{
+      "simulation_id" => sim.id
+    })
+    |> Repo.insert()
+    |> case do
+      _ ->
+        {:ok, sim}
+    end
+  end
+
   def find_documents_project(document_id) do
     from(p in Project,
       join: docs in assoc(p, :documents),
       where: docs.document_id == ^document_id
     )
     |> Repo.one()
+  end
+
+  def find_shadow_net_systems_project(sns_id) do
+    from(p in Project,
+      join: sns in assoc(p, :shadow_net_systems),
+      where: sns.shadow_net_system_id == ^sns_id
+    )
+    |> Repo.one()
+    |> dbg
   end
 
   def delete_document(document_id) do
