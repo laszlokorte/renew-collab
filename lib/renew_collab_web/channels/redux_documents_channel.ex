@@ -37,17 +37,14 @@ defmodule RenewCollabWeb.ReduxDocumentsChannel do
 
   @impl true
   def handle_event("delete_document", %{"id" => document_id}, state) do
-    Renew.delete_document(document_id)
+    RenewCollab.Renew.delete_document(document_id)
 
     {:noreply, state}
   end
 
   @impl true
   def handle_event("duplicate_document", %{"id" => document_id}, state) do
-    RenewCollab.Commands.DuplicateDocument.new(%{
-      document_id: document_id
-    })
-    |> RenewCollab.Commander.run_document_command()
+    RenewCollab.duplicate_document(document_id)
 
     {:noreply, state}
   end

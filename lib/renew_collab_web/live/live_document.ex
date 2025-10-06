@@ -39,7 +39,10 @@ defmodule RenewCollabWeb.LiveDocument do
             {:ok,
              %{
                undo_redo: Versioning.document_undo_redo(id),
-               other_documents: Renew.list_documents(),
+               other_documents:
+                 Renew.list_documents(
+                   RenewCollabProj.Projects.list_project_documents(document.project.id)
+                 ),
                snapshots: Versioning.document_versions(id),
                socket_schemas: Sockets.all_socket_schemas(),
                symbols: Symbols.list_shapes() |> Enum.map(fn s -> {s.id, s} end) |> Map.new(),
@@ -1720,6 +1723,7 @@ defmodule RenewCollabWeb.LiveDocument do
     formalism = RenewCollabSim.Compiler.SnsCompiler.default_formalism()
 
     RenewCollabSim.Simulator.create_simulation_from_documents(
+      socket.assigns.document.project,
       formalism,
       [socket.assigns.document.id],
       socket.assigns.document.name

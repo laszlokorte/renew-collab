@@ -18,6 +18,10 @@ defmodule RenewCollab.Renew do
     |> RenewCollab.Fetcher.fetch()
   end
 
+  def list_documents() do
+    []
+  end
+
   def count_documents do
     RenewCollab.Queries.DocumentCount.new()
     |> RenewCollab.Fetcher.fetch()
@@ -29,7 +33,7 @@ defmodule RenewCollab.Renew do
     %{document_id: document_id}
     |> RenewCollab.Queries.DocumentWithElements.new()
     |> RenewCollab.Fetcher.fetch()
-    |> RenewCollabProj.Projects.attach_document_project()
+    |> RenewCollabProj.Projects.attach_project_assignment()
   end
 
   def create_document(project, attrs \\ %{}, parenthoods \\ [], hyperlinks \\ [], bonds \\ []) do
@@ -73,6 +77,29 @@ defmodule RenewCollab.Renew do
 
       _ ->
         nil
+    end
+  end
+
+  def duplicate_document(document_id) do
+    RenewCollab.Commands.DuplicateDocument.new(%{
+      document_id: document_id
+    })
+    |> RenewCollab.Commander.run_document_command_sync(true)
+    |> case do
+      {:ok, %{insert_document: new_document}} = res ->
+        project = RenewCollabProj.Projects.find_documents_project(document_id)
+        RenewCollabProj.Projects.assign_to_project(project, new_document)
+
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "project/#{project.id}/documents",
+          :any
+        )
+
+        res
+
+      o ->
+        o
     end
   end
 

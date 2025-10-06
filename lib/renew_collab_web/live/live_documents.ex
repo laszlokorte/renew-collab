@@ -232,10 +232,7 @@ defmodule RenewCollabWeb.LiveDocuments do
   end
 
   def handle_event("duplicate", %{"id" => document_id}, socket) do
-    RenewCollab.Commands.DuplicateDocument.new(%{
-      document_id: document_id
-    })
-    |> RenewCollab.Commander.run_document_command()
+    Renew.duplicate_document(document_id)
 
     {:noreply, socket}
   end
@@ -314,7 +311,11 @@ defmodule RenewCollabWeb.LiveDocuments do
   end
 
   def handle_event("compile", %{"document_id" => document_id, "formalism" => formalism}, socket) do
-    RenewCollabSim.Simulator.create_simulation_from_documents(formalism, [document_id])
+    RenewCollabSim.Simulator.create_simulation_from_documents(
+      socket.assigns.project,
+      formalism,
+      [document_id]
+    )
     |> case do
       %RenewCollabSim.Entites.Simulation{} = sim ->
         {:noreply, redirect(socket, to: ~p"/simulation/#{sim.id}")}

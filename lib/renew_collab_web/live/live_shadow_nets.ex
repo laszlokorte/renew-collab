@@ -2,20 +2,21 @@ defmodule RenewCollabWeb.LiveShadowNets do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
-  @topic "shadow_nets"
-
   @file_count_limit 10
 
   def file_count_limit, do: @file_count_limit
 
   def mount(%{"project_id" => project_id}, _session, socket) do
-    RenewCollabWeb.Endpoint.subscribe(@topic)
-
     socket =
       socket
       |> assign(:is_admin, is_admin(socket))
-      |> assign(:project_id, project_id)
-      |> assign(:shadow_net_systems, RenewCollabSim.Simulator.list_shadow_net_systems())
+      |> assign(:project, RenewCollabProj.Projects.find_project(project_id))
+      |> assign(
+        :shadow_net_systems,
+        RenewCollabSim.Simulator.list_shadow_net_systems(
+          RenewCollabProj.Projects.list_project_shadow_net_systems(project_id)
+        )
+      )
       |> assign(
         import_rnw_form:
           to_form(%{
@@ -27,6 +28,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
       |> allow_upload(:import_rnw_file, accept: ~w(.rnw), max_entries: @file_count_limit)
       |> allow_upload(:import_sns_file, accept: ~w(.sns), max_entries: 1)
 
+    RenewCollabWeb.Endpoint.subscribe("project/#{socket.assigns.project.id}")
     {:ok, socket}
   end
 
@@ -44,7 +46,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
   def render(assigns) do
     ~H"""
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
-      <RenewCollabWeb.RenewComponents.app_header flash={@flash} project_id={@project_id} />
+      <RenewCollabWeb.RenewComponents.app_header flash={@flash} project_id={@project.id} />
 
       <div style="padding: 1em 1em 0; display: flex; align-items: start; gap: 1em">
         <fieldset style="margin-bottom: 1em">
@@ -403,7 +405,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
 
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
-      @topic,
+      "project/#{socket.assigns.project.id}",
       :any
     )
 

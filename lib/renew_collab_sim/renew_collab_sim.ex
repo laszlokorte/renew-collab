@@ -13,12 +13,13 @@ defmodule RenewCollabSim.Simulator do
   alias RenewCollabSim.Repo
   alias RenewCollab.Simulation.SimulationLink
 
-  def list_shadow_net_systems do
+  def list_shadow_net_systems(project) do
     Repo.all(
       from(s in ShadowNetSystem,
         as: :ssn,
         left_join: nets in assoc(s, :nets),
         left_join: sims in assoc(s, :simulations),
+        #    where: s.id in ^Enum.map(project.shadow_net_systems, & &1.shadow_net_system_id),
         order_by: [desc: s.inserted_at],
         preload: [nets: nets],
         select: map(s, ^ShadowNetSystem.__schema__(:fields)),
@@ -45,9 +46,14 @@ defmodule RenewCollabSim.Simulator do
         preload: [nets: nets, simulations: sims]
       )
     )
+    |> RenewCollabProj.Projects.attach_project_assignment()
   end
 
   def find_all_simulations() do
+    []
+  end
+
+  def find_all_simulations(project_id) do
     Repo.all(
       from(s in Simulation,
         inner_join: sns in assoc(s, :shadow_net_system),
@@ -285,7 +291,7 @@ defmodule RenewCollabSim.Simulator do
     sns
   end
 
-  def create_simulation_from_documents(formalism, document_ids, main_net_name \\ nil) do
+  def create_simulation_from_documents(project, formalism, document_ids, main_net_name \\ nil) do
     nets =
       try do
         document_ids
@@ -310,7 +316,7 @@ defmodule RenewCollabSim.Simulator do
              nets
              |> Enum.map(fn {name, rnw, _, _} -> {name, rnw} end)
            ),
-         {:ok, %{id: sns_id}} <-
+         {:ok, %{id: sns_id} = sns} <-
            %RenewCollabSim.Entites.ShadowNetSystem{}
            |> RenewCollabSim.Entites.ShadowNetSystem.changeset(%{
              "compiled" => content,
@@ -325,6 +331,8 @@ defmodule RenewCollabSim.Simulator do
                end)
            })
            |> Repo.insert() do
+      RenewCollabProj.Projects.assign_to_project(project, sns)
+
       %RenewCollabSim.Entites.Simulation{
         shadow_net_system_id: sns_id
       }

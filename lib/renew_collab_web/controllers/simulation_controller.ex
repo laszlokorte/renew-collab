@@ -19,6 +19,7 @@ defmodule RenewCollabWeb.SimulationController do
       Map.get(params, "formalism", RenewCollabSim.Compiler.SnsCompiler.default_formalism())
 
     case RenewCollabSim.Simulator.create_simulation_from_documents(
+           nil,
            formalism,
            document_ids,
            Map.get(params, "main_net_name")

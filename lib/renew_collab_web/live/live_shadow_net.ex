@@ -1,5 +1,5 @@
 defmodule RenewCollabWeb.LiveShadowNet do
-  alias RenewCollabProj.Entites.ProjectDocument
+  alias RenewCollabProj.Entites.ProjectShadowNetSystem
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
@@ -7,6 +7,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
 
   def mount(%{"id" => shadow_net_system_id}, _session, socket) do
     RenewCollabSim.Simulator.find_shadow_net_system(shadow_net_system_id)
+    |> dbg
     |> case do
       nil ->
         {:ok, socket |> redirect(to: ~p"/")}
@@ -62,7 +63,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
 
       <div style="padding: 1em">
         <%= case @shadow_net_system.project_assignment do %>
-          <% %ProjectDocument{project_id: project_id} -> %>
+          <% %ProjectShadowNetSystem{project_id: project_id} -> %>
             <.link navigate={~p"/project/#{project_id}/shadow_nets"} style="color: inherit">
               Back
             </.link>

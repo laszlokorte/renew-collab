@@ -3,6 +3,7 @@ defmodule RenewCollabProj.Projects do
   The Renew context.
   """
 
+  alias RenewCollabProj.Entites.ProjectShadowNetSystem
   alias RenewCollabProj.Entites.Project
   alias RenewCollabProj.Repo
   alias RenewCollabProj.Entites.ProjectMember
@@ -249,20 +250,51 @@ defmodule RenewCollabProj.Projects do
     |> Repo.one()
   end
 
-  def attach_document_project(doc) do
-    doc |> Repo.preload(project_assignment: [:project])
+  def list_project_shadow_net_systems(project_id) do
+    from(p in Project,
+      left_join: ssn in assoc(p, :shadow_net_systems),
+      where: p.id == ^project_id,
+      preload: [
+        shadow_net_systems: ssn
+      ]
+    )
+    |> Repo.one()
   end
 
-  def assign_to_project(project, doc) do
+  def attach_project_assignment(doc) do
+    doc |> Repo.preload(project_assignment: [:project], project: [])
+  end
+
+  def assign_to_project(project, %RenewCollab.Document.Document{} = document) do
     %ProjectDocument{project_id: project.id}
     |> ProjectDocument.changeset(%{
-      "document_id" => doc.id
+      "document_id" => document.id
     })
     |> Repo.insert()
     |> case do
       _ ->
-        {:ok, doc}
+        {:ok, document}
     end
+  end
+
+  def assign_to_project(project, %RenewCollabSim.Entites.ShadowNetSystem{} = sns) do
+    %ProjectShadowNetSystem{project_id: project.id}
+    |> ProjectShadowNetSystem.changeset(%{
+      "shadow_net_system_id" => sns.id
+    })
+    |> Repo.insert()
+    |> case do
+      _ ->
+        {:ok, sns}
+    end
+  end
+
+  def find_documents_project(document_id) do
+    from(p in Project,
+      join: docs in assoc(p, :documents),
+      where: docs.document_id == ^document_id
+    )
+    |> Repo.one()
   end
 
   def delete_document(document_id) do
