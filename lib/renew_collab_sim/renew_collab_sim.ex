@@ -36,6 +36,15 @@ defmodule RenewCollabSim.Simulator do
     )
   end
 
+  def list_simulations(project) do
+    Repo.all(
+      from(s in Simulation,
+        where: s.id in ^Enum.map(project.simulations, & &1.simulation_id),
+        order_by: [desc: s.inserted_at]
+      )
+    )
+  end
+
   def find_shadow_net_system(id) do
     Repo.one(
       from(s in ShadowNetSystem,

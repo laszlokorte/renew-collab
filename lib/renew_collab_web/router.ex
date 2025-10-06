@@ -152,6 +152,7 @@ defmodule RenewCollabWeb.Router do
       live "/projects", LiveProjects
       live "/project/:project_id/settings", LiveProjectSettings
       live "/project/:project_id/shadow_nets", LiveShadowNets
+      live "/project/:project_id/simulations", LiveSimulations
       live "/shadow_net/:id", LiveShadowNet
       live "/simulation/:id", LiveSimulation
     end

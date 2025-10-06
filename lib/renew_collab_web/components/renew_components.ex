@@ -28,15 +28,12 @@ defmodule RenewCollabWeb.RenewComponents do
         </h1>
       </.link>
 
-      <div>
-        <%= if @flash do %>
-          <.flash_group flash={@flash} />
-        <% end %>
-      </div>
+      <%= if @flash do %>
+        <.flash_group flash={@flash} />
+      <% end %>
 
       <div style="display: flex; gap: 2em; align-items: stretch;">
         <%= if not @blank do %>
-          <.link style="color: white; align-self: center;" navigate={~p"/projects"}>Projects</.link>
           <%= if @project_id do %>
             <.link
               style="color: white; align-self: center;"
@@ -46,9 +43,15 @@ defmodule RenewCollabWeb.RenewComponents do
             </.link>
             <.link
               style="color: white; align-self: center;"
-              navigate={~p"/project/#{@project_id}/shadow_nets"}
+              navigate={~p"/project/#{@project_id}/simulations"}
             >
               Simulations
+            </.link>
+            <.link
+              style="color: white; align-self: center;"
+              navigate={~p"/project/#{@project_id}/shadow_nets"}
+            >
+              Shadow Nets
             </.link>
             <.link
               style="color: white; align-self: center;"
@@ -57,7 +60,7 @@ defmodule RenewCollabWeb.RenewComponents do
               Settings
             </.link>
           <% end %>
-          <.link style="color: white; align-self: center;" navigate={~p"/"}>Dashboard</.link>
+          <.link style="color: white; align-self: center;" navigate={~p"/projects"}>Projects</.link>
         <% end %>
 
         <%= if @logout do %>
@@ -149,17 +152,17 @@ defmodule RenewCollabWeb.RenewComponents do
       id={@id}
       role="alert"
       class={[
-        "fixed top-2 right-2 mr-2 w-80 sm:w-96 z-50 rounded-lg p-3 ring-1",
-        @kind == :info && "bg-emerald-50 text-emerald-800 ring-emerald-500 fill-cyan-900",
-        @kind == :error && "bg-rose-50 text-rose-900 shadow-md ring-rose-500 fill-rose-900"
+        "flash",
+        @kind == :info && "flash-info",
+        @kind == :error && "flash-error"
       ]}
       {@rest}
     >
-      <p class="mt-2 text-sm leading-5">{msg}</p>
+      <div>{msg}</div>
 
       <button
         type="button"
-        class="group absolute top-1 right-1 p-2"
+        class="flash-button"
         aria-label="close"
         phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
       >
@@ -181,7 +184,7 @@ defmodule RenewCollabWeb.RenewComponents do
 
   def flash_group(assigns) do
     ~H"""
-    <div id={@id}>
+    <div id={@id} class="flash-group">
       <.flash kind={:info} title="Success!" flash={@flash} />
       <.flash kind={:error} title="Error!" flash={@flash} />
       <.flash

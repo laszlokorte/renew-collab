@@ -256,6 +256,18 @@ defmodule RenewCollabProj.Projects do
     |> Repo.one()
   end
 
+  def list_project_simulations(project_id) do
+    from(p in Project,
+      left_join: sims in assoc(p, :simulations),
+      where: p.id == ^project_id,
+      preload: [
+        simulations: sims
+      ]
+    )
+    |> Repo.one()
+    |> RenewCollabSim.Repo.preload(simulations: [:simulation])
+  end
+
   def list_project_shadow_net_systems(project_id) do
     from(p in Project,
       left_join: ssn in assoc(p, :shadow_net_systems),
