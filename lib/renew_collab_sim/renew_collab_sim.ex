@@ -286,6 +286,18 @@ defmodule RenewCollabSim.Simulator do
     )
   end
 
+  def clear_net_document(shadow_net_system_id, shadow_net_id) do
+    from(sn in ShadowNet,
+      where: sn.id == ^shadow_net_id and sn.shadow_net_system_id == ^shadow_net_system_id
+    )
+    |> Repo.one()
+    |> Ecto.Changeset.change(%{
+      document_json: nil
+    })
+    |> Repo.update()
+    |> dbg
+  end
+
   def change_net_document(
         shadow_net_system_id,
         shadow_net_id,

@@ -72,11 +72,37 @@ defmodule RenewCollabWeb.LiveSimulations do
           Projects
         </.link>
         / Simulations
+        <h2 style="margin: 0;">Simulations</h2>
+      </div>
+
+      <div style="padding: 1em 1em 0; display: flex; align-items: start; gap: 1em">
+        <fieldset style="margin-bottom: 1em">
+          <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
+            Simulate Documents
+          </legend>
+          <form phx-submit="compile">
+            <div>
+              <select multiple size="8" width="200" style="width:100%">
+                <option></option>
+              </select>
+            </div>
+            <label>
+              Formalism:
+              <select name="formalism">
+                <%= for f <- RenewCollabSim.Compiler.SnsCompiler.formalisms() do %>
+                  <option>{f}</option>
+                <% end %>
+              </select>
+            </label>
+
+            <button type="submit" phx-disable-with="Compiling...">
+              Simulate
+            </button>
+          </form>
+        </fieldset>
       </div>
 
       <div style="padding: 1em">
-        <h2 style="margin: 0;">Simulations</h2>
-
         <table style="width: 100%;" cellpadding="5">
           <thead>
             <tr>

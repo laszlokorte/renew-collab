@@ -37,6 +37,7 @@ defmodule RenewCollabWeb.LiveDocuments do
           Projects
         </.link>
         / Documents
+        <h2 style="margin: 0;">Documents</h2>
       </div>
 
       <div style="padding: 1em 1em 0; display: flex; align-items: start; gap: 1em">
@@ -131,8 +132,6 @@ defmodule RenewCollabWeb.LiveDocuments do
       </div>
 
       <div style="padding: 1em">
-        <h2 style="margin: 0;">Documents</h2>
-
         <table style="width: 100%;" cellpadding="5">
           <thead>
             <tr>

@@ -203,7 +203,12 @@ defmodule RenewCollabWeb.LiveProjectSettings do
           <h3>Delete Project</h3>
 
           <form method="post" phx-submit="delete" accept-charset="utf-8">
-            <button type="submit">Delete</button>
+            <button
+              type="submit"
+              style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
+            >
+              Delete
+            </button>
           </form>
         <% end %>
       </div>

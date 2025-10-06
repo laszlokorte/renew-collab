@@ -19,7 +19,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
         socket =
           socket
           |> assign(:shadow_net_system_id, shadow_net_system_id)
-          |> assign(:rename_form, to_form(%{name: nil}))
+          |> assign(:rename_form, to_form(%{"name" => sns.label}))
           |> assign(
             :running,
             RenewCollabSim.Server.SimulationServer.running_ids() |> MapSet.new()
@@ -85,93 +85,108 @@ defmodule RenewCollabWeb.LiveShadowNet do
       <div style="padding: 1em">
         <%= if @shadow_net_system.label do %>
           <h2 style="margin: 0;">
-            Shadow Net System {@shadow_net_system.label} (<small>{@shadow_net_system.id}</small>)
+            Shadow Net System {@shadow_net_system.label} (<small><code>{@shadow_net_system.id}</code></small>)
           </h2>
         <% else %>
-          <h2 style="margin: 0;">Shadow Net System {@shadow_net_system.id}</h2>
+          <h2 style="margin: 0;">Shadow Net System <code>{@shadow_net_system.id}</code></h2>
         <% end %>
-        <fieldset style="margin-bottom: 1em">
-          <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
-            Rename Shadow Net System
-          </legend>
+        <div style="padding: 1em 1em 0; display: flex; align-items: start; gap: 1em">
+          <fieldset style="margin-bottom: 1em">
+            <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
+              Nets
+            </legend>
+            <dl style="display: grid; grid-template-columns: auto 1fr;">
+              <dt>Main Net Name</dt>
 
-          <.form for={@rename_form} phx-submit="rename" phx-change="validate-rename">
-            <div style="display: flex; align-items: stretch; gap: 0.1em">
-              <input
-                type="text"
-                name="name"
-                placeholder="Untitled"
-                value={@rename_form[:name].value}
-                id={@rename_form[:name].id}
-              />
-              <button
-                type="submit"
-                style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff; padding: 1ex"
-              >
-                Rename
-              </button>
-            </div>
-          </.form>
-        </fieldset>
-        <dl style="display: grid; grid-template-columns: auto auto 1fr;">
-          <dt>Main Net Name</dt>
+              <dd>
+                <code>{@shadow_net_system.main_net_name}</code>
+              </dd>
+              <dt>
+                <label>
+                  Change main net:
+                </label>
+              </dt>
+              <dd>
+                <form phx-change="change_main_net">
+                  <select name="main_net">
+                    <%= for net <- @shadow_net_system.nets do %>
+                      <option selected={net.name == @shadow_net_system.main_net_name}>
+                        {net.name}
+                      </option>
+                    <% end %>
+                  </select>
+                </form>
+              </dd>
 
-          <dd>
-            <code>{@shadow_net_system.main_net_name}</code>
-          </dd>
+              <dt>Net Definitions</dt>
 
-          <dd>
-            <form phx-change="change_main_net">
-              <label>
-                Change main net:
-                <select name="main_net">
+              <dd>
+                <ul style="list-style: none; margin: 0; padding: 0;">
                   <%= for net <- @shadow_net_system.nets do %>
-                    <option selected={net.name == @shadow_net_system.main_net_name}>
-                      {net.name}
-                    </option>
+                    <li>
+                      <%= if net.document_json do %>
+                        <details>
+                          <summary>
+                            <button name="shadow_net_id" phx-click="clear_net_document" value={net.id}>
+                              X
+                            </button>
+                            <code>{net.name}</code>
+                          </summary>
+
+                          <div style="width: 10em; height: 5em;">
+                            <textarea
+                              readonly
+                              style="position: absolute; z-index:10;white-space: pre-wrap;  overflow-y: auto;"
+                            ><%= net.document_json %></textarea>
+                          </div>
+                        </details>
+                      <% else %>
+                        <form style="display: inline;" phx-change="change_net_document">
+                          <input type="hidden" name="shadow_net_id" value={net.id} />
+                          <label>
+                            <code>{net.name}</code>
+                            <select name="document_id">
+                              <option>Assign Document</option>
+
+                              <%= for doc <- @documents do %>
+                                <option value={doc.id}>
+                                  {doc.name}
+                                </option>
+                              <% end %>
+                            </select>
+                          </label>
+                        </form>
+                      <% end %>
+                    </li>
                   <% end %>
-                </select>
-              </label>
-            </form>
-          </dd>
+                </ul>
+              </dd>
+            </dl>
+          </fieldset>
+          <fieldset style="margin-bottom: 1em">
+            <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
+              Rename
+            </legend>
 
-          <dt>Net Definitions</dt>
-
-          <dd>
-            <ul style="list-style: none; margin: 0; padding: 0;">
-              <%= for net <- @shadow_net_system.nets do %>
-                <li>
-                  <details>
-                    <summary><code>{net.name}</code></summary>
-
-                    <div style="width: 10em; height: 5em;">
-                      <textarea
-                        readonly
-                        style="position: absolute; z-index:10;white-space: pre-wrap;  overflow-y: auto;"
-                      ><%= net.document_json %></textarea>
-                    </div>
-                  </details>
-
-                  <form style="display: inline;" phx-change="change_net_document">
-                    <label>
-                      <input type="hidden" name="shadow_net_id" value={net.id} />
-                      <select name="document_id">
-                        <option>Assign Document</option>
-
-                        <%= for doc <- @documents do %>
-                          <option value={doc.id}>
-                            {doc.name}
-                          </option>
-                        <% end %>
-                      </select>
-                    </label>
-                  </form>
-                </li>
-              <% end %>
-            </ul>
-          </dd>
-        </dl>
-
+            <.form for={@rename_form} phx-submit="rename" phx-change="validate-rename">
+              <div style="display: flex; align-items: stretch; gap: 0.1em">
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Untitled"
+                  value={@rename_form[:name].value}
+                  id={@rename_form[:name].id}
+                />
+                <button
+                  type="submit"
+                  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff; padding: 1ex"
+                >
+                  Rename
+                </button>
+              </div>
+            </.form>
+          </fieldset>
+        </div>
         <div>
           <button
             type="button"
@@ -225,11 +240,15 @@ defmodule RenewCollabWeb.LiveShadowNet do
               <%= for {sim,si} <- @shadow_net_system.simulations |> Enum.with_index do %>
                 <tr {if(rem(si, 2) == 0, do: [style: "background-color:#f5f5f5;"], else: [])}>
                   <td>
-                    <.link navigate={~p"/simulation/#{sim.id}"}>
-                      {sim.label || sim.id}
-                    </.link>
                     <%= if sim.label do %>
-                      <br /><small>{sim.id}</small>
+                      <.link navigate={~p"/simulation/#{sim.id}"}>
+                        {sim.label}
+                      </.link>
+                      <br /><small><code>{sim.id}</code></small>
+                    <% else %>
+                      <.link navigate={~p"/simulation/#{sim.id}"}>
+                        <code>{sim.id}</code>
+                      </.link>
                     <% end %>
                   </td>
 
@@ -372,6 +391,25 @@ defmodule RenewCollabWeb.LiveShadowNet do
 
   def handle_event("change_main_net", %{"main_net" => main_net}, socket) do
     RenewCollabSim.Simulator.change_main_net(socket.assigns.shadow_net_system_id, main_net)
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "#{@topic}:#{socket.assigns.shadow_net_system_id}",
+      :any
+    )
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "clear_net_document",
+        %{"value" => shadow_net_id},
+        socket
+      ) do
+    RenewCollabSim.Simulator.clear_net_document(
+      socket.assigns.shadow_net_system_id,
+      shadow_net_id
+    )
 
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,

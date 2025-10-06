@@ -30,6 +30,7 @@ defmodule RenewCollabWeb.LiveProjects do
 
       <div style="padding: 1em">
         Projects
+        <h2 style="margin: 0;">Projects</h2>
       </div>
       <div style="padding: 1em 1em 0; display: flex; align-items: start; gap: 1em">
         <fieldset style="margin-bottom: 1em; width: 30%">
@@ -40,15 +41,15 @@ defmodule RenewCollabWeb.LiveProjects do
           <.form for={@create_form} phx-submit="create_project" phx-change="validate_project">
             <div style="display: flex; align-items: stretch; gap: 0.1em; flex-direction: column;">
               <%!-- <input type="hidden" name="ownerships[0][role]" value="owner" />
-              <label>
-                Owner:
-                <.input
-                  field={@create_form[:owner]}
-                  name="ownerships[0][account_id]"
-                  type="select"
-                  options={@accounts |> Enum.map(&{&1.email, &1.id})}
-                />
-              </label> --%>
+            <label>
+              Owner:
+              <.input
+                field={@create_form[:owner]}
+                name="ownerships[0][account_id]"
+                type="select"
+                options={@accounts |> Enum.map(&{&1.email, &1.id})}
+              />
+            </label> --%>
               <input
                 type="text"
                 name="name"
@@ -69,21 +70,21 @@ defmodule RenewCollabWeb.LiveProjects do
       </div>
 
       <div style="padding: 1em">
-        <h2 style="margin: 0;">Projects</h2>
-
         <table style="width: 100%;" cellpadding="5">
           <thead>
             <tr>
               <th style="border-bottom: 1px solid #333;" align="left" width="1000">Name</th>
-              <th style="border-bottom: 1px solid #333;" align="left"></th>
+
+              <th style="border-bottom: 1px solid #333;" align="left" width="10">Documents</th>
+              <th style="border-bottom: 1px solid #333;" align="left" width="10">
+                Shadow Nets Systems
+              </th>
+              <th style="border-bottom: 1px solid #333;" align="left" width="10">Simulations</th>
+              <th style="border-bottom: 1px solid #333;" align="left" width="10">Owners/Members</th>
 
               <th style="border-bottom: 1px solid #333;" align="left" width="200">Created</th>
 
               <th style="border-bottom: 1px solid #333;" align="left" width="200">Last Updated</th>
-              <th style="border-bottom: 1px solid #333;" align="left" width="10">Document</th>
-              <th style="border-bottom: 1px solid #333;" align="left" width="10">Simulations</th>
-              <th style="border-bottom: 1px solid #333;" align="left" width="10">Owners/Members</th>
-
               <th style="border-bottom: 1px solid #333;" align="left" width="100" colspan="3">
                 Actions
               </th>
@@ -107,22 +108,32 @@ defmodule RenewCollabWeb.LiveProjects do
                       {project.name}
                     </.link>
                   </td>
-                  <td>
+
+                  <td width="50">
+                    <.link navigate={~p"/project/#{project.id}/documents"}>
+                      {project.documents |> Enum.count()}
+                    </.link>
+                  </td>
+                  <td width="50">
+                    <.link navigate={~p"/project/#{project.id}/shadow_nets"}>
+                      {project.shadow_net_systems |> Enum.count()}
+                    </.link>
+                  </td>
+                  <td width="50">
+                    <.link navigate={~p"/project/#{project.id}/simulations"}>
+                      {project.simulations |> Enum.count()}
+                    </.link>
+                  </td>
+
+                  <td width="50">
                     <.link style="color: #078" navigate={~p"/project/#{project.id}/settings"}>
-                      Settings
+                      {project.ownerships |> Enum.count()} / {project.members |> Enum.count()}
                     </.link>
                   </td>
 
                   <td>{project.inserted_at |> Calendar.strftime("%Y-%m-%d %H:%M")}</td>
 
                   <td>{project.updated_at |> Calendar.strftime("%Y-%m-%d %H:%M")}</td>
-
-                  <td width="50">{project.documents |> Enum.count()}</td>
-
-                  <td width="50">{project.simulations |> Enum.count()}</td>
-                  <td width="50">
-                    {project.ownerships |> Enum.count()} / {project.members |> Enum.count()}
-                  </td>
                   <td width="50"></td>
                   <td width="50"></td>
 

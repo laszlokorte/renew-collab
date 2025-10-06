@@ -82,91 +82,100 @@ defmodule RenewCollabWeb.LiveSimulation do
         </.link>
         / Simulation
         <%= if @simulation.label do %>
-          <h2 style="margin: 0;">Simulation {@simulation.label} (<small>{@simulation.id}</small>)</h2>
+          <h2 style="margin: 0;">
+            Simulation {@simulation.label} (<small><code>{@simulation.id}</code></small>)
+          </h2>
         <% else %>
-          <h2 style="margin: 0;">Simulation {@simulation.id}</h2>
+          <h2 style="margin: 0;">Simulation <code>{@simulation.id}</code></h2>
         <% end %>
-        <fieldset style="margin-bottom: 1em">
-          <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
-            Rename Simulation
-          </legend>
+        <div style="padding: 1em 1em 0; display: flex; align-items: start; gap: 1em">
+          <fieldset style="margin-bottom: 1em">
+            <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
+              Progress
+            </legend>
+            <dl style="display: grid; grid-template-columns: auto 1fr;">
+              <dt>Timestep</dt>
 
-          <.form for={@rename_form} phx-submit="rename" phx-change="validate-rename">
-            <div style="display: flex; align-items: stretch; gap: 0.1em">
-              <input
-                type="text"
-                name="name"
-                placeholder="Untitled"
-                value={@rename_form[:name].value}
-                id={@rename_form[:name].id}
-              />
-              <button
-                type="submit"
-                style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff; padding: 1ex"
-              >
-                Rename
-              </button>
+              <dd>{@simulation.timestep}</dd>
+            </dl>
+
+            <div style="margin: 1ex  0; display: flex; gap: 1ex">
+              <%= if @is_active do %>
+                <button
+                  type="button"
+                  phx-click="step"
+                  style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+                >
+                  Step
+                </button>
+
+                <button
+                  type="button"
+                  phx-click="play"
+                  style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+                >
+                  play
+                </button>
+
+                <button
+                  type="button"
+                  phx-click="pause"
+                  style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+                >
+                  pause
+                </button>
+
+                <button
+                  type="button"
+                  phx-click="terminate"
+                  style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #a3a; color: #fff"
+                >
+                  Terminate
+                </button>
+              <% else %>
+                <button
+                  type="button"
+                  phx-click="initialize"
+                  style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+                >
+                  Initialize
+                </button>
+
+                <button
+                  type="button"
+                  phx-click="reset"
+                  style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #a61; color: #fff"
+                >
+                  Clear all recorded data
+                </button>
+              <% end %>
             </div>
-          </.form>
-        </fieldset>
-        <dl>
-          <dt>Timestep</dt>
+          </fieldset>
 
-          <dd>{@simulation.timestep}</dd>
-        </dl>
+          <fieldset style="margin-bottom: 1em">
+            <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
+              Rename Simulation
+            </legend>
 
-        <div style="margin: 1ex  0; display: flex; gap: 1ex">
-          <%= if @is_active do %>
-            <button
-              type="button"
-              phx-click="step"
-              style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
-            >
-              Step
-            </button>
-
-            <button
-              type="button"
-              phx-click="play"
-              style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
-            >
-              play
-            </button>
-
-            <button
-              type="button"
-              phx-click="pause"
-              style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
-            >
-              pause
-            </button>
-
-            <button
-              type="button"
-              phx-click="terminate"
-              style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #a3a; color: #fff"
-            >
-              Terminate
-            </button>
-          <% else %>
-            <button
-              type="button"
-              phx-click="initialize"
-              style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
-            >
-              Initialize
-            </button>
-
-            <button
-              type="button"
-              phx-click="reset"
-              style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #a61; color: #fff"
-            >
-              Clear all recorded data
-            </button>
-          <% end %>
+            <.form for={@rename_form} phx-submit="rename" phx-change="validate-rename">
+              <div style="display: flex; align-items: stretch; gap: 0.1em">
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Untitled"
+                  value={@rename_form[:name].value}
+                  id={@rename_form[:name].id}
+                />
+                <button
+                  type="submit"
+                  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff; padding: 1ex"
+                >
+                  Rename
+                </button>
+              </div>
+            </.form>
+          </fieldset>
         </div>
-
         <h3>Net Instances</h3>
 
         <%= if Enum.empty?(@simulation.net_instances) do %>
