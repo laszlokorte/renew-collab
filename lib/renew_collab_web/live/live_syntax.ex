@@ -48,8 +48,16 @@ defmodule RenewCollabWeb.LiveSyntax do
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
       <RenewCollabWeb.RenewComponents.app_header flash={@flash} />
       <div style="padding: 1em">
-        <h2 style="margin: 0;">Syntax Rules</h2>
-
+        /
+        Syntax Rules
+        <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
+          <img class="icon" src="/assets/icon-syntax.svg" />
+          <span>
+            Syntax Rules
+          </span>
+        </h2>
+      </div>
+      <div style="padding: 1em">
         <.form for={@create_form} phx-change="validate" phx-submit="save">
           <div style="display: flex; gap: 1ex; align-items: stretch">
             <.input style="padding: 1ex" type="text" field={@create_form[:name]} />

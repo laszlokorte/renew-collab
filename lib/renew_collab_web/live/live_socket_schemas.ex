@@ -28,9 +28,17 @@ defmodule RenewCollabWeb.LiveSocketSchemas do
     ~H"""
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
       <RenewCollabWeb.RenewComponents.app_header flash={@flash} />
-      <div style="padding: 1em">
-        <h2 style="margin: 0;">Socket Schemas</h2>
 
+      <div style="padding: 1em">
+        / Socket Schemas
+        <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
+          <img class="icon" src="/assets/icon-socket.svg" />
+          <span>
+            Socket Schemas
+          </span>
+        </h2>
+      </div>
+      <div style="padding: 1em">
         <form phx-submit="create">
           <div style="display: flex; gap: 1ex; align-items: stretch">
             <input name="name" style="padding: 1ex" type="text" />
@@ -160,7 +168,14 @@ defmodule RenewCollabWeb.LiveSocketSchemas do
                     </.link>
                   </td>
                   <td width="50">
-                    <button type="button" phx-click="delete" value={schema.id}>Delete</button>
+                    <button
+                      style="cursor: pointer; background: #a00; color: #fff; padding: 1ex; border: none"
+                      type="button"
+                      phx-click="delete"
+                      value={schema.id}
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               <% end %>

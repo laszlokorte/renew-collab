@@ -41,12 +41,18 @@ defmodule RenewCollabWeb.LiveSocketSchema do
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
       <RenewCollabWeb.RenewComponents.app_header flash={@flash} />
       <div style="padding: 1em">
+        /
         <.link style="color: #078" navigate={~p"/socket_schemas"}>
-          Back
+          Socket Schemas
         </.link>
-
-        <h2 style="margin: 0;">Socket Schema</h2>
-
+        <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
+          <img class="icon" src="/assets/icon-socket.svg" />
+          <span>
+            Socket Schema: {@schema.name}
+          </span>
+        </h2>
+      </div>
+      <div style="padding: 1em">
         <div style="display: grid; grid-template-columns: 20em 1fr;">
           <div>
             <svg viewBox={"#{@bounds.position_x - 10} #{@bounds.position_y - 10} #{@bounds.width + 20} #{@bounds.height + 20}"}>

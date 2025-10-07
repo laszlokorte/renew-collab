@@ -112,23 +112,39 @@ defmodule RenewCollabWeb.LiveProjects do
                   </td>
 
                   <td width="50">
-                    <.link style="color: #078" navigate={~p"/project/#{project.id}/documents"}>
+                    <.link
+                      style="color: #078; display: flex; align-items: center; gap: 1ex; justify-content: center;"
+                      navigate={~p"/project/#{project.id}/documents"}
+                    >
+                      <img class="icon" src="/assets/icon-document.svg" />
                       {project.documents |> Enum.count()}
                     </.link>
                   </td>
                   <td width="50">
-                    <.link style="color: #078" navigate={~p"/project/#{project.id}/shadow_nets"}>
+                    <.link
+                      style="color: #078; display: flex; align-items: center; gap: 1ex; justify-content: center;"
+                      navigate={~p"/project/#{project.id}/shadow_nets"}
+                    >
+                      <img class="icon" src="/assets/icon-network.svg" />
                       {project.shadow_net_systems |> Enum.count()}
                     </.link>
                   </td>
                   <td width="50">
-                    <.link style="color: #078" navigate={~p"/project/#{project.id}/simulations"}>
+                    <.link
+                      style="color: #078; display: flex; align-items: center; gap: 1ex; justify-content: center;"
+                      navigate={~p"/project/#{project.id}/simulations"}
+                    >
+                      <img class="icon" src="/assets/icon-simulation.svg" />
                       {project.simulations |> Enum.count()}
                     </.link>
                   </td>
 
                   <td width="50">
-                    <.link style="color: #078" navigate={~p"/project/#{project.id}/settings"}>
+                    <.link
+                      style="color: #078; display: flex; align-items: center; gap: 1ex; justify-content: center;"
+                      navigate={~p"/project/#{project.id}/settings"}
+                    >
+                      <img class="icon" src="/assets/icon-gear.svg" />
                       {project.ownerships |> Enum.count()} / {project.members |> Enum.count()}
                     </.link>
                   </td>

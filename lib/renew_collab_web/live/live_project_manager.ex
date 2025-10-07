@@ -25,12 +25,14 @@ defmodule RenewCollabWeb.LiveProjectManager do
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
       <RenewCollabWeb.RenewComponents.app_header flash={@flash} project_id={@project.id} />
       <div style="padding: 1em">
-        <.link navigate={~p"/manage/projects"}>Back</.link>
+        <.link navigate={~p"/manage/projects"}>Projects Management</.link>
+        / Project
+        <h2 style="margin: 0; display: flex; align-items: center; gap: 1ex;">
+          <img class="icon" src="/assets/icon-project.svg" /> Project: {@project.name}
+        </h2>
       </div>
 
       <div style="padding: 1em">
-        <h2 style="margin: 0;">Project: {@project.name}</h2>
-
         <%= if Projects.can_rename(@current_account, @project) do %>
           <h3>Rename Project</h3>
 

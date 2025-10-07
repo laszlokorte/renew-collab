@@ -32,12 +32,18 @@ defmodule RenewCollabWeb.LiveIcon do
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
       <RenewCollabWeb.RenewComponents.app_header flash={@flash} />
       <div style="padding: 1em">
+        /
         <.link style="color: #078" navigate={~p"/icons"}>
-          Back
+          Icons
         </.link>
-
-        <h2 style="margin: 0;">Icon</h2>
-
+        <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
+          <img class="icon" src="/assets/icon-symbol.svg" />
+          <span>
+            Icon: {@icon.name}
+          </span>
+        </h2>
+      </div>
+      <div style="padding: 1em">
         <div style="display: grid; grid-template-rows: 20em 1fr;">
           <svg
             style="height: 100%;"

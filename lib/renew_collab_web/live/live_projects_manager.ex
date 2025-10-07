@@ -30,7 +30,9 @@ defmodule RenewCollabWeb.LiveProjectsManager do
 
       <div style="padding: 1em">
         Projects Management
-        <h2 style="margin: 0;">Manage Projects</h2>
+        <h2 style="margin: 0; display: flex; align-items: center; gap: 1ex;">
+          <img class="icon" src="/assets/icon-project.svg" /> Manage Projects
+        </h2>
       </div>
       <div style="padding: 1em 1em 0; display: flex; align-items: start; gap: 1em">
         <fieldset style="margin-bottom: 1em; width: 30%">
