@@ -13,6 +13,14 @@ defmodule RenewCollabSim.Simulator do
   alias RenewCollabSim.Repo
   alias RenewCollab.Simulation.SimulationLink
 
+  def count_shadow_net_systems do
+    from(sns in ShadowNetSystem, select: count(sns.id)) |> Repo.one()
+  end
+
+  def count_simulations do
+    from(sim in Simulation, select: count(sim.id)) |> Repo.one()
+  end
+
   def list_shadow_net_systems(project) do
     Repo.all(
       from(s in ShadowNetSystem,

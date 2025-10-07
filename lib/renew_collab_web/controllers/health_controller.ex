@@ -14,11 +14,14 @@ defmodule RenewCollabWeb.HealthController do
       number_of_sessions: RenewCollabAuth.Auth.count_sessions(),
       number_of_media: RenewCollab.Media.count(),
       number_of_documents: RenewCollab.Renew.count_documents(),
+      number_of_snapshots: RenewCollab.Renew.count_snapshots(),
+      number_of_shadow_net_systems: RenewCollabSim.Simulator.count_shadow_net_systems(),
+      number_of_simulations: RenewCollabSim.Simulator.count_simulations(),
       number_of_projects: RenewCollabProj.Projects.count_projects(),
       hierarchy_missing_count: RenewCollab.Hierarchy.count_missing_global(),
       hierarchy_invalid_count: RenewCollab.Hierarchy.count_invalids_global(),
       cache_size: RenewCollab.SimpleCache.size(),
-      simulation_count: RenewCollabSim.Server.SimulationServer.count(),
+      simulation_active_count: RenewCollabSim.Server.SimulationServer.count(),
       formalisms: RenewCollabSim.Compiler.SnsCompiler.formalisms()
     )
   end

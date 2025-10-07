@@ -4,6 +4,7 @@ defmodule RenewCollab.Renew do
   """
 
   import Ecto.Query, warn: false
+  alias RenewCollab.Versioning.Snapshot
   alias RenewCollab.Repo
   alias RenewCollab.Commands
 
@@ -25,6 +26,10 @@ defmodule RenewCollab.Renew do
   def count_documents do
     RenewCollab.Queries.DocumentCount.new()
     |> RenewCollab.Fetcher.fetch()
+  end
+
+  def count_snapshots do
+    from(s in Snapshot, select: count()) |> Repo.one()
   end
 
   def get_document(id), do: Repo.get(Document, id)
