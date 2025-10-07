@@ -172,6 +172,8 @@ defmodule RenewCollabWeb.Router do
       live "/icon/:id", LiveIcon
       live "/syntax", LiveSyntax
       live "/primitives", LivePrimitives
+      live "/manage/projects", LiveProjectsManager
+      live "/manage/project/:project_id", LiveProjectManager
     end
   end
 

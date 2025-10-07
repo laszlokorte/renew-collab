@@ -169,9 +169,13 @@ defmodule RenewCollabWeb.LiveDocuments do
 
                   <td>{if(document.syntax, do: document.syntax.name, else: "-")}</td>
 
-                  <td>{document.inserted_at |> Calendar.strftime("%Y-%m-%d %H:%M")}</td>
+                  <td>
+                    <RenewCollabWeb.RenewComponents.timestamp value={document.inserted_at} />
+                  </td>
 
-                  <td>{document.updated_at |> Calendar.strftime("%Y-%m-%d %H:%M")}</td>
+                  <td>
+                    <RenewCollabWeb.RenewComponents.timestamp value={document.inserted_at} />
+                  </td>
 
                   <td width="50">
                     <form phx-submit="compile">

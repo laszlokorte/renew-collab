@@ -3,6 +3,7 @@ defmodule RenewCollabProj.Projects do
   The Renew context.
   """
 
+  alias RenewCollabAuth.Entites.Account
   alias RenewCollabProj.Entites.ProjectShadowNetSystem
   alias RenewCollabProj.Entites.Project
   alias RenewCollabProj.Repo
@@ -12,7 +13,7 @@ defmodule RenewCollabProj.Projects do
 
   import Ecto.Query, warn: false
 
-  def create_project(account_id, params) do
+  def create_own_project(account_id, params) do
     %Project{}
     |> Project.creation_changeset(
       params
@@ -23,6 +24,12 @@ defmodule RenewCollabProj.Projects do
         }
       ])
     )
+    |> Repo.insert()
+  end
+
+  def create_project(params) do
+    %Project{}
+    |> Project.creation_changeset(params)
     |> Repo.insert()
   end
 
@@ -52,7 +59,7 @@ defmodule RenewCollabProj.Projects do
 
   def list_own_projects(nil), do: []
 
-  def list_own_projects(account_id) do
+  def list_own_projects(%RenewCollabAuth.Entites.Account{id: account_id}) do
     Repo.all(
       from(p in Project,
         left_join: m in assoc(p, :members),
@@ -74,7 +81,9 @@ defmodule RenewCollabProj.Projects do
     )
   end
 
-  def find_own_project(account_id, project_id) do
+  def find_own_project(nil, _), do: nil
+
+  def find_own_project(%RenewCollabAuth.Entites.Account{id: account_id}, project_id) do
     Repo.one(
       from(
         p in Project,
@@ -150,12 +159,31 @@ defmodule RenewCollabProj.Projects do
     |> RenewCollabAuth.Repo.all()
   end
 
-  def add_member(%Project{id: project_id}, member) do
+  def add_member(%Project{id: project_id}, %{"account_id" => account_id, "role" => role}) do
     %ProjectMember{
       project_id: project_id
     }
-    |> ProjectMember.changeset(member)
+    |> ProjectMember.changeset(%{"account_id" => account_id, "role" => role})
     |> Repo.insert()
+    |> dbg
+  end
+
+  def add_member(%Project{id: project_id}, %{
+        "account_email" => account_email,
+        "role_id" => role_id
+      }) do
+    RenewCollabAuth.Auth.get_account_by_email(account_email)
+    |> case do
+      %{account_id: account_id} ->
+        %ProjectMember{
+          project_id: project_id
+        }
+        |> ProjectMember.changeset(%{account_id: account_id, role_id: role_id})
+        |> Repo.insert()
+
+      nil ->
+        nil
+    end
   end
 
   def add_document(%Project{id: project_id}, document) do
@@ -181,6 +209,13 @@ defmodule RenewCollabProj.Projects do
     |> Repo.delete_all()
   end
 
+  def force_remove_member(%Project{id: project_id}, member_id) do
+    from(m in ProjectMember,
+      where: m.id == ^member_id and m.project_id == ^project_id
+    )
+    |> Repo.delete_all()
+  end
+
   def remove_document(%Project{id: project_id}, document_id) do
     from(m in ProjectDocument, where: m.id == ^document_id and m.project_id == ^project_id)
     |> Repo.delete_all()
@@ -202,7 +237,10 @@ defmodule RenewCollabProj.Projects do
 
   def member_roles(), do: RenewCollabProj.Entites.ProjectMember.roles()
 
-  def member_roles(own_account_id, project) do
+  def member_roles(%Account{is_admin: true}, _project),
+    do: RenewCollabProj.Entites.ProjectMember.roles()
+
+  def member_roles(%Account{id: own_account_id}, project) do
     from(m in ProjectMember,
       where: m.project_id == ^project.id and m.account_id == ^own_account_id,
       select: m.role
@@ -211,7 +249,10 @@ defmodule RenewCollabProj.Projects do
     |> RenewCollabProj.Entites.ProjectMember.weaker_roles()
   end
 
-  def can_remove(own_account_id, membership) do
+  def can_remove(%Account{is_admin: true}, _project),
+    do: true
+
+  def can_remove(%Account{id: own_account_id}, membership) do
     from(m in ProjectMember,
       where:
         m.project_id == ^membership.project_id and m.account_id == ^own_account_id and
@@ -221,7 +262,10 @@ defmodule RenewCollabProj.Projects do
     |> Repo.one()
   end
 
-  def can_rename(own_account_id, project) do
+  def can_rename(%Account{is_admin: true}, _project),
+    do: true
+
+  def can_rename(%Account{id: own_account_id}, project) do
     from(m in ProjectMember,
       where: m.project_id == ^project.id and m.account_id == ^own_account_id,
       select: m.role == :owner
@@ -229,7 +273,9 @@ defmodule RenewCollabProj.Projects do
     |> Repo.one()
   end
 
-  def can_invite(own_account_id, project) do
+  def can_invite(%Account{is_admin: true}, _project), do: true
+
+  def can_invite(%Account{id: own_account_id}, project) do
     from(m in ProjectMember,
       where: m.project_id == ^project.id and m.account_id == ^own_account_id,
       select: m.role == :owner
@@ -237,7 +283,9 @@ defmodule RenewCollabProj.Projects do
     |> Repo.one()
   end
 
-  def can_delete(own_account_id, project) do
+  def can_delete(%Account{is_admin: true}, _project), do: true
+
+  def can_delete(%Account{id: own_account_id}, project) do
     from(m in ProjectMember,
       where: m.project_id == ^project.id and m.account_id == ^own_account_id,
       select: m.role == :owner

@@ -268,7 +268,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
                   </td>
 
                   <td style="white-space: nowrap;">
-                    {sns.inserted_at |> Calendar.strftime("%Y-%m-%d %H:%M")}
+                    <RenewCollabWeb.RenewComponents.timestamp value={sns.inserted_at} />
                   </td>
 
                   <td style="white-space: nowrap;">

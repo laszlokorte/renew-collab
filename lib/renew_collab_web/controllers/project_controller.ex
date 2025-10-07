@@ -35,8 +35,8 @@ defmodule RenewCollabWeb.ProjectController do
     render(conn, :export, project: project)
   end
 
-  defp own_account(%{assigns: %{current_account: %{id: account_id}}}) do
-    account_id
+  defp own_account(%{assigns: %{current_account: current_account}}) do
+    current_account
   end
 
   defp own_account(_) do

@@ -1,4 +1,4 @@
-defmodule RenewCollabWeb.LiveProjects do
+defmodule RenewCollabWeb.LiveProjectsManager do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
@@ -11,7 +11,7 @@ defmodule RenewCollabWeb.LiveProjects do
 
     socket =
       socket
-      |> assign(:projects, Projects.list_own_projects(socket.assigns.current_account))
+      |> assign(:projects, Projects.list_all_projects())
       |> assign(:accounts, Projects.find_accounts())
       |> assign(
         create_form:
@@ -29,8 +29,8 @@ defmodule RenewCollabWeb.LiveProjects do
       <RenewCollabWeb.RenewComponents.app_header flash={@flash} />
 
       <div style="padding: 1em">
-        Projects
-        <h2 style="margin: 0;">Projects</h2>
+        Projects Management
+        <h2 style="margin: 0;">Manage Projects</h2>
       </div>
       <div style="padding: 1em 1em 0; display: flex; align-items: start; gap: 1em">
         <fieldset style="margin-bottom: 1em; width: 30%">
@@ -104,31 +104,23 @@ defmodule RenewCollabWeb.LiveProjects do
               <%= for {project, di} <- @projects |> Enum.with_index do %>
                 <tr {if(rem(di, 2) == 0, do: [style: "background-color:#f5f5f5;"], else: [])}>
                   <td>
-                    <.link style="color: #078" navigate={~p"/project/#{project.id}/documents"}>
+                    <.link style="color: #078" navigate={~p"/manage/project/#{project.id}"}>
                       {project.name}
                     </.link>
                   </td>
 
                   <td width="50">
-                    <.link style="color: #078" navigate={~p"/project/#{project.id}/documents"}>
-                      {project.documents |> Enum.count()}
-                    </.link>
+                    {project.documents |> Enum.count()}
                   </td>
                   <td width="50">
-                    <.link style="color: #078" navigate={~p"/project/#{project.id}/shadow_nets"}>
-                      {project.shadow_net_systems |> Enum.count()}
-                    </.link>
+                    {project.shadow_net_systems |> Enum.count()}
                   </td>
                   <td width="50">
-                    <.link style="color: #078" navigate={~p"/project/#{project.id}/simulations"}>
-                      {project.simulations |> Enum.count()}
-                    </.link>
+                    {project.simulations |> Enum.count()}
                   </td>
 
                   <td width="50">
-                    <.link style="color: #078" navigate={~p"/project/#{project.id}/settings"}>
-                      {project.ownerships |> Enum.count()} / {project.members |> Enum.count()}
-                    </.link>
+                    {project.ownerships |> Enum.count()} / {project.members |> Enum.count()}
                   </td>
 
                   <td>
@@ -136,7 +128,7 @@ defmodule RenewCollabWeb.LiveProjects do
                   </td>
 
                   <td>
-                    <RenewCollabWeb.RenewComponents.timestamp value={project.updated_at} />
+                    <RenewCollabWeb.RenewComponents.timestamp value={project.inserted_at} />
                   </td>
                   <td width="50"></td>
                   <td width="50"></td>
@@ -165,8 +157,7 @@ defmodule RenewCollabWeb.LiveProjects do
 
   def handle_event("create_project", params, socket) do
     with {:ok, %RenewCollabProj.Entites.Project{}} <-
-           Projects.create_own_project(
-             socket.assigns.current_account.id,
+           Projects.create_project(
              params
              |> Map.update("name", "", fn
                "" -> "untitled"
@@ -197,7 +188,6 @@ defmodule RenewCollabWeb.LiveProjects do
   end
 
   def reload(socket) do
-    {:noreply,
-     socket |> assign(:projects, Projects.list_own_projects(socket.assigns.current_account))}
+    {:noreply, socket |> assign(:projects, Projects.list_all_projects())}
   end
 end

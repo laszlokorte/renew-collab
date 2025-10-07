@@ -12,6 +12,17 @@ defmodule RenewCollabWeb.RenewComponents do
     Application.get_env(:renew_collab, :editor_url)
   end
 
+  attr :value, :map
+  attr :format, :string, default: "%Y-%m-%d %H:%M"
+
+  def timestamp(assigns) do
+    ~H"""
+    <time datetime={Calendar.strftime(@value, "%Y-%m-%d %H:%M")}>
+      {Calendar.strftime(@value, @format)}
+    </time>
+    """
+  end
+
   attr :blank, :boolean, default: false
   attr :logout, :boolean, default: false
   attr :project_id, :string, default: nil

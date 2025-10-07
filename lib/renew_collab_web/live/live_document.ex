@@ -736,11 +736,13 @@ defmodule RenewCollabWeb.LiveDocument do
                   <li style={"opacity: #{if(lnk.snapshot_id == @document.current_snaptshot.id, do: 1, else: 0.5)}"}>
                     <%= if lnk.simulation do %>
                       <.link navigate={~p"/simulation/#{lnk.simulation_id}"}>
-                        {lnk.inserted_at}<br />
+                        <RenewCollabWeb.RenewComponents.timestamp value={lnk.inserted_at} />
+                        <br />
                         <small>{lnk.simulation_id}</small>
                       </.link>
                     <% else %>
-                      {lnk.inserted_at}<br />
+                      <RenewCollabWeb.RenewComponents.timestamp value={lnk.inserted_at} />
+                      <br />
                       <small>{lnk.simulation_id}</small>
                     <% end %>
                   </li>

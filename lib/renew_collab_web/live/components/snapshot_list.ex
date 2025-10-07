@@ -32,7 +32,8 @@ defmodule RenewCollabWeb.SnapshotListComponent do
                   <span style="cursor: default; font-size: 10pt; font-family: sans-serif; width: max-content; display: inline; padding: 1ex; border: none; background: #33a; color: #fff">
                     Current
                   </span>
-                  {s.inserted_at |> Calendar.strftime("%H:%M:%S")}
+
+                  <RenewCollabWeb.RenewComponents.timestamp format="%H:%M" value={s.inserted_at} />
                   <%= if not is_nil(s.label) do %>
                     <button
                       phx-click="remove_snapshot_label"
@@ -68,7 +69,7 @@ defmodule RenewCollabWeb.SnapshotListComponent do
                   >
                     Restore
                   </button>
-                  {s.inserted_at |> Calendar.strftime("%H:%M:%S")}
+                  <RenewCollabWeb.RenewComponents.timestamp format="%H:%M" value={s.inserted_at} />
                   <%= if not is_nil(s.label)  do %>
                     <button
                       phx-click="remove_snapshot_label"
