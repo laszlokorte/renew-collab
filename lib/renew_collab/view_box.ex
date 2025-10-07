@@ -87,4 +87,8 @@ defmodule RenewCollab.ViewBox do
   def into_string(%ViewBox{x: x, y: y, width: width, height: height}) do
     "#{x} #{y} #{width} #{height}"
   end
+
+  def stretch(%ViewBox{x: x, y: y, width: width, height: height}) do
+    %ViewBox{x: x - 100, y: y - 100, width: width + 200, height: height + 200}
+  end
 end

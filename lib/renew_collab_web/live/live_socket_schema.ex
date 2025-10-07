@@ -24,8 +24,16 @@ defmodule RenewCollabWeb.LiveSocketSchema do
   end
 
   defp load_data(socket) do
-    socket
-    |> assign(:schema, RenewCollab.Sockets.find_socket_schema(socket.assigns.socket_schema_id))
+    RenewCollab.Sockets.find_socket_schema(socket.assigns.socket_schema_id)
+    |> case do
+      nil ->
+        socket
+        |> put_flash(:error, "Socket Schema not found")
+        |> redirect(to: ~p"/socket_schemas")
+
+      schema ->
+        socket |> assign(:schema, schema)
+    end
   end
 
   def render(assigns) do

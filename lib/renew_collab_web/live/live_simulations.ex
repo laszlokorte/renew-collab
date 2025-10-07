@@ -3,10 +3,10 @@ defmodule RenewCollabWeb.LiveSimulations do
   use RenewCollabWeb, :verified_routes
 
   def mount(%{"project_id" => project_id}, _session, socket) do
-    RenewCollabProj.Projects.list_project_simulations(project_id)
+    RenewCollabProj.Projects.find_project(project_id)
     |> case do
       nil ->
-        {:ok, socket |> redirect(to: ~p"/")}
+        {:ok, socket |> put_flash(:error, "Project not found") |> redirect(to: ~p"/projects")}
 
       project ->
         RenewCollabWeb.Endpoint.subscribe("projects/#{project.id}/simulations")
@@ -20,6 +20,10 @@ defmodule RenewCollabWeb.LiveSimulations do
           |> assign(
             :project,
             project
+          )
+          |> assign(
+            :sim_form,
+            to_form(%{"documents" => [], "formalism" => nil, "main_net" => nil})
           )
           |> assign(
             :simulations,
@@ -65,7 +69,11 @@ defmodule RenewCollabWeb.LiveSimulations do
   def render(assigns) do
     ~H"""
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
-      <RenewCollabWeb.RenewComponents.app_header flash={@flash} project_id={@project.id} />
+      <RenewCollabWeb.RenewComponents.app_header
+        flash={@flash}
+        tab={:simulations}
+        project_id={@project.id}
+      />
 
       <div style="padding: 1em">
         <.link navigate={~p"/projects"}>
@@ -77,29 +85,52 @@ defmodule RenewCollabWeb.LiveSimulations do
         </h2>
       </div>
 
-      <div style="padding: 1em 1em 0; display: flex; align-items: start; gap: 1em">
-        <fieldset style="margin-bottom: 1em">
+      <div style="padding: 0 1em; display: flex; align-items: start; gap: 1em">
+        <fieldset>
           <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
             Simulate Documents
           </legend>
-          <form phx-submit="compile">
+          <form phx-submit="compile" phx-change="validate">
             <div>
-              <select multiple size="8" width="200" style="width:100%">
-                <option></option>
-              </select>
-            </div>
-            <label>
-              Formalism:
-              <select name="formalism">
-                <%= for f <- RenewCollabSim.Compiler.SnsCompiler.formalisms() do %>
-                  <option>{f}</option>
+              <select multiple name="documents[]" size="8" width="200" style="width:100%">
+                <%= for doc <- @documents do %>
+                  <option selected={Enum.member?(@sim_form["documents"].value, doc.id)} value={doc.id}>
+                    {doc.name}
+                  </option>
                 <% end %>
               </select>
-            </label>
-
-            <button type="submit" phx-disable-with="Compiling...">
-              Simulate
-            </button>
+            </div>
+            <div>
+              <label>
+                Formalism:
+                <select name="formalism" style="width: 100%; box-sizing:border-box;">
+                  <%= for f <- RenewCollabSim.Compiler.SnsCompiler.formalisms() do %>
+                    <option value={f} selected={@sim_form["formalism"].value == f}>{f}</option>
+                  <% end %>
+                </select>
+              </label>
+            </div>
+            <%= if not Enum.empty?(@sim_form["documents"].value) do %>
+              <div>
+                <label>
+                  Main Name:
+                  <select name="main_net" style="width: 100%; box-sizing:border-box;">
+                    <%= for doc <- @documents,  Enum.member?(@sim_form["documents"].value, doc.id)do %>
+                      <option value={doc.name} selected={doc.name == @sim_form["main_net"].value}>
+                        {doc.name}
+                      </option>
+                    <% end %>
+                  </select>
+                </label>
+              </div>
+              <button
+                type="submit"
+                phx-disable-with="Compiling..."
+                style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff"
+              >
+                Simulate
+              </button>
+            <% end %>
           </form>
         </fieldset>
       </div>
@@ -218,10 +249,66 @@ defmodule RenewCollabWeb.LiveSimulations do
     """
   end
 
+  def handle_event(
+        "validate",
+        %{"documents" => documents, "main_net" => main_net, "formalism" => formalism},
+        socket
+      ) do
+    {:noreply,
+     socket
+     |> assign(
+       :sim_form,
+       to_form(%{"documents" => documents, "formalism" => formalism, "main_net" => main_net})
+     )}
+  end
+
+  def handle_event(
+        "validate",
+        %{"documents" => documents, "formalism" => formalism},
+        socket
+      ) do
+    {:noreply,
+     socket
+     |> assign(
+       :sim_form,
+       to_form(%{
+         "documents" => documents,
+         "formalism" => formalism,
+         "main_net" => documents |> Enum.at(0)
+       })
+     )}
+  end
+
+  def handle_event(
+        "compile",
+        %{"documents" => documents, "main_net" => main_net, "formalism" => formalism},
+        socket
+      ) do
+    RenewCollabSim.Simulator.create_simulation_from_documents(
+      socket.assigns.project,
+      formalism,
+      documents,
+      main_net
+    )
+    |> case do
+      %RenewCollabSim.Entites.Simulation{} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Simulation created")
+         |> assign(
+           :sim_form,
+           to_form(%{"documents" => [], "formalism" => nil, "main_net" => nil})
+         )}
+
+      {:error, {:dup, _}} ->
+        {:noreply, socket |> put_flash(:error, "Duplicate net names")}
+    end
+  end
+
   def handle_event("delete", %{"id" => simulation_id}, socket) do
     RenewCollabSim.Simulator.delete_simulation(simulation_id)
 
-    {:noreply, socket}
+    {:noreply, socket |> put_flash(:info, "Simulation deleted")}
   end
 
   def handle_event("setup", %{"id" => simulation_id}, socket) do

@@ -10,7 +10,7 @@ defmodule RenewCollabWeb.LiveProjectSettings do
     Projects.find_own_project(socket.assigns.current_account, id)
     |> case do
       nil ->
-        {:ok, redirect(socket, to: "/")}
+        {:ok, socket |> put_flash(:error, "Project not found") |> redirect(to: ~p"/projects")}
 
       proj ->
         RenewCollabWeb.Endpoint.subscribe(@topic)
@@ -27,7 +27,11 @@ defmodule RenewCollabWeb.LiveProjectSettings do
   def render(assigns) do
     ~H"""
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
-      <RenewCollabWeb.RenewComponents.app_header flash={@flash} project_id={@project.id} />
+      <RenewCollabWeb.RenewComponents.app_header
+        tab={:settings}
+        flash={@flash}
+        project_id={@project.id}
+      />
 
       <div style="padding: 1em">
         <.link navigate={~p"/projects"}>
@@ -42,13 +46,18 @@ defmodule RenewCollabWeb.LiveProjectSettings do
         </h2>
       </div>
 
-      <div style="padding: 1em">
+      <div style="padding: 0 1em">
         <%= if Projects.can_rename(@current_account, @project) do %>
           <h3>Project Name</h3>
 
           <form method="post" phx-submit="rename" accept-charset="utf-8">
             <input type="text" name="name" value={@project.name} />
-            <button type="submit">Rename</button>
+            <button
+              type="submit"
+              style="cursor: pointer; padding: 1ex; border: none; background: #3aa; color: #fff"
+            >
+              Rename
+            </button>
           </form>
         <% end %>
 
@@ -58,12 +67,19 @@ defmodule RenewCollabWeb.LiveProjectSettings do
             <%= for m <- @project.members do %>
               <%= with acc = %{} <- m.account do %>
                 <li>
-                  [{m.role}]
                   <%= if Projects.can_remove(@current_account, m) do %>
-                    <button type="button" phx-click="remove_member" phx-value-id={m.id}>
+                    <button
+                      type="button"
+                      phx-click="remove_member"
+                      style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
+                      phx-value-id={m.id}
+                    >
                       Remove
                     </button>
                   <% end %>
+                  <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
+                    [{m.role}]
+                  </span>
                   {acc.email}
                 </li>
                 <% else nil -> %>
@@ -71,7 +87,10 @@ defmodule RenewCollabWeb.LiveProjectSettings do
                     <button type="button" phx-click="remove_member" phx-value-id={m.id}>
                       Remove
                     </button>
-                    [{m.role}] <em>Account deleted</em>
+                    <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
+                      [{m.role}]
+                    </span>
+                    <em>Account deleted</em>
                     (ID: <code>{m.account_id}</code>)
                   </li>
               <% end %>
@@ -82,7 +101,7 @@ defmodule RenewCollabWeb.LiveProjectSettings do
         <% end %>
 
         <%= if Projects.can_invite(@current_account, @project) do %>
-          <h3>Invite</h3>
+          <h3>Invite Member</h3>
           <form method="post" phx-submit="add_member" accept-charset="utf-8">
             <label>
               E-Mail: <input type="email" name="account_email" />
@@ -94,7 +113,12 @@ defmodule RenewCollabWeb.LiveProjectSettings do
                 </option>
               <% end %>
             </select>
-            <button type="submit">Invite</button>
+            <button
+              type="submit"
+              style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+            >
+              Invite
+            </button>
           </form>
         <% end %>
 
@@ -135,7 +159,7 @@ defmodule RenewCollabWeb.LiveProjectSettings do
 
   def handle_event("rename", params, socket) do
     Projects.update_project(socket.assigns.project, params)
-    reload(socket)
+    reload(socket |> put_flash(:info, "Project name changed"))
   end
 
   def handle_event("delete", _params, socket) do

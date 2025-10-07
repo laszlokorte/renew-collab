@@ -9,7 +9,8 @@ defmodule RenewCollabWeb.LiveShadowNet do
     RenewCollabSim.Simulator.find_shadow_net_system(shadow_net_system_id)
     |> case do
       nil ->
-        {:ok, socket |> redirect(to: ~p"/")}
+        {:ok,
+         socket |> put_flash(:error, "Shadow Net System not found") |> redirect(to: ~p"/projects")}
 
       sns ->
         RenewCollabWeb.Endpoint.subscribe("#{@topic}:#{shadow_net_system_id}")
@@ -64,6 +65,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
       <RenewCollabWeb.RenewComponents.app_header
         flash={@flash}
+        tab={:sns}
         project_id={@shadow_net_system.project_assignment.project_id}
       />
 
@@ -342,7 +344,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
       new_name
     )
 
-    {:noreply, socket}
+    {:noreply, socket |> put_flash(:info, "Shadow net System renamed")}
   end
 
   def handle_event("delete", %{"id" => simulation_id}, socket) do
@@ -354,7 +356,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
       :any
     )
 
-    {:noreply, socket}
+    {:noreply, socket |> put_flash(:info, "Simulation deleted")}
   end
 
   def handle_event("setup", %{"id" => simulation_id}, socket) do
@@ -449,6 +451,6 @@ defmodule RenewCollabWeb.LiveShadowNet do
       :any
     )
 
-    {:noreply, socket}
+    {:noreply, socket |> put_flash(:info, "Simulated created")}
   end
 end

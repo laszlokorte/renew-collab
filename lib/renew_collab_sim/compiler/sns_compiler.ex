@@ -15,42 +15,45 @@ defmodule RenewCollabSim.Compiler.SnsCompiler do
     output_path = Path.absname(output_path, output_root)
     script_path = Path.absname(script_path, output_root)
 
-    try do
-      File.mkdir_p(output_root_upload)
+    with {:ok, nets} <- normalize_net_names(nets) do
+      try do
+        File.mkdir_p(output_root_upload)
 
-      paths =
-        for {name, content} <- nets do
-          normalized_name = normalize_net_name(name)
-          {:ok, name} = Path.safe_relative_to(normalized_name, output_root_upload)
-          net_file_name = Path.absname(name, output_root_upload)
-          File.write(net_file_name, content)
+        paths =
+          for {normalized_name, content} <- nets do
+            {:ok, name} = Path.safe_relative_to(normalized_name, output_root_upload)
+            net_file_name = Path.absname(name, output_root_upload)
+            File.write(net_file_name, content)
 
-          net_file_name
+            net_file_name
+          end
+
+        conf = Application.fetch_env!(:renew_collab, RenewCollabSim.Commands)
+        renewSetFormalism = Keyword.get(conf, :set_formalism)
+        renewExport = Keyword.get(conf, :export)
+        renewShadowNetSystem = Keyword.get(conf, :ssn)
+
+        script_content =
+          [
+            "#{renewSetFormalism} #{compiler}",
+            "#{renewExport} #{renewShadowNetSystem} -a #{Enum.join(paths |> Enum.map(&"\"#{&1}\""), " ")} -o \"#{output_path}\""
+          ]
+          |> Enum.join("\n")
+
+        File.write!(script_path, script_content)
+
+        with {:ok, 0} <- RenewCollabSim.Script.Runner.start_and_wait(script_path),
+             {:ok, content} when content != [] <- File.read(output_path) do
+          {:ok, content}
+        else
+          e ->
+            {:error, e}
         end
-
-      conf = Application.fetch_env!(:renew_collab, RenewCollabSim.Commands)
-      renewSetFormalism = Keyword.get(conf, :set_formalism)
-      renewExport = Keyword.get(conf, :export)
-      renewShadowNetSystem = Keyword.get(conf, :ssn)
-
-      script_content =
-        [
-          "#{renewSetFormalism} #{compiler}",
-          "#{renewExport} #{renewShadowNetSystem} -a #{Enum.join(paths |> Enum.map(&"\"#{&1}\""), " ")} -o \"#{output_path}\""
-        ]
-        |> Enum.join("\n")
-
-      File.write!(script_path, script_content)
-
-      with {:ok, 0} <- RenewCollabSim.Script.Runner.start_and_wait(script_path),
-           {:ok, content} when content != [] <- File.read(output_path) do
-        {:ok, content}
-      else
-        e ->
-          {:error, e}
+      after
+        File.rm_rf(output_root_upload)
       end
-    after
-      File.rm_rf(output_root_upload)
+    else
+      e -> {:error, e}
     end
   end
 
@@ -65,6 +68,26 @@ defmodule RenewCollabSim.Compiler.SnsCompiler do
   def formalisms(), do: Application.fetch_env!(:renew_collab, :formalisms)
 
   def default_formalism(), do: formalisms() |> List.first()
+
+  def normalize_net_names(nets) do
+    normalized =
+      for {name, content} <- nets do
+        {normalize_net_name(name), content}
+      end
+
+    freqs = Enum.frequencies_by(normalized, fn {name, _} -> name end)
+
+    dups =
+      freqs
+      |> Enum.filter(fn {_, count} -> count > 1 end)
+      |> Enum.map(fn {name, _} -> name end)
+
+    if Enum.empty?(dups) do
+      {:ok, normalized}
+    else
+      {:dup, dups}
+    end
+  end
 
   def normalize_net_name(name) do
     String.split(name, ".") |> List.first() |> String.trim()

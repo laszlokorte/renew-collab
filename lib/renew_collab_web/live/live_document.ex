@@ -65,14 +65,24 @@ defmodule RenewCollabWeb.LiveDocument do
       RenewCollabWeb.Endpoint.subscribe("document:#{id}")
       {:ok, socket}
     else
-      _ -> {:ok, redirect(socket, to: "/")}
+      _ ->
+        {:ok, socket |> put_flash(:error, "Document not found") |> redirect(to: ~p"/projects")}
     end
   end
 
   def render(assigns) do
     ~H"""
-    <div style="position: absolute; top:0;left:0;bottom: 0; right:0;display: grid; width: 100vw; height: 100vh; grid-template-rows: [top-start right-start] auto [top-end left-start ] 1fr [left-end right-end]; grid-template-columns: [left-start top-start]1fr [top-end left-end right-start]auto [right-end];">
-      <div style="grid-area: top; padding: 1em; background: #333; color: #fff; display: flex; justify-content: space-between; align-items: stretch;">
+    <div style="position: absolute; top:0;left:0;bottom: 0; right:0;display: grid; width: 100vw; height: 100vh;
+    grid-template-rows: [head-start ] auto [head-end top-start right-start] auto [top-end left-start ] 1fr [left-end right-end];
+    grid-template-columns: [head-start left-start top-start]1fr [top-end left-end right-start]auto [head-end right-end];">
+      <div style="grid-area: head">
+        <RenewCollabWeb.RenewComponents.app_header
+          flash={@flash}
+          project_id={@document.project_assignment.project_id}
+          tab={:documents}
+        />
+      </div>
+      <div style="grid-area: top; padding: 1em; background: #555; color: #fff; display: flex; justify-content: space-between; align-items: stretch;">
         <div>
           <.link navigate={~p"/projects"} style="color: inherit">
             Projects
@@ -83,6 +93,7 @@ defmodule RenewCollabWeb.LiveDocument do
               <.link navigate={~p"/project/#{project_id}/documents"} style="color: inherit">
                 Documents
               </.link>
+              / Document
             <% _ -> %>
           <% end %>
           <h2 style="margin: 0;">{@document.name}</h2>
@@ -251,7 +262,7 @@ defmodule RenewCollabWeb.LiveDocument do
           phx-value-id=""
           preserveAspectRatio="xMidYMin meet"
           id={"document-#{@document.id}"}
-          viewBox={RenewCollab.ViewBox.into_string(@viewbox)}
+          viewBox={RenewCollab.ViewBox.into_string(RenewCollab.ViewBox.stretch(@viewbox))}
           style="grid-area: 1 / 1 / span 1 / span 1; display: block; width: 100%; height: 100%;background: #f5f5f5;"
           width={@viewbox.width}
           height={@viewbox.height}

@@ -170,7 +170,7 @@ defmodule RenewCollabProj.Projects do
 
   def add_member(%Project{id: project_id}, %{
         "account_email" => account_email,
-        "role_id" => role_id
+        "role" => role
       }) do
     RenewCollabAuth.Auth.get_account_by_email(account_email)
     |> case do
@@ -178,7 +178,7 @@ defmodule RenewCollabProj.Projects do
         %ProjectMember{
           project_id: project_id
         }
-        |> ProjectMember.changeset(%{account_id: account_id, role_id: role_id})
+        |> ProjectMember.changeset(%{account_id: account_id, role: role})
         |> Repo.insert()
 
       nil ->
@@ -194,11 +194,31 @@ defmodule RenewCollabProj.Projects do
     |> Repo.insert()
   end
 
+  def duplicate_document_into_project(project, document_id) do
+    RenewCollab.Commands.DuplicateDocument.new(%{
+      document_id: document_id,
+      keep_name: true
+    })
+    |> RenewCollab.Commander.run_document_command_sync(true)
+    |> case do
+      {:ok, %{insert_document: %RenewCollab.Document.Document{id: new_document_id}}} ->
+        add_document(project, %{document_id: new_document_id})
+    end
+  end
+
   def add_simulation(%Project{id: project_id}, simulation) do
     %ProjectSimulation{
       project_id: project_id
     }
     |> ProjectSimulation.changeset(simulation)
+    |> Repo.insert()
+  end
+
+  def add_shadow_net_system(%Project{id: project_id}, ssn) do
+    %ProjectShadowNetSystem{
+      project_id: project_id
+    }
+    |> ProjectShadowNetSystem.changeset(ssn)
     |> Repo.insert()
   end
 
@@ -249,8 +269,11 @@ defmodule RenewCollabProj.Projects do
     |> RenewCollabProj.Entites.ProjectMember.weaker_roles()
   end
 
-  def can_remove(%Account{is_admin: true}, _project),
+  def can_force_remove(%Account{is_admin: true}, _project),
     do: true
+
+  def can_force_remove(%Account{}, _project),
+    do: false
 
   def can_remove(%Account{id: own_account_id}, membership) do
     from(m in ProjectMember,

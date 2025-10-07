@@ -34,8 +34,8 @@ defmodule RenewCollabWeb.LiveProjects do
           <img class="icon" src="/assets/icon-project.svg" /> Projects
         </h2>
       </div>
-      <div style="padding: 1em 1em 0; display: flex; align-items: start; gap: 1em">
-        <fieldset style="margin-bottom: 1em; width: 30%">
+      <div style="padding:  0 1em ; display: flex; align-items: start; gap: 1em">
+        <fieldset style="width: 30%">
           <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
             New Project
           </legend>
@@ -191,7 +191,10 @@ defmodule RenewCollabWeb.LiveProjects do
                n -> n
              end)
            ) do
-      socket |> assign(create_form: to_form(%{})) |> reload()
+      socket
+      |> put_flash(:info, "Project created")
+      |> assign(create_form: to_form(%{}))
+      |> reload()
     else
       _ ->
         {:noreply, socket}
@@ -205,9 +208,13 @@ defmodule RenewCollabWeb.LiveProjects do
   def handle_event("delete_project", %{"id" => id}, socket) do
     if Projects.can_delete(socket.assigns.current_account, Projects.find_project(id)) do
       Projects.delete_project(id)
-    end
 
-    socket |> reload()
+      socket
+      |> put_flash(:info, "Project deleted")
+      |> reload()
+    else
+      {:noreply, socket}
+    end
   end
 
   def handle_info(:any, socket) do

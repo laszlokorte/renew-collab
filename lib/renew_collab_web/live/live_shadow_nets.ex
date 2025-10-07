@@ -7,29 +7,36 @@ defmodule RenewCollabWeb.LiveShadowNets do
   def file_count_limit, do: @file_count_limit
 
   def mount(%{"project_id" => project_id}, _session, socket) do
-    socket =
-      socket
-      |> assign(:is_admin, is_admin(socket))
-      |> assign(:project, RenewCollabProj.Projects.find_project(project_id))
-      |> assign(
-        :shadow_net_systems,
-        RenewCollabSim.Simulator.list_shadow_net_systems(
-          RenewCollabProj.Projects.list_project_shadow_net_systems(project_id)
-        )
-      )
-      |> assign(
-        import_rnw_form:
-          to_form(%{
-            "main_net" => nil,
-            "formalism" => RenewCollabSim.Compiler.SnsCompiler.default_formalism()
-          })
-      )
-      |> assign(import_sns_form: to_form(%{"main_net" => nil}))
-      |> allow_upload(:import_rnw_file, accept: ~w(.rnw), max_entries: @file_count_limit)
-      |> allow_upload(:import_sns_file, accept: ~w(.sns), max_entries: 1)
+    RenewCollabProj.Projects.find_project(project_id)
+    |> case do
+      nil ->
+        {:ok, socket |> put_flash(:error, "Project not found") |> redirect(to: ~p"/projects")}
 
-    RenewCollabWeb.Endpoint.subscribe("projects/#{socket.assigns.project.id}/shadow_nets")
-    {:ok, socket}
+      proj ->
+        socket =
+          socket
+          |> assign(:is_admin, is_admin(socket))
+          |> assign(:project, proj)
+          |> assign(
+            :shadow_net_systems,
+            RenewCollabSim.Simulator.list_shadow_net_systems(
+              RenewCollabProj.Projects.list_project_shadow_net_systems(proj.id)
+            )
+          )
+          |> assign(
+            import_rnw_form:
+              to_form(%{
+                "main_net" => nil,
+                "formalism" => RenewCollabSim.Compiler.SnsCompiler.default_formalism()
+              })
+          )
+          |> assign(import_sns_form: to_form(%{"main_net" => nil}))
+          |> allow_upload(:import_rnw_file, accept: ~w(.rnw), max_entries: @file_count_limit)
+          |> allow_upload(:import_sns_file, accept: ~w(.sns), max_entries: 1)
+
+        RenewCollabWeb.Endpoint.subscribe("projects/#{socket.assigns.project.id}/shadow_nets")
+        {:ok, socket}
+    end
   end
 
   def handle_info(:any, socket) do
@@ -52,7 +59,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
   def render(assigns) do
     ~H"""
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
-      <RenewCollabWeb.RenewComponents.app_header flash={@flash} project_id={@project.id} />
+      <RenewCollabWeb.RenewComponents.app_header flash={@flash} tab={:sns} project_id={@project.id} />
 
       <div style="padding: 1em">
         <.link navigate={~p"/projects"}>
@@ -63,8 +70,8 @@ defmodule RenewCollabWeb.LiveShadowNets do
           <img class="icon" src="/assets/icon-network.svg" /> Shadow Net Systems
         </h2>
       </div>
-      <div style="padding: 1em 1em 0; display: flex; align-items: start; gap: 1em">
-        <fieldset style="margin-bottom: 1em">
+      <div style="padding: 0 1em; display: flex; align-items: start; gap: 1em">
+        <fieldset>
           <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
             Import Renew (.rnw) Files to Simulate
           </legend>
@@ -142,7 +149,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
           </.form>
         </fieldset>
 
-        <fieldset style="margin-bottom: 1em">
+        <fieldset>
           <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
             Import Shadow Net (.sns) File to Simulate
           </legend>
@@ -432,6 +439,6 @@ defmodule RenewCollabWeb.LiveShadowNets do
       :any
     )
 
-    {:noreply, socket}
+    {:noreply, socket |> put_flash(:info, "Shadow Net system deleted")}
   end
 end

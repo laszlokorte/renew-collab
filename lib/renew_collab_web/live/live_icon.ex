@@ -13,7 +13,14 @@ defmodule RenewCollabWeb.LiveIcon do
   end
 
   defp load_data(socket) do
-    socket |> assign(:icon, RenewCollab.Symbols.find_symbol(socket.assigns.symbol_id))
+    RenewCollab.Symbols.find_symbol(socket.assigns.symbol_id)
+    |> case do
+      nil ->
+        socket |> put_flash(:error, "Icon not found") |> redirect(to: ~p"/icons")
+
+      icon ->
+        socket |> assign(:icon, icon)
+    end
   end
 
   def render(assigns) do

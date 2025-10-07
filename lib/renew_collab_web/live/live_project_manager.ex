@@ -23,7 +23,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
   def render(assigns) do
     ~H"""
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
-      <RenewCollabWeb.RenewComponents.app_header flash={@flash} project_id={@project.id} />
+      <RenewCollabWeb.RenewComponents.app_header flash={@flash} />
       <div style="padding: 1em">
         <.link navigate={~p"/manage/projects"}>Projects Management</.link>
         / Project
@@ -38,7 +38,12 @@ defmodule RenewCollabWeb.LiveProjectManager do
 
           <form method="post" phx-submit="rename" accept-charset="utf-8">
             <input type="text" name="name" value={@project.name} />
-            <button type="submit">Rename</button>
+            <button
+              type="submit"
+              style="cursor: pointer; padding: 1ex; border: none; background: #3aa; color: #fff"
+            >
+              Rename
+            </button>
           </form>
         <% end %>
 
@@ -48,20 +53,35 @@ defmodule RenewCollabWeb.LiveProjectManager do
             <%= for m <- @project.members do %>
               <%= with acc = %{} <- m.account do %>
                 <li>
-                  [{m.role}]
-                  <%= if Projects.can_remove(@current_account, m) do %>
-                    <button type="button" phx-click="remove_member" phx-value-id={m.id}>
+                  <%= if Projects.can_force_remove(@current_account, m) do %>
+                    <button
+                      type="button"
+                      phx-click="remove_member"
+                      style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
+                      phx-value-id={m.id}
+                    >
                       Remove
                     </button>
                   <% end %>
+                  <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
+                    [{m.role}]
+                  </span>
                   {acc.email}
                 </li>
                 <% else nil -> %>
                   <li>
-                    <button type="button" phx-click="remove_member" phx-value-id={m.id}>
+                    <button
+                      type="button"
+                      phx-click="remove_member"
+                      style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
+                      phx-value-id={m.id}
+                    >
                       Remove
                     </button>
-                    [{m.role}] <em>Account deleted</em>
+                    <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
+                      [{m.role}]
+                    </span>
+                    <em>Account deleted</em>
                     (ID: <code>{m.account_id}</code>)
                   </li>
               <% end %>
@@ -91,7 +111,12 @@ defmodule RenewCollabWeb.LiveProjectManager do
                 </option>
               <% end %>
             </select>
-            <button type="submit">Invite</button>
+            <button
+              type="submit"
+              style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+            >
+              Invite
+            </button>
           </form>
         <% end %>
 
@@ -101,14 +126,25 @@ defmodule RenewCollabWeb.LiveProjectManager do
             <%= for d <- @project.documents do %>
               <%= with doc = %{} <- d.document do %>
                 <li>
-                  <button type="button" phx-click="remove_document" phx-value-id={d.id}>
+                  <button
+                    type="button"
+                    style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
+                    phx-click="remove_document"
+                    phx-value-id={d.id}
+                  >
                     Remove
                   </button>
                   {doc.name}
+                  <small>({doc.id})</small>
                 </li>
                 <% else nil -> %>
                   <li>
-                    <button type="button" phx-click="remove_document" phx-value-id={d.id}>
+                    <button
+                      type="button"
+                      style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
+                      phx-click="remove_document"
+                      phx-value-id={d.id}
+                    >
                       Remove
                     </button>
                     <em>Document deleted</em>
@@ -122,28 +158,60 @@ defmodule RenewCollabWeb.LiveProjectManager do
         <% end %>
 
         <form method="post" phx-submit="add_document" accept-charset="utf-8">
+          <h4>Unassigned Documents</h4>
           <select name="document_id">
             <option value="">---</option>
             <%= for d <- @documents do %>
-              <option value={d.id} disabled={d.project_assignment != nil}>{d.name}</option>
+              <option value={d.id} disabled={d.project_assignment != nil}>{d.name}({d.id})</option>
             <% end %>
           </select>
-          <button type="submit">Assign</button>
+          <button
+            type="submit"
+            style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+          >
+            Assign
+          </button>
         </form>
+        <h4>All Documents</h4>
+        <form method="post" phx-submit="dup_document" accept-charset="utf-8">
+          <select name="document_id">
+            <option value="">---</option>
+            <%= for d <- @documents do %>
+              <option value={d.id}>{d.name} ({d.id})</option>
+            <% end %>
+          </select>
+          <button
+            type="submit"
+            style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+          >
+            Copy into this project
+          </button>
+        </form>
+
         <h3>Shadow Net Systems</h3>
         <%= if  not Enum.empty?(@project.shadow_net_systems) do %>
           <ul style="list-style: none; padding: 0; margin: 0">
             <%= for s <- @project.shadow_net_systems do %>
               <%= with ssn = %{} <- s.shadow_net_system do %>
                 <li>
-                  <button type="button" phx-click="remove_ssn" phx-value-id={s.id}>
+                  <button
+                    type="button"
+                    style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
+                    phx-click="remove_ssn"
+                    phx-value-id={s.id}
+                  >
                     Remove
                   </button>
-                  {ssn.id}
+                  {ssn.label || "Untitled"} <small>({ssn.id})</small>
                 </li>
                 <% else nil -> %>
                   <li>
-                    <button type="button" phx-click="remove_ssn" phx-value-id={s.id}>
+                    <button
+                      type="button"
+                      style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
+                      phx-click="remove_ssn"
+                      phx-value-id={s.id}
+                    >
                       Remove
                     </button>
                     <em>SSN deleted</em>
@@ -163,7 +231,12 @@ defmodule RenewCollabWeb.LiveProjectManager do
               <option value={s.id} disabled={s.project_assignment != nil}>{s.id}</option>
             <% end %>
           </select>
-          <button type="submit">Assign</button>
+          <button
+            type="submit"
+            style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+          >
+            Assign
+          </button>
         </form>
 
         <h3>Simulations</h3>
@@ -172,14 +245,24 @@ defmodule RenewCollabWeb.LiveProjectManager do
             <%= for s <- @project.simulations do %>
               <%= with sim = %{} <- s.simulation do %>
                 <li>
-                  <button type="button" phx-click="remove_simulation" phx-value-id={s.id}>
+                  <button
+                    type="button"
+                    style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
+                    phx-click="remove_simulation"
+                    phx-value-id={s.id}
+                  >
                     Remove
                   </button>
-                  {sim.id}
+                  {sim.label || "Untitled"} <small>({sim.id})</small>
                 </li>
                 <% else nil -> %>
                   <li>
-                    <button type="button" phx-click="remove_simulation" phx-value-id={s.id}>
+                    <button
+                      type="button"
+                      style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
+                      phx-click="remove_simulation"
+                      phx-value-id={s.id}
+                    >
                       Remove
                     </button>
                     <em>Simulation deleted</em>
@@ -199,7 +282,12 @@ defmodule RenewCollabWeb.LiveProjectManager do
               <option value={s.id} disabled={s.project_assignment != nil}>{s.id}</option>
             <% end %>
           </select>
-          <button type="submit">Assign</button>
+          <button
+            type="submit"
+            style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+          >
+            Assign
+          </button>
         </form>
         <%= if Projects.can_delete(@current_account, @project) do %>
           <h3>Delete Project</h3>
@@ -228,12 +316,12 @@ defmodule RenewCollabWeb.LiveProjectManager do
 
   def handle_event("add_member", params, socket) do
     Projects.add_member(socket.assigns.project, params)
-    reload(socket)
+    socket |> put_flash(:info, "Project member added") |> reload
   end
 
   def handle_event("remove_member", %{"id" => member_id}, socket) do
     Projects.force_remove_member(socket.assigns.project, member_id)
-    reload(socket)
+    socket |> put_flash(:info, "Project member removed") |> reload
   end
 
   def handle_event("add_document", %{"document_id" => ""}, socket) do
@@ -242,12 +330,21 @@ defmodule RenewCollabWeb.LiveProjectManager do
 
   def handle_event("add_document", params, socket) do
     Projects.add_document(socket.assigns.project, params)
-    reload(socket)
+    socket |> put_flash(:info, "Document added") |> reload
+  end
+
+  def handle_event("dup_document", %{"document_id" => ""}, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("dup_document", %{"document_id" => document_id}, socket) do
+    Projects.duplicate_document_into_project(socket.assigns.project, document_id)
+    socket |> put_flash(:info, "Document duplicated") |> reload
   end
 
   def handle_event("remove_document", %{"id" => proj_document_id}, socket) do
     Projects.remove_document(socket.assigns.project, proj_document_id)
-    reload(socket)
+    socket |> put_flash(:info, "Document removed") |> reload
   end
 
   def handle_event("add_simulation", %{"simulation_id" => ""}, socket) do
@@ -256,28 +353,33 @@ defmodule RenewCollabWeb.LiveProjectManager do
 
   def handle_event("add_simulation", params, socket) do
     Projects.add_simulation(socket.assigns.project, params)
-    reload(socket)
+    socket |> put_flash(:info, "Simulation added") |> reload
   end
 
   def handle_event("remove_simulation", %{"id" => proj_simulation_id}, socket) do
     Projects.remove_simulation(socket.assigns.project, proj_simulation_id)
-    reload(socket)
+    socket |> put_flash(:info, "Simulation removed") |> reload
+  end
+
+  def handle_event("add_ssn", params, socket) do
+    Projects.add_shadow_net_system(socket.assigns.project, params)
+    socket |> put_flash(:info, "Shadow net system added") |> reload
   end
 
   def handle_event("remove_ssn", %{"id" => proj_ssn_id}, socket) do
     Projects.remove_shadow_net_system(socket.assigns.project, proj_ssn_id)
-    reload(socket)
+    socket |> put_flash(:info, "Shadow net system removed") |> reload
   end
 
   def handle_event("rename", params, socket) do
     Projects.update_project(socket.assigns.project, params)
-    reload(socket)
+    socket |> put_flash(:info, "Project name changed") |> reload
   end
 
   def handle_event("delete", _params, socket) do
     Projects.delete_project(socket.assigns.project.id)
 
-    {:noreply, redirect(socket, to: "/projects")}
+    {:noreply, socket |> put_flash(:info, "Project deleted") |> redirect(to: "/manage/projects")}
   end
 
   def reload(socket) do

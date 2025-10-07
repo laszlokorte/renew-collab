@@ -166,7 +166,10 @@ defmodule RenewCollabWeb.LiveProjectsManager do
                n -> n
              end)
            ) do
-      socket |> assign(create_form: to_form(%{})) |> reload()
+      socket
+      |> put_flash(:info, "Project created")
+      |> assign(create_form: to_form(%{}))
+      |> reload()
     else
       _ ->
         {:noreply, socket}
@@ -182,7 +185,9 @@ defmodule RenewCollabWeb.LiveProjectsManager do
       Projects.delete_project(id)
     end
 
-    socket |> reload()
+    socket
+    |> put_flash(:info, "Project deleted")
+    |> reload()
   end
 
   def handle_info(:any, socket) do

@@ -5,20 +5,27 @@ defmodule RenewCollabWeb.LiveDocuments do
   alias RenewCollab.Renew
 
   def mount(%{"project_id" => project_id}, _session, socket) do
-    RenewCollabWeb.Endpoint.subscribe("project/#{project_id}/documents")
+    RenewCollabProj.Projects.find_project(project_id)
+    |> case do
+      nil ->
+        {:ok, socket |> put_flash(:error, "Project not found") |> redirect(to: ~p"/projects")}
 
-    socket =
-      socket
-      |> assign(:project, RenewCollabProj.Projects.find_project(project_id))
-      |> assign(
-        :documents,
-        Renew.list_documents(RenewCollabProj.Projects.list_project_documents(project_id))
-      )
-      |> assign(create_form: to_form(%{}))
-      |> assign(import_form: to_form(%{}))
-      |> allow_upload(:import_file, accept: ~w(.rnw .aip), max_entries: 10)
+      proj ->
+        RenewCollabWeb.Endpoint.subscribe("project/#{proj.id}/documents")
 
-    {:ok, socket}
+        socket =
+          socket
+          |> assign(:project, proj)
+          |> assign(
+            :documents,
+            Renew.list_documents(RenewCollabProj.Projects.list_project_documents(project_id))
+          )
+          |> assign(create_form: to_form(%{}))
+          |> assign(import_form: to_form(%{}))
+          |> allow_upload(:import_file, accept: ~w(.rnw .aip), max_entries: 10)
+
+        {:ok, socket}
+    end
   end
 
   defp error_to_string(:too_large), do: "The selected file is too large."
@@ -30,7 +37,11 @@ defmodule RenewCollabWeb.LiveDocuments do
   def render(assigns) do
     ~H"""
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
-      <RenewCollabWeb.RenewComponents.app_header flash={@flash} project_id={@project.id} />
+      <RenewCollabWeb.RenewComponents.app_header
+        tab={:documents}
+        flash={@flash}
+        project_id={@project.id}
+      />
 
       <div style="padding: 1em">
         <.link navigate={~p"/projects"}>
@@ -42,8 +53,8 @@ defmodule RenewCollabWeb.LiveDocuments do
         </h2>
       </div>
 
-      <div style="padding: 1em 1em 0; display: flex; align-items: start; gap: 1em">
-        <fieldset style="margin-bottom: 1em">
+      <div style="padding: 0 1em; display: flex; align-items: start; gap: 1em">
+        <fieldset>
           <p>Create a new Empty Document</p>
 
           <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
@@ -69,7 +80,7 @@ defmodule RenewCollabWeb.LiveDocuments do
           </.form>
         </fieldset>
 
-        <fieldset style="margin-bottom: 1em">
+        <fieldset>
           <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
             Import Renew (.rnw) Files
           </legend>
@@ -169,7 +180,9 @@ defmodule RenewCollabWeb.LiveDocuments do
                     </.link>
                   </td>
 
-                  <td>{if(document.syntax, do: document.syntax.name, else: "-")}</td>
+                  <td style="white-space: nowrap;">
+                    <code>{if(document.syntax, do: document.syntax.name, else: "-")}</code>
+                  </td>
 
                   <td>
                     <RenewCollabWeb.RenewComponents.timestamp value={document.inserted_at} />
@@ -246,7 +259,7 @@ defmodule RenewCollabWeb.LiveDocuments do
   def handle_event("duplicate", %{"id" => document_id}, socket) do
     Renew.duplicate_document(document_id)
 
-    {:noreply, socket}
+    {:noreply, socket |> put_flash(:info, "Document duplicated")}
   end
 
   def handle_event("validate-create", params, socket) do
@@ -309,17 +322,20 @@ defmodule RenewCollabWeb.LiveDocuments do
              end)
              |> Map.put("kind", "de.renew.gui.CPNDrawing")
            ) do
+      {:noreply,
+       socket
+       |> put_flash(:info, "Document created")
+       |> assign(create_form: to_form(%{}))}
+    else
+      _ ->
+        {:norply, socket}
     end
-
-    {:noreply,
-     socket
-     |> assign(create_form: to_form(%{}))}
   end
 
   def handle_event("delete", %{"id" => document_id}, socket) do
     Renew.delete_document(document_id)
 
-    {:noreply, socket}
+    {:noreply, socket |> put_flash(:info, "Document deleted")}
   end
 
   def handle_event("compile", %{"document_id" => document_id, "formalism" => formalism}, socket) do

@@ -9,7 +9,7 @@ defmodule RenewCollabWeb.LiveSimulation do
     RenewCollabSim.Simulator.find_simulation(simulation_id)
     |> case do
       nil ->
-        {:ok, socket |> redirect(to: ~p"/")}
+        {:ok, socket |> put_flash(:error, "Simulation not found") |> redirect(to: ~p"/projects")}
 
       sim ->
         socket =
@@ -61,6 +61,7 @@ defmodule RenewCollabWeb.LiveSimulation do
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
       <RenewCollabWeb.RenewComponents.app_header
         flash={@flash}
+        tab={:simulations}
         project_id={@simulation.project_assignment.project_id}
       />
 
@@ -310,7 +311,7 @@ defmodule RenewCollabWeb.LiveSimulation do
       new_name
     )
 
-    {:noreply, socket}
+    {:noreply, socket |> put_flash(:info, "Simulation name changed")}
   end
 
   def handle_event("debug", %{}, socket) do
@@ -335,7 +336,7 @@ defmodule RenewCollabWeb.LiveSimulation do
       {:simulation_change, socket.assigns.simulation_id, :log}
     )
 
-    {:noreply, socket}
+    {:noreply, socket |> put_flash(:info, "Simulation log cleared")}
   end
 
   def handle_event("clear_instances", %{}, socket) do
@@ -347,7 +348,7 @@ defmodule RenewCollabWeb.LiveSimulation do
       {:simulation_change, socket.assigns.simulation_id, :records}
     )
 
-    {:noreply, socket}
+    {:noreply, socket |> put_flash(:info, "Simulation net instances cleared")}
   end
 
   def handle_event("reset", %{}, socket) do

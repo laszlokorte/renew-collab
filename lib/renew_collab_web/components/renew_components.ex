@@ -25,6 +25,7 @@ defmodule RenewCollabWeb.RenewComponents do
 
   attr :blank, :boolean, default: false
   attr :logout, :boolean, default: false
+  attr :tab, :atom, default: nil
   attr :project_id, :string, default: nil
   attr :flash, :map, default: nil
 
@@ -32,67 +33,69 @@ defmodule RenewCollabWeb.RenewComponents do
     assigns = assigns |> assign(:editor_url, editor_url())
 
     ~H"""
-    <header style="background: #333; color: #fff; padding: 1em; display: flex; justify-content: space-between; font-family: monospace;">
-      <.link style="color: white; align-self: center; text-decoration: none" navigate={~p"/"}>
-        <h1 style="margin: 0; font-size: 1.3em; display: flex; align-items: center; gap: 1ex">
-          <img src="/favicon.svg" style="width: 1.5em; height: 1.5em" /> {app_titel()}
-        </h1>
-      </.link>
-
+    <div style="display: grid; grid-template: [stack-start] 1fr [stack-end] / [stack-start] 1fr [stack-end];">
       <%= if @flash do %>
-        <.flash_group flash={@flash} />
+        <div style="grid-area: stack;z-index: 10;pointer-events: none; align-self: center; justify-self: center;">
+          <.flash_group flash={@flash} />
+        </div>
       <% end %>
+      <header style="grid-area: stack; background: #333; color: #fff; padding: 1em; display: flex; justify-content: space-between; font-family: monospace;">
+        <.link style="color: white; align-self: center; text-decoration: none" navigate={~p"/"}>
+          <h1 style="margin: 0; font-size: 1.3em; display: flex; align-items: center; gap: 1ex">
+            <img src="/favicon.svg" style="width: 1.5em; height: 1.5em" /> {app_titel()}
+          </h1>
+        </.link>
 
-      <div style="display: flex; gap: 2em; align-items: stretch;">
-        <%= if not @blank do %>
-          <%= if @project_id do %>
-            <.link
-              style="color: white; align-self: center;"
-              navigate={~p"/project/#{@project_id}/documents"}
-            >
-              Documents
-            </.link>
-            <.link
-              style="color: white; align-self: center;"
-              navigate={~p"/project/#{@project_id}/simulations"}
-            >
-              Simulations
-            </.link>
-            <.link
-              style="color: white; align-self: center;"
-              navigate={~p"/project/#{@project_id}/shadow_nets"}
-            >
-              Shadow Nets
-            </.link>
-            <.link
-              style="color: white; align-self: center;"
-              navigate={~p"/project/#{@project_id}/settings"}
-            >
-              Settings
+        <div style="display: flex; gap: 1.5em; align-items: stretch;align-self: stretch;">
+          <%= if not @blank do %>
+            <%= if @project_id do %>
+              <.link
+                style={"padding: 0.5ex 1ex; align-self: stretch; color: white; align-self: center;#{if(@tab==:documents, do: "text-decoration: none; color: black; background: white")}"}
+                navigate={~p"/project/#{@project_id}/documents"}
+              >
+                Documents
+              </.link>
+              <.link
+                style={"padding: 0.5ex 1ex; align-self: stretch; color: white; align-self: center;#{if(@tab==:simulations, do: "text-decoration: none; color: black; background: white")}"}
+                navigate={~p"/project/#{@project_id}/simulations"}
+              >
+                Simulations
+              </.link>
+              <.link
+                style={"padding: 0.5ex 1ex; align-self: stretch; color: white; align-self: center;#{if(@tab==:sns, do: "text-decoration: none; color: black; background: white")}"}
+                navigate={~p"/project/#{@project_id}/shadow_nets"}
+              >
+                Shadow Nets
+              </.link>
+              <.link
+                style={"padding: 0.5ex 1ex; align-self: stretch; color: white; align-self: center;#{if(@tab==:settings, do: "text-decoration: none; color: black; background: white")}"}
+                navigate={~p"/project/#{@project_id}/settings"}
+              >
+                Settings
+              </.link>
+            <% end %>
+          <% end %>
+
+          <%= if @logout do %>
+            <.link style="color: white; align-self: center;" href={~p"/logout"} method="delete">
+              Log out
             </.link>
           <% end %>
-          <.link style="color: white; align-self: center;" navigate={~p"/projects"}>Projects</.link>
-        <% end %>
 
-        <%= if @logout do %>
-          <.link style="color: white; align-self: center;" href={~p"/logout"} method="delete">
-            Log out
-          </.link>
-        <% end %>
-
-        <%= if @editor_url do %>
-          <div style="display: flex; gap: 2em; align-items: stretch; margin-left: auto; margin-right: 1em">
-            <.link
-              target="_blank"
-              style="text-decoration-color: #7fdfa4aa; outline: 2px solid #7fdfa4aa; color: white; align-self: center; padding: 0.7ex; background: #23875d; border-radius: 0.3ex"
-              href={@editor_url}
-            >
-              Go to Editor
-            </.link>
-          </div>
-        <% end %>
-      </div>
-    </header>
+          <%= if @editor_url do %>
+            <div style="display: flex; gap: 2em; align-items: stretch; margin-left: auto; margin-right: 1em">
+              <.link
+                target="_blank"
+                style="text-decoration-color: #7fdfa4aa; outline: 2px solid #7fdfa4aa; color: white; align-self: center; padding: 0.7ex; background: #23875d; border-radius: 0.3ex"
+                href={@editor_url}
+              >
+                Go to Editor
+              </.link>
+            </div>
+          <% end %>
+        </div>
+      </header>
+    </div>
     """
   end
 
@@ -176,6 +179,7 @@ defmodule RenewCollabWeb.RenewComponents do
         class="flash-button"
         aria-label="close"
         phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
+        style="pointer-events:all"
       >
         Discard
       </button>
