@@ -1,45 +1,84 @@
 body {
-	margin: 0;
-	padding: 0;
+    margin: 0;
+    padding: 0;
 }
-
 * {
-	box-sizing: border-box;
+    box-sizing: border-box;
 }
-
 .rnw-form > form > div {
-  display: grid;
-  grid-template-columns: auto auto;
-  gap: 1ex;
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 1ex;
 }
 .rnw-form > form > div > div {
-  display: contents;
+    display: contents;
 }
-
 .rnw-form button {
-  grid-column: 2;
-  align-self: baseline;
-  justify-self: start;
-  cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff
+    grid-column: 2;
+    align-self: baseline;
+    justify-self: start;
+    cursor: pointer;
+    padding: 1ex;
+    border: none;
+    background: #333;
+    color: #fff;
 }
-
 .rnw-form p {
-  grid-column: 1 / span 2;
-  margin: 0;
-  color: #a00;
+    grid-column: 1 / span 2;
+    margin: 0;
+    color: #a00;
 }
-
 .rnw-form label {
-  justify-self: end;
-  align-self: baseline;
+    justify-self: end;
+    align-self: baseline;
 }
-
 .rnw-form input + p {
-  grid-column: 2 / span 1;
-  margin: 0;
+    grid-column: 2 / span 1;
+    margin: 0;
+}
+.rnw-form input {
+    padding: 1ex;
+    align-self: baseline;
+}
+.flash:not([hidden]) {
+    display: flex;
 }
 
-.rnw-form input {
-  padding: 1ex;
-  align-self: baseline;
+.flash-group {
+    align-self: stretch;
+    display: flex;
+}
+.flash {
+    align-self: stretch;
+    color: black;
+    align-items: center;
+    padding: 0.2ex 0.5ex;
+    gap: 1em;
+}
+
+.flash.flash-info {
+    background-color: #ddffdd;
+}
+
+.flash.flash-error {
+    background-color: #ffaaaa;
+}
+
+.flash-button {
+    background-color: #000000aa;
+    border: none;
+    color: #fff;
+    display: block;
+    padding: 1ex;
+    cursor: pointer;
+    font-size: 7pt;
+    font-family: monospace;
+    text-transform: uppercase;
+}
+
+.icon {
+    display: inline-block;
+    width: 1.5em;
+    height: 1.5em;
+    vertical-align: center;
 }

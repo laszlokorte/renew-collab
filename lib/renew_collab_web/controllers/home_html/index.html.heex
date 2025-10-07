@@ -3,10 +3,10 @@
 <ul style="display: grid; justify-content: center; padding: 1em; list-style: none; gap: 1em; grid-template-columns: repeat(auto-fit, minmax(25em, 1fr));">
   <li style="background-color: #eee;">
     <.link
-      style="text-align: center; padding: 2em; display: block; color: #078"
+      style="text-align: center; padding: 2em; display: block; color: #078; display: flex; flex-direction: column; align-items: center;"
       navigate={~p"/projects"}
     >
-      My Projects
+      <img class="icon" src="/assets/icon-project.svg" /> My Projects
     </.link>
   </li>
 </ul>
@@ -15,7 +15,7 @@
   <ul style="display: grid; justify-content: center; padding: 1em; list-style: none; gap: 1em; grid-template-columns: repeat(auto-fit, minmax(25em, 1fr));">
     <li style="background-color: #eee;">
       <.link
-        style="text-align: center; padding: 2em; display: block; color: #078"
+        style="text-align: center; padding: 2em; display: block; color: #078; "
         navigate={~p"/manage/projects"}
       >
         All Projects

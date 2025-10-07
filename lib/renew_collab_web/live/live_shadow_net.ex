@@ -80,16 +80,16 @@ defmodule RenewCollabWeb.LiveShadowNet do
           <% _ -> %>
         <% end %>
         / Simulations
+        <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
+          <img class="icon" src="/assets/icon-network.svg" />
+          <span>
+            Shadow Net System {@shadow_net_system.label || "Untitled"}<br />
+            (<small><code>{@shadow_net_system.id}</code></small>)
+          </span>
+        </h2>
       </div>
 
       <div style="padding: 1em">
-        <%= if @shadow_net_system.label do %>
-          <h2 style="margin: 0;">
-            Shadow Net System {@shadow_net_system.label} (<small><code>{@shadow_net_system.id}</code></small>)
-          </h2>
-        <% else %>
-          <h2 style="margin: 0;">Shadow Net System <code>{@shadow_net_system.id}</code></h2>
-        <% end %>
         <div style="padding: 1em 1em 0; display: flex; align-items: start; gap: 1em">
           <fieldset style="margin-bottom: 1em">
             <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">

@@ -37,7 +37,9 @@ defmodule RenewCollabWeb.LiveDocuments do
           Projects
         </.link>
         / Documents
-        <h2 style="margin: 0;">Documents</h2>
+        <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
+          <img class="icon" src="/assets/icon-document.svg" /> Documents
+        </h2>
       </div>
 
       <div style="padding: 1em 1em 0; display: flex; align-items: start; gap: 1em">

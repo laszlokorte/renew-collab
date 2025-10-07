@@ -59,7 +59,9 @@ defmodule RenewCollabWeb.LiveShadowNets do
           Projects
         </.link>
         / Shadow Net Systems
-        <h2 style="margin: 0;">Shadow Net Systems</h2>
+        <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
+          <img class="icon" src="/assets/icon-network.svg" /> Shadow Net Systems
+        </h2>
       </div>
       <div style="padding: 1em 1em 0; display: flex; align-items: start; gap: 1em">
         <fieldset style="margin-bottom: 1em">

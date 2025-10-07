@@ -28,15 +28,23 @@ defmodule RenewCollabWeb.LiveProjectSettings do
     ~H"""
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
       <RenewCollabWeb.RenewComponents.app_header flash={@flash} project_id={@project.id} />
+
       <div style="padding: 1em">
-        <.link navigate={~p"/projects"}>Back</.link>
+        <.link navigate={~p"/projects"}>
+          Projects
+        </.link>
+        / Settings
+        <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
+          <img class="icon" src="/assets/icon-document.svg" />
+          <span>
+            Settings (Name: {@project.name}) <br /><small>{@project.id}</small>
+          </span>
+        </h2>
       </div>
 
       <div style="padding: 1em">
-        <h2 style="margin: 0;">Project: {@project.name}</h2>
-
         <%= if Projects.can_rename(@current_account, @project) do %>
-          <h3>Rename Project</h3>
+          <h3>Project Name</h3>
 
           <form method="post" phx-submit="rename" accept-charset="utf-8">
             <input type="text" name="name" value={@project.name} />
@@ -44,7 +52,7 @@ defmodule RenewCollabWeb.LiveProjectSettings do
           </form>
         <% end %>
 
-        <h3>Members</h3>
+        <h3>Project Members</h3>
         <%= if  not Enum.empty?(@project.members) do %>
           <ul style="list-style: none; padding: 0; margin: 0">
             <%= for m <- @project.members do %>
@@ -74,6 +82,7 @@ defmodule RenewCollabWeb.LiveProjectSettings do
         <% end %>
 
         <%= if Projects.can_invite(@current_account, @project) do %>
+          <h3>Invite</h3>
           <form method="post" phx-submit="add_member" accept-charset="utf-8">
             <label>
               E-Mail: <input type="email" name="account_email" />

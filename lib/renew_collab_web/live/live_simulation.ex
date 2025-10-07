@@ -81,13 +81,13 @@ defmodule RenewCollabWeb.LiveSimulation do
           Simulations
         </.link>
         / Simulation
-        <%= if @simulation.label do %>
-          <h2 style="margin: 0;">
-            Simulation {@simulation.label} (<small><code>{@simulation.id}</code></small>)
-          </h2>
-        <% else %>
-          <h2 style="margin: 0;">Simulation <code>{@simulation.id}</code></h2>
-        <% end %>
+        <h2 style="margin: 0; display: flex; gap: 1ex; align-items: start;">
+          <img class="icon" src="/assets/icon-simulation.svg" />
+          <span>
+            Simulation {@simulation.label || "Untitled"}<br />
+            (<small><code>{@simulation.id}</code></small>)
+          </span>
+        </h2>
         <div style="padding: 1em 1em 0; display: flex; align-items: start; gap: 1em">
           <fieldset style="margin-bottom: 1em">
             <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
