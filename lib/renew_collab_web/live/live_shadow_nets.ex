@@ -404,8 +404,13 @@ defmodule RenewCollabWeb.LiveShadowNets do
       paths,
       main_net_name
     )
+    |> case do
+      {:error, _} ->
+        {:noreply, socket |> put_flash(:error, "Import failed")}
 
-    {:noreply, socket}
+      {:ok, _} ->
+        {:noreply, socket |> put_flash(:info, "Import successful")}
+    end
   end
 
   def handle_event("import_sns", %{"main_net" => main_net_name}, socket) do
@@ -424,7 +429,10 @@ defmodule RenewCollabWeb.LiveShadowNets do
           )
         end)
 
-      {:noreply, socket |> assign(import_sns_form: to_form(%{"main_net" => nil}))}
+      {:noreply,
+       socket
+       |> put_flash(:info, "Import successful")
+       |> assign(import_sns_form: to_form(%{"main_net" => nil}))}
     else
       {:noreply, socket}
     end

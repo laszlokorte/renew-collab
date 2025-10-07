@@ -149,12 +149,12 @@ defmodule RenewCollabWeb.LiveProjectSettings do
 
   def handle_event("add_member", params, socket) do
     Projects.add_member(socket.assigns.project, params)
-    reload(socket)
+    reload(socket |> put_flash(:info, "Project member invited"))
   end
 
   def handle_event("remove_member", %{"id" => member_id}, socket) do
     Projects.remove_member(socket.assigns.project, member_id)
-    reload(socket)
+    reload(socket |> put_flash(:info, "Project member removed"))
   end
 
   def handle_event("rename", params, socket) do
@@ -165,7 +165,7 @@ defmodule RenewCollabWeb.LiveProjectSettings do
   def handle_event("delete", _params, socket) do
     Projects.delete_project(socket.assigns.project.id)
 
-    {:noreply, redirect(socket, to: "/projects")}
+    {:noreply, socket |> put_flash(:info, "Project deleted") |> redirect(to: "/projects")}
   end
 
   def reload(socket) do

@@ -47,6 +47,8 @@ body {
 .flash-group {
   align-self: stretch;
   display: flex;
+  flex-direction: column;
+  gap: 0.2ex;
 }
 .flash {
   align-self: stretch;
