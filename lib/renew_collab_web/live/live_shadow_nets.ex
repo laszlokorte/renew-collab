@@ -259,9 +259,12 @@ defmodule RenewCollabWeb.LiveShadowNets do
               <%= for {sns, si} <- @shadow_net_systems |> Enum.with_index do %>
                 <tr {if(rem(si, 2) == 0, do: [style: "background-color:#f5f5f5;"], else: [])}>
                   <td width="100%">
-                    <.link navigate={~p"/shadow_net/#{sns.id}"}>
-                      <code>{sns.id}</code>
-                    </.link>
+                    <div style="color: #078; display: flex; align-items: center; gap: 1ex; justify-content: start;">
+                      <img class="icon" src="/assets/icon-network.svg" />
+                      <.link navigate={~p"/shadow_net/#{sns.id}"}>
+                        <code>{sns.id}</code>
+                      </.link>
+                    </div>
                   </td>
 
                   <td valign="top">
@@ -281,7 +284,10 @@ defmodule RenewCollabWeb.LiveShadowNets do
                   </td>
 
                   <td style="white-space: nowrap;">
-                    {sns.simulation_count}
+                    <div style="display: flex; align-items: center; gap: 1ex; justify-content: start;">
+                      <img class="icon" src="/assets/icon-simulation.svg" />
+                      {sns.simulation_count}
+                    </div>
                   </td>
 
                   <td width="50">

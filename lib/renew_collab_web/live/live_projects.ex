@@ -106,7 +106,11 @@ defmodule RenewCollabWeb.LiveProjects do
               <%= for {project, di} <- @projects |> Enum.with_index do %>
                 <tr {if(rem(di, 2) == 0, do: [style: "background-color:#f5f5f5;"], else: [])}>
                   <td>
-                    <.link style="color: #078" navigate={~p"/project/#{project.id}/documents"}>
+                    <.link
+                      style="color: #078;display: flex; align-items: center; gap: 1ex; justify-content: start;"
+                      navigate={~p"/project/#{project.id}/documents"}
+                    >
+                      <img class="icon" src="/assets/icon-project.svg" />
                       {project.name}
                     </.link>
                   </td>
@@ -157,7 +161,16 @@ defmodule RenewCollabWeb.LiveProjects do
                     <RenewCollabWeb.RenewComponents.timestamp value={project.updated_at} />
                   </td>
                   <td width="50"></td>
-                  <td width="50"></td>
+                  <td width="50">
+                    <button
+                      type="button"
+                      phx-click="duplicate_project"
+                      phx-value-id={project.id}
+                      style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+                    >
+                      Duplicate
+                    </button>
+                  </td>
 
                   <td width="50">
                     <%= if Projects.can_delete(@current_account, project) do %>
@@ -184,7 +197,7 @@ defmodule RenewCollabWeb.LiveProjects do
   def handle_event("create_project", params, socket) do
     with {:ok, %RenewCollabProj.Entites.Project{}} <-
            Projects.create_own_project(
-             socket.assigns.current_account.id,
+             socket.assigns.current_account,
              params
              |> Map.update("name", "", fn
                "" -> "untitled"
@@ -215,6 +228,14 @@ defmodule RenewCollabWeb.LiveProjects do
     else
       {:noreply, socket}
     end
+  end
+
+  def handle_event("duplicate_project", %{"id" => id}, socket) do
+    Projects.duplicate_project_to_own(socket.assigns.current_account, id)
+
+    socket
+    |> put_flash(:info, "Project duplicated")
+    |> reload()
   end
 
   def handle_info(:any, socket) do

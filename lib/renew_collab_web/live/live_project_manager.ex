@@ -66,6 +66,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
                   <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
                     [{m.role}]
                   </span>
+                  <img class="icon" src="/assets/icon-user.svg" />
                   {acc.email}
                 </li>
                 <% else nil -> %>
@@ -81,6 +82,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
                     <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
                       [{m.role}]
                     </span>
+                    <img class="icon" src="/assets/icon-user.svg" />
                     <em>Account deleted</em>
                     (ID: <code>{m.account_id}</code>)
                   </li>
@@ -134,6 +136,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
                   >
                     Remove
                   </button>
+                  <img class="icon" src="/assets/icon-document.svg" />
                   {doc.name}
                   <small>({doc.id})</small>
                 </li>
@@ -147,6 +150,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
                     >
                       Remove
                     </button>
+                    <img class="icon" src="/assets/icon-document.svg" />
                     <em>Document deleted</em>
                     (ID: <code>{d.document_id}</code>)
                   </li>
@@ -202,6 +206,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
                   >
                     Remove
                   </button>
+                  <img class="icon" src="/assets/icon-network.svg" />
                   {ssn.label || "Untitled"} <small>({ssn.id})</small>
                 </li>
                 <% else nil -> %>
@@ -214,6 +219,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
                     >
                       Remove
                     </button>
+                    <img class="icon" src="/assets/icon-network.svg" />
                     <em>SSN deleted</em>
                     (ID: <code>{s.shadow_net_system_id}</code>)
                   </li>
@@ -253,6 +259,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
                   >
                     Remove
                   </button>
+                  <img class="icon" src="/assets/icon-simulation.svg" />
                   {sim.label || "Untitled"} <small>({sim.id})</small>
                 </li>
                 <% else nil -> %>
@@ -265,6 +272,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
                     >
                       Remove
                     </button>
+                    <img class="icon" src="/assets/icon-simulation.svg" />
                     <em>Simulation deleted</em>
                     (ID: <code>{s.simulation_id}</code>)
                   </li>

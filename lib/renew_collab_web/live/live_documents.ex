@@ -175,7 +175,12 @@ defmodule RenewCollabWeb.LiveDocuments do
               <%= for {document, di} <- @documents |> Enum.with_index do %>
                 <tr {if(rem(di, 2) == 0, do: [style: "background-color:#f5f5f5;"], else: [])}>
                   <td>
-                    <.link style="color: #078" navigate={~p"/document/#{document.id}"}>
+                    <.link
+                      style="color: #078"
+                      style="color: #078; display: flex; align-items: center; gap: 1ex; justify-content: start;"
+                      navigate={~p"/document/#{document.id}"}
+                    >
+                      <img class="icon" src="/assets/icon-document.svg" />
                       {document.name}
                     </.link>
                   </td>

@@ -111,6 +111,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
               <dd>
                 <form phx-change="change_main_net">
                   <select name="main_net">
+                    <option></option>
                     <%= for net <- @shadow_net_system.nets do %>
                       <option selected={net.name == @shadow_net_system.main_net_name}>
                         {net.name}
@@ -242,16 +243,19 @@ defmodule RenewCollabWeb.LiveShadowNet do
               <%= for {sim,si} <- @shadow_net_system.simulations |> Enum.with_index do %>
                 <tr {if(rem(si, 2) == 0, do: [style: "background-color:#f5f5f5;"], else: [])}>
                   <td>
-                    <%= if sim.label do %>
-                      <.link navigate={~p"/simulation/#{sim.id}"}>
-                        {sim.label}
-                      </.link>
-                      <br /><small><code>{sim.id}</code></small>
-                    <% else %>
-                      <.link navigate={~p"/simulation/#{sim.id}"}>
-                        <code>{sim.id}</code>
-                      </.link>
-                    <% end %>
+                    <div style="display: flex; align-items: center; gap: 1ex; justify-content: start;">
+                      <img class="icon" src="/assets/icon-simulation.svg" />
+                      <%= if sim.label do %>
+                        <.link navigate={~p"/simulation/#{sim.id}"}>
+                          {sim.label}
+                        </.link>
+                        <br /><small><code>{sim.id}</code></small>
+                      <% else %>
+                        <.link navigate={~p"/simulation/#{sim.id}"}>
+                          <code>{sim.id}</code>
+                        </.link>
+                      <% end %>
+                    </div>
                   </td>
 
                   <td>
@@ -388,6 +392,10 @@ defmodule RenewCollabWeb.LiveShadowNet do
   def handle_event("pause", %{"id" => simulation_id}, socket) do
     RenewCollabSim.Server.SimulationServer.pause(simulation_id)
 
+    {:noreply, socket}
+  end
+
+  def handle_event("change_main_net", %{"main_net" => ""}, socket) do
     {:noreply, socket}
   end
 

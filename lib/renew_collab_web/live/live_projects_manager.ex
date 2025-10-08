@@ -106,23 +106,39 @@ defmodule RenewCollabWeb.LiveProjectsManager do
               <%= for {project, di} <- @projects |> Enum.with_index do %>
                 <tr {if(rem(di, 2) == 0, do: [style: "background-color:#f5f5f5;"], else: [])}>
                   <td>
-                    <.link style="color: #078" navigate={~p"/manage/project/#{project.id}"}>
+                    <.link
+                      style="color: #078; display: flex; gap: 1ex;"
+                      navigate={~p"/manage/project/#{project.id}"}
+                    >
+                      <img class="icon" src="/assets/icon-project.svg" />
                       {project.name}
                     </.link>
                   </td>
 
                   <td width="50">
-                    {project.documents |> Enum.count()}
+                    <div style=" display: flex; gap: 1ex; align-items: center;">
+                      <img class="icon" src="/assets/icon-document.svg" />
+                      {project.documents |> Enum.count()}
+                    </div>
                   </td>
                   <td width="50">
-                    {project.shadow_net_systems |> Enum.count()}
+                    <div style=" display: flex; gap: 1ex; align-items: center;">
+                      <img class="icon" src="/assets/icon-network.svg" />
+                      {project.shadow_net_systems |> Enum.count()}
+                    </div>
                   </td>
                   <td width="50">
-                    {project.simulations |> Enum.count()}
+                    <div style=" display: flex; gap: 1ex; align-items: center;">
+                      <img class="icon" src="/assets/icon-simulation.svg" />
+                      {project.simulations |> Enum.count()}
+                    </div>
                   </td>
 
                   <td width="50">
-                    {project.ownerships |> Enum.count()} / {project.members |> Enum.count()}
+                    <div style=" display: flex; gap: 1ex; align-items: center;">
+                      <img class="icon" src="/assets/icon-user.svg" />
+                      {project.ownerships |> Enum.count()} / {project.members |> Enum.count()}
+                    </div>
                   </td>
 
                   <td>
@@ -133,7 +149,16 @@ defmodule RenewCollabWeb.LiveProjectsManager do
                     <RenewCollabWeb.RenewComponents.timestamp value={project.inserted_at} />
                   </td>
                   <td width="50"></td>
-                  <td width="50"></td>
+                  <td width="50">
+                    <button
+                      type="button"
+                      phx-click="duplicate_project"
+                      phx-value-id={project.id}
+                      style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+                    >
+                      Duplicate
+                    </button>
+                  </td>
 
                   <td width="50">
                     <%= if Projects.can_delete(@current_account, project) do %>
@@ -187,6 +212,14 @@ defmodule RenewCollabWeb.LiveProjectsManager do
 
     socket
     |> put_flash(:info, "Project deleted")
+    |> reload()
+  end
+
+  def handle_event("duplicate_project", %{"id" => id}, socket) do
+    Projects.duplicate_project(id)
+
+    socket
+    |> put_flash(:info, "Project duplicated")
     |> reload()
   end
 

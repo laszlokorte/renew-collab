@@ -13,7 +13,7 @@ defmodule RenewCollabProj.Projects do
 
   import Ecto.Query, warn: false
 
-  def create_own_project(account_id, params) do
+  def create_own_project(%RenewCollabAuth.Entites.Account{id: account_id}, params) do
     %Project{}
     |> Project.creation_changeset(
       params
@@ -134,6 +134,59 @@ defmodule RenewCollabProj.Projects do
 
   def delete_project(id) do
     Repo.delete_all(from(p in Project, where: p.id == ^id))
+  end
+
+  def duplicate_project(project_id) do
+    Repo.transact(fn ->
+      orig_project = find_project(project_id)
+
+      with {:ok, project} <- create_project(%{"name" => orig_project.name}) do
+        RenewCollab.Repo.transact(fn ->
+          for %{document_id: doc_id} <- orig_project.documents, reduce: {:ok, 0} do
+            {:ok, num} ->
+              duplicate_document_into_project(project, doc_id)
+              |> case do
+                {:ok, _} -> {:ok, num + 1}
+              end
+
+            e ->
+              e
+          end
+        end)
+
+        {:ok, project}
+      else
+        e -> e
+      end
+    end)
+  end
+
+  def duplicate_project_to_own(%Account{} = account, project_id) do
+    Repo.transact(fn ->
+      orig_project = find_own_project(account, project_id)
+
+      with {:ok, project} <-
+             create_own_project(account, %{
+               "name" => "#{String.trim_trailing(orig_project.name, "(Copy)")} (Copy)"
+             }) do
+        RenewCollab.Repo.transact(fn ->
+          for %{document_id: doc_id} <- orig_project.documents, reduce: {:ok, 0} do
+            {:ok, num} ->
+              duplicate_document_into_project(project, doc_id)
+              |> case do
+                {:ok, _} -> {:ok, num + 1}
+              end
+
+            e ->
+              e
+          end
+        end)
+
+        {:ok, project}
+      else
+        e -> e
+      end
+    end)
   end
 
   def find_documents() do

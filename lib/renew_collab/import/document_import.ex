@@ -126,6 +126,27 @@ defmodule RenewCollab.Import.DocumentImport do
                     }
                 end
 
+              text_style =
+                case attrs do
+                  nil ->
+                    nil
+
+                  attrs ->
+                    %{
+                      "underline" =>
+                        convert_font_style(Map.get(fields, :fCurrentFontStyle, 0), :underlined),
+                      "alignment" => convert_alignment(Map.get(attrs, "TextAlignment", 0)),
+                      "font_size" => Map.get(fields, :fCurrentFontSize, 12),
+                      "font_family" =>
+                        convert_font(Map.get(fields, :fCurrentFontName, "sans-serif")),
+                      "bold" => convert_font_style(Map.get(fields, :fCurrentFontStyle, 0), :bold),
+                      "italic" =>
+                        convert_font_style(Map.get(fields, :fCurrentFontStyle, 0), :italic),
+                      "text_color" => convert_color(Map.get(attrs, "TextColor", "black")),
+                      "rich" => is_rich_text(parser.grammar, class_name)
+                    }
+                end
+
               class_name =
                 if class_name == "de.renew.gui.CPNTextFigure" do
                   case Map.get(fields, :fType) do
@@ -147,19 +168,7 @@ defmodule RenewCollab.Import.DocumentImport do
                   "position_x" => x,
                   "position_y" => y,
                   "body" => if(is_nil(body), do: "", else: body),
-                  "style" => %{
-                    "underline" =>
-                      convert_font_style(Map.get(fields, :fCurrentFontStyle, 0), :underlined),
-                    "alignment" => convert_alignment(Map.get(attrs, "TextAlignment", 0)),
-                    "font_size" => Map.get(fields, :fCurrentFontSize, 12),
-                    "font_family" =>
-                      convert_font(Map.get(fields, :fCurrentFontName, "sans-serif")),
-                    "bold" => convert_font_style(Map.get(fields, :fCurrentFontStyle, 0), :bold),
-                    "italic" =>
-                      convert_font_style(Map.get(fields, :fCurrentFontStyle, 0), :italic),
-                    "text_color" => convert_color(Map.get(attrs, "TextColor", "black")),
-                    "rich" => is_rich_text(parser.grammar, class_name)
-                  }
+                  "style" => text_style
                 },
                 "interface" => convert_interface(socket_schema_ids, class_name)
               }

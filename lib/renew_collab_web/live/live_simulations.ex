@@ -162,12 +162,15 @@ defmodule RenewCollabWeb.LiveSimulations do
               <%= for {sim,si} <- @simulations |> Enum.with_index do %>
                 <tr {if(rem(si, 2) == 0, do: [style: "background-color:#f5f5f5;"], else: [])}>
                   <td>
-                    <.link navigate={~p"/simulation/#{sim.id}"}>
-                      {sim.label || sim.id}
-                    </.link>
-                    <%= if sim.label do %>
-                      <br /><small>{sim.id}</small>
-                    <% end %>
+                    <div style="color: #078; display: flex; align-items: center; gap: 1ex; justify-content: start;">
+                      <img class="icon" src="/assets/icon-simulation.svg" />
+                      <.link navigate={~p"/simulation/#{sim.id}"}>
+                        {sim.label || sim.id}
+                      </.link>
+                      <%= if sim.label do %>
+                        <br /><small>{sim.id}</small>
+                      <% end %>
+                    </div>
                   </td>
 
                   <td>

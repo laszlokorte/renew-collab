@@ -8,7 +8,7 @@ defmodule RenewCollab.Queries.DocumentList do
     %__MODULE__{project: project}
   end
 
-  def tags(%__MODULE__{project: project}), do: [{{:project, project.id}, :document_collection}]
+  def tags(%__MODULE__{project: project}), do: [{:project, project.id}, :document_collection]
 
   def multi(%__MODULE__{project: project}) do
     Ecto.Multi.new()
