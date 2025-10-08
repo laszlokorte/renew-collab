@@ -176,7 +176,6 @@ defmodule RenewCollabWeb.LiveDocuments do
                 <tr {if(rem(di, 2) == 0, do: [style: "background-color:#f5f5f5;"], else: [])}>
                   <td>
                     <.link
-                      style="color: #078"
                       style="color: #078; display: flex; align-items: center; gap: 1ex; justify-content: start;"
                       navigate={~p"/document/#{document.id}"}
                     >

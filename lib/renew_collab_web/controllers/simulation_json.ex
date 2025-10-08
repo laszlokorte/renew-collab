@@ -2,11 +2,12 @@ defmodule RenewCollabWeb.SimulationJSON do
   alias RenewCollabSim.Entites.Simulation
   use RenewCollabWeb, :verified_routes
 
-  def index(%{simulations: simulations, runnings: runnings}) do
+  def index(%{project_id: project_id, simulations: simulations, runnings: runnings}) do
     %{
       href: url(~p"/api/simulations"),
       topic: "redux_simulations",
-      content: index_content(%{simulations: simulations, runnings: runnings}),
+      content:
+        index_content(%{project_id: project_id, simulations: simulations, runnings: runnings}),
       links: %{
         create: %{
           href: url(~p"/api/simulations"),
@@ -175,8 +176,9 @@ defmodule RenewCollabWeb.SimulationJSON do
     %{transition_id: firing.transition_id, id: firing.id, timestep: firing.timestep}
   end
 
-  def index_content(%{simulations: simulations, runnings: runnings}) do
+  def index_content(%{project_id: project_id, simulations: simulations, runnings: runnings}) do
     %{
+      project_id: project_id,
       items: for(simulation <- simulations, do: list_data(simulation, runnings))
     }
   end

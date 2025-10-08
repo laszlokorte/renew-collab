@@ -66,20 +66,6 @@ defmodule RenewCollabSim.Simulator do
     |> RenewCollabProj.Projects.attach_project_assignment()
   end
 
-  def find_all_simulations() do
-    []
-  end
-
-  def find_all_simulations(project_id) do
-    Repo.all(
-      from(s in Simulation,
-        inner_join: sns in assoc(s, :shadow_net_system),
-        order_by: [desc: s.inserted_at],
-        preload: [shadow_net_system: sns]
-      )
-    )
-  end
-
   def find_simulation(id) do
     Repo.one(
       from(s in Simulation,
