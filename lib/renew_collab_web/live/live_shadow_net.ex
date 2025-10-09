@@ -13,6 +13,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
          socket |> put_flash(:error, "Shadow Net System not found") |> redirect(to: ~p"/projects")}
 
       sns ->
+        # TODO:subscription
         RenewCollabWeb.Endpoint.subscribe("#{@topic}:#{shadow_net_system_id}")
         RenewCollabWeb.Endpoint.subscribe("projects/#{sns.project.id}/simulations")
         RenewCollabWeb.Endpoint.subscribe("projects/#{sns.project.id}/shadow_net_systems")
@@ -354,6 +355,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
   def handle_event("delete", %{"id" => simulation_id}, socket) do
     RenewCollabSim.Simulator.delete_simulation(simulation_id)
 
+    # TODO:broadcast
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
       "#{@topic}:#{socket.assigns.shadow_net_system_id}",
@@ -402,6 +404,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
   def handle_event("change_main_net", %{"main_net" => main_net}, socket) do
     RenewCollabSim.Simulator.change_main_net(socket.assigns.shadow_net_system_id, main_net)
 
+    # TODO:broadcast
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
       "#{@topic}:#{socket.assigns.shadow_net_system_id}",
@@ -421,6 +424,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
       shadow_net_id
     )
 
+    # TODO:broadcast
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
       "#{@topic}:#{socket.assigns.shadow_net_system_id}",
@@ -441,6 +445,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
       document_id
     )
 
+    # TODO:broadcast
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
       "#{@topic}:#{socket.assigns.shadow_net_system_id}",
@@ -453,6 +458,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
   def handle_event("new-simulation", %{}, socket) do
     RenewCollabSim.Simulator.create_and_start_simulation(socket.assigns.shadow_net_system.id)
 
+    # TODO:broadcast
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
       "#{@topic}:#{socket.assigns.shadow_net_system_id}",

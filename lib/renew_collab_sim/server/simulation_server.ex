@@ -61,12 +61,14 @@ defmodule RenewCollabSim.Server.SimulationServer do
       {:noreply, state}
     else
       with {:ok, pid} <- RenewCollabSim.Server.SimulationProcess.start_monitor(simulation_id) do
+        # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "simulation:#{simulation_id}",
           {:simulation_change, simulation_id, :state}
         )
 
+        # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "simulations",
@@ -126,12 +128,14 @@ defmodule RenewCollabSim.Server.SimulationServer do
       {:noreply, state}
     else
       with {:ok, pid} <- RenewCollabSim.Server.SimulationProcess.start_monitor(simulation_id) do
+        # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "simulation:#{simulation_id}",
           {:simulation_change, simulation_id, :state}
         )
 
+        # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "simulations",
@@ -189,12 +193,14 @@ defmodule RenewCollabSim.Server.SimulationServer do
   @impl true
   def handle_info({:DOWN, _ref, :process, pid, _}, state) do
     for {simulation_id, %{sim_process: ^pid}} <- state do
+      # TODO:broadcast
       Phoenix.PubSub.broadcast(
         RenewCollab.PubSub,
         "simulation:#{simulation_id}",
         {:simulation_change, simulation_id, :state}
       )
 
+      # TODO:broadcast
       Phoenix.PubSub.broadcast(
         RenewCollab.PubSub,
         "simulations",
@@ -228,12 +234,14 @@ defmodule RenewCollabSim.Server.SimulationServer do
     for {simulation_id, %{sim_process: pid}} <- state do
       RenewCollabSim.Server.SimulationProcess.stop(pid)
 
+      # TODO:broadcast
       Phoenix.PubSub.broadcast(
         RenewCollab.PubSub,
         "simulation:#{simulation_id}",
         {:simulation_change, simulation_id, :state}
       )
 
+      # TODO:broadcast
       Phoenix.PubSub.broadcast(
         RenewCollab.PubSub,
         "simulations",

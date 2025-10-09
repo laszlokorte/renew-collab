@@ -7,12 +7,12 @@ defmodule RenewCollabWeb.DocumentController do
 
   action_fallback(RenewCollabWeb.FallbackController)
 
-  def index(conn, _params) do
-    documents = Renew.list_documents()
+  def index(conn, %{"project_id" => project_id}) do
+    documents = Renew.list_documents(project_id)
     render(conn, :index, documents: documents)
   end
 
-  def create(conn, %{"document" => document_params}) do
+  def create(conn, %{"project_id" => project_id, "document" => document_params}) do
     with {:ok, %Document{} = document} <- Renew.create_document(document_params) do
       conn
       |> put_status(:created)
@@ -21,7 +21,7 @@ defmodule RenewCollabWeb.DocumentController do
     end
   end
 
-  def create(conn, %{}) do
+  def create(conn, %{"project_id" => project_id}) do
     with {:ok, %Document{} = document} <-
            Renew.create_document(%{name: "Untitled", kind: "de.renew.gui.CPNDrawing"}) do
       conn

@@ -50,12 +50,14 @@ defmodule RenewCollabSim.Server.SimulationProcess do
     end
 
     if is_nil(latest_update) || DateTime.diff(now, latest_update, :millisecond) >= 100 do
+      # TODO:broadcast
       Phoenix.PubSub.broadcast(
         RenewCollab.PubSub,
         "simulation:#{sim_id}",
         {:simulation_change, sim_id, {event, playing}}
       )
 
+      # TODO:broadcast
       Phoenix.PubSub.broadcast(
         RenewCollab.PubSub,
         "projects/#{project_id}/simulations",

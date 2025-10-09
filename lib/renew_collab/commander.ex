@@ -61,6 +61,7 @@ defmodule RenewCollab.Commander do
             for tag <- tags do
               case tag do
                 :document_collection ->
+                  # TODO:broadcast
                   Phoenix.PubSub.broadcast(
                     RenewCollab.PubSub,
                     "documents",
@@ -68,6 +69,7 @@ defmodule RenewCollab.Commander do
                   )
 
                 {:document_content, ^document_id} ->
+                  # TODO:broadcast
                   Phoenix.PubSub.broadcast(
                     RenewCollab.PubSub,
                     "document:#{document_id}",
@@ -75,6 +77,7 @@ defmodule RenewCollab.Commander do
                   )
 
                 {:document_versions, ^document_id} ->
+                  # TODO:broadcast
                   Phoenix.PubSub.broadcast(
                     RenewCollab.PubSub,
                     "document:#{document_id}",

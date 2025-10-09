@@ -45,6 +45,7 @@ defmodule RenewCollab.Syntax do
     |> Repo.insert()
     |> case do
       {:ok, s} ->
+        # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "syntax",
@@ -65,6 +66,7 @@ defmodule RenewCollab.Syntax do
     |> Repo.delete_all()
     |> case do
       {1, _} ->
+        # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "syntax",
@@ -82,6 +84,7 @@ defmodule RenewCollab.Syntax do
     |> Repo.delete_all()
     |> case do
       {1, _} ->
+        # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "syntax",
@@ -99,6 +102,7 @@ defmodule RenewCollab.Syntax do
     |> Repo.delete_all()
     |> case do
       {1, _} ->
+        # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "syntax",
@@ -119,6 +123,7 @@ defmodule RenewCollab.Syntax do
     end)
     |> case do
       {:ok, _} ->
+        # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "syntax",
@@ -133,6 +138,7 @@ defmodule RenewCollab.Syntax do
     |> Repo.insert()
     |> case do
       {:ok, s} ->
+        # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "syntax",
@@ -152,6 +158,7 @@ defmodule RenewCollab.Syntax do
     |> Repo.insert()
     |> case do
       {:ok, s} ->
+        # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "syntax",

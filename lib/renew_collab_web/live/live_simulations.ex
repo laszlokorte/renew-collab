@@ -9,6 +9,7 @@ defmodule RenewCollabWeb.LiveSimulations do
         {:ok, socket |> put_flash(:error, "Project not found") |> redirect(to: ~p"/projects")}
 
       project ->
+        # TODO:subscription
         RenewCollabWeb.Endpoint.subscribe("projects/#{project.id}/simulations")
 
         socket =

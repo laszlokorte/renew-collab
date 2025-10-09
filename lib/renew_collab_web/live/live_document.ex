@@ -62,6 +62,7 @@ defmodule RenewCollabWeb.LiveDocument do
         |> assign(:show_grid, false)
         |> assign(:viewbox, viewbox(document))
 
+      # TODO:subscription
       RenewCollabWeb.Endpoint.subscribe("document:#{id}")
       {:ok, socket}
     else

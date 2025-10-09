@@ -42,6 +42,7 @@ defmodule RenewCollabWeb.Auth do
     account_token && Auth.delete_account_session_token(account_token)
 
     if live_socket_id = get_session(conn, :live_socket_id) do
+      # TODO:broadcast
       RenewCollabWeb.Endpoint.broadcast(live_socket_id, "disconnect", %{})
     end
 

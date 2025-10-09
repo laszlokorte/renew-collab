@@ -12,25 +12,13 @@ defmodule RenewCollabWeb.ApiJSON do
           method: "GET",
           href: url(~p"/")
         },
-        documents: %{
-          method: "GET",
-          href: url(~p"/api/documents")
-        },
-        import_documents: %{
-          method: "POST",
-          href: url(~p"/api/documents/import")
-        },
-        create_simulation: %{
-          method: "POST",
-          href: url(~p"/api/simulations")
-        },
-        simulations: %{
-          method: "GET",
-          href: url(~p"/api/simulations")
-        },
         projects: %{
           method: "GET",
           href: url(~p"/api/projects")
+        },
+        project: %{
+          method: "GET",
+          href: url(~p"/api/projects/:id")
         },
         document: %{
           method: "GET",

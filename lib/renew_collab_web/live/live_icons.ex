@@ -5,6 +5,7 @@ defmodule RenewCollabWeb.LiveIcons do
   @topic "icons"
 
   def mount(_params, _session, socket) do
+    # TODO:subscription
     RenewCollabWeb.Endpoint.subscribe(@topic)
 
     {:ok, load_data(socket)}

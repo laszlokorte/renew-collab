@@ -7,6 +7,7 @@ defmodule RenewCollabWeb.LiveProjects do
   @topic "projects"
 
   def mount(_params, _session, socket) do
+    # TODO:subscription
     RenewCollabWeb.Endpoint.subscribe(@topic)
 
     socket =

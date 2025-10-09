@@ -20,6 +20,7 @@ defmodule RenewCollabWeb.LiveSimulation do
           |> assign(:is_active, RenewCollabSim.Server.SimulationServer.exists(simulation_id))
           |> assign(:simulation, sim)
 
+        # TODO:subscription
         RenewCollabWeb.Endpoint.subscribe("#{@topic}:#{simulation_id}")
 
         {:ok, socket}
@@ -330,6 +331,7 @@ defmodule RenewCollabWeb.LiveSimulation do
   def handle_event("clear_log", %{}, socket) do
     RenewCollabSim.Simulator.clear_log(socket.assigns.simulation_id)
 
+    # TODO:broadcast
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
       "#{@topic}:#{socket.assigns.simulation_id}",
@@ -342,6 +344,7 @@ defmodule RenewCollabWeb.LiveSimulation do
   def handle_event("clear_instances", %{}, socket) do
     RenewCollabSim.Simulator.clear_instances(socket.assigns.simulation_id)
 
+    # TODO:broadcast
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
       "#{@topic}:#{socket.assigns.simulation_id}",
@@ -356,6 +359,7 @@ defmodule RenewCollabWeb.LiveSimulation do
     RenewCollabSim.Simulator.clear_instances(socket.assigns.simulation_id)
     RenewCollabSim.Simulator.clear_log(socket.assigns.simulation_id)
 
+    # TODO:broadcast
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
       "#{@topic}:#{socket.assigns.simulation_id}",

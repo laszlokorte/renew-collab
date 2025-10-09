@@ -48,7 +48,11 @@ defmodule RenewCollabSim.Simulator do
     Repo.all(
       from(s in Simulation,
         where: s.id in ^Enum.map(project.simulations, & &1.simulation_id),
-        order_by: [desc: s.inserted_at]
+        inner_join: ssn in assoc(s, :shadow_net_system),
+        order_by: [desc: s.inserted_at],
+        preload: [
+          shadow_net_system: ssn
+        ]
       )
     )
   end
@@ -171,6 +175,7 @@ defmodule RenewCollabSim.Simulator do
       |> Repo.update()
 
     if(sns.project) do
+      # TODO:broadcast
       Phoenix.PubSub.broadcast(
         RenewCollab.PubSub,
         "projects/#{sns.project.id}/shadow_net_systems",
@@ -187,12 +192,14 @@ defmodule RenewCollabSim.Simulator do
       |> Repo.update()
 
     if(simulation.project) do
+      # TODO:broadcast
       Phoenix.PubSub.broadcast(
         RenewCollab.PubSub,
         "projects/#{simulation.project.id}/simulations",
         {:simulation_change, simulation.id, :rename}
       )
 
+      # TODO:broadcast
       Phoenix.PubSub.broadcast(
         RenewCollab.PubSub,
         "simulation:#{simulation.id}",
@@ -227,6 +234,7 @@ defmodule RenewCollabSim.Simulator do
     RenewCollabSim.Server.SimulationServer.terminate(id)
 
     if(simulation.project) do
+      # TODO:broadcast
       Phoenix.PubSub.broadcast(
         RenewCollab.PubSub,
         "projects/#{simulation.project.id}/simulations",
@@ -252,6 +260,7 @@ defmodule RenewCollabSim.Simulator do
         proj = RenewCollabProj.Projects.find_shadow_net_systems_project(shadow_net_system_id)
         RenewCollabProj.Projects.assign_to_project(proj, simulation)
 
+        # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "projects/#{proj.id}/simulations",
@@ -273,6 +282,7 @@ defmodule RenewCollabSim.Simulator do
     }
     |> Repo.insert()
 
+    # TODO:broadcast
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
       "simulation:#{sim_id}",
@@ -344,6 +354,7 @@ defmodule RenewCollabSim.Simulator do
       result = {:ok, sns} ->
         RenewCollabProj.Projects.assign_to_project(project, sns)
 
+        # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "projects/#{project.id}/shadow_nets",
@@ -405,6 +416,7 @@ defmodule RenewCollabSim.Simulator do
           RenewCollabProj.Projects.assign_to_project(project, simulation)
           RenewCollabSim.Server.SimulationServer.setup(sim_id)
 
+          # TODO:broadcast
           Phoenix.PubSub.broadcast(
             RenewCollab.PubSub,
             "projects/#{project.id}/simulations",
@@ -428,6 +440,7 @@ defmodule RenewCollabSim.Simulator do
           RenewCollab.Repo.insert_all(SimulationLink, links)
 
           for %{document_id: document_id} <- links do
+            # TODO:broadcast
             Phoenix.PubSub.broadcast(
               RenewCollab.PubSub,
               "document:#{document_id}",

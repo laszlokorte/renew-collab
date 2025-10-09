@@ -34,6 +34,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
           |> allow_upload(:import_rnw_file, accept: ~w(.rnw), max_entries: @file_count_limit)
           |> allow_upload(:import_sns_file, accept: ~w(.sns), max_entries: 1)
 
+        # TODO:subscription
         RenewCollabWeb.Endpoint.subscribe("projects/#{socket.assigns.project.id}/shadow_nets")
         {:ok, socket}
     end
@@ -447,6 +448,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
   def handle_event("delete", %{"id" => sns_id}, socket) do
     RenewCollabSim.Simulator.delete_shadow_net_system(sns_id)
 
+    # TODO:broadcast
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
       "projects/#{socket.assigns.project.id}/shadow_nets",

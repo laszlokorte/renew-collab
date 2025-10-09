@@ -6,16 +6,6 @@ defmodule RenewCollabWeb.SimulationController do
 
   action_fallback RenewCollabWeb.FallbackController
 
-  def index(conn, %{"project_id" => project_id}) do
-    render(conn, :index,
-      simulations:
-        RenewCollabSim.Simulator.list_simulations(
-          RenewCollabProj.Projects.list_project_simulations(project_id)
-        ),
-      runnings: SimulationServer.running_ids() |> MapSet.new()
-    )
-  end
-
   def create(conn, params = %{"document_ids" => document_ids})
       when is_list(document_ids) do
     formalism =

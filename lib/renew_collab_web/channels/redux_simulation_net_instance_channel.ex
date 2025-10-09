@@ -8,6 +8,7 @@ defmodule RenewCollabWeb.ReduxSimulationNetInstanceChannel do
         {:error, %{reason: "not found"}}
 
       net_instance ->
+        # TODO:subscription
         Phoenix.PubSub.subscribe(RenewCollab.PubSub, "simulation:#{net_instance.simulation_id}")
 
         {:ok, RenewCollabWeb.SimulationJSON.show_instance_content(net_instance),

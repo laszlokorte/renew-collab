@@ -1,0 +1,53 @@
+defmodule RenewCollabWeb.ProjectSimulationController do
+  alias RenewCollabSim.Server.SimulationServer
+  alias RenewCollabSim.Entites.Simulation
+
+  use RenewCollabWeb, :controller
+
+  action_fallback RenewCollabWeb.FallbackController
+
+  def index(conn, %{"project_id" => project_id}) do
+    render(conn, :index,
+      project_id: project_id,
+      simulations:
+        RenewCollabSim.Simulator.list_simulations(
+          RenewCollabProj.Projects.list_project_simulations(project_id)
+        ),
+      runnings: SimulationServer.running_ids() |> MapSet.new()
+    )
+  end
+
+  def create(conn, params = %{"project_id" => project_id, "document_ids" => document_ids})
+      when is_list(document_ids) do
+    formalism =
+      Map.get(params, "formalism", RenewCollabSim.Compiler.SnsCompiler.default_formalism())
+
+    case RenewCollabSim.Simulator.create_simulation_from_documents(
+           nil,
+           formalism,
+           document_ids,
+           Map.get(params, "main_net_name")
+         ) do
+      %Simulation{} = simulation ->
+        render(conn, :created, simulation: simulation)
+
+      {:error, :invalid_rnw} ->
+        conn
+        |> put_status(:bad_request)
+        |> Phoenix.Controller.json(%{message: "Not a valid renew file"})
+        |> halt()
+
+      {:error, :export_rnw} ->
+        conn
+        |> put_status(:bad_request)
+        |> Phoenix.Controller.json(%{message: "Conversion to rnw file failed"})
+        |> halt()
+
+      _ ->
+        conn
+        |> put_status(:bad_request)
+        |> Phoenix.Controller.json(%{message: "Compiling SSN failed"})
+        |> halt()
+    end
+  end
+end

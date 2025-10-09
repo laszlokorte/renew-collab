@@ -55,6 +55,7 @@ defmodule RenewCollab.Renew do
       {:ok, %{insert_document: insert_document}} ->
         RenewCollabProj.Projects.assign_to_project(project, insert_document)
 
+        # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "project/#{project.id}/documents",
@@ -74,6 +75,7 @@ defmodule RenewCollab.Renew do
     RenewCollabProj.Projects.delete_document(document_id)
     |> case do
       %Project{id: project_id} ->
+        # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "project/#{project_id}/documents",
@@ -95,6 +97,7 @@ defmodule RenewCollab.Renew do
         project = RenewCollabProj.Projects.find_documents_project(document_id)
         RenewCollabProj.Projects.assign_to_project(project, new_document)
 
+        # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "project/#{project.id}/documents",

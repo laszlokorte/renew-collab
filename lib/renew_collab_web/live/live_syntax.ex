@@ -15,6 +15,7 @@ defmodule RenewCollabWeb.LiveSyntax do
   def semantic_tags(), do: @semantic_tags
 
   def mount(_params, _session, socket) do
+    # TODO:subscription
     RenewCollabWeb.Endpoint.subscribe(@topic)
 
     {:ok, load_data(socket)}

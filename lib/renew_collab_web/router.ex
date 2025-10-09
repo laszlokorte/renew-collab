@@ -71,23 +71,39 @@ defmodule RenewCollabWeb.Router do
     get "/blueprints", BlueprintController, :index
 
     scope "/documents" do
-      post "/import", DocumentController, :import
       get "/:id/export", DocumentController, :export
       get "/:id/download.iex", DocumentController, :inspect
       get "/:id/download.json", DocumentController, :show
       post "/:id/duplicate", DocumentController, :duplicate
       get "/:id/simulations", SimulationLinksController, :index
 
-      resources "/", DocumentController, except: [:new, :edit]
+      get "/:id", DocumentController, :show
+      delete "/:id", DocumentController, :delete
+      put "/:id", DocumentController, :update
+      patch "/:id", DocumentController, :update
     end
 
-    scope "/projects" do
-      get "/:id/export", ProjectController, :export
-      get "/:id/members", ProjectController, :members
-      get "/:id/documents", ProjectController, :documents
-      get "/:id/simulations", ProjectController, :simulations
+    # post "project/:project_id/documents", DocumentController, :create
+    # get "project/:project_id/documents", DocumentController, :index
 
-      resources "/", ProjectController, except: [:new, :edit]
+    scope "/projects" do
+      get "/", ProjectController, :index
+      post "/", ProjectController, :create
+      get "/:id", ProjectController, :show
+      put "/:id", ProjectController, :update
+      patch "/:id", ProjectController, :update
+      delete "/:id", ProjectController, :delete
+
+      get "/:id/export", ProjectController, :export
+
+      get "/:project_id/members", ProjectMemberController, :index
+      post "/:project_id/members", ProjectMemberController, :create
+      get "/:project_id/documents", ProjectDocumentController, :index
+      post "/:project_id/documents", ProjectDocumentController, :create
+      get "/:project_id/simulations", ProjectSimulationController, :index
+      post "/:project_id/simulations", ProjectSimulationController, :create
+
+      post "/:project_id/import", ProjectDocumentController, :import
     end
 
     scope "/media" do
@@ -95,7 +111,10 @@ defmodule RenewCollabWeb.Router do
     end
 
     scope "/simulations" do
-      resources "/", SimulationController, except: [:new, :edit]
+      get "/:id", SimulationController, :show
+      put "/:id", SimulationController, :update
+      patch "/:id", SimulationController, :update
+      delete "/:id", SimulationController, :delete
       get "/:id/instance/:net_name/:integer_id", SimulationController, :show_instance
       get "/:id/log", SimulationController, :log
       post "/:id/step", SimulationController, :step

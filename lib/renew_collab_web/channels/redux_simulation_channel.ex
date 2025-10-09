@@ -10,6 +10,7 @@ defmodule RenewCollabWeb.ReduxSimulationChannel do
         {:error, %{reason: "not found"}}
 
       sim ->
+        # TODO:subscription
         Phoenix.PubSub.subscribe(RenewCollab.PubSub, "simulation:#{simulation_id}")
 
         account_id = socket.assigns.current_account.account_id

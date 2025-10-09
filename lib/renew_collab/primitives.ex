@@ -18,6 +18,7 @@ defmodule RenewCollab.Primitives do
     |> Repo.insert()
     |> case do
       {:ok, s} ->
+        # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "primitives",
@@ -38,6 +39,7 @@ defmodule RenewCollab.Primitives do
     |> Repo.delete_all()
     |> case do
       {1, _} ->
+        # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "primitives",
@@ -55,6 +57,7 @@ defmodule RenewCollab.Primitives do
     |> Repo.delete_all()
     |> case do
       {1, _} ->
+        # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "primitives",
@@ -71,6 +74,7 @@ defmodule RenewCollab.Primitives do
     |> Repo.insert()
     |> case do
       {:ok, s} ->
+        # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "primitives",

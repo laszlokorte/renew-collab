@@ -7,6 +7,7 @@ defmodule RenewCollabWeb.LiveIcon do
   def mount(%{"id" => symbol_id}, _session, socket) do
     socket = assign(socket, :symbol_id, symbol_id)
 
+    # TODO:subscription
     RenewCollabWeb.Endpoint.subscribe(@topic)
 
     {:ok, load_data(socket)}
