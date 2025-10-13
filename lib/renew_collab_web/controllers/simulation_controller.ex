@@ -41,7 +41,6 @@ defmodule RenewCollabWeb.SimulationController do
 
   def delete(conn, %{"simulation_id" => simulation_id}) do
     RenewCollabSim.Simulator.delete_simulation(simulation_id)
-    RenewCollabSim.Server.ProjectSimulationServer.terminate(project_id, simulation_id)
 
     conn
     |> put_status(:ok)
@@ -60,7 +59,11 @@ defmodule RenewCollabWeb.SimulationController do
       sim ->
         render(conn, :show,
           simulation: sim,
-          running: RenewCollabSim.Server.ProjectSimulationServer.exists(project_id, simulation_id)
+          running:
+            RenewCollabSim.Server.ProjectSimulationServer.exists(
+              sim.project_assignment.project_id,
+              simulation_id
+            )
         )
     end
   end

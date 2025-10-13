@@ -225,6 +225,7 @@ defmodule RenewCollabWeb.StateChannel do
       def handle_message(_message, state, _scope), do: {:noreply, state}
 
       def handle_event(_message, _payload, state, _scope), do: {:noreply, state}
+      def handle_event(_message, _payload, state, _scope, _socket), do: {:noreply, state}
 
       defp update_state(%{assigns: assigns} = socket, new_state) do
         current_state = Map.get(assigns, state_key())
@@ -316,7 +317,7 @@ defmodule RenewCollabWeb.StateChannel do
                      handle_in: 3,
                      handle_info: 2,
                      handle_event: 5,
-                     handle_event: 6,
+                     handle_event: 4,
                      authorize: 3,
                      join: 3
     end

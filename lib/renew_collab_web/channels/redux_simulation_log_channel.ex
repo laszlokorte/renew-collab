@@ -2,7 +2,7 @@ defmodule RenewCollabWeb.ReduxSimulationLogChannel do
   use RenewCollabWeb.StateChannel, web_module: RenewCollabWeb
 
   @impl true
-  def init("redux_simulation_log:" <> simulation_id, _params, socket) do
+  def init("redux_simulation_log:" <> simulation_id, _params, _socket) do
     case RenewCollabSim.Simulator.find_simulation_simple(simulation_id) do
       nil ->
         {:error, %{reason: "not found"}}
@@ -13,13 +13,16 @@ defmodule RenewCollabWeb.ReduxSimulationLogChannel do
 
         {:ok,
          RenewCollabSim.Simulator.find_simulation_log_entries(simulation_id)
-         |> RenewCollabWeb.SimulationJSON.show_log_content(),
-         assign(socket, :simulation_id, simulation_id)}
+         |> RenewCollabWeb.SimulationJSON.show_log_content(), {:simulation_id, simulation_id}}
     end
   end
 
   @impl true
-  def handle_message({:simulation_change, simulation_id, _event}, _state, _scope) do
+  def handle_message(
+        {:simulation_change, simulation_id, _event},
+        _state,
+        {:simulation_id, simulation_id}
+      ) do
     case RenewCollabSim.Simulator.find_simulation_simple(simulation_id) do
       nil ->
         :stop

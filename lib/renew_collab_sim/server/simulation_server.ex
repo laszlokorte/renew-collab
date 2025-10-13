@@ -1,7 +1,7 @@
 defmodule RenewCollabSim.Server.SimulationServer do
   use GenServer
 
-  def start_link(_defaults) do
+  def start_link() do
     GenServer.start_link(__MODULE__, %{})
   end
 
@@ -46,6 +46,10 @@ defmodule RenewCollabSim.Server.SimulationServer do
 
   def count(pid) do
     GenServer.call(pid, :count)
+  end
+
+  def stop_all(pid) do
+    GenServer.call(pid, :stop_all)
   end
 
   # Callbacks

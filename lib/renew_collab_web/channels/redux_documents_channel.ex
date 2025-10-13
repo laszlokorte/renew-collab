@@ -24,7 +24,7 @@ defmodule RenewCollabWeb.ReduxDocumentsChannel do
     {:ok,
      RenewCollabWeb.ProjectDocumentJSON.index_content(%{
        documents: RenewCollab.Renew.list_documents()
-     })}
+     }), {:project_id, nil}}
   end
 
   @impl true

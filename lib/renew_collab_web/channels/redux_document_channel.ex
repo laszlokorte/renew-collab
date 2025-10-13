@@ -32,7 +32,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
   end
 
   @impl true
-  def handle_message({:document_changed, document_id}, _state, _scope) do
+  def handle_message({:document_changed, document_id}, _state, {:document_id, document_id}) do
     RenewCollab.Renew.get_document_with_elements(document_id)
     |> case do
       nil ->
@@ -109,10 +109,10 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
   end
 
   @impl true
-  def handle_event("restore_snapshot", snapshot_id, _state, _scope, socket)
+  def handle_event("restore_snapshot", snapshot_id, _state, {:document_id, document_id}, _socket)
       when is_binary(snapshot_id) do
     RenewCollab.Commands.RestoreSnapshot.new(%{
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       snapshot_id: snapshot_id
     })
     |> RenewCollab.Commander.run_document_command()
@@ -121,9 +121,10 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
   end
 
   @impl true
-  def handle_event("delete_layer", layer_id, _state, _scope, socket) when is_binary(layer_id) do
+  def handle_event("delete_layer", layer_id, _state, {:document_id, document_id}, _socket)
+      when is_binary(layer_id) do
     RenewCollab.Commands.DeleteLayer.new(%{
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       layer_id: layer_id,
       delete_children: true
     })
@@ -141,14 +142,15 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "with_edge" => with_edge
         },
         %{},
-        socket
+        {:document_id, document_id},
+        _socket
       ) do
     width = Map.get(params, "width", 50)
     height = Map.get(params, "height", 50)
 
     RenewCollab.Commands.CreateLayerWithEdge.new(%{
       base_layer_id: Map.get(params, "base_layer_id", nil),
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       edge: with_edge,
       attrs: %{
         "semantic_tag" => Map.get(params, "semantic_tag", nil),
@@ -175,7 +177,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
     |> RenewCollab.Commander.run_document_command_sync()
     |> case do
       {:ok, %{layer: layer}} ->
-        {:reply, %{id: layer.id}, socket}
+        {:reply, %{id: layer.id}}
     end
   end
 
@@ -184,15 +186,15 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "create_layer",
         params = %{"pos" => %{"x" => cx, "y" => cy}, "shape_id" => shape_id},
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       ) do
     width = Map.get(params, "width", 50)
     height = Map.get(params, "height", 50)
 
     RenewCollab.Commands.CreateLayer.new(%{
       base_layer_id: Map.get(params, "base_layer_id", nil),
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       attrs: %{
         "semantic_tag" => Map.get(params, "semantic_tag", nil),
         "box" => %{
@@ -218,7 +220,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
     |> RenewCollab.Commander.run_document_command_sync()
     |> case do
       {:ok, %{layer: layer}} ->
-        {:reply, %{id: layer.id}, socket}
+        {:reply, %{id: layer.id}}
     end
   end
 
@@ -230,12 +232,12 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "image" => background_url
         },
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       ) do
     RenewCollab.Commands.CreateLayer.new(%{
       base_layer_id: Map.get(params, "base_layer_id", nil),
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       attrs: %{
         "semantic_tag" => "CH.ifa.draw.figures.ImageFigure",
         "box" => %{
@@ -253,7 +255,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
     |> RenewCollab.Commander.run_document_command_sync()
     |> case do
       {:ok, %{layer: layer}} ->
-        {:reply, %{id: layer.id}, socket}
+        {:reply, %{id: layer.id}}
     end
   end
 
@@ -262,8 +264,8 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "create_layer",
         params = %{"points" => points},
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       )
       when is_list(points) and length(points) > 1 do
     %{"x" => source_x, "y" => source_y} = Enum.at(points, 0)
@@ -271,7 +273,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
 
     RenewCollab.Commands.CreateLayer.new(%{
       base_layer_id: Map.get(params, "base_layer_id", nil),
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       attrs: %{
         "semantic_tag" => Map.get(params, "semantic_tag", "CH.ifa.draw.figures.PolyLineFigure"),
         "edge" => %{
@@ -299,7 +301,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
     |> RenewCollab.Commander.run_document_command_sync()
     |> case do
       {:ok, %{layer: layer}} ->
-        {:reply, %{id: layer.id}, socket}
+        {:reply, %{id: layer.id}}
     end
   end
 
@@ -308,12 +310,12 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "create_layer",
         params = %{"pos" => %{"x" => position_x, "y" => position_y}, "body" => body},
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       ) do
     RenewCollab.Commands.CreateLayer.new(%{
       base_layer_id: Map.get(params, "base_layer_id", nil),
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       attrs: %{
         "semantic_tag" => Map.get(params, "semantic_tag", "CH.ifa.draw.figures.TextFigure"),
         "text" => %{
@@ -337,7 +339,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
     |> RenewCollab.Commander.run_document_command_sync()
     |> case do
       {:ok, %{layer: layer}} ->
-        {:reply, %{id: layer.id}, socket}
+        {:reply, %{id: layer.id}}
     end
   end
 
@@ -349,12 +351,12 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "target" => %{"socket_id" => target_socket_id, "layer_id" => target_layer_id}
         },
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       ) do
     RenewCollab.Commands.CreateLayer.new(%{
       base_layer_id: Map.get(params, "base_layer_id", nil),
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       attrs: %{
         "semantic_tag" => Map.get(params, "semantic_tag", "de.renew.gui.ArcConnection"),
         "edge" => %{
@@ -379,7 +381,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
     |> RenewCollab.Commander.run_document_command_sync()
     |> case do
       {:ok, %{layer: layer}} ->
-        {:reply, %{id: layer.id}, socket}
+        {:reply, %{id: layer.id}}
     end
   end
 
@@ -390,12 +392,12 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "child_layer_id" => child_layer_id
         },
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       ) do
     RenewCollab.Commands.CreateParentLayer.new(%{
       child_layer_id: child_layer_id,
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       attrs: %{
         "semantic_tag" => Map.get(params, "semantic_tag", "CH.ifa.draw.figures.GroupFigure")
       }
@@ -403,7 +405,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
     |> RenewCollab.Commander.run_document_command_sync()
     |> case do
       {:ok, %{layer: layer}} ->
-        {:reply, %{id: layer.id}, socket}
+        {:reply, %{id: layer.id}}
     end
   end
 
@@ -415,11 +417,11 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "position" => %{"x" => x, "y" => y}
         },
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       ) do
     RenewCollab.Commands.InsertDocument.new(%{
-      target_document_id: socket.assigns.document_id,
+      target_document_id: document_id,
       source_document_id: document_id,
       position: {x, y}
     })
@@ -433,12 +435,12 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "change_style",
         %{"type" => "text", "attr" => style_attr, "layer_id" => layer_id, "val" => value},
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       )
       when is_binary(style_attr) and is_binary(layer_id) do
     RenewCollab.Commands.UpdateLayerTextStyle.new(%{
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       layer_id: layer_id,
       style_attr: style_attr,
       value: value
@@ -453,12 +455,12 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "change_style",
         %{"type" => "edge", "attr" => style_attr, "layer_id" => layer_id, "val" => value},
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       )
       when is_binary(style_attr) and is_binary(layer_id) do
     RenewCollab.Commands.UpdateLayerEdgeStyle.new(%{
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       layer_id: layer_id,
       style_attr: style_attr,
       value: value
@@ -473,12 +475,12 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "change_style",
         %{"type" => "layer", "attr" => style_attr, "layer_id" => layer_id, "val" => value},
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       )
       when is_binary(style_attr) and is_binary(layer_id) do
     RenewCollab.Commands.UpdateLayerStyle.new(%{
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       layer_id: layer_id,
       style_attr: style_attr,
       value: value
@@ -493,12 +495,12 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "change_edge_attributes",
         %{"layer_id" => layer_id, "attrs" => attributes},
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       )
       when is_map(attributes) and is_binary(layer_id) do
     RenewCollab.Commands.UpdateLayerEdgeAttributes.new(%{
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       layer_id: layer_id,
       attributes: attributes
     })
@@ -512,12 +514,12 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "change_edge_direction",
         %{"layer_id" => layer_id},
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       )
       when is_binary(layer_id) do
     RenewCollab.Commands.UpdateLayerEdgeReverseDirection.new(%{
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       layer_id: layer_id
     })
     |> RenewCollab.Commander.run_document_command()
@@ -530,12 +532,12 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "change_text_body",
         %{"layer_id" => layer_id, "val" => new_body},
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       )
       when is_binary(new_body) and is_binary(layer_id) do
     RenewCollab.Commands.UpdateLayerTextBody.new(%{
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       layer_id: layer_id,
       new_body: new_body
     })
@@ -549,12 +551,12 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "change_layer_shape",
         %{"layer_id" => layer_id, "shape_id" => shape_id},
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       )
       when is_binary(shape_id) and is_binary(layer_id) do
     RenewCollab.Commands.UpdateLayerBoxShape.new(%{
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       layer_id: layer_id,
       shape_id: shape_id,
       attributes: %{}
@@ -569,11 +571,11 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "set_visibility",
         %{"layer_id" => layer_id, "visible" => visible},
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       ) do
     RenewCollab.Commands.SetVisibility.new(%{
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       layer_id: layer_id,
       visible: visible
     })
@@ -587,11 +589,11 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "set_socket_schema",
         %{"layer_id" => layer_id, "val" => socket_schema_id},
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       ) do
     RenewCollab.Commands.AssignLayerSocketSchema.new(%{
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       layer_id: layer_id,
       socket_schema_id: socket_schema_id
     })
@@ -605,11 +607,11 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "set_semantic_tag",
         %{"layer_id" => layer_id, "val" => new_tag},
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       ) do
     RenewCollab.Commands.UpdateLayerSemanticTag.new(%{
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       layer_id: layer_id,
       new_tag: new_tag
     })
@@ -626,11 +628,11 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "value" => new_size
         },
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       ) do
     RenewCollab.Commands.UpdateLayerBoxSize.new(%{
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       layer_id: layer_id,
       new_size: new_size
     })
@@ -647,11 +649,11 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "waypoint_id" => waypoint_id
         },
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       ) do
     RenewCollab.Commands.DeleteLayerEdgeWaypoint.new(%{
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       layer_id: layer_id,
       waypoint_id: waypoint_id
     })
@@ -672,11 +674,11 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           }
         },
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       ) do
     RenewCollab.Commands.UpdateLayerEdgeWaypointPosition.new(%{
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       layer_id: layer_id,
       waypoint_id: waypoint_id,
       new_position: %{
@@ -701,11 +703,11 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           }
         },
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       ) do
     RenewCollab.Commands.CreateLayerEdgeWaypoint.new(%{
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       layer_id: layer_id,
       prev_waypoint_id: prev_waypoint_id,
       position: {position_x, position_y}
@@ -723,11 +725,11 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "value" => new_position
         },
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       ) do
     RenewCollab.Commands.UpdateLayerEdgePosition.new(%{
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       layer_id: layer_id,
       new_position: new_position
     })
@@ -748,7 +750,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
            source_y: source_y,
            target_x: target_x,
            target_y: target_y
-         }, socket}
+         }}
 
       _ ->
         :silent
@@ -767,11 +769,11 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
             } = new_position
         },
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       ) do
     RenewCollab.Commands.UpdateLayerTextPosition.new(%{
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       layer_id: layer_id,
       new_position: new_position
     })
@@ -790,11 +792,11 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "relative" => relative
         },
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       ) do
     RenewCollab.Commands.ReorderLayer.new(%{
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       layer_id: layer_id,
       target_layer_id: target_layer_id,
       target: RenewCollab.Commands.ReorderLayer.parse_hierarchy_position(order, relative)
@@ -813,11 +815,11 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "dy" => dy
         },
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       ) do
     RenewCollab.Commands.MoveLayerRelative.new(%{
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       layer_id: layer_id,
       dx: dx,
       dy: dy
@@ -832,13 +834,13 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "reorder_relative",
         %{"id" => layer_id, "target_rel" => target_rel},
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       ) do
     {rel, target} = RenewCollab.Commands.ReorderLayerRelative.parse_direction(target_rel)
 
     RenewCollab.Commands.ReorderLayerRelative.new(%{
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       layer_id: layer_id,
       relative_direction: rel,
       target: target
@@ -853,19 +855,19 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "fetch_relative",
         %{"id" => layer_id, "rel" => rel},
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       ) do
     rel_id =
       RenewCollab.Queries.LayerHierarchyRelative.new(%{
-        document_id: socket.assigns.document_id,
+        document_id: document_id,
         layer_id: layer_id,
         id_only: true,
         relative: RenewCollab.Queries.LayerHierarchyRelative.parse_relative(rel)
       })
       |> RenewCollab.Fetcher.fetch()
 
-    {:reply, %{id: rel_id}, socket}
+    {:reply, %{id: rel_id}}
   end
 
   @impl true
@@ -876,11 +878,11 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "dir" => %{"x" => dx, "y" => dy}
         } = params,
         %{},
-        _scope,
-        socket
+        {:document_id, document_id},
+        _socket
       ) do
     RenewCollab.Commands.MakeSpaceBetween.new(%{
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       base: {bx, by},
       direction: {dx, dy},
       inverse: Map.get(params, "inverse", false)
@@ -891,9 +893,9 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
   end
 
   @impl true
-  def handle_event("set_meta", params, %{}, _scope, socket) do
+  def handle_event("set_meta", params, %{}, {:document_id, document_id}, _socket) do
     RenewCollab.Commands.UpdateDocumentMeta.new(%{
-      document_id: socket.assigns.document_id,
+      document_id: document_id,
       meta: params
     })
     |> RenewCollab.Commander.run_document_command()

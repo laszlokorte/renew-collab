@@ -30,14 +30,24 @@ defmodule RenewCollabWeb.ReduxSimulationChannel do
         {:ok,
          RenewCollabWeb.SimulationJSON.show_content(
            sim,
-           RenewCollabSim.Server.ProjectSimulationServer.exists(project_id, simulation_id),
-           RenewCollabSim.Server.ProjectSimulationServer.is_playing(project_id, simulation_id)
-         ), assign(socket, :simulation_id, simulation_id)}
+           RenewCollabSim.Server.ProjectSimulationServer.exists(
+             sim.project_assignment.project_id,
+             simulation_id
+           ),
+           RenewCollabSim.Server.ProjectSimulationServer.is_playing(
+             sim.project_assignment.project_id,
+             simulation_id
+           )
+         ), {:project_id, sim.project_assignment.project_id, :simulation_id, simulation_id}}
     end
   end
 
   @impl true
-  def handle_message({:simulation_change, simulation_id, {_event, is_playing}}, _state, _scope) do
+  def handle_message(
+        {:simulation_change, simulation_id, {_event, is_playing}},
+        _state,
+        {:project_id, project_id, :simulation_id, simulation_id}
+      ) do
     case RenewCollabSim.Simulator.find_simulation_simple(simulation_id) do
       nil ->
         :stop
@@ -53,7 +63,11 @@ defmodule RenewCollabWeb.ReduxSimulationChannel do
   end
 
   @impl true
-  def handle_message({:simulation_change, simulation_id, _event}, _state, _scope) do
+  def handle_message(
+        {:simulation_change, simulation_id, _event},
+        _state,
+        {:project_id, project_id, :simulation_id, simulation_id}
+      ) do
     case RenewCollabSim.Simulator.find_simulation_simple(simulation_id) do
       nil ->
         :stop
@@ -69,44 +83,49 @@ defmodule RenewCollabWeb.ReduxSimulationChannel do
   end
 
   @impl true
-  def handle_message(_, state) do
+  def handle_message(_, state, _scope) do
     {:noreply, state}
   end
 
   @impl true
-  def handle_event("step", %{}, _state, _scope, socket) do
-    RenewCollabSim.Server.ProjectSimulationServer.step(project_id, socket.assigns.simulation_id)
+  def handle_event("step", %{}, _state, {:project_id, project_id, :simulation_id, simulation_id}) do
+    RenewCollabSim.Server.ProjectSimulationServer.step(project_id, simulation_id)
 
     :silent
   end
 
   @impl true
-  def handle_event("play", %{}, _state, _scope, socket) do
-    RenewCollabSim.Server.ProjectSimulationServer.play(project_id, socket.assigns.simulation_id)
+  def handle_event("play", %{}, _state, {:project_id, project_id, :simulation_id, simulation_id}) do
+    RenewCollabSim.Server.ProjectSimulationServer.play(project_id, simulation_id)
 
     :silent
   end
 
   @impl true
-  def handle_event("pause", %{}, _state, _scope, socket) do
-    RenewCollabSim.Server.ProjectSimulationServer.pause(project_id, socket.assigns.simulation_id)
+  def handle_event("pause", %{}, _state, {:project_id, project_id, :simulation_id, simulation_id}) do
+    RenewCollabSim.Server.ProjectSimulationServer.pause(project_id, simulation_id)
 
     :silent
   end
 
   @impl true
-  def handle_event("terminate", %{}, _state, _scope, socket) do
+  def handle_event(
+        "terminate",
+        %{},
+        _state,
+        {:project_id, project_id, :simulation_id, simulation_id}
+      ) do
     RenewCollabSim.Server.ProjectSimulationServer.terminate(
       project_id,
-      socket.assigns.simulation_id
+      simulation_id
     )
 
     :silent
   end
 
   @impl true
-  def handle_event("init", %{}, _state, _scope, socket) do
-    RenewCollabSim.Server.ProjectSimulationServer.setup(project_id, socket.assigns.simulation_id)
+  def handle_event("init", %{}, _state, {:project_id, project_id, :simulation_id, simulation_id}) do
+    RenewCollabSim.Server.ProjectSimulationServer.setup(project_id, simulation_id)
 
     :silent
   end

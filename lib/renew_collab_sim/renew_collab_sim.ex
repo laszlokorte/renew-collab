@@ -231,7 +231,11 @@ defmodule RenewCollabSim.Simulator do
     simulation |> RenewCollabProj.Projects.attach_project_assignment()
 
     Repo.delete(simulation)
-    RenewCollabSim.Server.ProjectSimulationServer.terminate(project_id, id)
+
+    RenewCollabSim.Server.ProjectSimulationServer.terminate(
+      simulation.project_assignment.project_id,
+      id
+    )
 
     if(simulation.project) do
       # TODO:broadcast
@@ -243,7 +247,7 @@ defmodule RenewCollabSim.Simulator do
     end
   end
 
-  def create_and_start_simulation(shadow_net_system_id) do
+  def create_and_start_simulation(project_id, shadow_net_system_id) do
     create_simulation(shadow_net_system_id)
     |> case do
       {:ok, %{id: id}} -> RenewCollabSim.Server.ProjectSimulationServer.setup(project_id, id)
@@ -414,7 +418,7 @@ defmodule RenewCollabSim.Simulator do
       |> case do
         {:ok, %{id: sim_id} = simulation} ->
           RenewCollabProj.Projects.assign_to_project(project, simulation)
-          RenewCollabSim.Server.ProjectSimulationServer.setup(project_id, sim_id)
+          RenewCollabSim.Server.ProjectSimulationServer.setup(project.id, sim_id)
 
           # TODO:broadcast
           Phoenix.PubSub.broadcast(

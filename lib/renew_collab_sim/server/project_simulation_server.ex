@@ -28,7 +28,7 @@ defmodule RenewCollabSim.Server.ProjectSimulationServer do
     GenServer.cast(__MODULE__, {:pause, project_id, simulation_id})
   end
 
-  def terminate(project_id, simulation_id) do
+  def stop(project_id, simulation_id) do
     GenServer.call(__MODULE__, {:terminate, project_id, simulation_id})
   end
 
@@ -122,7 +122,7 @@ defmodule RenewCollabSim.Server.ProjectSimulationServer do
   def handle_call({:terminate, project_id, simulation_id}, _from, state) do
     case Map.get(state, simulation_id, nil) do
       %{server_process: p} ->
-        RenewCollabSim.Server.SimulationServer.stop(p, simulation_id)
+        RenewCollabSim.Server.SimulationServer.terminate(p, simulation_id)
         {:reply, true, state}
 
       nil ->
@@ -139,8 +139,11 @@ defmodule RenewCollabSim.Server.ProjectSimulationServer do
   def handle_call({:is_playing, project_id, simulation_id}, _from, state) do
     Map.has_key?(state, project_id)
     |> case do
-      %{server_process: pid} -> RenewCollabSim.Server.SimulationServer.is_playing(pid)
-      _ -> false
+      %{server_process: pid} ->
+        RenewCollabSim.Server.SimulationServer.is_playing(pid, simulation_id)
+
+      _ ->
+        false
     end
     |> then(&{:reply, &1, state})
   end
@@ -181,7 +184,7 @@ defmodule RenewCollabSim.Server.ProjectSimulationServer do
 
   defp cleanup(_reason, state) do
     for {simulation_id, %{server_process: pid}} <- state do
-      RenewCollabSim.Server.SimulationServer.stop(pid)
+      RenewCollabSim.Server.SimulationServer.stop_all(pid)
     end
   end
 end

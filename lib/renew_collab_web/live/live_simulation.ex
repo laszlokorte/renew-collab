@@ -15,11 +15,15 @@ defmodule RenewCollabWeb.LiveSimulation do
         socket =
           socket
           |> assign(:simulation_id, simulation_id)
+          |> assign(:project_id, sim.project_assignment.project_id)
           |> assign(:rename_form, to_form(%{"name" => sim.label}))
           |> assign(:show_transitions, false)
           |> assign(
             :is_active,
-            RenewCollabSim.Server.ProjectSimulationServer.exists(project_id, simulation_id)
+            RenewCollabSim.Server.ProjectSimulationServer.exists(
+              sim.project_assignment.project_id,
+              simulation_id
+            )
           )
           |> assign(:simulation, sim)
 
@@ -48,7 +52,10 @@ defmodule RenewCollabWeb.LiveSimulation do
            )
            |> assign(
              :is_active,
-             RenewCollabSim.Server.ProjectSimulationServer.exists(project_id, sim_id)
+             RenewCollabSim.Server.ProjectSimulationServer.exists(
+               sim.project_assignment.project_id,
+               sim_id
+             )
            )}
       end
     end
@@ -60,7 +67,7 @@ defmodule RenewCollabWeb.LiveSimulation do
      |> assign(
        :is_active,
        RenewCollabSim.Server.ProjectSimulationServer.exists(
-         project_id,
+         socket.assigns.simulation.project_assignment.project_id,
          socket.assigns.simulation.id
        )
      )}
@@ -379,26 +386,35 @@ defmodule RenewCollabWeb.LiveSimulation do
   end
 
   def handle_event("step", %{}, socket) do
-    RenewCollabSim.Server.ProjectSimulationServer.step(project_id, socket.assigns.simulation.id)
+    RenewCollabSim.Server.ProjectSimulationServer.step(
+      socket.assigns.project_id,
+      socket.assigns.simulation.id
+    )
 
     {:noreply, socket}
   end
 
   def handle_event("play", %{}, socket) do
-    RenewCollabSim.Server.ProjectSimulationServer.play(project_id, socket.assigns.simulation.id)
+    RenewCollabSim.Server.ProjectSimulationServer.play(
+      socket.assigns.project_id,
+      socket.assigns.simulation.id
+    )
 
     {:noreply, socket}
   end
 
   def handle_event("pause", %{}, socket) do
-    RenewCollabSim.Server.ProjectSimulationServer.pause(project_id, socket.assigns.simulation.id)
+    RenewCollabSim.Server.ProjectSimulationServer.pause(
+      socket.assigns.project_id,
+      socket.assigns.simulation.id
+    )
 
     {:noreply, socket}
   end
 
   def handle_event("terminate", %{}, socket) do
     RenewCollabSim.Server.ProjectSimulationServer.terminate(
-      project_id,
+      socket.assigns.project_id,
       socket.assigns.simulation.id
     )
 
@@ -406,7 +422,10 @@ defmodule RenewCollabWeb.LiveSimulation do
   end
 
   def handle_event("initialize", %{}, socket) do
-    RenewCollabSim.Server.ProjectSimulationServer.setup(project_id, socket.assigns.simulation.id)
+    RenewCollabSim.Server.ProjectSimulationServer.setup(
+      socket.assigns.project_id,
+      socket.assigns.simulation.id
+    )
 
     {:noreply, socket}
   end
@@ -416,7 +435,7 @@ defmodule RenewCollabWeb.LiveSimulation do
     RenewCollabSim.Simulator.delete_simulation(socket.assigns.simulation_id)
 
     RenewCollabSim.Server.ProjectSimulationServer.terminate(
-      project_id,
+      socket.assigns.project_id,
       socket.assigns.simulation.id
     )
 
