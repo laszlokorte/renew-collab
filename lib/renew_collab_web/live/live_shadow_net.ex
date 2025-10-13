@@ -24,7 +24,10 @@ defmodule RenewCollabWeb.LiveShadowNet do
           |> assign(:rename_form, to_form(%{"name" => sns.label}))
           |> assign(
             :running,
-            RenewCollabSim.Server.SimulationServer.running_ids() |> MapSet.new()
+            RenewCollabSim.Server.ProjectSimulationServer.running_ids(
+              sns.assigned_project.project_id
+            )
+            |> MapSet.new()
           )
           |> assign(
             :shadow_net_system,
@@ -48,7 +51,13 @@ defmodule RenewCollabWeb.LiveShadowNet do
        :shadow_net_system,
        RenewCollabSim.Simulator.find_shadow_net_system(socket.assigns.shadow_net_system_id)
      )
-     |> assign(:running, RenewCollabSim.Server.SimulationServer.running_ids() |> MapSet.new())}
+     |> assign(
+       :running,
+       RenewCollabSim.Server.ProjectSimulationServer.running_ids(
+         socket.assigns.sns.assigned_project.project_id
+       )
+       |> MapSet.new()
+     )}
   end
 
   def handle_info({:simulation_change, _, _}, socket) do
@@ -58,7 +67,13 @@ defmodule RenewCollabWeb.LiveShadowNet do
        :shadow_net_system,
        RenewCollabSim.Simulator.find_shadow_net_system(socket.assigns.shadow_net_system_id)
      )
-     |> assign(:running, RenewCollabSim.Server.SimulationServer.running_ids() |> MapSet.new())}
+     |> assign(
+       :running,
+       RenewCollabSim.Server.ProjectSimulationServer.running_ids(
+         socket.assigns.sns.assigned_project.project_id
+       )
+       |> MapSet.new()
+     )}
   end
 
   def render(assigns) do
@@ -366,33 +381,39 @@ defmodule RenewCollabWeb.LiveShadowNet do
   end
 
   def handle_event("setup", %{"id" => simulation_id}, socket) do
-    RenewCollabSim.Server.SimulationServer.setup_and_wait(simulation_id)
+    RenewCollabSim.Server.ProjectSimulationServer.setup_and_wait(project_id, simulation_id)
 
     {:noreply,
      socket
-     |> assign(:running, RenewCollabSim.Server.SimulationServer.running_ids() |> MapSet.new())}
+     |> assign(
+       :running,
+       RenewCollabSim.Server.ProjectSimulationServer.running_ids(
+         socket.assigns.sns.assigned_project.project_id
+       )
+       |> MapSet.new()
+     )}
   end
 
   def handle_event("stop", %{"id" => simulation_id}, socket) do
-    RenewCollabSim.Server.SimulationServer.terminate(simulation_id)
+    RenewCollabSim.Server.ProjectSimulationServer.terminate(project_id, simulation_id)
 
     {:noreply, socket}
   end
 
   def handle_event("step", %{"id" => simulation_id}, socket) do
-    RenewCollabSim.Server.SimulationServer.step(simulation_id)
+    RenewCollabSim.Server.ProjectSimulationServer.step(project_id, simulation_id)
 
     {:noreply, socket}
   end
 
   def handle_event("play", %{"id" => simulation_id}, socket) do
-    RenewCollabSim.Server.SimulationServer.play(simulation_id)
+    RenewCollabSim.Server.ProjectSimulationServer.play(project_id, simulation_id)
 
     {:noreply, socket}
   end
 
   def handle_event("pause", %{"id" => simulation_id}, socket) do
-    RenewCollabSim.Server.SimulationServer.pause(simulation_id)
+    RenewCollabSim.Server.ProjectSimulationServer.pause(project_id, simulation_id)
 
     {:noreply, socket}
   end

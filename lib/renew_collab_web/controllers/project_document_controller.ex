@@ -4,13 +4,12 @@ defmodule RenewCollabWeb.ProjectDocumentController do
   alias RenewCollabProj.Projects
   alias RenewCollab.Renew
   alias RenewCollab.Document.Document
-  alias RenewCollab.Import.DocumentImport
 
   action_fallback(RenewCollabWeb.FallbackController)
 
   def index(conn, %{"project_id" => project_id}) do
     documents = Renew.list_documents(Projects.find_project(project_id))
-    render(conn, :index, documents: documents)
+    render(conn, :index, project_id: project_id, documents: documents)
   end
 
   def create(conn, %{"project_id" => project_id, "document" => document_params}) do
@@ -18,7 +17,7 @@ defmodule RenewCollabWeb.ProjectDocumentController do
       conn
       |> put_status(:created)
       |> put_resp_header("location", ~p"/api/documents/#{document}")
-      |> render(:show, document: document)
+      |> render(:show, project_id: project_id, document: document)
     end
   end
 
@@ -28,7 +27,7 @@ defmodule RenewCollabWeb.ProjectDocumentController do
       conn
       |> put_status(:created)
       |> put_resp_header("location", ~p"/api/documents/#{document}")
-      |> render(:show, document: document)
+      |> render(:show, project_id: project_id, document: document)
     end
   end
 end

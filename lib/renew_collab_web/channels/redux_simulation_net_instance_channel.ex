@@ -17,7 +17,11 @@ defmodule RenewCollabWeb.ReduxSimulationNetInstanceChannel do
   end
 
   @impl true
-  def handle_message({:simulation_change, _simulation_id, _details}, %{id: net_instance_id}) do
+  def handle_message(
+        {:simulation_change, _simulation_id, _details},
+        %{id: net_instance_id},
+        _scope
+      ) do
     RenewCollabSim.Simulator.find_simulation_net_instance(net_instance_id)
     |> case do
       nil ->
@@ -29,7 +33,7 @@ defmodule RenewCollabWeb.ReduxSimulationNetInstanceChannel do
   end
 
   @impl true
-  def handle_message(_, state) do
+  def handle_message(_, state, _scope) do
     {:noreply, state}
   end
 end

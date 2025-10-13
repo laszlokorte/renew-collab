@@ -22,36 +22,40 @@ defmodule RenewCollabWeb.ReduxDocumentsChannel do
     push(socket, "presence_state", Presence.list(socket))
 
     {:ok,
-     RenewCollabWeb.DocumentJSON.index_content(%{documents: RenewCollab.Renew.list_documents()})}
+     RenewCollabWeb.ProjectDocumentJSON.index_content(%{
+       documents: RenewCollab.Renew.list_documents()
+     })}
   end
 
   @impl true
-  def handle_message(:any, _state) do
+  def handle_message(:any, _state, _scope) do
     {:noreply,
-     RenewCollabWeb.DocumentJSON.index_content(%{documents: RenewCollab.Renew.list_documents()})}
+     RenewCollabWeb.ProjectDocumentJSON.index_content(%{
+       documents: RenewCollab.Renew.list_documents()
+     })}
   end
 
   @impl true
-  def handle_message(_, state) do
+  def handle_message(_, state, _scope) do
     {:noreply, state}
   end
 
   @impl true
-  def handle_event("delete_document", %{"id" => document_id}, state) do
+  def handle_event("delete_document", %{"id" => document_id}, state, _scope) do
     RenewCollab.Renew.delete_document(document_id)
 
     {:noreply, state}
   end
 
   @impl true
-  def handle_event("duplicate_document", %{"id" => document_id}, state) do
+  def handle_event("duplicate_document", %{"id" => document_id}, state, _scope) do
     RenewCollab.Renew.duplicate_document(document_id)
 
     {:noreply, state}
   end
 
   @impl true
-  def handle_event("rename_document", %{"id" => document_id, "name" => name}, _state) do
+  def handle_event("rename_document", %{"id" => document_id, "name" => name}, _state, _scope) do
     RenewCollab.Commands.UpdateDocumentMeta.new(%{
       document_id: document_id,
       meta: %{name: name}

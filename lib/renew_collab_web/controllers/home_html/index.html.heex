@@ -9,6 +9,14 @@
       <img class="icon" src="/assets/icon-project.svg" /> My Projects
     </.link>
   </li>
+  <li style="background-color: #eee;">
+    <.link
+      style="gap: 1em; text-align: center; padding: 2em; display: block; color: #078; display: flex; flex-direction: column; align-items: center;"
+      navigate={~p"/account/me"}
+    >
+      <img class="icon" src="/assets/icon-user.svg" /> My Account
+    </.link>
+  </li>
 </ul>
 <%= if is_admin(@conn) do %>
   <h2 style="border-bottom: 2px solid gray;text-align: center;padding: 1ex">Administration</h2>

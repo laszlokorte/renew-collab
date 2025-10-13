@@ -15,7 +15,7 @@ defmodule RenewCollabWeb.ReduxSimulationLinksChannel do
   end
 
   @impl true
-  def handle_message({:document_simulated, document_id}, _state) do
+  def handle_message({:document_simulated, document_id}, _state, _scope) do
     {:noreply,
      RenewCollabWeb.SimulationLinksJSON.index_content(%{
        links: Renew.list_simulation_links(document_id)

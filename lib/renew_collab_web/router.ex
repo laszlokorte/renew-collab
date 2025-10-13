@@ -159,6 +159,12 @@ defmodule RenewCollabWeb.Router do
     delete "/accounts/:id", AccountsController, :delete
   end
 
+  scope "/account/me", RenewCollabWeb do
+    pipe_through [:browser, :authenticated]
+    get "/", MyAccountController, :show
+    post "/password", MyAccountController, :change_password
+  end
+
   scope "/", RenewCollabWeb do
     pipe_through [:browser, :authenticated]
 

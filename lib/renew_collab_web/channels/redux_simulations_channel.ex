@@ -13,12 +13,13 @@ defmodule RenewCollabWeb.ReduxSimulationsChannel do
          RenewCollabSim.Simulator.list_simulations(
            RenewCollabProj.Projects.list_project_simulations(project_id)
          ),
-       runnings: RenewCollabSim.Server.SimulationServer.running_ids() |> MapSet.new()
+       runnings:
+         RenewCollabSim.Server.ProjectSimulationServer.running_ids(project_id) |> MapSet.new()
      }), socket |> assign(:project_id, project_id)}
   end
 
   @impl true
-  def handle_message({:simulation_change, _simulation_id, _}, %{project_id: project_id}) do
+  def handle_message({:simulation_change, _simulation_id, _}, %{project_id: project_id}, _scope) do
     {:noreply,
      RenewCollabWeb.SimulationJSON.index_content(%{
        project_id: project_id,
@@ -26,7 +27,8 @@ defmodule RenewCollabWeb.ReduxSimulationsChannel do
          RenewCollabSim.Simulator.list_simulations(
            RenewCollabProj.Projects.list_project_simulations(project_id)
          ),
-       runnings: RenewCollabSim.Server.SimulationServer.running_ids() |> MapSet.new()
+       runnings:
+         RenewCollabSim.Server.ProjectSimulationServer.running_ids(project_id) |> MapSet.new()
      })}
   end
 
@@ -36,30 +38,30 @@ defmodule RenewCollabWeb.ReduxSimulationsChannel do
   end
 
   @impl true
-  def handle_event("step", %{"id" => id}, _state, _socket) do
-    RenewCollabSim.Server.SimulationServer.step(id)
+  def handle_event("step", %{"id" => id}, _state, _scope, _socket) do
+    RenewCollabSim.Server.ProjectSimulationServer.step(project_id, id)
 
     :silent
   end
 
   @impl true
-  def handle_event("stop", %{"id" => id}, _state, _socket) do
-    RenewCollabSim.Server.SimulationServer.terminate(id)
+  def handle_event("stop", %{"id" => id}, _state, _scope, _socket) do
+    RenewCollabSim.Server.ProjectSimulationServer.terminate(project_id, id)
 
     :silent
   end
 
   @impl true
-  def handle_event("start", %{"id" => id}, _state, _socket) do
-    RenewCollabSim.Server.SimulationServer.setup(id)
+  def handle_event("start", %{"id" => id}, _state, _scope, _scope, _socket) do
+    RenewCollabSim.Server.ProjectSimulationServer.setup(project_id, id)
 
     :silent
   end
 
   @impl true
-  def handle_event("delete", %{"id" => id}, _state, _socket) do
+  def handle_event("delete", %{"id" => id}, _state, _scope, _socket) do
     RenewCollabSim.Simulator.delete_simulation(id)
-    RenewCollabSim.Server.SimulationServer.terminate(id)
+    RenewCollabSim.Server.ProjectSimulationServer.terminate(project_id, id)
 
     :silent
   end

@@ -19,7 +19,7 @@ defmodule RenewCollabWeb.ReduxSimulationLogChannel do
   end
 
   @impl true
-  def handle_message({:simulation_change, simulation_id, _event}, _state) do
+  def handle_message({:simulation_change, simulation_id, _event}, _state, _scope) do
     case RenewCollabSim.Simulator.find_simulation_simple(simulation_id) do
       nil ->
         :stop

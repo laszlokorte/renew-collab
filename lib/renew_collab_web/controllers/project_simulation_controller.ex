@@ -1,5 +1,6 @@
 defmodule RenewCollabWeb.ProjectSimulationController do
   alias RenewCollabSim.Server.SimulationServer
+  alias RenewCollabSim.Server.ProjectSimulationServer
   alias RenewCollabSim.Entites.Simulation
 
   use RenewCollabWeb, :controller
@@ -13,7 +14,7 @@ defmodule RenewCollabWeb.ProjectSimulationController do
         RenewCollabSim.Simulator.list_simulations(
           RenewCollabProj.Projects.list_project_simulations(project_id)
         ),
-      runnings: SimulationServer.running_ids() |> MapSet.new()
+      runnings: ProjectSimulationServer.running_ids(project_id) |> MapSet.new()
     )
   end
 

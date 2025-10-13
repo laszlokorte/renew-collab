@@ -8,23 +8,6 @@ defmodule RenewCollabWeb.DocumentJSON do
   use RenewCollabWeb, :verified_routes
 
   @doc """
-  Renders a list of document.
-  """
-  def index(%{documents: documents}) do
-    %{
-      href: url(~p"/api/documents"),
-      topic: "redux_documents",
-      content: index_content(%{documents: documents})
-    }
-  end
-
-  def index_content(%{documents: documents}) do
-    %{
-      items: for(document <- documents, do: list_data(document))
-    }
-  end
-
-  @doc """
   Renders a single document.
   """
   def show(%{document: document}) do

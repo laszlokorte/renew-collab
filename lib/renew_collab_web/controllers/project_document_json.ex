@@ -1,16 +1,14 @@
 defmodule RenewCollabWeb.ProjectDocumentJSON do
-  alias RenewCollabProj.Entites.Project
-
   use RenewCollabWeb, :verified_routes
   alias RenewCollab.Document.Document
 
   @doc """
   Renders a list of document.
   """
-  def index(%{documents: documents}) do
+  def index(%{project_id: project_id, documents: documents}) do
     %{
-      href: url(~p"/api/documents"),
-      topic: "project/fooo/documents",
+      href: url(~p"/api/projects/#{project_id}/documents"),
+      topic: "project/#{project_id}/documents",
       content: index_content(%{documents: documents})
     }
   end

@@ -2,50 +2,50 @@ defmodule RenewCollabSim.Server.SimulationServer do
   use GenServer
 
   def start_link(_defaults) do
-    GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
+    GenServer.start_link(__MODULE__, %{})
   end
 
-  def setup(simulation_id) do
-    GenServer.cast(__MODULE__, {:setup, simulation_id})
+  def setup(pid, simulation_id) do
+    GenServer.cast(pid, {:setup, simulation_id})
   end
 
-  def setup_and_wait(simulation_id) do
+  def setup_and_wait(pid, simulation_id) do
     Task.async(fn ->
-      GenServer.call(__MODULE__, {:setup, simulation_id})
+      GenServer.call(pid, {:setup, simulation_id})
     end)
     |> Task.await()
   end
 
-  def step(simulation_id) do
-    GenServer.cast(__MODULE__, {:step, simulation_id})
+  def step(pid, simulation_id) do
+    GenServer.cast(pid, {:step, simulation_id})
   end
 
-  def play(simulation_id) do
-    GenServer.cast(__MODULE__, {:play, simulation_id})
+  def play(pid, simulation_id) do
+    GenServer.cast(pid, {:play, simulation_id})
   end
 
-  def pause(simulation_id) do
-    GenServer.cast(__MODULE__, {:pause, simulation_id})
+  def pause(pid, simulation_id) do
+    GenServer.cast(pid, {:pause, simulation_id})
   end
 
-  def terminate(simulation_id) do
-    GenServer.call(__MODULE__, {:terminate, simulation_id})
+  def terminate(pid, simulation_id) do
+    GenServer.call(pid, {:terminate, simulation_id})
   end
 
-  def exists(simulation_id) do
-    GenServer.call(__MODULE__, {:exists, simulation_id})
+  def exists(pid, simulation_id) do
+    GenServer.call(pid, {:exists, simulation_id})
   end
 
-  def is_playing(simulation_id) do
-    GenServer.call(__MODULE__, {:is_playing, simulation_id})
+  def is_playing(pid, simulation_id) do
+    GenServer.call(pid, {:is_playing, simulation_id})
   end
 
-  def running_ids() do
-    GenServer.call(__MODULE__, :running_ids)
+  def running_ids(pid) do
+    GenServer.call(pid, :running_ids)
   end
 
-  def count() do
-    GenServer.call(__MODULE__, :count)
+  def count(pid) do
+    GenServer.call(pid, :count)
   end
 
   # Callbacks

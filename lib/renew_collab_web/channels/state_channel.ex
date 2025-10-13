@@ -21,8 +21,8 @@ defmodule RenewCollabWeb.StateChannel do
   Returns the initial application state. Called just after connection
   """
   @callback init(channel :: binary(), payload :: term(), socket :: Phoenix.Socket.t()) ::
-              {:ok, state :: map()}
-              | {:ok, state :: map(), Phoenix.Socket.t()}
+              {:ok, state :: map(), scope :: term()}
+              | {:ok, state :: map(), scope :: term(), Phoenix.Socket.t()}
               | {:error, reason :: any()}
 
   @doc """
@@ -37,7 +37,12 @@ defmodule RenewCollabWeb.StateChannel do
   you need to send events to the client, otherwise return `:noreply`. `:reply` tuples
   can contain a single `LiveState.Event` or a list of events as well as the new state.
   """
-  @callback handle_event(event_name :: binary(), payload :: term(), state :: term()) ::
+  @callback handle_event(
+              event_name :: binary(),
+              payload :: term(),
+              state :: term(),
+              scope :: term()
+            ) ::
               {:reply, reply :: %LiveState.Event{} | list(%LiveState.Event{}), new_state :: any()}
               | {:noreply, new_state :: map()}
               | :silent
@@ -54,6 +59,7 @@ defmodule RenewCollabWeb.StateChannel do
               event_name :: binary(),
               payload :: term(),
               state :: term(),
+              scope :: term(),
               socket :: Phoenix.Socket.t()
             ) ::
               {:reply, reply :: %LiveState.Event{} | list(%LiveState.Event{}), new_state :: map(),
@@ -62,12 +68,17 @@ defmodule RenewCollabWeb.StateChannel do
               | :silent
               | :ack
 
-  @optional_callbacks handle_event: 4, handle_event: 3
+  @optional_callbacks handle_event: 4, handle_event: 5
 
   @doc """
   The key on assigns to hold application state. Defaults to `:state`.
   """
   @callback state_key() :: atom()
+
+  @doc """
+  The key on assigns to hold the channel scope
+  """
+  @callback scope_key() :: atom()
 
   @doc """
   The key on assigns to hold application state version. Defaults to `:version`.
@@ -77,7 +88,7 @@ defmodule RenewCollabWeb.StateChannel do
   @doc """
   Receives pubsub message and current state. Returns new state
   """
-  @callback handle_message(message :: term(), state :: term()) ::
+  @callback handle_message(message :: term(), state :: term(), scope :: term()) ::
               {:reply, reply :: %LiveState.Event{} | list(%LiveState.Event{}), new_state :: any()}
               | {:noreply, new_state :: term}
 
@@ -117,22 +128,32 @@ defmodule RenewCollabWeb.StateChannel do
         end
       end
 
-      defp initialize_state(state, socket) do
+      defp initialize_state(state, scope, socket) do
         {event_name, message} = build_new_state_message(state, 0)
         push(socket, event_name, message)
-        socket |> assign(state_key(), state) |> assign(state_version_key(), 0)
+
+        socket
+        |> assign(scope_key(), scope)
+        |> assign(state_key(), state)
+        |> assign(state_version_key(), 0)
       end
 
       def handle_in("lvs_evt:" <> event_name, payload, %{assigns: assigns} = socket) do
-        if function_exported?(__MODULE__, :handle_event, 4) do
+        if function_exported?(__MODULE__, :handle_event, 5) do
           apply(__MODULE__, :handle_event, [
             event_name,
             payload,
             Map.get(assigns, state_key()),
+            Map.get(assigns, scope_key()),
             socket
           ])
         else
-          apply(__MODULE__, :handle_event, [event_name, payload, Map.get(assigns, state_key())])
+          apply(__MODULE__, :handle_event, [
+            event_name,
+            payload,
+            Map.get(assigns, state_key()),
+            Map.get(assigns, scope_key())
+          ])
         end
         |> case do
           :silent ->
@@ -156,26 +177,32 @@ defmodule RenewCollabWeb.StateChannel do
       end
 
       def handle_in("lvs_evt:" <> event_name, payload, %{assigns: assigns} = socket) do
-        if function_exported?(__MODULE__, :handle_event, 4) do
+        if function_exported?(__MODULE__, :handle_event, 5) do
           apply(__MODULE__, :handle_event, [
             event_name,
             payload,
             Map.get(assigns, state_key()),
+            Map.get(assigns, scope_key()),
             socket
           ])
         else
-          apply(__MODULE__, :handle_event, [event_name, payload, Map.get(assigns, state_key())])
+          apply(__MODULE__, :handle_event, [
+            event_name,
+            payload,
+            Map.get(assigns, state_key()),
+            Map.get(assigns, scope_key())
+          ])
         end
         |> maybe_handle_reply(socket)
       end
 
       def handle_info({:after_join, channel, payload}, socket) do
         case init(channel, payload, socket) do
-          {:ok, state, socket} ->
-            {:noreply, initialize_state(state, socket)}
+          {:ok, state, scope, socket} ->
+            {:noreply, initialize_state(state, scope, socket)}
 
-          {:ok, state} ->
-            {:noreply, initialize_state(state, socket)}
+          {:ok, state, scope} ->
+            {:noreply, initialize_state(state, scope, socket)}
 
           {:error, error} ->
             push_error(socket, error)
@@ -184,18 +211,20 @@ defmodule RenewCollabWeb.StateChannel do
       end
 
       def handle_info(message, %{assigns: assigns} = socket) do
-        handle_message(message, Map.get(assigns, state_key())) |> maybe_handle_reply(socket)
+        handle_message(message, Map.get(assigns, state_key()), Map.get(assigns, scope_key()))
+        |> maybe_handle_reply(socket)
       end
 
       def authorize(_channel, _payload, socket), do: {:ok, socket}
 
       def state_key, do: :state
+      def scope_key, do: :scope
 
       def state_version_key, do: :version
 
-      def handle_message(_message, state), do: {:noreply, state}
+      def handle_message(_message, state, _scope), do: {:noreply, state}
 
-      def handle_event(_message, _payload, state), do: {:noreply, state}
+      def handle_event(_message, _payload, state, _scope), do: {:noreply, state}
 
       defp update_state(%{assigns: assigns} = socket, new_state) do
         current_state = Map.get(assigns, state_key())
@@ -283,10 +312,11 @@ defmodule RenewCollabWeb.StateChannel do
       end
 
       defoverridable state_key: 0,
-                     handle_message: 2,
+                     handle_message: 3,
                      handle_in: 3,
                      handle_info: 2,
-                     handle_event: 3,
+                     handle_event: 5,
+                     handle_event: 6,
                      authorize: 3,
                      join: 3
     end

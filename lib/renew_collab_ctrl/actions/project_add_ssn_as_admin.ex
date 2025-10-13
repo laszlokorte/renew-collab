@@ -1,3 +1,3 @@
 defmodule RenewCollabCtrl.Actions.ProjectAddSsnAsAdmin do
-  defstruct [:project, :sns]
+  defstruct [:project_id, :sns_id]
 end

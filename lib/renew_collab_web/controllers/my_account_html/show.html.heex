@@ -1,0 +1,11 @@
+<RenewCollabWeb.RenewComponents.app_header flash={@flash} blank={true} logout={true} />
+<div style="text-align: center; margin-top: 1em;">
+  <a href={~p"/"}>Back</a>
+  <h2 style="text-align: center; display: flex; gap: 1ex; align-items: center; justify-content: center;">
+    <img class="icon" src="/assets/icon-user.svg" /> My Account
+  </h2>
+</div>
+<div style="text-align: center; margin-top: 1em;">
+  <h2>Change Password</h2>
+  <.change_password_form changeset={@changeset} action={~p"/account/me/password"} />
+</div>
