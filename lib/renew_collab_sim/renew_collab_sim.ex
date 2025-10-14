@@ -232,7 +232,7 @@ defmodule RenewCollabSim.Simulator do
 
     Repo.delete(simulation)
 
-    RenewCollabSim.Server.ProjectSimulationServer.terminate(
+    RenewCollabSim.Server.ProjectSimulationServer.stop(
       simulation.project_assignment.project_id,
       id
     )

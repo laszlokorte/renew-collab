@@ -65,6 +65,8 @@ defmodule RenewCollabWeb.LiveShadowNet do
   end
 
   def handle_info({:simulation_change, _, _}, socket) do
+    dbg("SIMMMMCHANGE")
+
     {:noreply,
      socket
      |> assign(
@@ -402,7 +404,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
   end
 
   def handle_event("stop", %{"id" => simulation_id}, socket) do
-    RenewCollabSim.Server.ProjectSimulationServer.terminate(
+    RenewCollabSim.Server.ProjectSimulationServer.stop(
       socket.assigns.project_id,
       simulation_id
     )

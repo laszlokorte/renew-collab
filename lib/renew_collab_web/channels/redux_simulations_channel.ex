@@ -50,7 +50,7 @@ defmodule RenewCollabWeb.ReduxSimulationsChannel do
 
   @impl true
   def handle_event("stop", %{"id" => id}, _state, {:project_id, project_id}, _socket) do
-    RenewCollabSim.Server.ProjectSimulationServer.terminate(project_id, id)
+    RenewCollabSim.Server.ProjectSimulationServer.stop(project_id, id)
 
     :silent
   end
@@ -65,7 +65,7 @@ defmodule RenewCollabWeb.ReduxSimulationsChannel do
   @impl true
   def handle_event("delete", %{"id" => id}, _state, {:project_id, project_id}, _socket) do
     RenewCollabSim.Simulator.delete_simulation(id)
-    RenewCollabSim.Server.ProjectSimulationServer.terminate(project_id, id)
+    RenewCollabSim.Server.ProjectSimulationServer.stop(project_id, id)
 
     :silent
   end

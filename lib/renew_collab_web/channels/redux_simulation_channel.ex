@@ -115,7 +115,7 @@ defmodule RenewCollabWeb.ReduxSimulationChannel do
         _state,
         {:project_id, project_id, :simulation_id, simulation_id}
       ) do
-    RenewCollabSim.Server.ProjectSimulationServer.terminate(
+    RenewCollabSim.Server.ProjectSimulationServer.stop(
       project_id,
       simulation_id
     )

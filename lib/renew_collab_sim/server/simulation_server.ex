@@ -1,8 +1,14 @@
 defmodule RenewCollabSim.Server.SimulationServer do
   use GenServer
 
-  def start_link() do
-    GenServer.start_link(__MODULE__, %{})
+  def start_monitor(project_id) do
+    with {:ok, pid} <-
+           GenServer.start_link(__MODULE__, %{project_id: project_id}) do
+      Process.monitor(pid)
+      {:ok, pid}
+    else
+      e -> e
+    end
   end
 
   def setup(pid, simulation_id) do
@@ -28,8 +34,8 @@ defmodule RenewCollabSim.Server.SimulationServer do
     GenServer.cast(pid, {:pause, simulation_id})
   end
 
-  def terminate(pid, simulation_id) do
-    GenServer.call(pid, {:terminate, simulation_id})
+  def stop(pid, simulation_id) do
+    GenServer.call(pid, {:stop, simulation_id})
   end
 
   def exists(pid, simulation_id) do
@@ -55,13 +61,13 @@ defmodule RenewCollabSim.Server.SimulationServer do
   # Callbacks
 
   @impl true
-  def init(stack) do
-    {:ok, stack}
+  def init(%{project_id: project_id}) do
+    {:ok, %{project_id: project_id, processes: %{}}}
   end
 
   @impl true
-  def handle_cast({:setup, simulation_id}, state) do
-    if Map.has_key?(state, simulation_id) do
+  def handle_cast({:setup, simulation_id}, %{project_id: project_id, processes: procs} = state) do
+    if Map.has_key?(procs, simulation_id) do
       {:noreply, state}
     else
       with {:ok, pid} <- RenewCollabSim.Server.SimulationProcess.start_monitor(simulation_id) do
@@ -75,14 +81,18 @@ defmodule RenewCollabSim.Server.SimulationServer do
         # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
-          "simulations",
+          "projects/#{project_id}/simulations",
           {:simulation_change, simulation_id, :state}
         )
 
         {:noreply,
-         Map.put(state, simulation_id, %{
-           sim_process: pid
-         })}
+         %{
+           state
+           | processes:
+               Map.put(procs, simulation_id, %{
+                 sim_process: pid
+               })
+         }}
       else
         _ ->
           {:noreply, state}
@@ -91,8 +101,8 @@ defmodule RenewCollabSim.Server.SimulationServer do
   end
 
   @impl true
-  def handle_cast({:step, simulation_id}, state) do
-    case Map.get(state, simulation_id, nil) do
+  def handle_cast({:step, simulation_id}, %{processes: procs} = state) do
+    case Map.get(procs, simulation_id, nil) do
       %{sim_process: p} ->
         RenewCollabSim.Server.SimulationProcess.step(p)
         {:noreply, state}
@@ -103,8 +113,8 @@ defmodule RenewCollabSim.Server.SimulationServer do
   end
 
   @impl true
-  def handle_cast({:play, simulation_id}, state) do
-    case Map.get(state, simulation_id, nil) do
+  def handle_cast({:play, simulation_id}, %{processes: procs} = state) do
+    case Map.get(procs, simulation_id, nil) do
       %{sim_process: p} ->
         RenewCollabSim.Server.SimulationProcess.play(p)
         {:noreply, state}
@@ -115,8 +125,8 @@ defmodule RenewCollabSim.Server.SimulationServer do
   end
 
   @impl true
-  def handle_cast({:pause, simulation_id}, state) do
-    case Map.get(state, simulation_id, nil) do
+  def handle_cast({:pause, simulation_id}, %{processes: procs} = state) do
+    case Map.get(procs, simulation_id, nil) do
       %{sim_process: p} ->
         RenewCollabSim.Server.SimulationProcess.pause(p)
         {:noreply, state}
@@ -127,8 +137,12 @@ defmodule RenewCollabSim.Server.SimulationServer do
   end
 
   @impl true
-  def handle_call({:setup, simulation_id}, _from, state) do
-    if Map.has_key?(state, simulation_id) do
+  def handle_call(
+        {:setup, simulation_id},
+        _from,
+        %{project_id: project_id, processes: procs} = state
+      ) do
+    if Map.has_key?(procs, simulation_id) do
       {:noreply, state}
     else
       with {:ok, pid} <- RenewCollabSim.Server.SimulationProcess.start_monitor(simulation_id) do
@@ -142,14 +156,18 @@ defmodule RenewCollabSim.Server.SimulationServer do
         # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
-          "simulations",
+          "projects/#{project_id}/simulations",
           {:simulation_change, simulation_id, :state}
         )
 
         {:reply, :ok,
-         Map.put(state, simulation_id, %{
-           sim_process: pid
-         })}
+         %{
+           state
+           | processes:
+               Map.put(procs, simulation_id, %{
+                 sim_process: pid
+               })
+         }}
       else
         _ ->
           {:reply, :error, state}
@@ -158,8 +176,8 @@ defmodule RenewCollabSim.Server.SimulationServer do
   end
 
   @impl true
-  def handle_call({:terminate, simulation_id}, _from, state) do
-    case Map.get(state, simulation_id, nil) do
+  def handle_call({:stop, simulation_id}, _from, %{processes: procs} = state) do
+    case Map.get(procs, simulation_id, nil) do
       %{sim_process: p} ->
         RenewCollabSim.Server.SimulationProcess.stop(p)
         {:reply, true, state}
@@ -170,13 +188,14 @@ defmodule RenewCollabSim.Server.SimulationServer do
   end
 
   @impl true
-  def handle_call({:exists, simulation_id}, _from, state) do
-    {:reply, Map.has_key?(state, simulation_id), state}
+  def handle_call({:exists, simulation_id}, _from, %{processes: procs} = state) do
+    dbg("EXISTS")
+    {:reply, Map.has_key?(procs, simulation_id), state}
   end
 
   @impl true
-  def handle_call({:is_playing, simulation_id}, _from, state) do
-    Map.has_key?(state, simulation_id)
+  def handle_call({:is_playing, simulation_id}, _from, %{processes: procs} = state) do
+    Map.has_key?(procs, simulation_id)
     |> case do
       %{sim_process: pid} -> RenewCollabSim.Server.SimulationProcess.is_playing(pid)
       _ -> false
@@ -185,43 +204,54 @@ defmodule RenewCollabSim.Server.SimulationServer do
   end
 
   @impl true
-  def handle_call(:running_ids, _from, state) do
-    {:reply, Map.keys(state), state}
+  def handle_call(:running_ids, _from, %{processes: procs} = state) do
+    dbg("RUNNING_IDS")
+    {:reply, Map.keys(procs), state}
   end
 
   @impl true
-  def handle_call(:count, _from, state) do
-    {:reply, map_size(state), state}
+  def handle_call(:count, _from, %{processes: procs} = state) do
+    {:reply, map_size(procs), state}
   end
 
   @impl true
-  def handle_info({:DOWN, _ref, :process, pid, _}, state) do
-    for {simulation_id, %{sim_process: ^pid}} <- state do
-      # TODO:broadcast
-      Phoenix.PubSub.broadcast(
-        RenewCollab.PubSub,
-        "simulation:#{simulation_id}",
-        {:simulation_change, simulation_id, :state}
-      )
+  def handle_info(
+        {:broadcast_shutdown, simulation_id},
+        %{project_id: project_id, processes: procs} = state
+      ) do
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "simulation:#{simulation_id}",
+      {:simulation_change, simulation_id, :state}
+    )
 
-      # TODO:broadcast
-      Phoenix.PubSub.broadcast(
-        RenewCollab.PubSub,
-        "simulations",
-        {:simulation_change, simulation_id, :state}
-      )
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "projects/#{project_id}/simulations",
+      {:simulation_change, simulation_id, :state}
+    )
+
+    if Enum.empty?(procs), do: {:stop, :normal, state}, else: {:noreply, state}
+  end
+
+  @impl true
+  def handle_info({:DOWN, _ref, :process, pid, _}, %{processes: procs} = state) do
+    for {simulation_id, %{sim_process: ^pid}} <- procs do
+      Process.send_after(self(), {:broadcast_shutdown, simulation_id}, 0)
     end
 
-    {:noreply,
-     Map.filter(state, fn
-       {_, %{sim_process: ^pid}} -> false
-       _ -> true
-     end)}
+    remaining =
+      Map.filter(procs, fn
+        {_, %{sim_process: ^pid}} -> false
+        _ -> true
+      end)
+
+    {:noreply, %{state | processes: remaining}}
   end
 
   @impl true
   # handle the trapped exit call
-  def handle_info({:EXIT, _from, reason}, state) do
+  def handle_info({:EXIT, _from, reason}, %{processes: procs} = state) do
     # cleanup(reason, state)
     # see GenServer docs for other return types
     {:stop, reason, state}
@@ -234,8 +264,8 @@ defmodule RenewCollabSim.Server.SimulationServer do
     state
   end
 
-  defp cleanup(_reason, state) do
-    for {simulation_id, %{sim_process: pid}} <- state do
+  defp cleanup(_reason, %{project_id: project_id, processes: procs} = state) do
+    for {simulation_id, %{sim_process: pid}} <- procs do
       RenewCollabSim.Server.SimulationProcess.stop(pid)
 
       # TODO:broadcast
@@ -248,7 +278,7 @@ defmodule RenewCollabSim.Server.SimulationServer do
       # TODO:broadcast
       Phoenix.PubSub.broadcast(
         RenewCollab.PubSub,
-        "simulations",
+        "projects/#{project_id}/simulations",
         {:simulation_change, simulation_id, :state}
       )
     end

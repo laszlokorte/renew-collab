@@ -413,7 +413,7 @@ defmodule RenewCollabWeb.LiveSimulation do
   end
 
   def handle_event("terminate", %{}, socket) do
-    RenewCollabSim.Server.ProjectSimulationServer.terminate(
+    RenewCollabSim.Server.ProjectSimulationServer.stop(
       socket.assigns.project_id,
       socket.assigns.simulation.id
     )
@@ -434,7 +434,7 @@ defmodule RenewCollabWeb.LiveSimulation do
     shadow_net_system_id = socket.assigns.simulation.shadow_net_system_id
     RenewCollabSim.Simulator.delete_simulation(socket.assigns.simulation_id)
 
-    RenewCollabSim.Server.ProjectSimulationServer.terminate(
+    RenewCollabSim.Server.ProjectSimulationServer.stop(
       socket.assigns.project_id,
       socket.assigns.simulation.id
     )

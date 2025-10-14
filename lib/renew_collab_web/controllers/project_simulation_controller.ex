@@ -1,7 +1,7 @@
 defmodule RenewCollabWeb.ProjectSimulationController do
   alias RenewCollabSim.Server.ProjectSimulationServer
   alias RenewCollabSim.Entites.Simulation
-
+  alias RenewCollabProj.Projects
   use RenewCollabWeb, :controller
 
   action_fallback RenewCollabWeb.FallbackController
@@ -22,8 +22,11 @@ defmodule RenewCollabWeb.ProjectSimulationController do
     formalism =
       Map.get(params, "formalism", RenewCollabSim.Compiler.SnsCompiler.default_formalism())
 
+    project =
+      Projects.find_own_project(conn.assigns.current_account, project_id)
+
     case RenewCollabSim.Simulator.create_simulation_from_documents(
-           nil,
+           project,
            formalism,
            document_ids,
            Map.get(params, "main_net_name")

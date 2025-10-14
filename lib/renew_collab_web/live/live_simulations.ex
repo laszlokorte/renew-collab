@@ -44,6 +44,8 @@ defmodule RenewCollabWeb.LiveSimulations do
   end
 
   def handle_info(:any, socket) do
+    dbg("BAAAR")
+
     {:noreply,
      socket
      |> assign(
@@ -60,6 +62,8 @@ defmodule RenewCollabWeb.LiveSimulations do
   end
 
   def handle_info({:simulation_change, _, _}, socket) do
+    dbg("FOOOOOOO")
+
     {:noreply,
      socket
      |> assign(
@@ -339,7 +343,7 @@ defmodule RenewCollabWeb.LiveSimulations do
   end
 
   def handle_event("stop", %{"id" => simulation_id}, socket) do
-    RenewCollabSim.Server.ProjectSimulationServer.terminate(
+    RenewCollabSim.Server.ProjectSimulationServer.stop(
       socket.assigns.project_id,
       simulation_id
     )

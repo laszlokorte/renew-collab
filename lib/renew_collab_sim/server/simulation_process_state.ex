@@ -68,7 +68,7 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
             )}
        }}
     rescue
-      e ->
+      _e ->
         # dbg(e)
         :error
     end

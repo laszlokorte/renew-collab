@@ -30,7 +30,7 @@ defmodule RenewCollabSim.Server.ProjectSimulationServer do
   end
 
   def stop(project_id, simulation_id) do
-    GenServer.call(__MODULE__, {:terminate, project_id, simulation_id})
+    GenServer.call(__MODULE__, {:stop, project_id, simulation_id})
   end
 
   def exists(project_id, simulation_id) do
@@ -65,7 +65,7 @@ defmodule RenewCollabSim.Server.ProjectSimulationServer do
     Map.get(state, project_id)
     |> case do
       nil ->
-        with {:ok, pid} <- RenewCollabSim.Server.SimulationServer.start_link() do
+        with {:ok, pid} <- RenewCollabSim.Server.SimulationServer.start_monitor(project_id) do
           RenewCollabSim.Server.SimulationServer.setup(pid, simulation_id)
 
           {:noreply,
@@ -124,10 +124,8 @@ defmodule RenewCollabSim.Server.ProjectSimulationServer do
     Map.get(state, project_id)
     |> case do
       nil ->
-        with {:ok, pid} <- RenewCollabSim.Server.SimulationServer.start_link() do
+        with {:ok, pid} <- RenewCollabSim.Server.SimulationServer.start_monitor(project_id) do
           RenewCollabSim.Server.SimulationServer.setup_and_wait(pid, simulation_id)
-
-          dbg("xXxx")
 
           {:reply, :ok,
            Map.put(state, project_id, %{
@@ -145,10 +143,10 @@ defmodule RenewCollabSim.Server.ProjectSimulationServer do
   end
 
   @impl true
-  def handle_call({:terminate, project_id, simulation_id}, _from, state) do
+  def handle_call({:stop, project_id, simulation_id}, _from, state) do
     case Map.get(state, project_id, nil) do
       %{server_process: p} ->
-        RenewCollabSim.Server.SimulationServer.terminate(p, simulation_id)
+        RenewCollabSim.Server.SimulationServer.stop(p, simulation_id)
         {:reply, true, state}
 
       nil ->
@@ -160,8 +158,7 @@ defmodule RenewCollabSim.Server.ProjectSimulationServer do
   def handle_call({:exists, project_id, simulation_id}, _from, state) do
     case Map.get(state, project_id, nil) do
       %{server_process: p} ->
-        RenewCollabSim.Server.SimulationServer.exists(p, simulation_id)
-        {:reply, true, state}
+        {:reply, RenewCollabSim.Server.SimulationServer.exists(p, simulation_id), state}
 
       nil ->
         {:reply, false, state}
@@ -218,11 +215,13 @@ defmodule RenewCollabSim.Server.ProjectSimulationServer do
 
   @impl true
   def handle_info({:DOWN, _ref, :process, pid, _}, state) do
-    {:noreply,
-     Map.filter(state, fn
-       {_, %{server_process: ^pid}} -> false
-       _ -> true
-     end)}
+    remaining =
+      Map.filter(state, fn
+        {_, %{server_process: ^pid}} -> false
+        _ -> true
+      end)
+
+    {:noreply, remaining}
   end
 
   @impl true
@@ -241,7 +240,7 @@ defmodule RenewCollabSim.Server.ProjectSimulationServer do
   end
 
   defp cleanup(_reason, state) do
-    for {project_id, %{server_process: pid}} <- state do
+    for {_project_id, %{server_process: pid}} <- state do
       RenewCollabSim.Server.SimulationServer.stop_all(pid)
     end
   end
