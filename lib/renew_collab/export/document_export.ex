@@ -482,8 +482,8 @@ defmodule RenewCollab.Export.DocumentExport do
                 fLocator: locator_ref,
                 fType: if(locator_ref, do: 1, else: 0)
 
-                # CH.ifa.draw.standard.OffsetLocator 0 0 
-                #     CH.ifa.draw.standard.RelativeLocator 0.5 0.5   1  NULL 
+                # CH.ifa.draw.standard.OffsetLocator 0 0
+                #     CH.ifa.draw.standard.RelativeLocator 0.5 0.5   1  NULL
               }
             }
           ])
@@ -678,7 +678,8 @@ defmodule RenewCollab.Export.DocumentExport do
                 class_name: "CH.ifa.draw.figures.FigureAttributes",
                 fields: %{
                   attributes: [
-                    {"Visible", "Boolean", true}
+                    {"Visible", "Boolean", true},
+                    {"PetriStationSyntetic", "Boolean", true}
                   ]
                 }
               },

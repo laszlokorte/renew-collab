@@ -10,6 +10,26 @@ defmodule RenewCollab.Import.DocumentImport do
          %Renewex.Storable{class_name: class_name, fields: %{figures: figures}} <- root do
       refs_with_ids = Enum.map(refs, fn s -> {s, generate_layer_id()} end) |> Enum.to_list()
 
+      figures =
+        figures
+        |> Enum.filter(fn
+          {:ref, ref} ->
+            with %Renewex.Storable{
+                   fields: %{
+                     attributes: %Renewex.Storable{
+                       fields: %{attributes: attrs}
+                     }
+                   }
+                 } <-
+                   Enum.at(refs, ref) do
+              not (attrs
+                   |> Enum.into(%{}, fn {key, _type, value} -> {key, value} end)
+                   |> Map.get("PetriStationSyntetic", false))
+            else
+              _ -> true
+            end
+        end)
+
       figs =
         figures
         |> Enum.with_index()
@@ -291,8 +311,16 @@ defmodule RenewCollab.Import.DocumentImport do
               }
 
             {{%Renewex.Storable{
-                class_name: class_name
+                class_name: class_name,
+                fields: fields
               }, uuid}, z_index} ->
+              attrs =
+                with %Renewex.Storable{fields: f} <- Map.get(fields, :attributes) do
+                  f.attributes |> Enum.into(%{}, fn {key, _type, value} -> {key, value} end)
+                else
+                  _ -> nil
+                end
+
               %{
                 "semantic_tag" => class_name,
                 "z_index" => z_index,
