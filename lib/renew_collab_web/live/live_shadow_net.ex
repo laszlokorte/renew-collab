@@ -65,8 +65,6 @@ defmodule RenewCollabWeb.LiveShadowNet do
   end
 
   def handle_info({:simulation_change, _, _}, socket) do
-    dbg("SIMMMMCHANGE")
-
     {:noreply,
      socket
      |> assign(

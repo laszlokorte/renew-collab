@@ -30,9 +30,21 @@ defmodule RenewCollabWeb.ProjectController do
     render(conn, :simulations, project: project)
   end
 
-  def export(conn, %{"id" => project_id}) do
+  def export(conn, %{"id" => project_id} = params) do
     project = Projects.find_own_project(own_account(conn), project_id)
-    render(conn, :export, project: project)
+
+    conn
+    |> put_resp_header(
+      "content-disposition",
+      "#{if(Map.has_key?(params, "inline"), do: "inline", else: "attachment")}; filename=\"#{project.name}.zip\""
+    )
+    |> put_resp_header(
+      "content-type",
+      "text/plain+renew"
+    )
+    |> text("Foo")
+
+    # TODO: Zip all documents and ssns
   end
 
   defp own_account(%{assigns: %{current_account: current_account}}) do

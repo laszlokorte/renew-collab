@@ -88,6 +88,7 @@ defmodule RenewCollabSim.Simulator do
     |> Repo.preload(:log_entries)
     |> Repo.preload(net_instances: :firings)
     |> RenewCollabProj.Projects.attach_project_assignment()
+    |> Map.update(:shadow_net_system, nil, &RenewCollabProj.Projects.attach_project_assignment/1)
   end
 
   def find_simulation_log_entries(id) do

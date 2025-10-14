@@ -12,16 +12,22 @@ defmodule RenewCollabWeb.LiveSimulation do
         {:ok, socket |> put_flash(:error, "Simulation not found") |> redirect(to: ~p"/projects")}
 
       sim ->
+        project_id =
+          if(sim.project_assignment,
+            do: sim.project_assignment.project_id,
+            else: sim.shadow_net_system.project_assignment.project_id
+          )
+
         socket =
           socket
           |> assign(:simulation_id, simulation_id)
-          |> assign(:project_id, sim.project_assignment.project_id)
+          |> assign(:project_id, project_id)
           |> assign(:rename_form, to_form(%{"name" => sim.label}))
           |> assign(:show_transitions, false)
           |> assign(
             :is_active,
             RenewCollabSim.Server.ProjectSimulationServer.exists(
-              sim.project_assignment.project_id,
+              project_id,
               simulation_id
             )
           )
@@ -79,7 +85,7 @@ defmodule RenewCollabWeb.LiveSimulation do
       <RenewCollabWeb.RenewComponents.app_header
         flash={@flash}
         tab={:simulations}
-        project_id={@simulation.project_assignment.project_id}
+        project_id={@project_id}
       />
 
       <div style="padding: 1em">

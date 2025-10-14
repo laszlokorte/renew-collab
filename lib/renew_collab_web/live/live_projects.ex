@@ -161,7 +161,13 @@ defmodule RenewCollabWeb.LiveProjects do
                   <td>
                     <RenewCollabWeb.RenewComponents.timestamp value={project.updated_at} />
                   </td>
-                  <td width="50"></td>
+                  <td width="50">
+                    <a href={~p"/projects/#{project.id}/export"}>
+                      <button style="cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff">
+                        Export
+                      </button>
+                    </a>
+                  </td>
                   <td width="50">
                     <button
                       type="button"

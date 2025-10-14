@@ -172,9 +172,6 @@ defmodule RenewCollabWeb.LiveProjectSettings do
   def reload(socket) do
     {:noreply,
      socket
-     |> assign(:project, Projects.find_project(socket.assigns.project.id))
-     |> assign(:accounts, Projects.find_accounts())
-     |> assign(:documents, Projects.find_documents())
-     |> assign(:simulations, Projects.find_simulations())}
+     |> assign(:project, Projects.find_project(socket.assigns.project.id))}
   end
 end

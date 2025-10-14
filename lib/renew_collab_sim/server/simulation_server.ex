@@ -189,7 +189,6 @@ defmodule RenewCollabSim.Server.SimulationServer do
 
   @impl true
   def handle_call({:exists, simulation_id}, _from, %{processes: procs} = state) do
-    dbg("EXISTS")
     {:reply, Map.has_key?(procs, simulation_id), state}
   end
 
@@ -205,7 +204,6 @@ defmodule RenewCollabSim.Server.SimulationServer do
 
   @impl true
   def handle_call(:running_ids, _from, %{processes: procs} = state) do
-    dbg("RUNNING_IDS")
     {:reply, Map.keys(procs), state}
   end
 
@@ -251,7 +249,7 @@ defmodule RenewCollabSim.Server.SimulationServer do
 
   @impl true
   # handle the trapped exit call
-  def handle_info({:EXIT, _from, reason}, %{processes: procs} = state) do
+  def handle_info({:EXIT, _from, reason}, state) do
     # cleanup(reason, state)
     # see GenServer docs for other return types
     {:stop, reason, state}
@@ -264,7 +262,7 @@ defmodule RenewCollabSim.Server.SimulationServer do
     state
   end
 
-  defp cleanup(_reason, %{project_id: project_id, processes: procs} = state) do
+  defp cleanup(_reason, %{project_id: project_id, processes: procs}) do
     for {simulation_id, %{sim_process: pid}} <- procs do
       RenewCollabSim.Server.SimulationProcess.stop(pid)
 
