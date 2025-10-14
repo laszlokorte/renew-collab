@@ -27,7 +27,8 @@ defmodule RenewCollabProj.Entites.ProjectMember do
     member
     |> cast(attrs, [:account_id, :role])
     |> validate_required([:account_id, :role])
-    |> dbg
+
+    # |> dbg
   end
 
   def roles(), do: @member_roles

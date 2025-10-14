@@ -1,0 +1,17 @@
+<.simple_form :let={f} for={@changeset} action={@action}>
+  <.error :if={@changeset.action}>
+    Oops, something went wrong! Please check the errors below.
+  </.error>
+  <.input field={f[:email]} type="email" label="Your E-mail" autocomplete="cc-number" />
+  <.input field={f[:new_password]} type="password" label="Password" autocomplete="new-password" />
+  <.input
+    field={f[:confirm_password]}
+    type="password"
+    label="Confirm Password"
+    autocomplete="confirm-password"
+  />
+
+  <:actions>
+    <.button>Sign up!</.button>
+  </:actions>
+</.simple_form>

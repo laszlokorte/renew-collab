@@ -1,0 +1,2 @@
+defmodule RenewCollabWeb.ResetAccountController do
+end

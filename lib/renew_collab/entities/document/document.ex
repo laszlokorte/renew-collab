@@ -41,7 +41,8 @@ defmodule RenewCollab.Document.Document do
     document
     |> cast(attrs, [:name, :kind, :syntax_id])
     |> maybe_force_nil(:syntax_id)
-    |> dbg()
+
+    # |> dbg()
   end
 
   defp maybe_force_nil(changeset, field) do

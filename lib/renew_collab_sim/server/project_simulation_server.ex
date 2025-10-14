@@ -1,4 +1,5 @@
 defmodule RenewCollabSim.Server.ProjectSimulationServer do
+  alias RenewCollabSim.Server.SimulationServer
   use GenServer
 
   def start_link(_defaults) do
@@ -48,6 +49,10 @@ defmodule RenewCollabSim.Server.ProjectSimulationServer do
     GenServer.call(__MODULE__, {:count, project_id})
   end
 
+  def count_all() do
+    GenServer.call(__MODULE__, :count_all)
+  end
+
   # Callbacks
 
   @impl true
@@ -57,54 +62,14 @@ defmodule RenewCollabSim.Server.ProjectSimulationServer do
 
   @impl true
   def handle_cast({:setup, project_id, simulation_id}, state) do
-  end
-
-  @impl true
-  def handle_cast({:step, project_id, simulation_id}, state) do
-    case Map.get(state, simulation_id, nil) do
-      %{server_process: p} ->
-        RenewCollabSim.Server.SimulationServer.step(p, simulation_id)
-        {:noreply, state}
-
-      nil ->
-        {:noreply, state}
-    end
-  end
-
-  @impl true
-  def handle_cast({:play, project_id, simulation_id}, state) do
-    case Map.get(state, simulation_id, nil) do
-      %{server_process: p} ->
-        RenewCollabSim.Server.SimulationServer.play(p, simulation_id)
-        {:noreply, state}
-
-      nil ->
-        {:noreply, state}
-    end
-  end
-
-  @impl true
-  def handle_cast({:pause, project_id, simulation_id}, state) do
-    case Map.get(state, simulation_id, nil) do
-      %{server_process: p} ->
-        RenewCollabSim.Server.SimulationServer.pause(p, simulation_id)
-        {:noreply, state}
-
-      nil ->
-        {:noreply, state}
-    end
-  end
-
-  @impl true
-  def handle_call({:setup, project_id, simulation_id}, _from, state) do
-    Map.get(state, simulation_id)
+    Map.get(state, project_id)
     |> case do
       nil ->
         with {:ok, pid} <- RenewCollabSim.Server.SimulationServer.start_link() do
           RenewCollabSim.Server.SimulationServer.setup(pid, simulation_id)
 
-          {:reply, :ok,
-           Map.put(state, simulation_id, %{
+          {:noreply,
+           Map.put(state, project_id, %{
              server_process: pid
            })}
         else
@@ -119,8 +84,69 @@ defmodule RenewCollabSim.Server.ProjectSimulationServer do
   end
 
   @impl true
+  def handle_cast({:step, project_id, simulation_id}, state) do
+    case Map.get(state, project_id, nil) do
+      %{server_process: p} ->
+        RenewCollabSim.Server.SimulationServer.step(p, simulation_id)
+        {:noreply, state}
+
+      nil ->
+        {:noreply, state}
+    end
+  end
+
+  @impl true
+  def handle_cast({:play, project_id, simulation_id}, state) do
+    case Map.get(state, project_id, nil) do
+      %{server_process: p} ->
+        RenewCollabSim.Server.SimulationServer.play(p, simulation_id)
+        {:noreply, state}
+
+      nil ->
+        {:noreply, state}
+    end
+  end
+
+  @impl true
+  def handle_cast({:pause, project_id, simulation_id}, state) do
+    case Map.get(state, project_id, nil) do
+      %{server_process: p} ->
+        RenewCollabSim.Server.SimulationServer.pause(p, simulation_id)
+        {:noreply, state}
+
+      nil ->
+        {:noreply, state}
+    end
+  end
+
+  @impl true
+  def handle_call({:setup, project_id, simulation_id}, _from, state) do
+    Map.get(state, project_id)
+    |> case do
+      nil ->
+        with {:ok, pid} <- RenewCollabSim.Server.SimulationServer.start_link() do
+          RenewCollabSim.Server.SimulationServer.setup_and_wait(pid, simulation_id)
+
+          dbg("xXxx")
+
+          {:reply, :ok,
+           Map.put(state, project_id, %{
+             server_process: pid
+           })}
+        else
+          _ ->
+            {:reply, :error, state}
+        end
+
+      %{server_process: pid} ->
+        RenewCollabSim.Server.SimulationServer.setup_and_wait(pid, simulation_id)
+        {:reply, :ok, state}
+    end
+  end
+
+  @impl true
   def handle_call({:terminate, project_id, simulation_id}, _from, state) do
-    case Map.get(state, simulation_id, nil) do
+    case Map.get(state, project_id, nil) do
       %{server_process: p} ->
         RenewCollabSim.Server.SimulationServer.terminate(p, simulation_id)
         {:reply, true, state}
@@ -132,7 +158,14 @@ defmodule RenewCollabSim.Server.ProjectSimulationServer do
 
   @impl true
   def handle_call({:exists, project_id, simulation_id}, _from, state) do
-    {:reply, Map.has_key?(state, simulation_id), state}
+    case Map.get(state, project_id, nil) do
+      %{server_process: p} ->
+        RenewCollabSim.Server.SimulationServer.exists(p, simulation_id)
+        {:reply, true, state}
+
+      nil ->
+        {:reply, false, state}
+    end
   end
 
   @impl true
@@ -150,12 +183,37 @@ defmodule RenewCollabSim.Server.ProjectSimulationServer do
 
   @impl true
   def handle_call({:running_ids, project_id}, _from, state) do
-    {:reply, Map.keys(state), state}
+    case Map.get(state, project_id, nil) do
+      %{server_process: p} ->
+        {:reply, RenewCollabSim.Server.SimulationServer.running_ids(p), state}
+
+      nil ->
+        {:reply, MapSet.new(), state}
+    end
   end
 
   @impl true
   def handle_call({:count, project_id}, _from, state) do
-    {:reply, map_size(state), state}
+    case Map.get(state, project_id, nil) do
+      %{server_process: p} ->
+        {:reply, RenewCollabSim.Server.SimulationServer.count(p), state}
+
+      nil ->
+        {:reply, 0, state}
+    end
+  end
+
+  @impl true
+  def handle_call(:count_all, _from, state) do
+    sum =
+      state
+      |> Enum.map(fn {_, %{server_process: pid}} ->
+        Task.async(fn -> SimulationServer.count(pid) end)
+      end)
+      |> Enum.map(&Task.await(&1, 1_000))
+      |> Enum.sum()
+
+    {:reply, {map_size(state), sum}, state}
   end
 
   @impl true
@@ -183,7 +241,7 @@ defmodule RenewCollabSim.Server.ProjectSimulationServer do
   end
 
   defp cleanup(_reason, state) do
-    for {simulation_id, %{server_process: pid}} <- state do
+    for {project_id, %{server_process: pid}} <- state do
       RenewCollabSim.Server.SimulationServer.stop_all(pid)
     end
   end

@@ -38,7 +38,11 @@
   <dd>{@cache_size}</dd>
 
   <dt>Running Simulation Processes</dt>
-  <dd>{@simulation_active_count}</dd>
+  <dd>
+    <%= with {proj, total} <- @simulation_active_count do %>
+      Projects:{proj}/ Total:{total}
+    <% end %>
+  </dd>
 
   <dt>Media</dt>
   <dd>{@number_of_media}</dd>

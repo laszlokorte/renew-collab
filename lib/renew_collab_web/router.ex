@@ -133,6 +133,8 @@ defmodule RenewCollabWeb.Router do
 
     get "/login", LoginController, :index
     post "/login", LoginController, :login
+    get "/signup", SignupController, :new
+    post "/signup", SignupController, :create
   end
 
   scope "/", RenewCollabWeb do

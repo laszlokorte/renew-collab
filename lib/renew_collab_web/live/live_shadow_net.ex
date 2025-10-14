@@ -58,7 +58,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
      |> assign(
        :running,
        RenewCollabSim.Server.ProjectSimulationServer.running_ids(
-         socket.assigns.sns.project_assignment.project_id
+         socket.assigns.shadow_net_system.project_assignment.project_id
        )
        |> MapSet.new()
      )}
@@ -74,7 +74,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
      |> assign(
        :running,
        RenewCollabSim.Server.ProjectSimulationServer.running_ids(
-         socket.assigns.sns.project_assignment.project_id
+         socket.assigns.shadow_net_system.project_assignment.project_id
        )
        |> MapSet.new()
      )}
@@ -395,7 +395,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
      |> assign(
        :running,
        RenewCollabSim.Server.ProjectSimulationServer.running_ids(
-         socket.assigns.sns.project_assignment.project_id
+         socket.assigns.shadow_net_system.project_assignment.project_id
        )
        |> MapSet.new()
      )}
@@ -487,7 +487,10 @@ defmodule RenewCollabWeb.LiveShadowNet do
   end
 
   def handle_event("new-simulation", %{}, socket) do
-    RenewCollabSim.Simulator.create_and_start_simulation(socket.assigns.shadow_net_system.id)
+    RenewCollabSim.Simulator.create_and_start_simulation(
+      socket.assigns.project_id,
+      socket.assigns.shadow_net_system.id
+    )
 
     # TODO:broadcast
     Phoenix.PubSub.broadcast(

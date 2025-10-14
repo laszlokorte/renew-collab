@@ -218,7 +218,8 @@ defmodule RenewCollabProj.Projects do
     }
     |> ProjectMember.changeset(%{"account_id" => account_id, "role" => role})
     |> Repo.insert()
-    |> dbg
+
+    # |> dbg
   end
 
   def add_member(%Project{id: project_id}, %{
@@ -457,7 +458,8 @@ defmodule RenewCollabProj.Projects do
       where: sns.shadow_net_system_id == ^sns_id
     )
     |> Repo.one()
-    |> dbg
+
+    # |> dbg
   end
 
   def delete_document(document_id) do

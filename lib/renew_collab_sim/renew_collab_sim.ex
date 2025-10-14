@@ -303,7 +303,8 @@ defmodule RenewCollabSim.Simulator do
       document_json: nil
     })
     |> Repo.update()
-    |> dbg
+
+    # |> dbg
   end
 
   def change_net_document(

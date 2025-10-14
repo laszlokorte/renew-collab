@@ -1,5 +1,4 @@
 defmodule RenewCollabWeb.ProjectSimulationController do
-  alias RenewCollabSim.Server.SimulationServer
   alias RenewCollabSim.Server.ProjectSimulationServer
   alias RenewCollabSim.Entites.Simulation
 

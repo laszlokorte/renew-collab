@@ -3,7 +3,7 @@ defmodule RenewCollabWeb.MyAccountController do
 
   action_fallback RenewCollabWeb.FallbackController
 
-  def show(conn, params) do
+  def show(conn, _params) do
     conn
     |> render(:show, %{
       changeset:
@@ -14,7 +14,7 @@ defmodule RenewCollabWeb.MyAccountController do
     })
   end
 
-  def change_password(conn, params) do
+  def change_password(conn, _params) do
     conn
     |> put_flash(:info, "Password changed")
     |> redirect(to: ~p"/account/me")
