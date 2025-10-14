@@ -22,7 +22,10 @@ defmodule RenewCollabWeb.LiveDocument do
     with document when not is_nil(document) <- Renew.get_document_with_elements(id) do
       socket =
         socket
+        |> assign(:auto_adjust_viewbox, false)
         |> assign(:document, document)
+        |> assign(import_form: to_form(%{}))
+        |> allow_upload(:import_file, accept: ~w(.rnw), max_entries: 1)
         |> assign(:syntax_types, Syntax.find_all())
         |> assign_async(
           [
@@ -425,6 +428,53 @@ defmodule RenewCollabWeb.LiveDocument do
           </form>
         </div>
 
+        <div>
+          <.form for={@import_form} phx-submit="import_document" phx-change="validate-import">
+            <label>
+              Import Rnw:<br /> <.live_file_input upload={@uploads.import_file} />
+            </label>
+            <%= unless Enum.empty?(@uploads.import_file.entries) do %>
+              <dl style="display: grid; grid-template-columns: auto auto auto; justify-content: start; gap: 2px ; align-items: center">
+                <%= for entry <- @uploads.import_file.entries do %>
+                  <dt style="grid-column: 1; display: flex; gap: 1em">
+                    <button
+                      style="justify-content: center; text-align: center; font-weight: bold; cursor: pointer; width: 1.8em; height: 1.8em; display: flex; place-items: center; border: none; background: #a33; color: #fff; border-radius: 100%;"
+                      type="button"
+                      phx-click="cancel-upload"
+                      phx-value-ref={entry.ref}
+                      aria-label="cancel"
+                    >
+                      &times;
+                    </button>
+                    {entry.client_name}
+                  </dt>
+
+                  <dd>
+                    <%!-- entry.progress will update automatically for in-flight entries --%>
+                    <progress value={entry.progress} max="100">{entry.progress}%</progress>
+                  </dd>
+
+                  <dd style="grid-column: 1 / span 3;">
+                    <ul>
+                      <%= for err <- upload_errors(@uploads.import_file, entry) do %>
+                        <li class="alert alert-danger">{error_to_string(err)}</li>
+                      <% end %>
+                    </ul>
+                  </dd>
+                <% end %>
+              </dl>
+            <% end %>
+            <%= if Enum.count(@uploads.import_file.entries) > 0 and Enum.count(@uploads.import_file.errors) == 0 do %>
+              <button
+                type="submit"
+                style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff; padding: 1ex"
+              >
+                Import
+              </button>
+            <% end %>
+          </.form>
+        </div>
+
         <h2 style="cursor: pointer;" phx-click="toggle-meta">
           <span>{if(@show_meta, do: "▼", else: "►")}</span> Document
         </h2>
@@ -797,6 +847,42 @@ defmodule RenewCollabWeb.LiveDocument do
 
   def viewbox_center(viewbox) do
     RenewCollab.ViewBox.center(viewbox)
+  end
+
+  defp error_to_string(:too_large), do: "The selected file is too large."
+  defp error_to_string(:too_many_files), do: "You have selected too many files."
+
+  defp error_to_string(:not_accepted),
+    do: "You have selected an unsupported file format. (only .rnw files can be imported)"
+
+  def handle_event("validate-import", params, socket) do
+    {:noreply, assign(socket, import_form: to_form(params))}
+  end
+
+  def handle_event("cancel-upload", %{"ref" => ref}, socket) do
+    {:noreply, cancel_upload(socket, :import_file, ref)}
+  end
+
+  def handle_event("import_document", _params, socket) do
+    [converted_document] =
+      consume_uploaded_entries(socket, :import_file, fn %{path: path}, %{client_name: filename} ->
+        {:ok, content} = File.read(path)
+
+        with {:ok, converted = %RenewCollab.Import.Converted{}} =
+               RenewCollab.Import.DocumentImport.import(filename, content) do
+          {:ok, converted}
+        end
+      end)
+
+    RenewCollab.Commands.InsertTransientDocument.new(%{
+      target_document_id: socket.assigns.document.id,
+      converted_document: converted_document
+    })
+    |> RenewCollab.Commander.run_document_command()
+
+    {:noreply,
+     socket
+     |> assign(:auto_adjust_viewbox, true)}
   end
 
   def handle_event("toggle_visible", %{"id" => layer_id}, socket) do
@@ -1754,14 +1840,17 @@ defmodule RenewCollabWeb.LiveDocument do
       %RenewCollabSim.Entites.Simulation{} = sim ->
         case params do
           %{"redirect" => "no"} ->
-            {:noreply, socket}
+            {:noreply, socket |> put_flash(:info, "Simulation created")}
 
           _ ->
-            {:noreply, redirect(socket, to: ~p"/simulation/#{sim.id}")}
+            {:noreply,
+             socket
+             |> put_flash(:info, "Simulation created")
+             |> redirect(to: ~p"/simulation/#{sim.id}")}
         end
 
-      _e ->
-        {:noreply, socket}
+      {:error, _} ->
+        {:noreply, socket |> put_flash(:error, "Failed to create simulation")}
     end
   end
 
@@ -1793,7 +1882,14 @@ defmodule RenewCollabWeb.LiveDocument do
                 }}
              end
            )
-           |> assign(:document, doc)}
+           |> assign(:document, doc)
+           |> then(fn socket ->
+             if socket.assigns.auto_adjust_viewbox do
+               socket |> assign(:viewbox, viewbox(doc)) |> assign(:auto_adjust_viewbox, false)
+             else
+               socket
+             end
+           end)}
       end
     end
   end

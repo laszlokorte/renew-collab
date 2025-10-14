@@ -47,6 +47,7 @@ defmodule RenewCollabWeb.LiveSimulation do
         nil ->
           {:noreply,
            socket
+           |> put_flash(:error, "Simulation not found")
            |> redirect(to: ~p"/shadow_net/#{socket.assigns.simulation.shadow_net_system_id}")}
 
         sim ->

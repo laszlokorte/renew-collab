@@ -314,6 +314,9 @@ defmodule RenewCollabWeb.LiveSimulations do
 
       {:error, {:dup, _}} ->
         {:noreply, socket |> put_flash(:error, "Duplicate net names")}
+
+      {:error, _} ->
+        {:noreply, socket |> put_flash(:error, "Failed to create simulation")}
     end
   end
 

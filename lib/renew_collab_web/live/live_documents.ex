@@ -353,8 +353,8 @@ defmodule RenewCollabWeb.LiveDocuments do
       %RenewCollabSim.Entites.Simulation{} = sim ->
         {:noreply, redirect(socket, to: ~p"/simulation/#{sim.id}")}
 
-      _e ->
-        {:noreply, socket}
+      {:error, _} ->
+        {:noreply, socket |> put_flash(:error, "Failed to create simulation")}
     end
   end
 
