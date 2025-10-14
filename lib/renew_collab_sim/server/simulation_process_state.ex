@@ -83,7 +83,7 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
 
   defp init_process(simulation, start_command) do
     slf = self()
-    uuid_dir = "renew-simulation-#{simulation.id}/#{UUID.uuid4(:default)}"
+    uuid_dir = "petristation/renew-simulation-#{simulation.id}/#{UUID.uuid4(:default)}"
 
     {:ok, output_root} = Path.safe_relative_to(uuid_dir, System.tmp_dir!())
     output_root = Path.absname(output_root, System.tmp_dir!())

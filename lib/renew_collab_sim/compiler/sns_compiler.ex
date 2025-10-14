@@ -2,7 +2,7 @@ defmodule RenewCollabSim.Compiler.SnsCompiler do
   def compile(formalism, nets) do
     {:ok, compiler} = compiler_name(formalism)
 
-    uuid_dir = "renew-ssn-compilation-#{UUID.uuid4(:default)}"
+    uuid_dir = "petristation/renew-ssn-compilation-#{UUID.uuid4(:default)}"
     {:ok, output_root} = Path.safe_relative_to(uuid_dir, System.tmp_dir!())
     output_root = Path.absname(output_root, System.tmp_dir!())
 

@@ -1834,7 +1834,7 @@ defmodule RenewCollabWeb.LiveDocument do
       socket.assigns.document.project,
       formalism,
       [socket.assigns.document.id],
-      socket.assigns.document.name
+      RenewCollabSim.Compiler.SnsCompiler.normalize_net_name(socket.assigns.document.name)
     )
     |> case do
       %RenewCollabSim.Entites.Simulation{} = sim ->
