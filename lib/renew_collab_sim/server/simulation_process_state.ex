@@ -13,6 +13,8 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
     :scheduled,
     :logging,
     :open_multi,
+    :throttle,
+    :pubsub_channels,
     :cmds
   ]
 
@@ -41,6 +43,11 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
          retry: nil,
          playing: false,
          scheduled: false,
+         pubsub_channels: [
+           "projects/#{simulation.project.id}/simulations",
+           "simulation:#{simulation.id}"
+         ],
+         throttle: {100, :millisecond},
          logging: true,
          cmds: cmds,
          open_multi:

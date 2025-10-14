@@ -71,19 +71,7 @@ defmodule RenewCollabSim.Server.SimulationServer do
       {:noreply, state}
     else
       with {:ok, pid} <- RenewCollabSim.Server.SimulationProcess.start_monitor(simulation_id) do
-        # TODO:broadcast
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "simulation:#{simulation_id}",
-          {:simulation_change, simulation_id, :state}
-        )
-
-        # TODO:broadcast
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "projects/#{project_id}/simulations",
-          {:simulation_change, simulation_id, :state}
-        )
+        broadcast_state_change(state, project_id, simulation_id)
 
         {:noreply,
          %{
@@ -146,19 +134,7 @@ defmodule RenewCollabSim.Server.SimulationServer do
       {:noreply, state}
     else
       with {:ok, pid} <- RenewCollabSim.Server.SimulationProcess.start_monitor(simulation_id) do
-        # TODO:broadcast
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "simulation:#{simulation_id}",
-          {:simulation_change, simulation_id, :state}
-        )
-
-        # TODO:broadcast
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "projects/#{project_id}/simulations",
-          {:simulation_change, simulation_id, :state}
-        )
+        broadcast_state_change(state, project_id, simulation_id)
 
         {:reply, :ok,
          %{
@@ -217,17 +193,7 @@ defmodule RenewCollabSim.Server.SimulationServer do
         {:broadcast_shutdown, simulation_id},
         %{project_id: project_id, processes: procs} = state
       ) do
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "simulation:#{simulation_id}",
-      {:simulation_change, simulation_id, :state}
-    )
-
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "projects/#{project_id}/simulations",
-      {:simulation_change, simulation_id, :state}
-    )
+    broadcast_state_change(state, project_id, simulation_id)
 
     if Enum.empty?(procs), do: {:stop, :normal, state}, else: {:noreply, state}
   end
@@ -262,23 +228,27 @@ defmodule RenewCollabSim.Server.SimulationServer do
     state
   end
 
-  defp cleanup(_reason, %{project_id: project_id, processes: procs}) do
+  defp cleanup(_reason, %{project_id: project_id, processes: procs} = state) do
     for {simulation_id, %{sim_process: pid}} <- procs do
       RenewCollabSim.Server.SimulationProcess.stop(pid)
 
-      # TODO:broadcast
-      Phoenix.PubSub.broadcast(
-        RenewCollab.PubSub,
-        "simulation:#{simulation_id}",
-        {:simulation_change, simulation_id, :state}
-      )
-
-      # TODO:broadcast
-      Phoenix.PubSub.broadcast(
-        RenewCollab.PubSub,
-        "projects/#{project_id}/simulations",
-        {:simulation_change, simulation_id, :state}
-      )
+      broadcast_state_change(state, project_id, simulation_id)
     end
+  end
+
+  defp broadcast_state_change(state, project_id, simulation_id) do
+    # TODO:broadcast
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "simulation:#{simulation_id}",
+      {:simulation_change, simulation_id, :state}
+    )
+
+    # TODO:broadcast
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "projects/#{project_id}/simulations",
+      {:simulation_change, simulation_id, :state}
+    )
   end
 end

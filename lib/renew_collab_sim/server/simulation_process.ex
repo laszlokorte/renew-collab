@@ -39,7 +39,9 @@ defmodule RenewCollabSim.Server.SimulationProcess do
            project_id: project_id,
            latest_update: latest_update,
            retry: retry,
-           playing: playing
+           playing: playing,
+           throttle: {throttle_amount, throttle_unit},
+           pubsub_channels: pubsub_channels
          },
          event
        ) do
@@ -49,20 +51,16 @@ defmodule RenewCollabSim.Server.SimulationProcess do
       Process.cancel_timer(retry)
     end
 
-    if is_nil(latest_update) || DateTime.diff(now, latest_update, :millisecond) >= 100 do
-      # TODO:broadcast
-      Phoenix.PubSub.broadcast(
-        RenewCollab.PubSub,
-        "simulation:#{sim_id}",
-        {:simulation_change, sim_id, {event, playing}}
-      )
-
-      # TODO:broadcast
-      Phoenix.PubSub.broadcast(
-        RenewCollab.PubSub,
-        "projects/#{project_id}/simulations",
-        {:simulation_change, sim_id, {event, playing}}
-      )
+    if is_nil(latest_update) ||
+         DateTime.diff(now, latest_update, throttle_unit) >= throttle_amount do
+      for channel <- pubsub_channels do
+        # TODO:broadcast
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          channel,
+          {:simulation_change, sim_id, {event, playing}}
+        )
+      end
 
       %{state | latest_update: now, retry: nil}
     else
