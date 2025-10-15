@@ -42,7 +42,6 @@ defmodule RenewCollab.Import.DocumentImport do
 
       hierarchy = Enum.flat_map(figures, fn fig -> collect_hierarchy(fig, refs_with_ids) end)
 
-      # raise "x"
       # FrameColor
       # FillColor
       # TextColor

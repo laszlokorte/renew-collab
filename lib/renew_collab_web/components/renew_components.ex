@@ -228,16 +228,10 @@ defmodule RenewCollabWeb.RenewComponents do
   end
 
   def show(js \\ %JS{}, selector) do
-    JS.show(js,
-      to: selector,
-      time: 300
-    )
+    JS.remove_attribute("hidden", to: selector)
   end
 
   def hide(js \\ %JS{}, selector) do
-    JS.hide(js,
-      to: selector,
-      time: 200
-    )
+    JS.set_attribute({"hidden", true}, to: selector)
   end
 end
