@@ -56,8 +56,6 @@ defmodule RenewCollab.LegacyCommander do
         end)
         |> case do
           document_id when is_binary(document_id) ->
-            RenewCollab.SimpleCache.delete_tags([{:document_versions, document_id} | tags])
-
             for tag <- tags do
               case tag do
                 :document_collection ->

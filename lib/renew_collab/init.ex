@@ -90,6 +90,6 @@ defmodule RenewCollab.Init do
       end
     end
 
-    RenewCollab.SimpleCache.clear()
+    RenewCollabCtrl.CacheServer.clear()
   end
 end

@@ -1,4 +1,4 @@
-defmodule RenewCollab.SimpleCache do
+defmodule RenewCollabCtrl.CacheServer do
   use GenServer
 
   @initial_state %{entries: Map.new(), tags: Map.new()}
@@ -9,18 +9,12 @@ defmodule RenewCollab.SimpleCache do
 
   def start_link(opts), do: GenServer.start_link(__MODULE__, opts, name: __MODULE__)
 
-  def cache(key, fun, tags, lifetime \\ :infinity)
-      when is_function(fun) and
-             (lifetime == :infinity or (is_integer(lifetime) and lifetime >= 0)) do
-    case GenServer.call(__MODULE__, {:get, key, lifetime}) do
-      {:ok, value} ->
-        value
+  def get(key, lifetime) do
+    GenServer.call(__MODULE__, {:get, key, lifetime})
+  end
 
-      :error ->
-        value = fun.()
-        GenServer.cast(__MODULE__, {:put, key, value, tags})
-        value
-    end
+  def put(key, value, tags) do
+    GenServer.cast(__MODULE__, {:put, key, value, tags})
   end
 
   def delete_tag(tag), do: GenServer.cast(__MODULE__, {:delete_tag, tag})

@@ -120,14 +120,7 @@ defmodule RenewCollab.Hierarchy do
   end
 
   def find_missing(doc_id) do
-    RenewCollab.SimpleCache.cache(
-      {:hierarchy_missing, doc_id},
-      fn ->
-        Repo.all(find_missing_query(doc_id))
-      end,
-      [{:document_content, doc_id}],
-      600
-    )
+    Repo.all(find_missing_query(doc_id))
   end
 
   def count_missing_global() do
@@ -214,14 +207,7 @@ defmodule RenewCollab.Hierarchy do
   end
 
   def find_invalids(doc_id) do
-    RenewCollab.SimpleCache.cache(
-      {:hierarchy_invalids, doc_id},
-      fn ->
-        Repo.all(find_invalids_query(doc_id))
-      end,
-      [{:document_content, doc_id}],
-      600
-    )
+    Repo.all(find_invalids_query(doc_id))
   end
 
   def count_invalids_global() do
