@@ -7,7 +7,7 @@ defmodule RenewCollab.Commands.InsertTransientDocument do
   alias RenewCollab.Element.Edge
   alias RenewCollab.Import.Converted
 
-  defstruct [:converted_document, :target_document_id, :position]
+  defstruct [:converted_document, :target_document_id, :position, :target]
 
   def new(%{
         target_document_id: target_document_id,
@@ -40,7 +40,7 @@ defmodule RenewCollab.Commands.InsertTransientDocument do
   def multi(%__MODULE__{
         target_document_id: target_document_id,
         converted_document: converted_document,
-        position: {dx, dy}
+        position: {_dx, _dy}
       }) do
     Ecto.Multi.new()
     |> Ecto.Multi.put(:stripped_document, converted_document)
@@ -157,4 +157,9 @@ defmodule RenewCollab.Commands.InsertTransientDocument do
       end)
     end)
   end
+
+  def parse_hierarchy_position("above", "inside"), do: {:above, :inside}
+  def parse_hierarchy_position("above", "outside"), do: {:above, :outside}
+  def parse_hierarchy_position("below", "outside"), do: {:below, :outside}
+  def parse_hierarchy_position("below", "inside"), do: {:below, :inside}
 end

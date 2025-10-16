@@ -36,7 +36,6 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   defp broadcast_change(
          state = %{
            simulation_id: sim_id,
-           project_id: project_id,
            latest_update: latest_update,
            retry: retry,
            playing: playing,

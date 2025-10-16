@@ -4,7 +4,6 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
   defstruct [
     :simulation,
     :simulation_id,
-    :project_id,
     :sim_process,
     :directory,
     :latest_update,
@@ -36,7 +35,6 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
        %__MODULE__{
          simulation: simulation,
          simulation_id: simulation.id,
-         project_id: simulation.project.id,
          sim_process: sim_process,
          directory: directory,
          latest_update: nil,

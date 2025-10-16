@@ -1,9 +1,9 @@
 defmodule RenewCollabCtrl.Dispatcher do
-  alias RenewCollabCtrl.Access
+  alias RenewCollabCtrl.ReadAccess
   alias RenewCollabCtrl.Actions
 
   def perform_as(action, account) do
-    if Access.can(account, action) do
+    if ReadAccess.can(account, action) do
       do_perform(action)
     end
   end

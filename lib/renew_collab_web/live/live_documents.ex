@@ -1,4 +1,6 @@
 defmodule RenewCollabWeb.LiveDocuments do
+  alias RenewCollabCtrl.Views
+  alias RenewCollabCtrl.Fetcher
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
@@ -10,16 +12,19 @@ defmodule RenewCollabWeb.LiveDocuments do
       nil ->
         {:ok, socket |> put_flash(:error, "Project not found") |> redirect(to: ~p"/projects")}
 
-      proj ->
+      project ->
         # TODO:subscription
-        RenewCollabWeb.Endpoint.subscribe("project/#{proj.id}/documents")
+        RenewCollabWeb.Endpoint.subscribe("project/#{project.id}/documents")
 
         socket =
           socket
-          |> assign(:project, proj)
+          |> assign(:project, project)
           |> assign(
             :documents,
-            Renew.list_documents(RenewCollabProj.Projects.list_project_documents(project_id))
+            %Views.ProjectDocumentsList{
+              project_id: project.id
+            }
+            |> Fetcher.fetch_as(socket.assigns.current_account)
           )
           |> assign(create_form: to_form(%{}))
           |> assign(import_form: to_form(%{}))
@@ -363,9 +368,10 @@ defmodule RenewCollabWeb.LiveDocuments do
      socket
      |> assign(
        :documents,
-       Renew.list_documents(
-         RenewCollabProj.Projects.list_project_documents(socket.assigns.project.id)
-       )
+       %Views.ProjectDocumentsList{
+         project_id: socket.assigns.project.id
+       }
+       |> Fetcher.fetch_as(socket.assigns.current_account)
      )}
   end
 end

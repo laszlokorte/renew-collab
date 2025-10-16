@@ -34,11 +34,9 @@ defmodule RenewCollabWeb.RenewComponents do
 
     ~H"""
     <div style="display: grid; grid-template: [stack-start] 1fr [stack-end] / [stack-start] 1fr [stack-end];">
-      <%= if @flash do %>
-        <div style="grid-area: stack;z-index: 10;pointer-events: none; align-self: center; justify-self: center;">
-          <.flash_group flash={@flash} />
-        </div>
-      <% end %>
+      <div style="grid-area: stack;z-index: 10;pointer-events: none; align-self: center; justify-self: center;">
+        <.flash_group flash={@flash || nil} />
+      </div>
       <header style="grid-area: stack; background: #333; color: #fff; padding: 1em; display: flex; justify-content: space-between; font-family: monospace;">
         <.link style="color: white; align-self: center; text-decoration: none" navigate={~p"/"}>
           <h1 style="margin: 0; font-size: 1.3em; display: flex; align-items: center; gap: 1ex">
@@ -228,10 +226,10 @@ defmodule RenewCollabWeb.RenewComponents do
   end
 
   def show(js \\ %JS{}, selector) do
-    JS.remove_attribute("hidden", to: selector)
+    js |> JS.remove_attribute("hidden", to: selector)
   end
 
   def hide(js \\ %JS{}, selector) do
-    JS.set_attribute({"hidden", true}, to: selector)
+    js |> JS.set_attribute({"hidden", true}, to: selector)
   end
 end

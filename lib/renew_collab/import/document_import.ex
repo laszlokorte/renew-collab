@@ -313,12 +313,11 @@ defmodule RenewCollab.Import.DocumentImport do
                 class_name: class_name,
                 fields: fields
               }, uuid}, z_index} ->
-              attrs =
-                with %Renewex.Storable{fields: f} <- Map.get(fields, :attributes) do
-                  f.attributes |> Enum.into(%{}, fn {key, _type, value} -> {key, value} end)
-                else
-                  _ -> nil
-                end
+              with %Renewex.Storable{fields: f} <- Map.get(fields, :attributes) do
+                f.attributes |> Enum.into(%{}, fn {key, _type, value} -> {key, value} end)
+              else
+                _ -> nil
+              end
 
               %{
                 "semantic_tag" => class_name,

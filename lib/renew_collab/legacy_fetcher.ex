@@ -1,4 +1,4 @@
-defmodule RenewCollab.Fetcher do
+defmodule RenewCollab.LegacyFetcher do
   alias RenewCollab.Repo
 
   @default_ttl 600

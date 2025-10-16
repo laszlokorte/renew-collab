@@ -236,7 +236,7 @@ defmodule RenewCollabSim.Server.SimulationServer do
     end
   end
 
-  defp broadcast_state_change(state, project_id, simulation_id) do
+  defp broadcast_state_change(_state, project_id, simulation_id) do
     # TODO:broadcast
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
