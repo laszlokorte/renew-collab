@@ -3,6 +3,9 @@ defmodule RenewCollabWeb.LiveDocument do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
+  alias RenewCollabCtrl.Fetcher
+  alias RenewCollabCtrl.Views
+
   import RenewCollabWeb.RenewComponents
 
   alias RenewCollab.Versioning
@@ -19,7 +22,11 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def mount(%{"id" => id}, _session, socket) do
-    with document when not is_nil(document) <- Renew.get_document_with_elements(id) do
+    with document when not is_nil(document) <-
+           %Views.DocumentWithContent{
+             document_id: id
+           }
+           |> Fetcher.fetch_as(socket.assigns.current_account) do
       socket =
         socket
         |> assign(:auto_adjust_viewbox, false)
@@ -1856,7 +1863,10 @@ defmodule RenewCollabWeb.LiveDocument do
 
   def handle_info({:document_changed, document_id}, socket) do
     if document_id == socket.assigns.document.id do
-      Renew.get_document_with_elements(document_id)
+      %Views.DocumentWithContent{
+        document_id: document_id
+      }
+      |> Fetcher.fetch_as(socket.assigns.current_account)
       |> case do
         nil ->
           {:norely, socket}
@@ -1936,13 +1946,13 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   defp find_relative(socket, rel) do
-    Queries.LayerHierarchyRelative.new(%{
+    %Views.DocumentLayerRelative{
       document_id: socket.assigns.document.id,
       layer_id: socket.assigns.selection,
       id_only: true,
       relative: rel
-    })
-    |> RenewCollab.Fetcher.fetch()
+    }
+    |> Fetcher.fetch_as(socket.assigns.current_account)
   end
 
   defp select_relative(socket, rel) do

@@ -17,8 +17,17 @@ defmodule RenewCollabCtrl.View do
     {:error, []}
   end
 
-  def do_fetch(_account, %Views.DocumentWithContent{}) do
-    {:error, :not_implemented}
+  def do_fetch(_account, %Views.DocumentWithContent{document_id: document_id}) do
+    %{document_id: document_id}
+    |> RenewCollab.Queries.DocumentWithElements.new()
+    |> RenewCollab.Queries.DocumentWithElements.multi()
+    |> RenewCollab.Repo.transact()
+    |> extract_result()
+    |> then(
+      &case &1 do
+        {:ok, list} -> {:ok, RenewCollabProj.Projects.attach_project_assignment(list)}
+      end
+    )
   end
 
   def do_fetch(_account, %Views.GlobalAccounts{}) do
@@ -81,8 +90,13 @@ defmodule RenewCollabCtrl.View do
     {:error, []}
   end
 
-  def do_fetch(_account, %Views.ProjectDocumentsList{}) do
-    {:ok, []}
+  def do_fetch(account, %Views.ProjectDocumentsList{project_id: project_id}) do
+    account
+    |> RenewCollabProj.Projects.find_own_project(project_id)
+    |> then(&RenewCollab.Queries.DocumentList.new(%{project: &1}))
+    |> RenewCollab.Queries.DocumentList.multi()
+    |> RenewCollab.Repo.transact()
+    |> extract_result()
   end
 
   def do_fetch(_account, %Views.ProjectShadowNetSystemsList{}) do
@@ -99,5 +113,9 @@ defmodule RenewCollabCtrl.View do
 
   def do_fetch(_account, %Views.SimulationWithState{}) do
     {:error, :not_implemented}
+  end
+
+  defp extract_result({:ok, %{:result => res}}) do
+    {:ok, res}
   end
 end

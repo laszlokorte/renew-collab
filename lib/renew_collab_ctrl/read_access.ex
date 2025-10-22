@@ -3,6 +3,7 @@ defmodule RenewCollabCtrl.ReadAccess do
   def can(_, _)
 
   def can(_account, %Views.ProjectDocumentsList{}), do: true
+  def can(_account, %Views.DocumentWithContent{}), do: true
 
   def can(_account, _view), do: false
 end
