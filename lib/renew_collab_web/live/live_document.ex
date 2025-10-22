@@ -8,12 +8,8 @@ defmodule RenewCollabWeb.LiveDocument do
 
   import RenewCollabWeb.RenewComponents
 
-  alias RenewCollab.Versioning
   alias RenewCollab.Renew
-  alias RenewCollab.Symbols
   alias RenewCollab.Syntax
-  alias RenewCollab.Sockets
-  alias RenewCollab.Queries
 
   @renew_grammar Renewex.Grammar.new(11)
 
@@ -22,11 +18,13 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def mount(%{"id" => id}, _session, socket) do
+    account = socket.assigns.current_account
+
     with document when not is_nil(document) <-
            %Views.DocumentWithContent{
              document_id: id
            }
-           |> Fetcher.fetch_as(socket.assigns.current_account) do
+           |> Fetcher.fetch_as(account) do
       socket =
         socket
         |> assign(:auto_adjust_viewbox, false)
@@ -48,17 +46,38 @@ defmodule RenewCollabWeb.LiveDocument do
           fn ->
             {:ok,
              %{
-               undo_redo: Versioning.document_undo_redo(id),
+               undo_redo:
+                 %Views.DocumentVersionState{
+                   document_id: id
+                 }
+                 |> Fetcher.fetch_as(account),
                other_documents:
-                 Renew.list_documents(
-                   RenewCollabProj.Projects.list_project_documents(document.project.id)
-                 ),
-               snapshots: Versioning.document_versions(id),
-               socket_schemas: Sockets.all_socket_schemas(),
-               symbols: Symbols.list_shapes() |> Enum.map(fn s -> {s.id, s} end) |> Map.new(),
-               hierachy_missing: RenewCollab.Hierarchy.find_missing(id),
-               hierachy_invalid: RenewCollab.Hierarchy.find_invalids(id),
-               simulation_links: Renew.list_simulation_links(document.id)
+                 %Views.ProjectDocumentsList{
+                   project_id: document.project_assignment.project_id
+                 }
+                 |> Fetcher.fetch_as(account),
+               snapshots:
+                 %Views.DocumentVersionsList{
+                   document_id: document.id
+                 }
+                 |> Fetcher.fetch_as(account),
+               socket_schemas:
+                 %Views.GlobalSocketSchemasList{}
+                 |> Fetcher.fetch_as(account),
+               symbols:
+                 %Views.GlobalSymbolsList{}
+                 |> Fetcher.fetch_as(account)
+                 |> Enum.map(fn s -> {s.id, s} end)
+                 |> Map.new(),
+               hierachy_missing:
+                 %Views.DocumentHierarchyMissings{document_id: id}
+                 |> Fetcher.fetch_as(account),
+               hierachy_invalid:
+                 %Views.DocumentHierarchyInvalids{document_id: id}
+                 |> Fetcher.fetch_as(account),
+               simulation_links:
+                 %Views.DocumentSimulationLinks{document_id: id}
+                 |> Fetcher.fetch_as(account)
              }}
           end
         )
@@ -1862,6 +1881,8 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def handle_info({:document_changed, document_id}, socket) do
+    account = socket.assigns.account
+
     if document_id == socket.assigns.document.id do
       %Views.DocumentWithContent{
         document_id: document_id
@@ -1879,7 +1900,11 @@ defmodule RenewCollabWeb.LiveDocument do
              fn ->
                {:ok,
                 %{
-                  undo_redo: Versioning.document_undo_redo(document_id)
+                  undo_redo:
+                    %Views.DocumentVersionState{
+                      document_id: document_id
+                    }
+                    |> Fetcher.fetch_as(account)
                 }}
              end
            )
@@ -1888,7 +1913,11 @@ defmodule RenewCollabWeb.LiveDocument do
              fn ->
                {:ok,
                 %{
-                  snapshots: Versioning.document_versions(document_id)
+                  snapshots:
+                    %Views.DocumentVersionsList{
+                      document_id: document_id
+                    }
+                    |> Fetcher.fetch_as(account)
                 }}
              end
            )
@@ -1921,6 +1950,8 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def handle_info({:versions_changed, document_id}, socket) do
+    account = socket.assigns.account
+
     if document_id == socket.assigns.document.id do
       {:noreply,
        socket
@@ -1929,7 +1960,11 @@ defmodule RenewCollabWeb.LiveDocument do
          fn ->
            {:ok,
             %{
-              undo_redo: Versioning.document_undo_redo(document_id)
+              undo_redo:
+                %Views.DocumentVersionState{
+                  document_id: document_id
+                }
+                |> Fetcher.fetch_as(account)
             }}
          end
        )
@@ -1938,7 +1973,11 @@ defmodule RenewCollabWeb.LiveDocument do
          fn ->
            {:ok,
             %{
-              snapshots: Versioning.document_versions(document_id)
+              snapshots:
+                %Views.DocumentVersionsList{
+                  document_id: document_id
+                }
+                |> Fetcher.fetch_as(account)
             }}
          end
        )}

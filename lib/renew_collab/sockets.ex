@@ -10,8 +10,7 @@ defmodule RenewCollab.Sockets do
   end
 
   def all_socket_schemas do
-    RenewCollab.Queries.SocketSchemasList.new()
-    |> RenewCollab.Fetcher.fetch(:infinity)
+    :deprecated
   end
 
   def all_socket_by_id do

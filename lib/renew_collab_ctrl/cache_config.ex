@@ -28,6 +28,7 @@ defmodule RenewCollabCtrl.CacheConfig do
   def key_for_view(_account, %Views.ProjectSimulationsList{}), do: nil
   def key_for_view(_account, %Views.ShadowNetSystemSimulations{}), do: nil
   def key_for_view(_account, %Views.SimulationWithState{}), do: nil
+  def key_for_view(_, _), do: nil
 
   def tags_for_view(account, view)
   def tags_for_view(_account, %Views.DocumentLayerRelative{}), do: []
@@ -55,6 +56,7 @@ defmodule RenewCollabCtrl.CacheConfig do
   def tags_for_view(_account, %Views.ProjectSimulationsList{}), do: []
   def tags_for_view(_account, %Views.ShadowNetSystemSimulations{}), do: []
   def tags_for_view(_account, %Views.SimulationWithState{}), do: []
+  def tags_for_view(_, _), do: nil
 
   def ttl_for_view(view)
   def ttl_for_view(%Views.DocumentLayerRelative{}), do: :infinity
@@ -82,6 +84,7 @@ defmodule RenewCollabCtrl.CacheConfig do
   def ttl_for_view(%Views.ProjectSimulationsList{}), do: :infinity
   def ttl_for_view(%Views.ShadowNetSystemSimulations{}), do: :infinity
   def ttl_for_view(%Views.SimulationWithState{}), do: :infinity
+  def ttl_for_view(_), do: nil
 
   def tags_for_action(%Actions.AccountChangePasswordAsAdmin{}, _result), do: []
   def tags_for_action(%Actions.AccountChangePasswordAsUser{}, _result), do: []
@@ -160,4 +163,5 @@ defmodule RenewCollabCtrl.CacheConfig do
   def tags_for_action(%Actions.SimulationStep{}, _result), do: []
   def tags_for_action(%Actions.SimulationTerminate{}, _result), do: []
   def tags_for_action(%Actions.SystemReinstall{}, _result), do: []
+  def tags_for_action(_, _result), do: []
 end

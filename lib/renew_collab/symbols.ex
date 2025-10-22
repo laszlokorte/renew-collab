@@ -1,7 +1,6 @@
 defmodule RenewCollab.Symbols do
   def list_shapes do
-    RenewCollab.Queries.ListSymbols.new()
-    |> RenewCollab.Fetcher.fetch(:infinity)
+    :deprecated
   end
 
   def ids_by_name do

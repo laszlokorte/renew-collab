@@ -9,12 +9,20 @@ defmodule RenewCollabCtrl.View do
     {:error, :not_implemented}
   end
 
-  def do_fetch(_account, %Views.DocumentVersionState{}) do
-    {:error, :not_implemented}
+  def do_fetch(_account, %Views.DocumentVersionState{document_id: document_id}) do
+    %{document_id: document_id}
+    |> RenewCollab.Queries.UndoRedoState.new()
+    |> RenewCollab.Queries.UndoRedoState.multi()
+    |> RenewCollab.Repo.transact()
+    |> extract_result()
   end
 
-  def do_fetch(_account, %Views.DocumentVersionsList{}) do
-    {:error, []}
+  def do_fetch(_account, %Views.DocumentVersionsList{document_id: document_id}) do
+    %{document_id: document_id}
+    |> RenewCollab.Queries.DocumentVersions.new()
+    |> RenewCollab.Queries.DocumentVersions.multi()
+    |> RenewCollab.Repo.transact()
+    |> extract_result()
   end
 
   def do_fetch(_account, %Views.DocumentWithContent{document_id: document_id}) do
@@ -30,6 +38,21 @@ defmodule RenewCollabCtrl.View do
     )
   end
 
+  def do_fetch(_account, %Views.DocumentHierarchyMissings{document_id: document_id}) do
+    RenewCollab.Hierarchy.find_missing(document_id)
+    |> then(&{:ok, &1})
+  end
+
+  def do_fetch(_account, %Views.DocumentHierarchyInvalids{document_id: document_id}) do
+    RenewCollab.Hierarchy.find_missing(document_id)
+    |> then(&{:ok, &1})
+  end
+
+  def do_fetch(_account, %Views.DocumentSimulationLinks{document_id: document_id}) do
+    RenewCollab.Renew.list_simulation_links(document_id)
+    |> then(&{:ok, &1})
+  end
+
   def do_fetch(_account, %Views.GlobalAccounts{}) do
     {:error, :not_implemented}
   end
@@ -39,7 +62,7 @@ defmodule RenewCollabCtrl.View do
   end
 
   def do_fetch(_account, %Views.GlobalDocumentsList{}) do
-    {:error, []}
+    {:error, :not_implemented}
   end
 
   def do_fetch(_account, %Views.GlobalPrimitives{}) do
@@ -47,11 +70,11 @@ defmodule RenewCollabCtrl.View do
   end
 
   def do_fetch(_account, %Views.GlobalShadowNetsList{}) do
-    {:error, []}
+    {:error, :not_implemented}
   end
 
   def do_fetch(_account, %Views.GlobalSimulationsList{}) do
-    {:error, []}
+    {:error, :not_implemented}
   end
 
   def do_fetch(_account, %Views.GlobalSocketById{}) do
@@ -63,7 +86,10 @@ defmodule RenewCollabCtrl.View do
   end
 
   def do_fetch(_account, %Views.GlobalSocketSchemasList{}) do
-    {:error, []}
+    RenewCollab.Queries.SocketSchemasList.new()
+    |> RenewCollab.Queries.SocketSchemasList.multi()
+    |> RenewCollab.Repo.transact()
+    |> extract_result()
   end
 
   def do_fetch(_account, %Views.GlobalSocketSchemasNames{}) do
@@ -71,7 +97,10 @@ defmodule RenewCollabCtrl.View do
   end
 
   def do_fetch(_account, %Views.GlobalSymbolsList{}) do
-    {:error, []}
+    RenewCollab.Queries.ListSymbols.new()
+    |> RenewCollab.Queries.ListSymbols.multi()
+    |> RenewCollab.Repo.transact()
+    |> extract_result()
   end
 
   def do_fetch(_account, %Views.GlobalSymbolsNames{}) do
@@ -79,7 +108,7 @@ defmodule RenewCollabCtrl.View do
   end
 
   def do_fetch(_account, %Views.GlobalSyntaxList{}) do
-    {:error, []}
+    {:error, :not_implemented}
   end
 
   def do_fetch(_account, %Views.MyAccount{}) do
@@ -87,7 +116,11 @@ defmodule RenewCollabCtrl.View do
   end
 
   def do_fetch(_account, %Views.MyProjectsList{}) do
-    {:error, []}
+    {:error, :not_implemented}
+  end
+
+  def do_fetch(_account, %Views.MyProjectsList{}) do
+    {:error, :not_implemented}
   end
 
   def do_fetch(account, %Views.ProjectDocumentsList{project_id: project_id}) do
@@ -100,11 +133,11 @@ defmodule RenewCollabCtrl.View do
   end
 
   def do_fetch(_account, %Views.ProjectShadowNetSystemsList{}) do
-    {:error, []}
+    {:error, :not_implemented}
   end
 
   def do_fetch(_account, %Views.ProjectSimulationsList{}) do
-    {:error, []}
+    {:error, :not_implemented}
   end
 
   def do_fetch(_account, %Views.ShadowNetSystemSimulations{}) do
