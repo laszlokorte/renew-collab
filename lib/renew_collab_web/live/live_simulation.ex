@@ -8,7 +8,10 @@ defmodule RenewCollabWeb.LiveSimulation do
   @topic "simulation"
 
   def mount(%{"id" => simulation_id}, _session, socket) do
-    RenewCollabSim.Simulator.find_simulation(simulation_id)
+    %Views.SimulationWithState{
+      simulation_id: simulation_id
+    }
+    |> Fetcher.fetch_as(socket.assigns.current_account)
     |> case do
       nil ->
         {:ok, socket |> put_flash(:error, "Simulation not found") |> redirect(to: ~p"/projects")}
@@ -43,8 +46,13 @@ defmodule RenewCollabWeb.LiveSimulation do
   end
 
   def handle_info({:simulation_change, sim_id, _}, socket) do
+    current_account = socket.assigns.current_account
+
     if sim_id == socket.assigns.simulation_id do
-      RenewCollabSim.Simulator.find_simulation(socket.assigns.simulation_id)
+      %Views.SimulationWithState{
+        simulation_id: sim_id
+      }
+      |> Fetcher.fetch_as(current_account)
       |> case do
         nil ->
           {:noreply,

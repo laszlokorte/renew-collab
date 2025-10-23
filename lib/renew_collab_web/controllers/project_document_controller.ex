@@ -1,14 +1,19 @@
 defmodule RenewCollabWeb.ProjectDocumentController do
   use RenewCollabWeb, :controller
 
-  alias RenewCollabProj.Projects
-  alias RenewCollab.Renew
   alias RenewCollab.Document.Document
+  alias RenewCollabCtrl.Views
+  alias RenewCollabCtrl.Fetcher
 
   action_fallback(RenewCollabWeb.FallbackController)
 
   def index(conn, %{"project_id" => project_id}) do
-    documents = Renew.list_documents(Projects.find_project(project_id))
+    documents =
+      %Views.ProjectDocumentsList{
+        project_id: project_id
+      }
+      |> Fetcher.fetch_as(conn.assigns.current_account)
+
     render(conn, :index, project_id: project_id, documents: documents)
   end
 

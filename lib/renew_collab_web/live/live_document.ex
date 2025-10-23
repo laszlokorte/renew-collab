@@ -1881,7 +1881,7 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def handle_info({:document_changed, document_id}, socket) do
-    account = socket.assigns.account
+    account = socket.assigns.current_account
 
     if document_id == socket.assigns.document.id do
       %Views.DocumentWithContent{
@@ -1950,7 +1950,7 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def handle_info({:versions_changed, document_id}, socket) do
-    account = socket.assigns.account
+    account = socket.assigns.current_account
 
     if document_id == socket.assigns.document.id do
       {:noreply,

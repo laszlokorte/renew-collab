@@ -5,8 +5,15 @@ defmodule RenewCollabCtrl.View do
     {:error, :not_implemented}
   end
 
-  def do_fetch(_account, %Views.DocumentStripped{}) do
-    {:error, :not_implemented}
+  def do_fetch(_account, %Views.DocumentStripped{
+        document_id: document_id,
+        original_ids: original_ids
+      }) do
+    %{document_id: document_id, original_ids: original_ids}
+    |> RenewCollab.Queries.StrippedDocument.new()
+    |> RenewCollab.Queries.StrippedDocument.multi()
+    |> RenewCollab.Repo.transact()
+    |> extract_result()
   end
 
   def do_fetch(_account, %Views.DocumentVersionState{document_id: document_id}) do
@@ -132,10 +139,6 @@ defmodule RenewCollabCtrl.View do
     {:error, :not_implemented}
   end
 
-  def do_fetch(_account, %Views.MyProjectsList{}) do
-    {:error, :not_implemented}
-  end
-
   def do_fetch(account, %Views.ProjectDocumentsList{project_id: project_id}) do
     account
     |> RenewCollabProj.Projects.find_own_project(project_id)
@@ -168,8 +171,9 @@ defmodule RenewCollabCtrl.View do
     {:error, :not_implemented}
   end
 
-  def do_fetch(_account, %Views.SimulationWithState{}) do
-    {:error, :not_implemented}
+  def do_fetch(_account, %Views.SimulationWithState{simulation_id: simulation_id}) do
+    RenewCollabSim.Simulator.find_simulation(simulation_id)
+    |> then(&{:ok, &1})
   end
 
   def do_fetch(_account, %Views.SystemHealthReport{}) do

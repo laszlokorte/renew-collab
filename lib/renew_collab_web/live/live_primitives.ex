@@ -21,11 +21,13 @@ defmodule RenewCollabWeb.LivePrimitives do
   end
 
   defp load_data(socket) do
+    current_account = socket.assigns.current_account
+
     socket
     |> assign(
       :primitive_groups,
       %Views.GlobalPrimitives{}
-      |> Fetcher.fetch_as(socket.assigns.current_account)
+      |> Fetcher.fetch_as(current_account)
     )
     |> assign(:create_form, to_form(%{"name" => nil}, as: :create_group))
     |> assign_async(
@@ -38,10 +40,10 @@ defmodule RenewCollabWeb.LivePrimitives do
          %{
            sockets:
              %Views.GlobalSocketById{}
-             |> Fetcher.fetch_as(socket.assigns.current_account),
+             |> Fetcher.fetch_as(current_account),
            symbols:
              %Views.GlobalSymbolsList{}
-             |> Fetcher.fetch_as(socket.assigns.current_account)
+             |> Fetcher.fetch_as(current_account)
              |> Enum.map(fn s -> {s.id, s} end)
              |> Map.new()
          }}

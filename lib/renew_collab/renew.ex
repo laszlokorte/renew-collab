@@ -14,15 +14,6 @@ defmodule RenewCollab.Renew do
 
   alias RenewCollabProj.Entites.Project
 
-  def list_documents(%Project{} = project) do
-    RenewCollab.Queries.DocumentList.new(%{project: project})
-    |> RenewCollab.Fetcher.fetch()
-  end
-
-  def list_documents() do
-    []
-  end
-
   def count_documents do
     :deprecated
   end
@@ -39,7 +30,6 @@ defmodule RenewCollab.Renew do
     |> RenewCollab.Queries.DocumentWithElements.multi()
     |> RenewCollab.Repo.transact()
     |> then(fn {:ok, %{result: result}} -> result end)
-    |> dbg
   end
 
   def create_document(project, attrs \\ %{}, parenthoods \\ [], hyperlinks \\ [], bonds \\ []) do

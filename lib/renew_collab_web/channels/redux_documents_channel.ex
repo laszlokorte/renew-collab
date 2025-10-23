@@ -2,6 +2,8 @@ defmodule RenewCollabWeb.ReduxDocumentsChannel do
   use RenewCollabWeb.StateChannel, web_module: RenewCollabWeb
 
   alias RenewCollabWeb.Presence
+  alias RenewCollabCtrl.Views
+  alias RenewCollabCtrl.Fetcher
 
   @impl true
   def init("redux_documents", _params, socket) do
@@ -21,18 +23,21 @@ defmodule RenewCollabWeb.ReduxDocumentsChannel do
 
     push(socket, "presence_state", Presence.list(socket))
 
-    {:ok,
-     RenewCollabWeb.ProjectDocumentJSON.index_content(%{
-       documents: RenewCollab.Renew.list_documents()
-     }), {:project_id, nil}}
+    {:ok, load_state(socket.assigns.current_account, nil),
+     %{:project_id => nil, :account => socket.assigns.current_account}}
+  end
+
+  defp load_state(current_account, project_id) do
+    %Views.ProjectDocumentsList{
+      project_id: project_id
+    }
+    |> Fetcher.fetch_as(current_account)
+    |> RenewCollabWeb.ProjectDocumentJSON.index_content()
   end
 
   @impl true
-  def handle_message(:any, _state, _scope) do
-    {:noreply,
-     RenewCollabWeb.ProjectDocumentJSON.index_content(%{
-       documents: RenewCollab.Renew.list_documents()
-     })}
+  def handle_message(:any, _state, %{:project_id => project_id, :account => account}) do
+    {:noreply, load_state(account, project_id)}
   end
 
   @impl true

@@ -385,7 +385,6 @@ defmodule RenewCollabSim.Simulator do
         end)
       rescue
         e ->
-          dbg(e)
           {:error, {:export_error, e}}
       end
 

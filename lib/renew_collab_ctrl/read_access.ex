@@ -6,6 +6,7 @@ defmodule RenewCollabCtrl.ReadAccess do
   def can(_account, %Views.DocumentWithContent{}), do: true
   def can(_account, %Views.DocumentVersionsList{}), do: true
   def can(_account, %Views.DocumentVersionState{}), do: true
+  def can(_account, %Views.DocumentStripped{}), do: true
   def can(_account, %Views.DocumentSimulationLinks{}), do: true
   def can(_account, %Views.GlobalSocketSchemasList{}), do: true
   def can(_account, %Views.GlobalSocketSchema{}), do: true
@@ -21,5 +22,6 @@ defmodule RenewCollabCtrl.ReadAccess do
   def can(_account, %Views.ProjectSimulationsList{}), do: true
   def can(_account, %Views.ProjectShadowNetSystemsList{}), do: true
   def can(_account, %Views.ShadowNetSystem{}), do: true
+  def can(_account, %Views.SimulationWithState{}), do: true
   def can(_account, _view), do: false
 end

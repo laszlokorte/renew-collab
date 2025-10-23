@@ -2,7 +2,8 @@ defmodule RenewCollabWeb.ProjectController do
   use RenewCollabWeb, :controller
 
   alias RenewCollabProj.Projects
-  alias RenewCollab.Renew
+  alias RenewCollabCtrl.Views
+  alias RenewCollabCtrl.Fetcher
 
   action_fallback(RenewCollabWeb.FallbackController)
 
@@ -36,15 +37,20 @@ defmodule RenewCollabWeb.ProjectController do
 
     files =
       for %{document: document} <- project.documents do
-        doc_content = Renew.get_document_with_elements(document.id)
+        doc_content =
+          %Views.DocumentWithContent{
+            document_id: document.id
+          }
+          |> Fetcher.fetch_as(conn.assigns.current_account)
+
         {:ok, output} = RenewCollab.Export.DocumentExport.export(doc_content, synthetic: true)
 
         stripped_document =
-          RenewCollab.Queries.StrippedDocument.new(%{
+          %Views.DocumentStripped{
             document_id: document.id,
             original_ids: true
-          })
-          |> RenewCollab.Fetcher.fetch()
+          }
+          |> Fetcher.fetch_as(conn.assigns.current_account)
           |> Map.from_struct()
           |> Kernel.inspect(pretty: true, limit: :infinity)
 

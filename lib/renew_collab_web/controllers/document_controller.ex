@@ -4,11 +4,16 @@ defmodule RenewCollabWeb.DocumentController do
   alias RenewCollab.Renew
   alias RenewCollab.Document.Document
   alias RenewCollab.Import.DocumentImport
+  alias RenewCollabCtrl.Views
+  alias RenewCollabCtrl.Fetcher
 
   action_fallback(RenewCollabWeb.FallbackController)
 
   def show(conn, %{"id" => id}) do
-    case Renew.get_document_with_elements(id) do
+    case %Views.DocumentWithContent{
+           document_id: id
+         }
+         |> Fetcher.fetch_as(conn.assigns.current_account) do
       nil ->
         conn
         |> put_status(:not_found)
@@ -40,7 +45,10 @@ defmodule RenewCollabWeb.DocumentController do
   end
 
   def export(conn, %{"id" => id} = params) do
-    case Renew.get_document_with_elements(id) do
+    case %Views.DocumentWithContent{
+           document_id: id
+         }
+         |> Fetcher.fetch_as(conn.assigns.current_account) do
       nil ->
         conn
         |> put_status(:not_found)
@@ -64,8 +72,11 @@ defmodule RenewCollabWeb.DocumentController do
   end
 
   def inspect(conn, %{"id" => id}) do
-    RenewCollab.Queries.StrippedDocument.new(%{document_id: id, original_ids: true})
-    |> RenewCollab.Fetcher.fetch()
+    %Views.DocumentStripped{
+      document_id: id,
+      original_ids: true
+    }
+    |> Fetcher.fetch_as(conn.assigns.current_account)
     |> case do
       document ->
         conn
