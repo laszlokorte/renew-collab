@@ -25,6 +25,48 @@ defmodule RenewCollabWeb.DocumentController do
     end
   end
 
+  def thumbnail(conn, %{"id" => id}) do
+    import Phoenix.Component, only: [sigil_H: 2, render_slot: 1]
+
+    case %Views.DocumentWithContent{
+           document_id: id
+         }
+         |> Fetcher.fetch_as(conn.assigns.current_account) do
+      nil ->
+        conn
+        |> put_resp_content_type("image/svg+xml")
+        |> send_resp(:not_found, """
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">
+          <circle cx="100" cy="100" r="80" stroke="black" stroke-width="4" fill="red" />
+        </svg>
+        """)
+        |> halt()
+
+      document ->
+        assigns = %{document: document}
+
+        svg = ~H"""
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">
+          <circle
+            cx="100"
+            cy="100"
+            r="80"
+            stroke="black"
+            stroke-width="4"
+            fill={if(@document.thumbnail, do: "green", else: "gray")}
+          />
+          <text font-size="100" x="100" y="100" text-anchor="middle" dominant-baseline="middle">
+            #{with %{layer_id: id} <- @document.thumbnail, do: id, else: (_ -> "-")}
+          </text>
+        </svg>
+        """
+
+        conn
+        |> put_resp_content_type("image/svg+xml")
+        |> send_resp(200, svg |> Phoenix.HTML.Safe.to_iodata() |> IO.iodata_to_binary())
+    end
+  end
+
   def delete(conn, %{"id" => document_id}) do
     Renew.delete_document(document_id)
 

@@ -18,7 +18,18 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
           👁
         <% end %>
       </td>
-
+      <td
+        valign="top"
+        width="20"
+        align="center"
+        style="cursor:pointer;"
+        phx-click="make_thumbnail"
+        phx-value-id={@layer.id}
+      >
+        <%= if @document.thumbnail && @document.thumbnail.layer_id == @layer.id do %>
+          🖼
+        <% end %>
+      </td>
       <td valign="top" width="20">
         <%= if @layer.outgoing_link do %>
           <span

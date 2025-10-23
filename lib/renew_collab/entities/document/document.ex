@@ -24,6 +24,9 @@ defmodule RenewCollab.Document.Document do
     has_one :project_assignment, RenewCollabProj.Entites.ProjectDocument
     has_one :project, through: [:project_assignment, :project]
 
+    has_one :thumbnail, RenewCollab.Thumbnail.DocumentThumbnailLayer
+    has_one :thumbnail_layer, through: [:thumbnail, :layer]
+
     timestamps(type: :utc_datetime)
   end
 

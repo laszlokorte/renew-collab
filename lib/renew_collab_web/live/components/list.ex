@@ -9,6 +9,7 @@ defmodule RenewCollabWeb.HierarchyListComponent do
         <thead>
           <tr>
             <td width="20" align="center" style="padding: 5px">Vis</td>
+            <td width="20" align="center" style="padding: 5px">Thmb</td>
 
             <td width="20" align="center" style="padding: 5px">Link</td>
 

@@ -56,6 +56,8 @@ defmodule RenewCollab.Hierarchy.Layer do
     has_many :attached_edges, through: [:attached_bonds, :element_edge]
     has_many :used_sockets, through: [:attached_bonds, :socket]
 
+    has_one :thumbnail, RenewCollab.Thumbnail.DocumentThumbnailLayer
+
     timestamps(type: :utc_datetime)
   end
 

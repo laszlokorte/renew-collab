@@ -186,6 +186,7 @@ defmodule RenewCollabWeb.LiveDocuments do
                       navigate={~p"/document/#{document.id}"}
                     >
                       <img class="icon" src="/assets/icon-document.svg" />
+                      <img class="icon" src={"/documents/#{document.id}/thumbnail"} />
                       {document.name}
                     </.link>
                   </td>

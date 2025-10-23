@@ -1,4 +1,6 @@
 defmodule RenewCollabWeb.LiveDocument do
+  alias RenewCollab.Repo
+  alias RenewCollab.Thumbnail.DocumentThumbnailLayer
   alias RenewCollabProj.Entites.ProjectDocument
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
@@ -126,7 +128,14 @@ defmodule RenewCollabWeb.LiveDocument do
               / Document
             <% _ -> %>
           <% end %>
-          <h2 style="margin: 0;">{@document.name}</h2>
+
+          <div style="display: flex; gap: 1ex; align-items: center;">
+            <img
+              class="icon"
+              src={"/documents/#{@document.id}/thumbnail?v=#{@document.thumbnail && @document.thumbnail.layer_id}"}
+            />
+            <h2 style="margin: 0;">{@document.name}</h2>
+          </div>
         </div>
 
         <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: undo_redo} <- @undo_redo do %>
@@ -579,6 +588,14 @@ defmodule RenewCollabWeb.LiveDocument do
               </dl>
             </form>
           </div>
+          <hr />
+          <button
+            type="button"
+            phx-click="remove_thumbnail"
+            style="cursor: pointer; padding: 1ex; border: none; background: #933; color: #fff"
+          >
+            Remove Thumbnail
+          </button>
         <% end %>
 
         <h2
@@ -917,6 +934,39 @@ defmodule RenewCollabWeb.LiveDocument do
       layer_id: layer_id
     })
     |> RenewCollab.Commander.run_document_command()
+
+    {:noreply, socket}
+  end
+
+  def handle_event("remove_thumbnail", %{}, socket) do
+    import Ecto.Query
+
+    Repo.delete_all(
+      from(t in DocumentThumbnailLayer, where: t.document_id == ^socket.assigns.document.id)
+    )
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "document:#{socket.assigns.document.id}",
+      {:document_changed, socket.assigns.document.id}
+    )
+
+    {:noreply, socket}
+  end
+
+  def handle_event("make_thumbnail", %{"id" => layer_id}, socket) do
+    {:ok, updated} =
+      Repo.insert(
+        %DocumentThumbnailLayer{document_id: socket.assigns.document.id, layer_id: layer_id},
+        on_conflict: [set: [layer_id: layer_id]],
+        conflict_target: :document_id
+      )
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "document:#{socket.assigns.document.id}",
+      {:document_changed, socket.assigns.document.id}
+    )
 
     {:noreply, socket}
   end

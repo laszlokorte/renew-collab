@@ -20,6 +20,7 @@ defmodule RenewCollab.Queries.DocumentWithElements do
       from(d in Document,
         where: d.id == ^document_id,
         left_join: l in assoc(d, :layers),
+        left_join: thumb in assoc(d, :thumbnail),
         left_join: dp in assoc(l, :direct_parent_hood),
         left_join: b in assoc(l, :box),
         left_join: ss in assoc(b, :symbol_shape),
@@ -44,6 +45,7 @@ defmodule RenewCollab.Queries.DocumentWithElements do
         order_by: [asc: l.z_index, asc: w.sort],
         preload: [
           current_snaptshot: {cs, [predecessor: ps, successors: ns]},
+          thumbnail: thumb,
           layers:
             {l,
              [

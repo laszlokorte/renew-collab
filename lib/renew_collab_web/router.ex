@@ -144,6 +144,7 @@ defmodule RenewCollabWeb.Router do
 
     get "/", HomeController, :index
 
+    get "/documents/:id/thumbnail", DocumentController, :thumbnail
     get "/documents/:id/export", DocumentController, :export
     get "/projects/:id/export", ProjectController, :export
     get "/documents/:id/inspect", DocumentController, :inspect
