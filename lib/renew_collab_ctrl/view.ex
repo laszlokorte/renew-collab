@@ -66,7 +66,8 @@ defmodule RenewCollabCtrl.View do
   end
 
   def do_fetch(_account, %Views.GlobalPrimitives{}) do
-    {:error, :not_implemented}
+    RenewCollab.Primitives.find_all()
+    |> then(&{:ok, &1})
   end
 
   def do_fetch(_account, %Views.GlobalShadowNetsList{}) do
@@ -78,7 +79,10 @@ defmodule RenewCollabCtrl.View do
   end
 
   def do_fetch(_account, %Views.GlobalSocketById{}) do
-    {:error, :not_implemented}
+    RenewCollab.Queries.SocketsById.new()
+    |> RenewCollab.Queries.SocketsById.multi()
+    |> RenewCollab.Repo.transact()
+    |> extract_result()
   end
 
   def do_fetch(_account, %Views.GlobalSocketIdsByName{}) do
@@ -92,6 +96,10 @@ defmodule RenewCollabCtrl.View do
     |> extract_result()
   end
 
+  def do_fetch(_account, %Views.GlobalSocketSchema{socket_schema_id: id}) do
+    {:ok, RenewCollab.Sockets.find_socket_schema(id)}
+  end
+
   def do_fetch(_account, %Views.GlobalSocketSchemasNames{}) do
     {:error, :not_implemented}
   end
@@ -103,12 +111,17 @@ defmodule RenewCollabCtrl.View do
     |> extract_result()
   end
 
+  def do_fetch(_account, %Views.GlobalSymbol{symbol_id: id}) do
+    RenewCollab.Symbols.find_symbol(id)
+    |> then(&{:ok, &1})
+  end
+
   def do_fetch(_account, %Views.GlobalSymbolsNames{}) do
     {:error, :not_implemented}
   end
 
   def do_fetch(_account, %Views.GlobalSyntaxList{}) do
-    {:error, :not_implemented}
+    {:ok, RenewCollab.Syntax.find_all()}
   end
 
   def do_fetch(_account, %Views.MyAccount{}) do
@@ -132,12 +145,23 @@ defmodule RenewCollabCtrl.View do
     |> extract_result()
   end
 
-  def do_fetch(_account, %Views.ProjectShadowNetSystemsList{}) do
-    {:error, :not_implemented}
+  def do_fetch(_account, %Views.ProjectShadowNetSystemsList{project_id: project_id}) do
+    RenewCollabSim.Simulator.list_shadow_net_systems(
+      RenewCollabProj.Projects.list_project_shadow_net_systems(project_id)
+    )
+    |> then(&{:ok, &1})
   end
 
-  def do_fetch(_account, %Views.ProjectSimulationsList{}) do
-    {:error, :not_implemented}
+  def do_fetch(_account, %Views.ProjectSimulationsList{project_id: project_id}) do
+    RenewCollabSim.Simulator.list_simulations(
+      RenewCollabProj.Projects.list_project_simulations(project_id)
+    )
+    |> then(&{:ok, &1})
+  end
+
+  def do_fetch(_account, %Views.ShadowNetSystem{shadow_net_system_id: shadow_net_system_id}) do
+    RenewCollabSim.Simulator.find_shadow_net_system(shadow_net_system_id)
+    |> then(&{:ok, &1})
   end
 
   def do_fetch(_account, %Views.ShadowNetSystemSimulations{}) do
@@ -146,6 +170,40 @@ defmodule RenewCollabCtrl.View do
 
   def do_fetch(_account, %Views.SimulationWithState{}) do
     {:error, :not_implemented}
+  end
+
+  def do_fetch(_account, %Views.SystemHealthReport{}) do
+    %{
+      installed_socket_schema:
+        RenewCollab.Queries.SocketSchemasList.new()
+        |> RenewCollab.Queries.SocketSchemasList.multi()
+        |> RenewCollab.Repo.transact()
+        |> then(fn {:ok, r} -> r end),
+      installed_symbols:
+        RenewCollab.Queries.SymbolIdsByName.new()
+        |> RenewCollab.Queries.SymbolIdsByName.multi()
+        |> RenewCollab.Repo.transact()
+        |> then(fn {:ok, r} -> r end),
+      number_of_accounts: RenewCollabAuth.Auth.count_accounts(),
+      number_of_sessions: RenewCollabAuth.Auth.count_sessions(),
+      number_of_media: RenewCollab.Media.count(),
+      number_of_documents:
+        RenewCollab.Queries.DocumentCount.new()
+        |> RenewCollab.Queries.DocumentCount.multi()
+        |> RenewCollab.Repo.transact()
+        |> extract_result()
+        |> then(fn {:ok, r} -> r end),
+      number_of_snapshots: RenewCollab.Renew.count_snapshots(),
+      number_of_shadow_net_systems: RenewCollabSim.Simulator.count_shadow_net_systems(),
+      number_of_simulations: RenewCollabSim.Simulator.count_simulations(),
+      number_of_projects: RenewCollabProj.Projects.count_projects(),
+      hierarchy_missing_count: RenewCollab.Hierarchy.count_missing_global(),
+      hierarchy_invalid_count: RenewCollab.Hierarchy.count_invalids_global(),
+      cache_size: RenewCollabCtrl.CacheServer.size(),
+      simulation_active_count: RenewCollabSim.Server.ProjectSimulationServer.count_all(),
+      formalisms: RenewCollabSim.Compiler.SnsCompiler.formalisms()
+    }
+    |> then(&{:ok, &1})
   end
 
   defp extract_result({:ok, %{:result => res}}) do

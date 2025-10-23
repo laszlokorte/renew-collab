@@ -1,6 +1,8 @@
 defmodule RenewCollabWeb.LiveSocketSchema do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
+  alias RenewCollabCtrl.Views
+  alias RenewCollabCtrl.Fetcher
 
   @topic "socket_schema"
 
@@ -14,7 +16,11 @@ defmodule RenewCollabWeb.LiveSocketSchema do
     socket =
       socket
       |> assign(:socket_schema_id, socket_schema_id)
-      |> assign(:icons, RenewCollab.Symbols.list_shapes())
+      |> assign(
+        :icons,
+        %Views.GlobalSymbolsList{}
+        |> Fetcher.fetch_as(socket.assigns.current_account)
+      )
       |> assign(:icon, nil)
       |> assign(:preview, %RenewCollab.Connection.Socket{})
 
@@ -25,7 +31,8 @@ defmodule RenewCollabWeb.LiveSocketSchema do
   end
 
   defp load_data(socket) do
-    RenewCollab.Sockets.find_socket_schema(socket.assigns.socket_schema_id)
+    %Views.GlobalSocketSchema{socket_schema_id: socket.assigns.socket_schema_id}
+    |> Fetcher.fetch_as(socket.assigns.current_account)
     |> case do
       nil ->
         socket

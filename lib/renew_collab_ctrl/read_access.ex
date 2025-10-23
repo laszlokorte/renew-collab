@@ -8,9 +8,18 @@ defmodule RenewCollabCtrl.ReadAccess do
   def can(_account, %Views.DocumentVersionState{}), do: true
   def can(_account, %Views.DocumentSimulationLinks{}), do: true
   def can(_account, %Views.GlobalSocketSchemasList{}), do: true
+  def can(_account, %Views.GlobalSocketSchema{}), do: true
+  def can(_account, %Views.GlobalSocketById{}), do: true
   def can(_account, %Views.GlobalSymbolsList{}), do: true
+  def can(_account, %Views.GlobalSymbol{}), do: true
+  def can(_account, %Views.GlobalSyntaxList{}), do: true
+  def can(_account, %Views.GlobalPrimitives{}), do: true
   def can(_account, %Views.DocumentHierarchyMissings{}), do: true
   def can(_account, %Views.DocumentHierarchyInvalids{}), do: true
+  def can(_account, %Views.SystemHealthReport{}), do: true
 
+  def can(_account, %Views.ProjectSimulationsList{}), do: true
+  def can(_account, %Views.ProjectShadowNetSystemsList{}), do: true
+  def can(_account, %Views.ShadowNetSystem{}), do: true
   def can(_account, _view), do: false
 end

@@ -24,8 +24,7 @@ defmodule RenewCollab.Renew do
   end
 
   def count_documents do
-    RenewCollab.Queries.DocumentCount.new()
-    |> RenewCollab.Fetcher.fetch()
+    :deprecated
   end
 
   def count_snapshots do
@@ -37,8 +36,10 @@ defmodule RenewCollab.Renew do
   def get_document_with_elements(document_id) do
     %{document_id: document_id}
     |> RenewCollab.Queries.DocumentWithElements.new()
-    |> RenewCollab.Fetcher.fetch()
-    |> RenewCollabProj.Projects.attach_project_assignment()
+    |> RenewCollab.Queries.DocumentWithElements.multi()
+    |> RenewCollab.Repo.transact()
+    |> then(fn {:ok, %{result: result}} -> result end)
+    |> dbg
   end
 
   def create_document(project, attrs \\ %{}, parenthoods \\ [], hyperlinks \\ [], bonds \\ []) do

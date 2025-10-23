@@ -2,6 +2,8 @@ defmodule RenewCollabWeb.LiveShadowNets do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
+  alias RenewCollabCtrl.Views
+  alias RenewCollabCtrl.Fetcher
   @file_count_limit 10
 
   def file_count_limit, do: @file_count_limit
@@ -19,9 +21,10 @@ defmodule RenewCollabWeb.LiveShadowNets do
           |> assign(:project, proj)
           |> assign(
             :shadow_net_systems,
-            RenewCollabSim.Simulator.list_shadow_net_systems(
-              RenewCollabProj.Projects.list_project_shadow_net_systems(proj.id)
-            )
+            %Views.ProjectShadowNetSystemsList{
+              project_id: project_id
+            }
+            |> Fetcher.fetch_as(socket.assigns.current_account)
           )
           |> assign(
             import_rnw_form:
@@ -45,9 +48,10 @@ defmodule RenewCollabWeb.LiveShadowNets do
      socket
      |> assign(
        :shadow_net_systems,
-       RenewCollabSim.Simulator.list_shadow_net_systems(
-         RenewCollabProj.Projects.list_project_shadow_net_systems(socket.assigns.project.id)
-       )
+       %Views.ProjectShadowNetSystemsList{
+         project_id: socket.assigns.project.id
+       }
+       |> Fetcher.fetch_as(socket.assigns.current_account)
      )}
   end
 

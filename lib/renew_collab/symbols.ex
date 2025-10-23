@@ -4,8 +4,7 @@ defmodule RenewCollab.Symbols do
   end
 
   def ids_by_name do
-    RenewCollab.Queries.SymbolIdsByName.new()
-    |> RenewCollab.Fetcher.fetch(:infinity)
+    :deprecated
   end
 
   def find_symbol(id) do

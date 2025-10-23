@@ -1,6 +1,8 @@
 defmodule RenewCollabWeb.LiveSocketSchemas do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
+  alias RenewCollabCtrl.Views
+  alias RenewCollabCtrl.Fetcher
 
   @topic "socket_schema"
 
@@ -12,7 +14,13 @@ defmodule RenewCollabWeb.LiveSocketSchemas do
   end
 
   defp load_data(socket) do
-    socket |> assign(:socket_schemas, RenewCollab.Sockets.all_socket_schemas() |> Map.values())
+    socket
+    |> assign(
+      :socket_schemas,
+      %Views.GlobalSocketSchemasList{}
+      |> Fetcher.fetch_as(socket.assigns.current_account)
+      |> Map.values()
+    )
   end
 
   def render(assigns) do

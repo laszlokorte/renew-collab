@@ -1,21 +1,23 @@
 defmodule RenewCollab.Sockets do
   def ids_by_name do
     RenewCollab.Queries.SocketIdsByName.new()
-    |> RenewCollab.Fetcher.fetch(:infinity)
+    |> RenewCollab.Queries.SocketIdsByName.multi()
+    |> RenewCollab.Repo.transact()
+    |> then(fn {:ok, %{result: result}} -> result end)
   end
 
   def schemas_by_name do
     RenewCollab.Queries.SocketSchemasByName.new()
-    |> RenewCollab.Fetcher.fetch(:infinity)
-  end
-
-  def all_socket_schemas do
-    :deprecated
+    |> RenewCollab.Queries.SocketSchemasByName.multi()
+    |> RenewCollab.Repo.transact()
+    |> then(fn {:ok, %{result: result}} -> result end)
   end
 
   def all_socket_by_id do
     RenewCollab.Queries.SocketsById.new()
-    |> RenewCollab.Fetcher.fetch(:infinity)
+    |> RenewCollab.Queries.SocketsById.multi()
+    |> RenewCollab.Repo.transact()
+    |> then(fn {:ok, %{result: result}} -> result end)
   end
 
   def find_socket_schema(id) do

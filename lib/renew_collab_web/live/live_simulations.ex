@@ -1,6 +1,8 @@
 defmodule RenewCollabWeb.LiveSimulations do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
+  alias RenewCollabCtrl.Views
+  alias RenewCollabCtrl.Fetcher
 
   def mount(%{"project_id" => project_id}, _session, socket) do
     RenewCollabProj.Projects.find_project(project_id)
@@ -28,15 +30,17 @@ defmodule RenewCollabWeb.LiveSimulations do
           )
           |> assign(
             :simulations,
-            RenewCollabSim.Simulator.list_simulations(
-              RenewCollabProj.Projects.list_project_simulations(project_id)
-            )
+            %Views.ProjectSimulationsList{
+              project_id: project_id
+            }
+            |> Fetcher.fetch_as(socket.assigns.current_account)
           )
           |> assign(
             :documents,
-            RenewCollab.Renew.list_documents(
-              RenewCollabProj.Projects.list_project_documents(project.id)
-            )
+            %Views.ProjectDocumentsList{
+              project_id: project.id
+            }
+            |> Fetcher.fetch_as(socket.assigns.current_account)
           )
 
         {:ok, socket}
@@ -48,9 +52,10 @@ defmodule RenewCollabWeb.LiveSimulations do
      socket
      |> assign(
        :simulations,
-       RenewCollabSim.Simulator.list_simulations(
-         RenewCollabProj.Projects.list_project_simulations(socket.assigns.project.id)
-       )
+       %Views.ProjectSimulationsList{
+         project_id: socket.assigns.project_id
+       }
+       |> Fetcher.fetch_as(socket.assigns.current_account)
      )
      |> assign(
        :running,
@@ -64,9 +69,10 @@ defmodule RenewCollabWeb.LiveSimulations do
      socket
      |> assign(
        :simulations,
-       RenewCollabSim.Simulator.list_simulations(
-         RenewCollabProj.Projects.list_project_simulations(socket.assigns.project.id)
-       )
+       %Views.ProjectSimulationsList{
+         project_id: socket.assigns.project_id
+       }
+       |> Fetcher.fetch_as(socket.assigns.current_account)
      )
      |> assign(
        :running,

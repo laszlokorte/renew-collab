@@ -1,6 +1,8 @@
 defmodule RenewCollabWeb.LiveIcon do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
+  alias RenewCollabCtrl.Views
+  alias RenewCollabCtrl.Fetcher
 
   @topic "icon"
 
@@ -14,7 +16,8 @@ defmodule RenewCollabWeb.LiveIcon do
   end
 
   defp load_data(socket) do
-    RenewCollab.Symbols.find_symbol(socket.assigns.symbol_id)
+    %Views.GlobalSymbol{symbol_id: socket.assigns.symbol_id}
+    |> Fetcher.fetch_as(socket.assigns.current_account)
     |> case do
       nil ->
         socket |> put_flash(:error, "Icon not found") |> redirect(to: ~p"/icons")

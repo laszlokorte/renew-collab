@@ -384,8 +384,9 @@ defmodule RenewCollabSim.Simulator do
            {document.id, document.current_snaptshot.id}}
         end)
       rescue
-        _e ->
-          :export_error
+        e ->
+          dbg(e)
+          {:error, {:export_error, e}}
       end
 
     with [{default_main_name, _, _, _} | _] <- nets,

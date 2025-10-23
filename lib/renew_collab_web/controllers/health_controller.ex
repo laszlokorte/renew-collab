@@ -1,5 +1,7 @@
 defmodule RenewCollabWeb.HealthController do
   use RenewCollabWeb, :controller
+  alias RenewCollabCtrl.Views
+  alias RenewCollabCtrl.Fetcher
 
   action_fallback RenewCollabWeb.FallbackController
 
@@ -7,22 +9,11 @@ defmodule RenewCollabWeb.HealthController do
   @renew_cmd_timelimit 5000
 
   def index(conn, _params) do
-    render(conn, :index,
-      installed_socke_schema: RenewCollab.Sockets.all_socket_schemas(),
-      installed_symbols: RenewCollab.Symbols.ids_by_name(),
-      number_of_accounts: RenewCollabAuth.Auth.count_accounts(),
-      number_of_sessions: RenewCollabAuth.Auth.count_sessions(),
-      number_of_media: RenewCollab.Media.count(),
-      number_of_documents: RenewCollab.Renew.count_documents(),
-      number_of_snapshots: RenewCollab.Renew.count_snapshots(),
-      number_of_shadow_net_systems: RenewCollabSim.Simulator.count_shadow_net_systems(),
-      number_of_simulations: RenewCollabSim.Simulator.count_simulations(),
-      number_of_projects: RenewCollabProj.Projects.count_projects(),
-      hierarchy_missing_count: RenewCollab.Hierarchy.count_missing_global(),
-      hierarchy_invalid_count: RenewCollab.Hierarchy.count_invalids_global(),
-      cache_size: RenewCollabCtrl.CacheServer.size(),
-      simulation_active_count: RenewCollabSim.Server.ProjectSimulationServer.count_all(),
-      formalisms: RenewCollabSim.Compiler.SnsCompiler.formalisms()
+    render(
+      conn,
+      :index,
+      %Views.SystemHealthReport{}
+      |> Fetcher.fetch_as(conn.assigns.current_account)
     )
   end
 

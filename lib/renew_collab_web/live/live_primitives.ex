@@ -2,9 +2,10 @@ defmodule RenewCollabWeb.LivePrimitives do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
-  alias RenewCollab.Symbols
+  alias RenewCollabCtrl.Views
+  alias RenewCollabCtrl.Fetcher
+
   alias RenewCollab.Primitives
-  alias RenewCollab.Sockets
 
   @topic "primitives"
 
@@ -21,7 +22,11 @@ defmodule RenewCollabWeb.LivePrimitives do
 
   defp load_data(socket) do
     socket
-    |> assign(:primitive_groups, Primitives.find_all())
+    |> assign(
+      :primitive_groups,
+      %Views.GlobalPrimitives{}
+      |> Fetcher.fetch_as(socket.assigns.current_account)
+    )
     |> assign(:create_form, to_form(%{"name" => nil}, as: :create_group))
     |> assign_async(
       [
@@ -31,8 +36,14 @@ defmodule RenewCollabWeb.LivePrimitives do
       fn ->
         {:ok,
          %{
-           sockets: Sockets.all_socket_by_id(),
-           symbols: Symbols.list_shapes() |> Enum.map(fn s -> {s.id, s} end) |> Map.new()
+           sockets:
+             %Views.GlobalSocketById{}
+             |> Fetcher.fetch_as(socket.assigns.current_account),
+           symbols:
+             %Views.GlobalSymbolsList{}
+             |> Fetcher.fetch_as(socket.assigns.current_account)
+             |> Enum.map(fn s -> {s.id, s} end)
+             |> Map.new()
          }}
       end
     )

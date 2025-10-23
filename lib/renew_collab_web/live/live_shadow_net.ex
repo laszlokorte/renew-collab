@@ -2,11 +2,16 @@ defmodule RenewCollabWeb.LiveShadowNet do
   alias RenewCollabProj.Entites.ProjectShadowNetSystem
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
+  alias RenewCollabCtrl.Views
+  alias RenewCollabCtrl.Fetcher
 
   @topic "shadow_net"
 
   def mount(%{"id" => shadow_net_system_id}, _session, socket) do
-    RenewCollabSim.Simulator.find_shadow_net_system(shadow_net_system_id)
+    %Views.ShadowNetSystem{
+      shadow_net_system_id: shadow_net_system_id
+    }
+    |> Fetcher.fetch_as(socket.assigns.current_account)
     |> case do
       nil ->
         {:ok,
@@ -39,9 +44,10 @@ defmodule RenewCollabWeb.LiveShadowNet do
           )
           |> assign(
             :documents,
-            RenewCollab.Renew.list_documents(
-              RenewCollabProj.Projects.list_project_documents(sns.project.id)
-            )
+            %Views.ProjectDocumentsList{
+              project_id: sns.project_assignment.project_id
+            }
+            |> Fetcher.fetch_as(socket.assigns.current_account)
           )
 
         {:ok, socket}

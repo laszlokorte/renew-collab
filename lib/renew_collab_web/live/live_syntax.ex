@@ -2,9 +2,9 @@ defmodule RenewCollabWeb.LiveSyntax do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
-  alias RenewCollab.Symbols
   alias RenewCollab.Syntax
-  alias RenewCollab.Sockets
+  alias RenewCollabCtrl.Views
+  alias RenewCollabCtrl.Fetcher
 
   @topic "syntax"
 
@@ -27,7 +27,11 @@ defmodule RenewCollabWeb.LiveSyntax do
 
   defp load_data(socket) do
     socket
-    |> assign(:syntax_types, Syntax.find_all())
+    |> assign(
+      :syntax_types,
+      %Views.GlobalSyntaxList{}
+      |> Fetcher.fetch_as(socket.assigns.current_account)
+    )
     |> assign(:create_form, to_form(%{"name" => nil}, as: :create_syntax))
     |> assign_async(
       [
@@ -37,8 +41,14 @@ defmodule RenewCollabWeb.LiveSyntax do
       fn ->
         {:ok,
          %{
-           sockets: Sockets.all_socket_by_id(),
-           symbols: Symbols.list_shapes() |> Enum.map(fn s -> {s.id, s} end) |> Map.new()
+           sockets:
+             %Views.GlobalSocketById{}
+             |> Fetcher.fetch_as(socket.assigns.current_account),
+           symbols:
+             %Views.GlobalSymbolsList{}
+             |> Fetcher.fetch_as(socket.assigns.current_account)
+             |> Enum.map(fn s -> {s.id, s} end)
+             |> Map.new()
          }}
       end
     )
