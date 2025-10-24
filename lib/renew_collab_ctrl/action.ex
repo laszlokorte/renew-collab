@@ -125,8 +125,18 @@ defmodule RenewCollabCtrl.Action do
     {:error, :not_implemented}
   end
 
-  def do_perform(%Actions.DocumentEditLayerTextSizeHint{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditLayerTextSizeHint{
+        document_id: document_id,
+        box: box,
+        layer_id: layer_id
+      }) do
+    RenewCollab.Commands.UpdateLayerTextSizeHint.new(%{
+      document_id: document_id,
+      layer_id: layer_id,
+      box: box
+    })
+    |> RenewCollab.LegacyCommander.run_document_command(false)
+    |> dbg
   end
 
   def do_perform(%Actions.DocumentEditLayerTextStyle{}) do
@@ -159,6 +169,39 @@ defmodule RenewCollabCtrl.Action do
 
   def do_perform(%Actions.DocumentEditReorderLayerRelative{}) do
     {:error, :not_implemented}
+  end
+
+  def do_perform(%Actions.DocumentEditSetThumbnail{document_id: document_id, layer_id: layer_id}) do
+    alias RenewCollab.Repo
+    alias RenewCollab.Thumbnail.DocumentThumbnailLayer
+
+    {:ok, updated} =
+      Repo.insert(
+        %DocumentThumbnailLayer{document_id: document_id, layer_id: layer_id},
+        on_conflict: [set: [layer_id: layer_id]],
+        conflict_target: :document_id
+      )
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "document:#{document_id}",
+      {:document_changed, document_id}
+    )
+  end
+
+  def do_perform(%Actions.DocumentEditRemoveThumbnail{document_id: document_id}) do
+    import Ecto.Query
+
+    alias RenewCollab.Repo
+    alias RenewCollab.Thumbnail.DocumentThumbnailLayer
+
+    Repo.delete_all(from(t in DocumentThumbnailLayer, where: t.document_id == ^document_id))
+
+    Phoenix.PubSub.broadcast(
+      RenewCollab.PubSub,
+      "document:#{document_id}",
+      {:document_changed, document_id}
+    )
   end
 
   def do_perform(%Actions.DocumentEditSetLayerVisibility{}) do

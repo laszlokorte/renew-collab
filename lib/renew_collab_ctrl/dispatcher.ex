@@ -1,11 +1,11 @@
 defmodule RenewCollabCtrl.Dispatcher do
+  alias RenewCollabCtrl.WriteAccess
   alias RenewCollabCtrl.Action
   alias RenewCollabCtrl.CacheServer
   alias RenewCollabCtrl.CacheConfig
-  alias RenewCollabCtrl.ReadAccess
 
   def perform_as(action, account) do
-    if ReadAccess.can(account, action) do
+    if WriteAccess.can(account, action) do
       Action.do_perform(action)
       |> case do
         {:error, :not_implemented} ->
@@ -26,6 +26,9 @@ defmodule RenewCollabCtrl.Dispatcher do
         res = {:error, _e} ->
           res
       end
+    else
+      raise "Access denied: #{inspect(action)}"
+      :access_denied
     end
   end
 

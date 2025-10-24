@@ -32,10 +32,26 @@ defmodule RenewCollabCtrl.View do
     |> extract_result()
   end
 
-  def do_fetch(_account, %Views.DocumentWithContent{document_id: document_id}) do
-    %{document_id: document_id}
+  def do_fetch(_account, %Views.DocumentWithContent{
+        document_id: document_id,
+        root_layer_id: root_layer_id
+      }) do
+    %{document_id: document_id, root_layer_id: root_layer_id}
     |> RenewCollab.Queries.DocumentWithElements.new()
     |> RenewCollab.Queries.DocumentWithElements.multi()
+    |> RenewCollab.Repo.transact()
+    |> extract_result()
+    |> then(
+      &case &1 do
+        {:ok, list} -> {:ok, RenewCollabProj.Projects.attach_project_assignment(list)}
+      end
+    )
+  end
+
+  def do_fetch(_account, %Views.DocumentWithThumbnailContent{document_id: document_id}) do
+    %{document_id: document_id}
+    |> RenewCollab.Queries.DocumentWithThumbnailElements.new()
+    |> RenewCollab.Queries.DocumentWithThumbnailElements.multi()
     |> RenewCollab.Repo.transact()
     |> extract_result()
     |> then(
