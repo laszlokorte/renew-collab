@@ -1,4 +1,7 @@
 defmodule RenewCollabCtrl.Action do
+  alias RenewCollab.Commands
+  alias RenewCollabProj.Entites.ProjectDocument
+  alias RenewCollab.Document.TransientDocument
   alias RenewCollabCtrl.Actions
 
   def do_perform(%Actions.AccountChangePasswordAsAdmin{}) do
@@ -29,7 +32,33 @@ defmodule RenewCollabCtrl.Action do
         project_id: project_id,
         document_data: document_data
       }) do
-    {:error, :not_implemented}
+    Commands.CreateDocument.new(%{
+      doc: %TransientDocument{
+        content: document_data,
+        parenthoods: [],
+        hyperlinks: [],
+        bonds: []
+      }
+    })
+    |> Commands.CreateDocument.multi()
+    |> RenewCollab.Repo.transact()
+    |> case do
+      {:ok, %{insert_document: insert_document}} ->
+        %ProjectDocument{project_id: project_id}
+        |> ProjectDocument.changeset(%{
+          "document_id" => insert_document.id
+        })
+        |> RenewCollabProj.Repo.insert()
+
+        # TODO:broadcast
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "project/#{project_id}/documents",
+          :any
+        )
+
+        {:ok, insert_document}
+    end
   end
 
   def do_perform(%Actions.DocumentDeleteAsUser{}) do

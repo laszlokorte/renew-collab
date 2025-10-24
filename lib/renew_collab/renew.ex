@@ -32,7 +32,7 @@ defmodule RenewCollab.Renew do
     |> then(fn {:ok, %{result: result}} -> result end)
   end
 
-  def create_document(project, attrs \\ %{}, parenthoods \\ [], hyperlinks \\ [], bonds \\ []) do
+  def create_document(attrs \\ %{}, parenthoods \\ [], hyperlinks \\ [], bonds \\ []) do
     Commands.CreateDocument.new(%{
       doc: %TransientDocument{
         content: attrs,
@@ -44,15 +44,6 @@ defmodule RenewCollab.Renew do
     |> RenewCollab.Commander.run_document_command_sync()
     |> case do
       {:ok, %{insert_document: insert_document}} ->
-        RenewCollabProj.Projects.assign_to_project(project, insert_document)
-
-        # TODO:broadcast
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "project/#{project.id}/documents",
-          :any
-        )
-
         {:ok, insert_document}
     end
   end
