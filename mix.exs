@@ -7,7 +7,7 @@ defmodule RenewCollab.MixProject do
     "RENEW_SIM_DB_TYPE",
     "RENEW_PROJ_DB_TYPE"
   ]
-
+  #  lib/renew_collab_web/channels/redux_documents_channel.ex:68:30: RenewCollabWeb.ReduxDocumentsChannel.handle_event/4
   def project do
     [
       app: :renew_collab,

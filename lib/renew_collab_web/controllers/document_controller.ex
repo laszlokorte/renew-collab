@@ -7,6 +7,8 @@ defmodule RenewCollabWeb.DocumentController do
   alias RenewCollab.Import.DocumentImport
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Fetcher
+  alias RenewCollabCtrl.Actions
+  alias RenewCollabCtrl.Dispatcher
 
   action_fallback(RenewCollabWeb.FallbackController)
 
@@ -188,22 +190,14 @@ defmodule RenewCollabWeb.DocumentController do
 
       imported ->
         with {:ok, content} <- File.read(path),
-             {:ok,
-              %RenewCollab.Import.Converted{
-                name: doc_name,
-                kind: kind,
-                layers: layers,
-                hierarchy: hierarchy,
-                hyperlinks: hyperlinks,
-                bonds: bonds
-              }} <- DocumentImport.import(filename, content),
+             {:ok, imported = %RenewCollab.Import.Converted{}} <-
+               DocumentImport.import(filename, content),
              {:ok, %Document{} = document} <-
-               RenewCollab.Renew.create_document(
-                 %{"name" => doc_name, "kind" => kind, "layers" => layers},
-                 hierarchy,
-                 hyperlinks,
-                 bonds
-               ) do
+               %Actions.DocumentCreateInProject{
+                 project_id: conn.assigns.project.id,
+                 document_data: imported
+               }
+               |> Dispatcher.perform_as(conn.assigns.current_account) do
           [document | imported]
         else
           _ ->

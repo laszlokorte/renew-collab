@@ -25,7 +25,10 @@ defmodule RenewCollabCtrl.Action do
     {:error, :not_implemented}
   end
 
-  def do_perform(%Actions.DocumentCreateInProject{}) do
+  def do_perform(%Actions.DocumentCreateInProject{
+        project_id: project_id,
+        document_data: document_data
+      }) do
     {:error, :not_implemented}
   end
 
@@ -175,12 +178,11 @@ defmodule RenewCollabCtrl.Action do
     alias RenewCollab.Repo
     alias RenewCollab.Thumbnail.DocumentThumbnailLayer
 
-    {:ok, updated} =
-      Repo.insert(
-        %DocumentThumbnailLayer{document_id: document_id, layer_id: layer_id},
-        on_conflict: [set: [layer_id: layer_id]],
-        conflict_target: :document_id
-      )
+    Repo.insert(
+      %DocumentThumbnailLayer{document_id: document_id, layer_id: layer_id},
+      on_conflict: [set: [layer_id: layer_id]],
+      conflict_target: :document_id
+    )
 
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,

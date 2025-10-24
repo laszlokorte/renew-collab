@@ -4,7 +4,6 @@ defmodule RenewCollabCtrl.ReadAccess do
 
   def can(_account, %Views.ProjectDocumentsList{}), do: true
   def can(_account, %Views.DocumentWithContent{}), do: true
-  def can(_account, %Views.DocumentWithThumbnailContent{}), do: true
   def can(_account, %Views.DocumentVersionsList{}), do: true
   def can(_account, %Views.DocumentVersionState{}), do: true
   def can(_account, %Views.DocumentStripped{}), do: true

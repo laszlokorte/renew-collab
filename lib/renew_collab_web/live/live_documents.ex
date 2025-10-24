@@ -4,6 +4,8 @@ defmodule RenewCollabWeb.LiveDocuments do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
+  alias RenewCollabCtrl.Actions
+  alias RenewCollabCtrl.Dispatcher
   alias RenewCollab.Renew
 
   def mount(%{"project_id" => project_id}, _session, socket) do
@@ -289,31 +291,26 @@ defmodule RenewCollabWeb.LiveDocuments do
     consume_uploaded_entries(socket, :import_file, fn %{path: path}, %{client_name: filename} ->
       {:ok, content} = File.read(path)
 
-      with {:ok,
-            %RenewCollab.Import.Converted{
-              name: doc_name,
-              kind: kind,
-              layers: layers,
-              hierarchy: hierarchy,
-              hyperlinks: hyperlinks,
-              bonds: bonds
-            }} = RenewCollab.Import.DocumentImport.import(filename, content),
+      with {:ok, imported = %RenewCollab.Import.Converted{}} =
+             RenewCollab.Import.DocumentImport.import(filename, content),
            {:ok, %RenewCollab.Document.Document{} = document} <-
-             RenewCollab.Renew.create_document(
-               socket.assigns.project,
-               %{"name" => doc_name, "kind" => kind, "layers" => layers},
-               hierarchy,
-               hyperlinks,
-               bonds
-             ) do
+             %Actions.DocumentCreateInProject{
+               project_id: socket.assigns.project.id,
+               document_data: imported
+             }
+             |> Dispatcher.perform_as(socket.assigns.current_account) do
         {:ok, document}
       else
         _ ->
           with {:ok, %RenewCollab.Document.Document{} = document} <-
-                 RenewCollab.Renew.create_document(socket.assigns.project, %{
-                   "name" => filename,
-                   "kind" => "error"
-                 }) do
+                 %Actions.DocumentCreateInProject{
+                   project_id: socket.assigns.project.id,
+                   document_data: %{
+                     "name" => filename,
+                     "kind" => "error"
+                   }
+                 }
+                 |> Dispatcher.perform_as(socket.assigns.current_account) do
             {:ok, document}
           end
       end
@@ -324,15 +321,17 @@ defmodule RenewCollabWeb.LiveDocuments do
 
   def handle_event("create_document", params, socket) do
     with {:ok, %RenewCollab.Document.Document{}} <-
-           RenewCollab.Renew.create_document(
-             socket.assigns.project,
-             params
-             |> Map.update("name", "", fn
-               "" -> "untitled"
-               n -> n
-             end)
-             |> Map.put("kind", "de.renew.gui.CPNDrawing")
-           ) do
+           %Actions.DocumentCreateInProject{
+             project_id: socket.assigns.project.id,
+             document_data:
+               params
+               |> Map.update("name", "", fn
+                 "" -> "untitled"
+                 n -> n
+               end)
+               |> Map.put("kind", "de.renew.gui.CPNDrawing")
+           }
+           |> Dispatcher.perform_as(socket.assigns.current_account) do
       {:noreply,
        socket
        |> put_flash(:info, "Document created")

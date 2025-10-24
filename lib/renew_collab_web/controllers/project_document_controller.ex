@@ -1,6 +1,8 @@
 defmodule RenewCollabWeb.ProjectDocumentController do
   use RenewCollabWeb, :controller
 
+  alias RenewCollabCtrl.Dispatcher
+  alias RenewCollabCtrl.Actions
   alias RenewCollab.Document.Document
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Fetcher
@@ -17,12 +19,15 @@ defmodule RenewCollabWeb.ProjectDocumentController do
     render(conn, :index, project_id: project_id, documents: documents)
   end
 
-  def create(conn, %{"project_id" => project_id, "document" => document_params}) do
-    with {:ok, %Document{} = document} <- Renew.create_document(document_params) do
-      conn
-      |> put_status(:created)
-      |> put_resp_header("location", ~p"/api/documents/#{document}")
-      |> render(:show, project_id: project_id, document: document)
+  def create(conn, %{"project_id" => project_id, "document" => document_data}) do
+    %Actions.DocumentCreateInProject{project_id: project_id, document_data: document_data}
+    |> Dispatcher.perform_as(conn.assigns.current_user)
+    |> case do
+      {:ok, %Document{} = document} ->
+        conn
+        |> put_status(:created)
+        |> put_resp_header("location", ~p"/api/documents/#{document}")
+        |> render(:show, project_id: project_id, document: document)
     end
   end
 

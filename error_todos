@@ -1,53 +1,81 @@
-    [33mwarning:[0m Renew.create_document/1 is undefined (module Renew is not available or is yet to be defined). Did you mean:
+Compiling 385 files (.ex)
+    warning: variable "document_data" is unused (if the variable is not meant to be used, prefix it with an underscore)
+    │
+ 30 │         document_data: document_data
+    │                        ~~~~~~~~~~~~~
+    │
+    └─ lib/renew_collab_ctrl/action.ex:30:24: RenewCollabCtrl.Action.do_perform/1
+
+    warning: variable "project_id" is unused (if the variable is not meant to be used, prefix it with an underscore)
+    │
+ 29 │         project_id: project_id,
+    │                     ~~~~~~~~~~
+    │
+    └─ lib/renew_collab_ctrl/action.ex:29:21: RenewCollabCtrl.Action.do_perform/1
+
+    warning: unused alias Actions
+    │
+ 10 │   alias RenewCollabCtrl.Actions
+    │   ~
+    │
+    └─ lib/renew_collab/renew.ex:10:3
+
+     warning: variable "imported" is unused (if the variable is not meant to be used, prefix it with an underscore)
+     │
+ 191 │       imported ->
+     │       ~
+     │
+     └─ lib/renew_collab_web/controllers/document_controller.ex:191:7: RenewCollabWeb.DocumentController.import/2
+
+    warning: RenewCollab.Commander.run_document_command/1 is undefined (module RenewCollab.Commander is not available or is yet to be defined)
+    │
+ 68 │     |> RenewCollab.Commander.run_document_command()
+    │                              ~
+    │
+    └─ lib/renew_collab_web/channels/redux_documents_channel.ex:68:30: RenewCollabWeb.ReduxDocumentsChannel.handle_event/4
+
+    warning: Renew.create_document/1 is undefined (module Renew is not available or is yet to be defined). Did you mean:
 
           * RenewCollab.Renew.create_document/1
 
     │
- 21 │     with {:ok, %Document{} = document} <- Renew.create_document(document_params) do
-    │ [33m                                                ~[0m
+ 36 │            Renew.create_document(%{name: "Untitled", kind: "de.renew.gui.CPNDrawing"}) do
+    │                  ~
     │
-    └─ lib/renew_collab_web/controllers/project_document_controller.ex:21:49: RenewCollabWeb.ProjectDocumentController.create/2
-    └─ lib/renew_collab_web/controllers/project_document_controller.ex:31:18: RenewCollabWeb.ProjectDocumentController.create/2
+    └─ lib/renew_collab_web/controllers/project_document_controller.ex:36:18: RenewCollabWeb.ProjectDocumentController.create/2
 
-     [33mwarning:[0m RenewCollab.Commander.run_document_command_sync/2 is undefined (module RenewCollab.Commander is not available or is yet to be defined)
+     warning: RenewCollab.Commander.run_document_command_sync/2 is undefined (module RenewCollab.Commander is not available or is yet to be defined)
      │
  256 │     |> RenewCollab.Commander.run_document_command_sync(true)
-     │ [33m                             ~[0m
+     │                              ~
      │
      └─ lib/renew_collab_proj/proj.ex:256:30: RenewCollabProj.Projects.duplicate_document_into_project/2
 
-    [33mwarning:[0m RenewCollab.Commander.run_document_command/1 is undefined (module RenewCollab.Commander is not available or is yet to be defined)
+    warning: RenewCollab.Commander.run_document_command_sync/1 is undefined (module RenewCollab.Commander is not available or is yet to be defined)
     │
- 68 │     |> RenewCollab.Commander.run_document_command()
-    │ [33m                             ~[0m
+ 45 │     |> RenewCollab.Commander.run_document_command_sync()
+    │                              ~
     │
-    └─ lib/renew_collab_web/channels/redux_documents_channel.ex:68:30: RenewCollabWeb.ReduxDocumentsChannel.handle_event/4
+    └─ lib/renew_collab/renew.ex:45:30: RenewCollab.Renew.create_document/5
 
-    [33mwarning:[0m RenewCollab.Commander.run_document_command_sync/1 is undefined (module RenewCollab.Commander is not available or is yet to be defined)
+    warning: RenewCollab.Commander.run_document_command/2 is undefined (module RenewCollab.Commander is not available or is yet to be defined)
     │
- 44 │     |> RenewCollab.Commander.run_document_command_sync()
-    │ [33m                             ~[0m
+ 65 │     |> RenewCollab.Commander.run_document_command(false)
+    │                              ~
     │
-    └─ lib/renew_collab/renew.ex:44:30: RenewCollab.Renew.create_document/5
+    └─ lib/renew_collab/renew.ex:65:30: RenewCollab.Renew.delete_document/1
 
-    [33mwarning:[0m RenewCollab.Commander.run_document_command/2 is undefined (module RenewCollab.Commander is not available or is yet to be defined)
+    warning: RenewCollab.Commander.run_document_command_sync/2 is undefined (module RenewCollab.Commander is not available or is yet to be defined)
     │
- 64 │     |> RenewCollab.Commander.run_document_command(false)
-    │ [33m                             ~[0m
+ 86 │     |> RenewCollab.Commander.run_document_command_sync(true)
+    │                              ~
     │
-    └─ lib/renew_collab/renew.ex:64:30: RenewCollab.Renew.delete_document/1
+    └─ lib/renew_collab/renew.ex:86:30: RenewCollab.Renew.duplicate_document/1
 
-    [33mwarning:[0m RenewCollab.Commander.run_document_command_sync/2 is undefined (module RenewCollab.Commander is not available or is yet to be defined)
-    │
- 85 │     |> RenewCollab.Commander.run_document_command_sync(true)
-    │ [33m                             ~[0m
-    │
-    └─ lib/renew_collab/renew.ex:85:30: RenewCollab.Renew.duplicate_document/1
-
-     [33mwarning:[0m RenewCollab.Commander.run_document_command/1 is undefined (module RenewCollab.Commander is not available or is yet to be defined)
+     warning: RenewCollab.Commander.run_document_command/1 is undefined (module RenewCollab.Commander is not available or is yet to be defined)
      │
  137 │     |> RenewCollab.Commander.run_document_command()
-     │ [33m                             ~[0m
+     │                              ~
      │
      └─ lib/renew_collab_web/channels/redux_document_channel.ex:137:30: RenewCollabWeb.ReduxDocumentChannel.handle_event/5
      └─ lib/renew_collab_web/channels/redux_document_channel.ex:156:30: RenewCollabWeb.ReduxDocumentChannel.handle_event/5
@@ -72,10 +100,10 @@
      └─ lib/renew_collab_web/channels/redux_document_channel.ex:915:30: RenewCollabWeb.ReduxDocumentChannel.handle_event/5
      └─ lib/renew_collab_web/channels/redux_document_channel.ex:932:30: RenewCollabWeb.ReduxDocumentChannel.handle_event/5
 
-     [33mwarning:[0m RenewCollab.Commander.run_document_command_sync/1 is undefined (module RenewCollab.Commander is not available or is yet to be defined)
+     warning: RenewCollab.Commander.run_document_command_sync/1 is undefined (module RenewCollab.Commander is not available or is yet to be defined)
      │
  202 │     |> RenewCollab.Commander.run_document_command_sync()
-     │ [33m                             ~[0m
+     │                              ~
      │
      └─ lib/renew_collab_web/channels/redux_document_channel.ex:202:30: RenewCollabWeb.ReduxDocumentChannel.handle_event/5
      └─ lib/renew_collab_web/channels/redux_document_channel.ex:245:30: RenewCollabWeb.ReduxDocumentChannel.handle_event/5
@@ -87,60 +115,4 @@
      └─ lib/renew_collab_web/channels/redux_document_channel.ex:761:30: RenewCollabWeb.ReduxDocumentChannel.handle_event/5
      └─ lib/renew_collab_web/channels/redux_document_channel.ex:852:30: RenewCollabWeb.ReduxDocumentChannel.handle_event/5
 
-     [33mwarning:[0m RenewCollab.Commander.run_document_command/1 is undefined (module RenewCollab.Commander is not available or is yet to be defined)
-     │
- 907 │     |> RenewCollab.Commander.run_document_command()
-     │ [33m                             ~[0m
-     │
-     └─ lib/renew_collab_web/live/live_document.ex:907:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:919:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:964:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:974:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1028:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1049:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1070:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1099:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1117:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1139:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1157:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1173:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1197:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1215:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1236:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1254:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1270:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1288:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1307:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1328:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1348:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1363:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1379:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1403:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1438:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1463:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1488:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1516:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1545:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1569:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1592:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1628:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1644:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1662:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1680:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1696:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1707:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1721:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1736:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1750:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1761:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1775:30: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:1794:34: RenewCollabWeb.LiveDocument.handle_event/3
-     └─ lib/renew_collab_web/live/live_document.ex:2015:32: RenewCollabWeb.LiveDocument.move_relative/3
-
-      [33mwarning:[0m RenewCollab.Commander.run_document_command/2 is undefined (module RenewCollab.Commander is not available or is yet to be defined)
-      │
- 1088 │     |> RenewCollab.Commander.run_document_command(false)
-      │ [33m                             ~[0m
-      │
-      └─ lib/renew_collab_web/live/live_document.ex:1088:30: RenewCollabWeb.LiveDocument.handle_event/3
-
+Generated renew_collab app

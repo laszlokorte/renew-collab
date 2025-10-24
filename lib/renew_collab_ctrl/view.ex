@@ -48,19 +48,6 @@ defmodule RenewCollabCtrl.View do
     )
   end
 
-  def do_fetch(_account, %Views.DocumentWithThumbnailContent{document_id: document_id}) do
-    %{document_id: document_id}
-    |> RenewCollab.Queries.DocumentWithThumbnailElements.new()
-    |> RenewCollab.Queries.DocumentWithThumbnailElements.multi()
-    |> RenewCollab.Repo.transact()
-    |> extract_result()
-    |> then(
-      &case &1 do
-        {:ok, list} -> {:ok, RenewCollabProj.Projects.attach_project_assignment(list)}
-      end
-    )
-  end
-
   def do_fetch(_account, %Views.DocumentHierarchyMissings{document_id: document_id}) do
     RenewCollab.Hierarchy.find_missing(document_id)
     |> then(&{:ok, &1})
