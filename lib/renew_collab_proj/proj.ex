@@ -3,6 +3,8 @@ defmodule RenewCollabProj.Projects do
   The Renew context.
   """
 
+  alias RenewCollabCtrl.Dispatcher
+  alias RenewCollabCtrl.Actions
   alias RenewCollabAuth.Entites.Account
   alias RenewCollabProj.Entites.ProjectShadowNetSystem
   alias RenewCollabProj.Entites.Project
@@ -144,7 +146,11 @@ defmodule RenewCollabProj.Projects do
         RenewCollab.Repo.transact(fn ->
           for %{document_id: doc_id} <- orig_project.documents, reduce: {:ok, 0} do
             {:ok, num} ->
-              duplicate_document_into_project(project, doc_id)
+              %Actions.DocumentDuplicateInProject{
+                document_id: doc_id,
+                project_id: project.id
+              }
+              |> Dispatcher.perform_as(nil)
               |> case do
                 {:ok, _} -> {:ok, num + 1}
               end
@@ -172,7 +178,11 @@ defmodule RenewCollabProj.Projects do
         RenewCollab.Repo.transact(fn ->
           for %{document_id: doc_id} <- orig_project.documents, reduce: {:ok, 0} do
             {:ok, num} ->
-              duplicate_document_into_project(project, doc_id)
+              %Actions.DocumentDuplicateInProject{
+                document_id: doc_id,
+                project_id: project.id
+              }
+              |> Dispatcher.perform_as(nil)
               |> case do
                 {:ok, _} -> {:ok, num + 1}
               end
@@ -246,18 +256,6 @@ defmodule RenewCollabProj.Projects do
     }
     |> ProjectDocument.changeset(document)
     |> Repo.insert()
-  end
-
-  def duplicate_document_into_project(project, document_id) do
-    RenewCollab.Commands.DuplicateDocument.new(%{
-      document_id: document_id,
-      keep_name: true
-    })
-    |> RenewCollab.Commander.run_document_command_sync(true)
-    |> case do
-      {:ok, %{insert_document: %RenewCollab.Document.Document{id: new_document_id}}} ->
-        add_document(project, %{document_id: new_document_id})
-    end
   end
 
   def add_simulation(%Project{id: project_id}, simulation) do

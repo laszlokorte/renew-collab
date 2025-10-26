@@ -1,4 +1,6 @@
 defmodule RenewCollabCtrl.Action do
+  alias RenewCollabProj.Entites.Project
+  alias RenewCollab.Import.Converted
   alias RenewCollab.Commands
   alias RenewCollabProj.Entites.ProjectDocument
   alias RenewCollab.Document.TransientDocument
@@ -26,6 +28,49 @@ defmodule RenewCollabCtrl.Action do
 
   def do_perform(%Actions.AccountDeleteAsUser{}) do
     {:error, :not_implemented}
+  end
+
+  def do_perform(%Actions.DocumentCreateInProject{
+        project_id: project_id,
+        document_data: %Converted{
+          name: document_name,
+          kind: document_kind,
+          layers: layers,
+          hyperlinks: hyperlinks,
+          hierarchy: hierarchy,
+          bonds: bonds
+        }
+      }) do
+    Commands.CreateDocument.new(%{
+      doc: %TransientDocument{
+        content: %{
+          name: document_name,
+          kind: document_kind,
+          layers: layers
+        },
+        parenthoods: hierarchy,
+        hyperlinks: hyperlinks,
+        bonds: bonds
+      }
+    })
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
+    |> case do
+      {:ok, %{insert_document: insert_document}} ->
+        %ProjectDocument{project_id: project_id}
+        |> ProjectDocument.changeset(%{
+          "document_id" => insert_document.id
+        })
+        |> RenewCollabProj.Repo.insert()
+
+        # TODO:broadcast
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "project/#{project_id}/documents",
+          :any
+        )
+
+        {:ok, insert_document}
+    end
   end
 
   def do_perform(%Actions.DocumentCreateInProject{
@@ -60,20 +105,95 @@ defmodule RenewCollabCtrl.Action do
     end
   end
 
-  def do_perform(%Actions.DocumentDeleteAsUser{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentDeleteAsUser{document_id: document_id}) do
+    RenewCollab.Commands.DeleteDocument.new(%{
+      document_id: document_id
+    })
+    |> RenewCollab.DocumentCommander.run_document_command(false)
+
+    RenewCollabProj.Projects.delete_document(document_id)
+    |> case do
+      %Project{id: project_id} ->
+        # TODO:broadcast
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "project/#{project_id}/documents",
+          :any
+        )
+
+      _ ->
+        nil
+    end
+
+    :ok
   end
 
-  def do_perform(%Actions.DocumentDuplicateInProject{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentDuplicateInProject{
+        document_id: document_id,
+        project_id: project_id
+      }) do
+    RenewCollab.Commands.DuplicateDocument.new(%{
+      document_id: document_id,
+      keep_name: true
+    })
+    |> RenewCollab.DocumentCommander.run_document_command_sync(true)
+    |> case do
+      {:ok,
+       %{insert_document: %RenewCollab.Document.Document{id: new_document_id} = new_document}} ->
+        %ProjectDocument{project_id: project_id}
+        |> ProjectDocument.changeset(%{
+          "document_id" => new_document_id
+        })
+        |> RenewCollabProj.Repo.insert()
+
+        # TODO:broadcast
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "project/#{project_id}/documents",
+          :any
+        )
+
+        {:ok, new_document}
+
+      _ ->
+        :error
+    end
   end
 
-  def do_perform(%Actions.DocumentEditCreateEdgeBond{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditCreateEdgeBond{
+        document_id: document_id,
+        edge_id: edge_id,
+        kind: kind,
+        layer_id: layer_id,
+        socket_id: socket_id
+      }) do
+    Commands.CreateEdgeBond.new(%{
+      document_id: document_id,
+      edge_id: edge_id,
+      kind: kind,
+      layer_id: layer_id,
+      socket_id: socket_id
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
-  def do_perform(%Actions.DocumentEditCreateEdgeWaypoint{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditCreateEdgeWaypoint{
+        document_id: document_id,
+        layer_id: layer_id,
+        prev_waypoint_id: prev_waypoint_id,
+        position: position
+      }) do
+    Commands.CreateLayerEdgeWaypoint.new(%{
+      document_id: document_id,
+      layer_id: layer_id,
+      prev_waypoint_id: prev_waypoint_id,
+      position: position
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
   def do_perform(%Actions.DocumentEditCreateLayerWithEdge{}) do
@@ -99,20 +219,57 @@ defmodule RenewCollabCtrl.Action do
     {:error, :not_implemented}
   end
 
-  def do_perform(%Actions.DocumentEditDeleteBond{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditDeleteBond{document_id: document_id, bond_id: bond_id}) do
+    Commands.DeleteBond.new(%{
+      document_id: document_id,
+      bond_id: bond_id
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
-  def do_perform(%Actions.DocumentEditDeleteEdgeWaypoint{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditDeleteEdgeWaypoint{
+        document_id: document_id,
+        layer_id: layer_id,
+        waypoint_id: waypoint_id
+      }) do
+    Commands.DeleteLayerEdgeWaypoint.new(%{
+      document_id: document_id,
+      layer_id: layer_id,
+      waypoint_id: waypoint_id
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
-  def do_perform(%Actions.DocumentEditDeleteLayer{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditDeleteLayer{
+        document_id: document_id,
+        layer_id: layer_id,
+        delete_children: delete_children
+      }) do
+    RenewCollab.Commands.DeleteLayer.new(%{
+      document_id: document_id,
+      layer_id: layer_id,
+      delete_children: delete_children
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
-  def do_perform(%Actions.DocumentEditEdgeRemoveAllWaypoints{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditEdgeRemoveAllWaypoints{
+        document_id: document_id,
+        layer_id: layer_id
+      }) do
+    RenewCollab.Commands.RemoveAllLayerEdgeWaypoints.new(%{
+      document_id: document_id,
+      layer_id: layer_id
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
   def do_perform(%Actions.DocumentEditInsertDocument{
@@ -135,13 +292,16 @@ defmodule RenewCollabCtrl.Action do
         file_name: file_name,
         file_content: file_content
       }) do
-    %RenewCollab.Commands.InsertTransientDocument{
-      target_document_id: document_id,
-      converted_document: RenewCollab.Import.DocumentImport.import(file_name, file_content)
-    }
-    |> RenewCollab.DocumentCommander.run_document_command()
+    with {:ok, imported} <- RenewCollab.Import.DocumentImport.import(file_name, file_content) do
+      %RenewCollab.Commands.InsertTransientDocument{
+        target_document_id: document_id,
+        converted_document: imported,
+        position: {0, 0}
+      }
+      |> RenewCollab.DocumentCommander.run_document_command()
 
-    :ok
+      :ok
+    end
   end
 
   def do_perform(%Actions.DocumentEditLayerAssignSocketSchema{
@@ -159,8 +319,21 @@ defmodule RenewCollabCtrl.Action do
     :ok
   end
 
-  def do_perform(%Actions.DocumentEditLayerBoxShape{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditLayerBoxShape{
+        document_id: document_id,
+        layer_id: layer_id,
+        shape_id: shape_id,
+        attributes: attributes
+      }) do
+    RenewCollab.Commands.UpdateLayerBoxShape.new(%{
+      document_id: document_id,
+      layer_id: layer_id,
+      shape_id: shape_id,
+      attributes: attributes
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
   def do_perform(%Actions.DocumentEditLayerBoxSize{
@@ -178,40 +351,143 @@ defmodule RenewCollabCtrl.Action do
     :ok
   end
 
-  def do_perform(%Actions.DocumentEditLayerEdgeAttributes{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditLayerEdgeAttributes{
+        document_id: document_id,
+        layer_id: layer_id,
+        attributes: attributes
+      }) do
+    RenewCollab.Commands.UpdateLayerEdgeAttributes.new(%{
+      document_id: document_id,
+      layer_id: layer_id,
+      attributes: attributes
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
-  def do_perform(%Actions.DocumentEditLayerEdgePosition{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditLayerEdgePosition{
+        document_id: document_id,
+        layer_id: layer_id,
+        new_position: new_position
+      }) do
+    RenewCollab.Commands.UpdateLayerEdgePosition.new(%{
+      document_id: document_id,
+      layer_id: layer_id,
+      new_position: new_position
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
-  def do_perform(%Actions.DocumentEditLayerEdgeStyle{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditLayerEdgeStyle{
+        document_id: document_id,
+        layer_id: layer_id,
+        style_attr: style_attr,
+        value: value
+      }) do
+    RenewCollab.Commands.UpdateLayerEdgeStyle.new(%{
+      document_id: document_id,
+      layer_id: layer_id,
+      style_attr: style_attr,
+      value: value
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
-  def do_perform(%Actions.DocumentEditLayerEdgeSwapDirection{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditLayerEdgeSwapDirection{
+        document_id: document_id,
+        layer_id: layer_id
+      }) do
+    RenewCollab.Commands.UpdateLayerEdgeReverseDirection.new(%{
+      document_id: document_id,
+      layer_id: layer_id
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
-  def do_perform(%Actions.DocumentEditLayerEdgeWaypointPosition{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditLayerEdgeWaypointPosition{
+        document_id: document_id,
+        layer_id: layer_id,
+        waypoint_id: waypoint_id,
+        new_position: new_position
+      }) do
+    RenewCollab.Commands.UpdateLayerEdgeWaypointPosition.new(%{
+      document_id: document_id,
+      waypoint_id: waypoint_id,
+      layer_id: layer_id,
+      new_position: new_position
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
-  def do_perform(%Actions.DocumentEditLayerSemanticTag{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditLayerSemanticTag{
+        document_id: document_id,
+        layer_id: layer_id,
+        new_tag: new_tag
+      }) do
+    RenewCollab.Commands.UpdateLayerSemanticTag.new(%{
+      document_id: document_id,
+      layer_id: layer_id,
+      new_tag: new_tag
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
-  def do_perform(%Actions.DocumentEditLayerStyle{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditLayerStyle{
+        document_id: document_id,
+        layer_id: layer_id,
+        style_attr: style_attr,
+        value: value
+      }) do
+    RenewCollab.Commands.UpdateLayerStyle.new(%{
+      document_id: document_id,
+      layer_id: layer_id,
+      style_attr: style_attr,
+      value: value
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
-  def do_perform(%Actions.DocumentEditLayerTextBody{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditLayerTextBody{
+        document_id: document_id,
+        layer_id: layer_id,
+        new_body: new_body
+      }) do
+    RenewCollab.Commands.UpdateLayerTextBody.new(%{
+      document_id: document_id,
+      layer_id: layer_id,
+      new_body: new_body
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
-  def do_perform(%Actions.DocumentEditLayerTextPosition{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditLayerTextPosition{
+        document_id: document_id,
+        layer_id: layer_id,
+        new_position: new_position
+      }) do
+    RenewCollab.Commands.UpdateLayerTextPosition.new(%{
+      document_id: document_id,
+      layer_id: layer_id,
+      new_position: new_position
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
   def do_perform(%Actions.DocumentEditLayerTextSizeHint{
@@ -229,28 +505,111 @@ defmodule RenewCollabCtrl.Action do
     :ok
   end
 
-  def do_perform(%Actions.DocumentEditLayerTextStyle{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditLayerTextStyle{
+        document_id: document_id,
+        layer_id: layer_id,
+        style_attr: style_attr,
+        value: value
+      }) do
+    RenewCollab.Commands.UpdateLayerTextStyle.new(%{
+      document_id: document_id,
+      layer_id: layer_id,
+      style_attr: style_attr,
+      value: value
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
-  def do_perform(%Actions.DocumentEditLayerZIndex{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditLayerZIndex{
+        document_id: document_id,
+        layer_id: layer_id,
+        z_index: z_index
+      }) do
+    RenewCollab.Commands.UpdateLayerZIndex.new(%{
+      document_id: document_id,
+      layer_id: layer_id,
+      z_index: z_index
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
-  def do_perform(%Actions.DocumentEditLinkLayer{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditLinkLayer{
+        document_id: document_id,
+        layer_id: layer_id,
+        target_layer_id: target_layer_id
+      }) do
+    RenewCollab.Commands.LinkLayer.new(%{
+      document_id: document_id,
+      layer_id: layer_id,
+      target_layer_id: target_layer_id
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
-  def do_perform(%Actions.DocumentEditMakeSpaceBetween{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditUnlinkLayer{
+        document_id: document_id,
+        layer_id: layer_id
+      }) do
+    RenewCollab.Commands.UnlinkLayer.new(%{
+      document_id: document_id,
+      layer_id: layer_id
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
-  def do_perform(%Actions.DocumentEditMoveLayerRelative{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditMakeSpaceBetween{
+        document_id: document_id,
+        base: base,
+        direction: direction,
+        inverse: inverse
+      }) do
+    RenewCollab.Commands.MakeSpaceBetween.new(%{
+      document_id: document_id,
+      base: base,
+      direction: direction,
+      inverse: inverse
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
-  def do_perform(%Actions.DocumentEditRemoveLayerSocketSchema{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditMoveLayerRelative{
+        document_id: document_id,
+        layer_id: layer_id,
+        dx: dx,
+        dy: dy
+      }) do
+    RenewCollab.Commands.MoveLayerRelative.new(%{
+      document_id: document_id,
+      layer_id: layer_id,
+      dx: dx,
+      dy: dy
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
+  end
+
+  def do_perform(%Actions.DocumentEditRemoveLayerSocketSchema{
+        document_id: document_id,
+        layer_id: layer_id
+      }) do
+    Commands.RemoveLayerSocketSchema.new(%{
+      document_id: document_id,
+      layer_id: layer_id
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
   def do_perform(%Actions.DocumentEditReorderLayer{
@@ -270,8 +629,21 @@ defmodule RenewCollabCtrl.Action do
     :ok
   end
 
-  def do_perform(%Actions.DocumentEditReorderLayerRelative{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditReorderLayerRelative{
+        document_id: document_id,
+        layer_id: layer_id,
+        target: target,
+        relative_direction: relative_direction
+      }) do
+    Commands.ReorderLayerRelative.new(%{
+      document_id: document_id,
+      layer_id: layer_id,
+      target: target,
+      relative_direction: relative_direction
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
   def do_perform(%Actions.DocumentEditSetThumbnail{document_id: document_id, layer_id: layer_id}) do
@@ -307,10 +679,6 @@ defmodule RenewCollabCtrl.Action do
     :ok
   end
 
-  def do_perform(%Actions.DocumentEditUnlinkLayer{}) do
-    {:error, :not_implemented}
-  end
-
   def do_perform(%Actions.DocumentMoveIntoProject{}) do
     {:error, :not_implemented}
   end
@@ -342,8 +710,41 @@ defmodule RenewCollabCtrl.Action do
     :ok
   end
 
-  def do_perform(%Actions.DocumentSnapshotsPrune{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditSnapshotCreateLabel{
+        document_id: document_id,
+        snapshot_id: snapshot_id,
+        description: description
+      }) do
+    RenewCollab.Commands.CreateSnapshotLabel.new(%{
+      document_id: document_id,
+      snapshot_id: snapshot_id,
+      description: description
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
+  end
+
+  def do_perform(%Actions.DocumentEditSnapshotRemoveLabel{
+        document_id: document_id,
+        snapshot_id: snapshot_id
+      }) do
+    RenewCollab.Commands.RemoveSnapshotLabel.new(%{
+      document_id: document_id,
+      snapshot_id: snapshot_id
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
+  end
+
+  def do_perform(%Actions.DocumentSnapshotsPrune{document_id: document_id}) do
+    RenewCollab.Commands.PruneSnapshots.new(%{
+      document_id: document_id
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
   def do_perform(%Actions.ProjectAddDocumentAsAdmin{}) do

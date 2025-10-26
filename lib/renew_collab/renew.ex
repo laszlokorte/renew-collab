@@ -32,67 +32,6 @@ defmodule RenewCollab.Renew do
     |> then(fn {:ok, %{result: result}} -> result end)
   end
 
-  def create_document(attrs \\ %{}, parenthoods \\ [], hyperlinks \\ [], bonds \\ []) do
-    Commands.CreateDocument.new(%{
-      doc: %TransientDocument{
-        content: attrs,
-        parenthoods: parenthoods,
-        hyperlinks: hyperlinks,
-        bonds: bonds
-      }
-    })
-    |> RenewCollab.Commander.run_document_command_sync()
-    |> case do
-      {:ok, %{insert_document: insert_document}} ->
-        {:ok, insert_document}
-    end
-  end
-
-  def delete_document(document_id) do
-    RenewCollab.Commands.DeleteDocument.new(%{
-      document_id: document_id
-    })
-    |> RenewCollab.Commander.run_document_command(false)
-
-    RenewCollabProj.Projects.delete_document(document_id)
-    |> case do
-      %Project{id: project_id} ->
-        # TODO:broadcast
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "project/#{project_id}/documents",
-          :any
-        )
-
-      _ ->
-        nil
-    end
-  end
-
-  def duplicate_document(document_id) do
-    RenewCollab.Commands.DuplicateDocument.new(%{
-      document_id: document_id
-    })
-    |> RenewCollab.Commander.run_document_command_sync(true)
-    |> case do
-      {:ok, %{insert_document: new_document}} = res ->
-        project = RenewCollabProj.Projects.find_documents_project(document_id)
-        RenewCollabProj.Projects.assign_to_project(project, new_document)
-
-        # TODO:broadcast
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "project/#{project.id}/documents",
-          :any
-        )
-
-        res
-
-      o ->
-        o
-    end
-  end
-
   def list_simulation_links(document_id) do
     Repo.all(
       from(l in SimulationLink,

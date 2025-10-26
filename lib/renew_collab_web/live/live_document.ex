@@ -1269,8 +1269,7 @@ defmodule RenewCollabWeb.LiveDocument do
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       prev_waypoint_id: prev_waypoint_id,
-      x: position_x,
-      y: position_y
+      position: {position_x, position_y}
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 

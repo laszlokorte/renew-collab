@@ -1,4 +1,6 @@
 defmodule RenewCollabWeb.LiveProjectManager do
+  alias RenewCollabCtrl.Dispatcher
+  alias RenewCollabCtrl.Actions
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
@@ -347,7 +349,12 @@ defmodule RenewCollabWeb.LiveProjectManager do
   end
 
   def handle_event("dup_document", %{"document_id" => document_id}, socket) do
-    Projects.duplicate_document_into_project(socket.assigns.project, document_id)
+    %Actions.DocumentDuplicateInProject{
+      document_id: document_id,
+      project_id: socket.assigns.project
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+
     socket |> put_flash(:info, "Document duplicated") |> reload
   end
 

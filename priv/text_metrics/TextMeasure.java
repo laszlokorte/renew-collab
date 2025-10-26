@@ -10,6 +10,7 @@ public class TextMeasure {
     private static String singleColon = ":";
 
     public static void main(String[] args) {
+        System.setProperty("java.awt.headless", "true");
         Canvas canvas = new Canvas();
         try (
             BufferedReader br = new BufferedReader(

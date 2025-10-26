@@ -7,8 +7,10 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(_account, %Actions.DocumentCreateInProject{}), do: true
   def can(_account, %Actions.DocumentEditCreateLayer{}), do: true
   def can(_account, %Actions.DocumentSnapshotRestore{}), do: true
+  def can(_account, %Actions.DocumentDuplicateInProject{}), do: true
   def can(_account, %Actions.DocumentEditLayerAssignSocketSchema{}), do: true
   def can(_account, %Actions.DocumentEditImportFile{}), do: true
+  def can(_account, %Actions.DocumentDeleteAsUser{}), do: true
 
   def can(_account, %Actions.DocumentEditSetLayerVisibility{}), do: true
 

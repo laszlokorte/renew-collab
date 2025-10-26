@@ -1,8 +1,15 @@
 defmodule RenewCollabCtrl.View do
   alias RenewCollabCtrl.Views
 
-  def do_fetch(_account, %Views.DocumentLayerRelative{}) do
-    {:error, :not_implemented}
+  def do_fetch(_account, %Views.DocumentLayerRelative{
+        document_id: document_id,
+        layer_id: layer_id,
+        relative: relative,
+        id_only: id_only
+      }) do
+    %{document_id: document_id, layer_id: layer_id, relative: relative, id_only: id_only}
+    |> RenewCollab.Queries.LayerHierarchyRelative.new()
+    |> RenewCollab.DocumentFetcher.fetch()
   end
 
   def do_fetch(_account, %Views.DocumentStripped{
@@ -11,25 +18,19 @@ defmodule RenewCollabCtrl.View do
       }) do
     %{document_id: document_id, original_ids: original_ids}
     |> RenewCollab.Queries.StrippedDocument.new()
-    |> RenewCollab.Queries.StrippedDocument.multi()
-    |> RenewCollab.Repo.transact()
-    |> extract_result()
+    |> RenewCollab.DocumentFetcher.fetch()
   end
 
   def do_fetch(_account, %Views.DocumentVersionState{document_id: document_id}) do
     %{document_id: document_id}
     |> RenewCollab.Queries.UndoRedoState.new()
-    |> RenewCollab.Queries.UndoRedoState.multi()
-    |> RenewCollab.Repo.transact()
-    |> extract_result()
+    |> RenewCollab.DocumentFetcher.fetch()
   end
 
   def do_fetch(_account, %Views.DocumentVersionsList{document_id: document_id}) do
     %{document_id: document_id}
     |> RenewCollab.Queries.DocumentVersions.new()
-    |> RenewCollab.Queries.DocumentVersions.multi()
-    |> RenewCollab.Repo.transact()
-    |> extract_result()
+    |> RenewCollab.DocumentFetcher.fetch()
   end
 
   def do_fetch(_account, %Views.DocumentWithContent{
@@ -38,9 +39,7 @@ defmodule RenewCollabCtrl.View do
       }) do
     %{document_id: document_id, root_layer_id: root_layer_id}
     |> RenewCollab.Queries.DocumentWithElements.new()
-    |> RenewCollab.Queries.DocumentWithElements.multi()
-    |> RenewCollab.Repo.transact()
-    |> extract_result()
+    |> RenewCollab.DocumentFetcher.fetch()
     |> then(
       &case &1 do
         {:ok, list} -> {:ok, RenewCollabProj.Projects.attach_project_assignment(list)}
@@ -90,9 +89,7 @@ defmodule RenewCollabCtrl.View do
 
   def do_fetch(_account, %Views.GlobalSocketById{}) do
     RenewCollab.Queries.SocketsById.new()
-    |> RenewCollab.Queries.SocketsById.multi()
-    |> RenewCollab.Repo.transact()
-    |> extract_result()
+    |> RenewCollab.DocumentFetcher.fetch()
   end
 
   def do_fetch(_account, %Views.GlobalSocketIdsByName{}) do
@@ -101,9 +98,7 @@ defmodule RenewCollabCtrl.View do
 
   def do_fetch(_account, %Views.GlobalSocketSchemasList{}) do
     RenewCollab.Queries.SocketSchemasList.new()
-    |> RenewCollab.Queries.SocketSchemasList.multi()
-    |> RenewCollab.Repo.transact()
-    |> extract_result()
+    |> RenewCollab.DocumentFetcher.fetch()
   end
 
   def do_fetch(_account, %Views.GlobalSocketSchema{socket_schema_id: id}) do
@@ -116,9 +111,7 @@ defmodule RenewCollabCtrl.View do
 
   def do_fetch(_account, %Views.GlobalSymbolsList{}) do
     RenewCollab.Queries.ListSymbols.new()
-    |> RenewCollab.Queries.ListSymbols.multi()
-    |> RenewCollab.Repo.transact()
-    |> extract_result()
+    |> RenewCollab.DocumentFetcher.fetch()
   end
 
   def do_fetch(_account, %Views.GlobalSymbol{symbol_id: id}) do
@@ -146,9 +139,7 @@ defmodule RenewCollabCtrl.View do
     account
     |> RenewCollabProj.Projects.find_own_project(project_id)
     |> then(&RenewCollab.Queries.DocumentList.new(%{project: &1}))
-    |> RenewCollab.Queries.DocumentList.multi()
-    |> RenewCollab.Repo.transact()
-    |> extract_result()
+    |> RenewCollab.DocumentFetcher.fetch()
   end
 
   def do_fetch(_account, %Views.ProjectShadowNetSystemsList{project_id: project_id}) do
@@ -196,9 +187,7 @@ defmodule RenewCollabCtrl.View do
       number_of_media: RenewCollab.Media.count(),
       number_of_documents:
         RenewCollab.Queries.DocumentCount.new()
-        |> RenewCollab.Queries.DocumentCount.multi()
-        |> RenewCollab.Repo.transact()
-        |> extract_result()
+        |> RenewCollab.DocumentFetcher.fetch()
         |> then(fn {:ok, r} -> r end),
       number_of_snapshots: RenewCollab.Renew.count_snapshots(),
       number_of_shadow_net_systems: RenewCollabSim.Simulator.count_shadow_net_systems(),
@@ -211,9 +200,5 @@ defmodule RenewCollabCtrl.View do
       formalisms: RenewCollabSim.Compiler.SnsCompiler.formalisms()
     }
     |> then(&{:ok, &1})
-  end
-
-  defp extract_result({:ok, %{:result => res}}) do
-    {:ok, res}
   end
 end

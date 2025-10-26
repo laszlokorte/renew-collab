@@ -1,10 +1,18 @@
 defmodule RenewCollab.Symbols do
   def list_shapes do
-    :deprecated
+    RenewCollab.Queries.SocketsById.new()
+    |> RenewCollab.DocumentFetcher.fetch()
+    |> case do
+      {:ok, result} -> result
+    end
   end
 
   def ids_by_name do
-    :deprecated
+    RenewCollab.Queries.SymbolIdsByName.new()
+    |> RenewCollab.DocumentFetcher.fetch()
+    |> case do
+      {:ok, result} -> result
+    end
   end
 
   def find_symbol(id) do

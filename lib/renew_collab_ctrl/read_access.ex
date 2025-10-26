@@ -18,6 +18,7 @@ defmodule RenewCollabCtrl.ReadAccess do
   def can(_account, %Views.DocumentHierarchyMissings{}), do: true
   def can(_account, %Views.DocumentHierarchyInvalids{}), do: true
   def can(_account, %Views.SystemHealthReport{}), do: true
+  def can(_account, %Views.DocumentLayerRelative{}), do: true
 
   def can(_account, %Views.ProjectSimulationsList{}), do: true
   def can(_account, %Views.ProjectShadowNetSystemsList{}), do: true

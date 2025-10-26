@@ -5,7 +5,7 @@ defmodule RenewCollab.DocumentFetcher do
     apply(module, :multi, [query])
     |> Repo.transact()
     |> case do
-      {:ok, %{result: result}} -> result
+      {:ok, %{result: result}} -> {:ok, result}
     end
   end
 end

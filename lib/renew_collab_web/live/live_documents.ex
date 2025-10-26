@@ -231,7 +231,7 @@ defmodule RenewCollabWeb.LiveDocuments do
                   </td>
 
                   <td width="50">
-                    <a href={~p"/documents/#{document.id}/export"}>
+                    <a target="_blank" href={~p"/documents/#{document.id}/export"}>
                       <button style="cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff">
                         Export
                       </button>
@@ -270,7 +270,11 @@ defmodule RenewCollabWeb.LiveDocuments do
   end
 
   def handle_event("duplicate", %{"id" => document_id}, socket) do
-    Renew.duplicate_document(document_id)
+    %Actions.DocumentDuplicateInProject{
+      document_id: document_id,
+      project_id: socket.assigns.project.id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket |> put_flash(:info, "Document duplicated")}
   end
@@ -343,7 +347,10 @@ defmodule RenewCollabWeb.LiveDocuments do
   end
 
   def handle_event("delete", %{"id" => document_id}, socket) do
-    Renew.delete_document(document_id)
+    %Actions.DocumentDeleteAsUser{
+      document_id: document_id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket |> put_flash(:info, "Document deleted")}
   end
