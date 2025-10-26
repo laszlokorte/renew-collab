@@ -115,8 +115,19 @@ defmodule RenewCollabCtrl.Action do
     {:error, :not_implemented}
   end
 
-  def do_perform(%Actions.DocumentEditInsertDocument{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditInsertDocument{
+        source_document_id: source_document_id,
+        target_document_id: target_document_id,
+        position: position
+      }) do
+    RenewCollab.Commands.InsertDocument.new(%{
+      source_document_id: source_document_id,
+      target_document_id: target_document_id,
+      position: position
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
   def do_perform(%Actions.DocumentEditImportFile{
@@ -152,8 +163,19 @@ defmodule RenewCollabCtrl.Action do
     {:error, :not_implemented}
   end
 
-  def do_perform(%Actions.DocumentEditLayerBoxSize{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditLayerBoxSize{
+        document_id: document_id,
+        layer_id: layer_id,
+        new_size: new_size
+      }) do
+    RenewCollab.Commands.UpdateLayerBoxSize.new(%{
+      document_id: document_id,
+      layer_id: layer_id,
+      new_size: new_size
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
   def do_perform(%Actions.DocumentEditLayerEdgeAttributes{}) do
@@ -231,8 +253,21 @@ defmodule RenewCollabCtrl.Action do
     {:error, :not_implemented}
   end
 
-  def do_perform(%Actions.DocumentEditReorderLayer{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditReorderLayer{
+        document_id: document_id,
+        layer_id: layer_id,
+        target_layer_id: target_layer_id,
+        target: target
+      }) do
+    Commands.ReorderLayer.new(%{
+      document_id: document_id,
+      layer_id: layer_id,
+      target_layer_id: target_layer_id,
+      target: target
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
   def do_perform(%Actions.DocumentEditReorderLayerRelative{}) do
@@ -258,8 +293,18 @@ defmodule RenewCollabCtrl.Action do
     :ok
   end
 
-  def do_perform(%Actions.DocumentEditSetLayerVisibility{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditSetLayerVisibility{
+        document_id: document_id,
+        layer_id: layer_id,
+        visible: :toggle
+      }) do
+    Commands.ToggleVisible.new(%{
+      document_id: document_id,
+      layer_id: layer_id
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
   def do_perform(%Actions.DocumentEditUnlinkLayer{}) do
@@ -272,6 +317,16 @@ defmodule RenewCollabCtrl.Action do
 
   def do_perform(%Actions.DocumentRename{}) do
     {:error, :not_implemented}
+  end
+
+  def do_perform(%Actions.DocumentUpdateMeta{document_id: document_id, meta: meta}) do
+    RenewCollab.Commands.UpdateDocumentMeta.new(%{
+      document_id: document_id,
+      meta: meta
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
   def do_perform(%Actions.DocumentSnapshotRestore{

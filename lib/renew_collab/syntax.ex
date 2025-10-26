@@ -114,7 +114,7 @@ defmodule RenewCollab.Syntax do
   end
 
   def make_default(id) do
-    Repo.transaction(fn _ ->
+    Repo.transact(fn _ ->
       from(s in SyntaxDefault)
       |> Repo.delete_all()
 

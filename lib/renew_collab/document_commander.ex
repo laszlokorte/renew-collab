@@ -45,7 +45,7 @@ defmodule RenewCollab.DocumentCommander do
   end
 
   defp run_document_transaction(multi, tags) do
-    Repo.transaction(multi)
+    Repo.transact(multi)
     |> case do
       {:ok, values} ->
         values

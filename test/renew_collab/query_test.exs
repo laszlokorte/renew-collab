@@ -192,7 +192,7 @@ defmodule RenewCollab.QueryTest do
       RenewCollab.DocumentFixtures.document_fixture()
 
       for {%{__struct__: t} = q, expected} <- @queries do
-        assert {:ok, %{result: ^expected}} = t.multi(q) |> Repo.transaction()
+        assert {:ok, %{result: ^expected}} = t.multi(q) |> Repo.transact()
       end
     end
   end

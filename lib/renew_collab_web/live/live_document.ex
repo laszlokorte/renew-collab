@@ -1,12 +1,12 @@
 defmodule RenewCollabWeb.LiveDocument do
   alias RenewCollabCtrl.Dispatcher
-  alias RenewCollabCtrl.Actions
   alias RenewCollabProj.Entites.ProjectDocument
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
   alias RenewCollabCtrl.Fetcher
   alias RenewCollabCtrl.Views
+  alias RenewCollabCtrl.Actions
 
   import RenewCollabWeb.RenewComponents
 
@@ -912,7 +912,7 @@ defmodule RenewCollabWeb.LiveDocument do
         {:ok, content} = File.read(path)
 
         with {:ok, converted = %RenewCollab.Import.Converted{}} <-
-               %RenewCollabCtrl.Actions.DocumentEditImportFile{
+               %Actions.DocumentEditImportFile{
                  document_id: socket.assigns.document.id,
                  file_name: filename,
                  file_content: content
@@ -930,7 +930,7 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def handle_event("toggle_visible", %{"id" => layer_id}, socket) do
-    %RenewCollabCtrl.Actions.DocumentEditSetLayerVisibility{
+    %Actions.DocumentEditSetLayerVisibility{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       visible: :toggle
@@ -994,7 +994,7 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def handle_event("make-space", %{}, socket) do
-    %RenewCollabCtrl.Actions.DocumentEditMakeSpaceBetween{
+    %Actions.DocumentEditMakeSpaceBetween{
       document_id: socket.assigns.document.id,
       base: {20, 0},
       direction: {100, 0}
@@ -1005,7 +1005,7 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def handle_event("detach-bond", %{"id" => bond_id}, socket) do
-    %RenewCollabCtrl.Actions.DocumentEditDeleteBond{
+    %Actions.DocumentEditDeleteBond{
       document_id: socket.assigns.document.id,
       bond_id: bond_id
     }
@@ -1057,7 +1057,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditLayerStyle{
+    %Actions.DocumentEditLayerStyle{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       style_attr: style_attr,
@@ -1078,7 +1078,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditLayerEdgeStyle{
+    %Actions.DocumentEditLayerEdgeStyle{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       style_attr: style_attr,
@@ -1099,7 +1099,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditLayerTextStyle{
+    %Actions.DocumentEditLayerTextStyle{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       style_attr: style_attr,
@@ -1129,7 +1129,7 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def handle_event("update_text_body", %{"layer_id" => layer_id, "value" => new_body}, socket) do
-    %RenewCollabCtrl.Actions.DocumentEditLayerTextBody{
+    %Actions.DocumentEditLayerTextBody{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       new_body: new_body
@@ -1147,7 +1147,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditLayerBoxSize{
+    %Actions.DocumentEditLayerBoxSize{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       new_size: new_size
@@ -1169,7 +1169,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditLayerTextPosition{
+    %Actions.DocumentEditLayerTextPosition{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       new_position: new_position
@@ -1187,7 +1187,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditLayerEdgePosition{
+    %Actions.DocumentEditLayerEdgePosition{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       new_position: new_position
@@ -1204,7 +1204,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditLayerEdgeSwapDirection{
+    %Actions.DocumentEditLayerEdgeSwapDirection{
       document_id: socket.assigns.document.id,
       layer_id: layer_id
     }
@@ -1226,7 +1226,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditLayerEdgeWaypointPosition{
+    %Actions.DocumentEditLayerEdgeWaypointPosition{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       waypoint_id: waypoint_id,
@@ -1245,7 +1245,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditDeleteEdgeWaypoint{
+    %Actions.DocumentEditDeleteEdgeWaypoint{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       waypoint_id: waypoint_id
@@ -1265,7 +1265,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditCreateEdgeWaypoint{
+    %Actions.DocumentEditCreateEdgeWaypoint{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       prev_waypoint_id: prev_waypoint_id,
@@ -1285,7 +1285,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditCreateEdgeWaypoint{
+    %Actions.DocumentEditCreateEdgeWaypoint{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       prev_waypoint_id: prev_waypoint_id
@@ -1302,7 +1302,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditEdgeRemoveAllWaypoints{
+    %Actions.DocumentEditEdgeRemoveAllWaypoints{
       document_id: socket.assigns.document.id,
       layer_id: layer_id
     }
@@ -1319,7 +1319,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditLayerSemanticTag{
+    %Actions.DocumentEditLayerSemanticTag{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       new_tag: new_tag
@@ -1337,7 +1337,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditLayerBoxShape{
+    %Actions.DocumentEditLayerBoxShape{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       shape_id: shape_id,
@@ -1358,12 +1358,11 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditReorderLayer{
+    %Actions.DocumentEditReorderLayer{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       target_layer_id: target_layer_id,
-      target:
-        RenewCollabCtrl.Actions.DocumentEditReorderLayer.parse_hierarchy_position(order, relative)
+      target: Actions.DocumentEditReorderLayer.parse_hierarchy_position(order, relative)
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
@@ -1379,7 +1378,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditMoveLayerRelative{
+    %Actions.DocumentEditMoveLayerRelative{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       dx: dx,
@@ -1395,7 +1394,7 @@ defmodule RenewCollabWeb.LiveDocument do
         %{"id" => layer_id},
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditDeleteLayer{
+    %Actions.DocumentEditDeleteLayer{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       delete_children: true
@@ -1410,7 +1409,7 @@ defmodule RenewCollabWeb.LiveDocument do
         %{"example" => "yes"},
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditCreateLayer{
+    %Actions.DocumentEditCreateLayer{
       document_id: socket.assigns.document.id,
       attrs: %{
         "semantic_tag" => "CH.ifa.draw.figures.GroupFigure"
@@ -1428,7 +1427,7 @@ defmodule RenewCollabWeb.LiveDocument do
       ) do
     {cx, cy} = viewbox_center(socket.assigns.viewbox)
 
-    %RenewCollabCtrl.Actions.DocumentEditCreateLayer{
+    %Actions.DocumentEditCreateLayer{
       base_layer_id: socket.assigns.selection,
       document_id: socket.assigns.document.id,
       attrs: %{
@@ -1460,7 +1459,7 @@ defmodule RenewCollabWeb.LiveDocument do
           {(source_x + target_x) / 2, (source_y + target_y) / 2}
       end
 
-    %RenewCollabCtrl.Actions.DocumentEditCreateLayer{
+    %Actions.DocumentEditCreateLayer{
       base_layer_id: socket.assigns.selection,
       document_id: socket.assigns.document.id,
       attrs: %{
@@ -1487,7 +1486,7 @@ defmodule RenewCollabWeb.LiveDocument do
       ) do
     {cx, cy} = viewbox_center(socket.assigns.viewbox)
 
-    %RenewCollabCtrl.Actions.DocumentEditCreateLayer{
+    %Actions.DocumentEditCreateLayer{
       base_layer_id: socket.assigns.selection,
       document_id: socket.assigns.document.id,
       attrs: %{
@@ -1512,7 +1511,7 @@ defmodule RenewCollabWeb.LiveDocument do
       ) do
     {cx, cy} = viewbox_center(socket.assigns.viewbox)
 
-    %RenewCollabCtrl.Actions.DocumentEditCreateLayer{
+    %Actions.DocumentEditCreateLayer{
       base_layer_id: socket.assigns.selection,
       document_id: socket.assigns.document.id,
       attrs: %{
@@ -1537,7 +1536,7 @@ defmodule RenewCollabWeb.LiveDocument do
       ) do
     {cx, cy} = viewbox_center(socket.assigns.viewbox)
 
-    %RenewCollabCtrl.Actions.DocumentEditCreateLayer{
+    %Actions.DocumentEditCreateLayer{
       base_layer_id: socket.assigns.selection,
       document_id: socket.assigns.document.id,
       attrs: %{
@@ -1565,7 +1564,7 @@ defmodule RenewCollabWeb.LiveDocument do
       ) do
     {cx, cy} = viewbox_center(socket.assigns.viewbox)
 
-    %RenewCollabCtrl.Actions.DocumentEditCreateLayer{
+    %Actions.DocumentEditCreateLayer{
       base_layer_id: socket.assigns.selection,
       document_id: socket.assigns.document.id,
       attrs: %{
@@ -1592,7 +1591,7 @@ defmodule RenewCollabWeb.LiveDocument do
         %{} = edge,
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditCreateLayer{
+    %Actions.DocumentEditCreateLayer{
       base_layer_id: socket.assigns.selection,
       document_id: socket.assigns.document.id,
       attrs: %{
@@ -1621,7 +1620,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditCreateEdgeBond{
+    %Actions.DocumentEditCreateEdgeBond{
       document_id: socket.assigns.document.id,
       edge_id: edge_id,
       kind: kind,
@@ -1643,7 +1642,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditCreateLayer{
+    %Actions.DocumentEditCreateLayer{
       base_layer_id: socket.assigns.selection,
       document_id: socket.assigns.document.id,
       attrs: %{
@@ -1676,7 +1675,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditUnlinkLayer{
+    %Actions.DocumentEditUnlinkLayer{
       document_id: socket.assigns.document.id,
       layer_id: layer_id
     }
@@ -1693,7 +1692,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditLinkLayer{
+    %Actions.DocumentEditLinkLayer{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       target_layer_id: target_layer_id
@@ -1711,7 +1710,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditLayerAssignSocketSchema{
+    %Actions.DocumentEditLayerAssignSocketSchema{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       socket_schema_id: socket_schema_id
@@ -1728,7 +1727,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditRemoveLayerSocketSchema{
+    %Actions.DocumentEditRemoveLayerSocketSchema{
       document_id: socket.assigns.document.id,
       layer_id: layer_id
     }
@@ -1742,7 +1741,7 @@ defmodule RenewCollabWeb.LiveDocument do
         %{},
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditCreateSnapshot{
+    %Actions.DocumentEditCreateSnapshot{
       document_id: socket.assigns.document.id
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
@@ -1755,7 +1754,7 @@ defmodule RenewCollabWeb.LiveDocument do
         %{"id" => snapshot_id},
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentSnapshotRestore{
+    %Actions.DocumentSnapshotRestore{
       document_id: socket.assigns.document.id,
       snapshot_id: snapshot_id
     }
@@ -1769,7 +1768,7 @@ defmodule RenewCollabWeb.LiveDocument do
         %{"snapshot_id" => snapshot_id, "description" => description},
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditSnapshotCreateLabel{
+    %Actions.DocumentEditSnapshotCreateLabel{
       document_id: socket.assigns.document.id,
       snapshot_id: snapshot_id,
       description: description
@@ -1784,7 +1783,7 @@ defmodule RenewCollabWeb.LiveDocument do
         %{"id" => snapshot_id},
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentEditSnapshotRemoveLabel{
+    %Actions.DocumentEditSnapshotRemoveLabel{
       document_id: socket.assigns.document.id,
       snapshot_id: snapshot_id
     }
@@ -1798,7 +1797,7 @@ defmodule RenewCollabWeb.LiveDocument do
         %{},
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentSnapshotsPrune{
+    %Actions.DocumentSnapshotsPrune{
       document_id: socket.assigns.document.id
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
@@ -1811,7 +1810,7 @@ defmodule RenewCollabWeb.LiveDocument do
         meta,
         socket
       ) do
-    %RenewCollabCtrl.Actions.DocumentUpdateMeta{
+    %Actions.DocumentUpdateMeta{
       document_id: socket.assigns.document.id,
       meta: meta
     }
@@ -1830,7 +1829,7 @@ defmodule RenewCollabWeb.LiveDocument do
         nil
 
       id ->
-        %RenewCollabCtrl.Actions.DocumentEditInsertDocument{
+        %Actions.DocumentEditInsertDocument{
           target_document_id: socket.assigns.document.id,
           source_document_id: id
         }
@@ -2049,7 +2048,7 @@ defmodule RenewCollabWeb.LiveDocument do
 
   defp move_relative(socket, rel, order) do
     with s when not is_nil(s) <- socket.assigns.selection do
-      %RenewCollabCtrl.Actions.DocumentEditReorderLayerRelative{
+      %Actions.DocumentEditReorderLayerRelative{
         document_id: socket.assigns.document.id,
         layer_id: socket.assigns.selection,
         relative_direction: rel,

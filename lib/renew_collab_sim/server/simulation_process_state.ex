@@ -136,13 +136,13 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
   def commit(state, mode \\ :strict)
 
   def commit(%{open_multi: {_, open_multi}} = state, :strict) do
-    open_multi |> Repo.transaction()
+    open_multi |> Repo.transact()
     %{state | open_multi: {0, Ecto.Multi.new()}}
   end
 
   def commit(%{open_multi: {_, open_multi}} = state, :try) do
     try do
-      open_multi |> Repo.transaction()
+      open_multi |> Repo.transact()
     rescue
       Ecto.ConstraintError -> {}
     end

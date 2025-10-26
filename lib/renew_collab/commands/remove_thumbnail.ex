@@ -19,6 +19,7 @@ defmodule RenewCollab.Commands.RemoveThumbnail do
         document_id: document_id
       }) do
     Ecto.Multi.new()
+    |> Ecto.Multi.put(:document_id, document_id)
     |> Ecto.delete_all(
       :deleted,
       from(d in DocumentThumbnailLayer, where: d.document_id == ^document_id),

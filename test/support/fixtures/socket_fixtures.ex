@@ -15,6 +15,6 @@ defmodule RenewCollab.SocketFixtures do
         )
       end
     )
-    |> Repo.transaction()
+    |> Repo.transact()
   end
 end

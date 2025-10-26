@@ -33,7 +33,7 @@ defmodule RenewCollab.Hierarchy do
     |> Ecto.Multi.insert_all(:insert_missings, LayerParenthood, fn %{missings: rows_to_insert} ->
       rows_to_insert
     end)
-    |> Repo.transaction()
+    |> Repo.transact()
   end
 
   def find_missing_query(doc_id) do

@@ -644,10 +644,10 @@ defmodule RenewCollab.DocumentFixtures do
           RenewCollab.Commands.CreateDocument.new(%{doc: transient_doc})
           |> RenewCollab.Commands.CreateDocument.multi(id)
           |> Ecto.Multi.append(Versioning.snapshot_multi(id))
-          |> rep.transaction()
+          |> rep.transact()
         end
       )
     end)
-    |> Repo.transaction()
+    |> Repo.transact()
   end
 end

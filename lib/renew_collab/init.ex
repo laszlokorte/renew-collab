@@ -39,7 +39,7 @@ defmodule RenewCollab.Init do
             )
           end))
       )
-      |> repo.transaction()
+      |> repo.transact()
     rescue
       e -> dbg(e)
     end
@@ -72,7 +72,7 @@ defmodule RenewCollab.Init do
             )
           end))
       )
-      |> repo.transaction()
+      |> repo.transact()
     rescue
       e -> dbg(e)
     end
@@ -84,7 +84,7 @@ defmodule RenewCollab.Init do
         |> Ecto.Multi.merge(fn %{insert_document: %{id: doc_id}} ->
           Versioning.snapshot_multi(doc_id)
         end)
-        |> repo.transaction()
+        |> repo.transact()
       rescue
         _e -> nil
       end

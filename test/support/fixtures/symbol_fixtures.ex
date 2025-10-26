@@ -11,6 +11,6 @@ defmodule RenewCollab.SymbolFixtures do
         %Shape{id: Map.get(shape, :id)} |> Shape.changeset(shape)
       )
     end)
-    |> Repo.transaction()
+    |> Repo.transact()
   end
 end

@@ -21,6 +21,7 @@ defmodule RenewCollab.Commands.SetThumbnail do
         layer_id: layer_id
       }) do
     Ecto.Multi.new()
+    |> Ecto.Multi.put(:document_id, document_id)
     |> Ecto.Multi.insert(
       :insert_thumbnail,
       %DocumentThumbnailLayer{document_id: document_id, layer_id: layer_id},

@@ -10,5 +10,74 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(_account, %Actions.DocumentEditLayerAssignSocketSchema{}), do: true
   def can(_account, %Actions.DocumentEditImportFile{}), do: true
 
+  def can(_account, %Actions.DocumentEditSetLayerVisibility{}), do: true
+
+  def can(_account, %Actions.DocumentEditMakeSpaceBetween{}), do: true
+
+  def can(_account, %Actions.DocumentEditDeleteBond{}), do: true
+
+  def can(_account, %Actions.DocumentEditLayerStyle{}), do: true
+
+  def can(_account, %Actions.DocumentEditLayerEdgeStyle{}), do: true
+
+  def can(_account, %Actions.DocumentEditLayerTextStyle{}), do: true
+
+  def can(_account, %Actions.DocumentEditLayerTextBody{}), do: true
+
+  def can(_account, %Actions.DocumentEditLayerBoxSize{}), do: true
+
+  def can(_account, %Actions.DocumentEditLayerTextPosition{}), do: true
+
+  def can(_account, %Actions.DocumentEditLayerEdgePosition{}), do: true
+
+  def can(_account, %Actions.DocumentEditLayerEdgeSwapDirection{}), do: true
+
+  def can(_account, %Actions.DocumentEditLayerEdgeWaypointPosition{}), do: true
+
+  def can(_account, %Actions.DocumentEditDeleteEdgeWaypoint{}), do: true
+
+  def can(_account, %Actions.DocumentEditCreateEdgeWaypoint{}), do: true
+
+  def can(_account, %Actions.DocumentEditCreateEdgeWaypoint{}), do: true
+
+  def can(_account, %Actions.DocumentEditEdgeRemoveAllWaypoints{}), do: true
+
+  def can(_account, %Actions.DocumentEditLayerSemanticTag{}), do: true
+
+  def can(_account, %Actions.DocumentEditLayerBoxShape{}), do: true
+
+  def can(_account, %Actions.DocumentEditReorderLayer{}), do: true
+
+  def can(_account, %Actions.DocumentEditMoveLayerRelative{}), do: true
+
+  def can(_account, %Actions.DocumentEditDeleteLayer{}), do: true
+
+  def can(_account, %Actions.DocumentEditCreateLayer{}), do: true
+
+  def can(_account, %Actions.DocumentEditCreateEdgeBond{}), do: true
+
+  def can(_account, %Actions.DocumentEditUnlinkLayer{}), do: true
+
+  def can(_account, %Actions.DocumentEditLinkLayer{}), do: true
+
+  def can(_account, %Actions.DocumentEditLayerAssignSocketSchema{}), do: true
+
+  def can(_account, %Actions.DocumentEditRemoveLayerSocketSchema{}), do: true
+
+  def can(_account, %Actions.DocumentEditCreateSnapshot{}), do: true
+
+  def can(_account, %Actions.DocumentSnapshotRestore{}), do: true
+
+  def can(_account, %Actions.DocumentEditSnapshotCreateLabel{}), do: true
+
+  def can(_account, %Actions.DocumentEditSnapshotRemoveLabel{}), do: true
+
+  def can(_account, %Actions.DocumentSnapshotsPrune{}), do: true
+
+  def can(_account, %Actions.DocumentUpdateMeta{}), do: true
+
+  def can(_account, %Actions.DocumentEditInsertDocument{}), do: true
+
+  def can(_account, %Actions.DocumentEditReorderLayerRelative{}), do: true
   def can(_account, _action), do: false
 end
