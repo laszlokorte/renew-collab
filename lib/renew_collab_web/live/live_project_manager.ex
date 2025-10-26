@@ -351,7 +351,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
   def handle_event("dup_document", %{"document_id" => document_id}, socket) do
     %Actions.DocumentDuplicateInProject{
       document_id: document_id,
-      project_id: socket.assigns.project
+      project_id: socket.assigns.project.id
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
