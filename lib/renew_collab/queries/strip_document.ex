@@ -26,6 +26,7 @@ defmodule RenewCollab.Queries.StrippedDocument do
       from(d in Document,
         where: d.id == ^document_id,
         left_join: l in assoc(d, :layers),
+        left_join: tb in assoc(d, :thumbnail),
         left_join: b in assoc(l, :box),
         left_join: t in assoc(l, :text),
         left_join: e in assoc(l, :edge),
@@ -36,6 +37,7 @@ defmodule RenewCollab.Queries.StrippedDocument do
         left_join: i in assoc(l, :interface),
         order_by: [asc: l.z_index, asc: w.sort],
         preload: [
+          thumbnail: tb,
           layers:
             {l,
              [
@@ -93,6 +95,17 @@ defmodule RenewCollab.Queries.StrippedDocument do
          layers
          |> Enum.map(fn layer -> {layer.id, Ecto.UUID.generate()} end)
          |> Map.new()}
+      end
+    end)
+    |> Ecto.Multi.run(:new_thumbnail, fn _,
+                                         %{
+                                           new_layer_ids: layer_ids,
+                                           original_document: %{thumbnail: thumbnail}
+                                         } ->
+      if thumbnail do
+        {:ok, Map.get(layer_ids, thumbnail.layer_id)}
+      else
+        {:ok, nil}
       end
     end)
     |> Ecto.Multi.run(:new_document_content, fn _,
@@ -164,14 +177,16 @@ defmodule RenewCollab.Queries.StrippedDocument do
                                     new_document_content: content,
                                     new_parenthoods: parenthoods,
                                     new_hyperlinks: hyperlinks,
-                                    new_bonds: bonds
+                                    new_bonds: bonds,
+                                    new_thumbnail: thumbnail
                                   } ->
       {:ok,
        %TransientDocument{
          content: content,
          parenthoods: parenthoods,
          hyperlinks: hyperlinks,
-         bonds: bonds
+         bonds: bonds,
+         thumbnail: thumbnail
        }}
     end)
   end

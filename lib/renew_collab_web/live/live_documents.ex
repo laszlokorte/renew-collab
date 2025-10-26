@@ -6,7 +6,6 @@ defmodule RenewCollabWeb.LiveDocuments do
 
   alias RenewCollabCtrl.Actions
   alias RenewCollabCtrl.Dispatcher
-  alias RenewCollab.Renew
 
   def mount(%{"project_id" => project_id}, _session, socket) do
     RenewCollabProj.Projects.find_project(project_id)

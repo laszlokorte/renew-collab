@@ -5,7 +5,8 @@ defmodule RenewCollab.Import.Converted do
     :layers,
     :hierarchy,
     :hyperlinks,
-    :bonds
+    :bonds,
+    :thumbnail
   ]
 
   def new(
