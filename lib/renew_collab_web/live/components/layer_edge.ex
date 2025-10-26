@@ -304,7 +304,7 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
   defp edge_path(edge, :linear) do
     waypoints =
       edge.waypoints
-      |> Enum.map(" ", fn %{position_x: x, position_y: y} -> "L #{x} #{y}" end)
+      |> Enum.map_join(" ", fn %{position_x: x, position_y: y} -> "L #{x} #{y}" end)
 
     "M #{edge.source_x} #{edge.source_y} #{waypoints} L #{edge.target_x} #{edge.target_y}"
   end

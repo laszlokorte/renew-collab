@@ -77,7 +77,7 @@ defmodule RenewCollab.TextMeasure.MeasureServer do
         %{port: port, clients: clients} = state
       )
       when is_binary(font) and is_integer(style) and is_float(size) and is_list(lines) do
-    joined_text = lines |> Enum.map(":", &:uri_string.quote(&1))
+    joined_text = lines |> Enum.map_join(":", &:uri_string.quote(&1))
     Port.command(port, "#{java_font_name(font)}:#{style}:#{round(size)}:#{joined_text}\n")
     {:noreply, %{state | clients: :queue.in(from, clients)}}
   end
