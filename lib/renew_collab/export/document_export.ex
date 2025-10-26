@@ -893,7 +893,7 @@ defmodule RenewCollab.Export.DocumentExport do
 
   defp create_ref(storables, nil), do: {storables, nil}
 
-  defp create_ref(storables, s = %Storable{}),
+  defp create_ref(storables, %Storable{} = s),
     do: {Enum.concat(storables, [s]), {:ref, Enum.count(storables)}}
 
   defp bond_to_connector(bond, sockets) do

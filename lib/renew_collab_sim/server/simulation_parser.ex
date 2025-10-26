@@ -10,8 +10,7 @@ defmodule RenewCollabSim.Server.SimulationParser do
   @setup ~r/(?<setup>Simulation set up,\s+)/
 
   @combined [@new_instance, @init_token, @putting, @removing, @firing, @sync, @setup]
-            |> Enum.map(& &1.source)
-            |> Enum.join("|")
+            |> Enum.map_join("|", & &1.source)
             |> then(&"(:?#{@prompt})?(?:#{&1})")
             |> Regex.compile!("um")
 

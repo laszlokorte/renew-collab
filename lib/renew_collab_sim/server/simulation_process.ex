@@ -34,14 +34,14 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   end
 
   defp broadcast_change(
-         state = %{
+         %{
            simulation_id: sim_id,
            latest_update: latest_update,
            retry: retry,
            playing: playing,
            throttle: {throttle_amount, throttle_unit},
            pubsub_channels: pubsub_channels
-         },
+         } = state,
          event
        ) do
     now = DateTime.utc_now()
@@ -94,9 +94,9 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   def handle_call(
         :is_playing,
         _from,
-        state = %{
+        %{
           playing: is_playing
-        }
+        } = state
       ) do
     {:reply, is_playing, state}
   end
@@ -105,9 +105,9 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   def handle_call(
         :stop,
         _from,
-        state = %{
+        %{
           simulation_id: simulation_id
-        }
+        } = state
       ) do
     # Is this needed?
     State.destroy(state)
@@ -124,7 +124,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   @impl true
   def handle_cast(
         {:log, {:exit, status}},
-        state = %{simulation_id: simulation_id}
+        %{simulation_id: simulation_id} = state
       ) do
     state
     |> State.append_command(
@@ -151,7 +151,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   end
 
   @impl true
-  def handle_cast(:pause, state = %{sim_process: _sim_process}) do
+  def handle_cast(:pause, %{sim_process: _sim_process} = state) do
     # send(sim_process, {:command, "simulation stop\n"})
     {:noreply, %{state | playing: false}}
   end
@@ -159,11 +159,11 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   @impl true
   def handle_cast(
         {:log, {:noeol, content}},
-        state = %{
+        %{
           simulation_id: simulation_id,
           logging: logging,
           playing: playing
-        }
+        } = state
       ) do
     state =
       if logging and not playing do
@@ -332,7 +332,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   # handle termination
   def terminate(
         _reason,
-        state = %State{}
+        %State{} = state
       ) do
     State.destroy(state)
 

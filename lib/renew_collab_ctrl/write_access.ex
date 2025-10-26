@@ -5,5 +5,10 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(_account, %Actions.DocumentEditSetThumbnail{}), do: true
   def can(_account, %Actions.DocumentEditRemoveThumbnail{}), do: true
   def can(_account, %Actions.DocumentCreateInProject{}), do: true
+  def can(_account, %Actions.DocumentEditCreateLayer{}), do: true
+  def can(_account, %Actions.DocumentSnapshotRestore{}), do: true
+  def can(_account, %Actions.DocumentEditLayerAssignSocketSchema{}), do: true
+  def can(_account, %Actions.DocumentEditImportFile{}), do: true
+
   def can(_account, _action), do: false
 end

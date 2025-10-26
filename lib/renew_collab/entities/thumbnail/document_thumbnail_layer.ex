@@ -16,4 +16,25 @@ defmodule RenewCollab.Thumbnail.DocumentThumbnailLayer do
     |> validate_required([:document_id, :layer_id])
     |> unique_constraint(:document_id)
   end
+
+  defmodule Snapshotter do
+    alias RenewCollab.Thumbnail.DocumentThumbnailLayer
+    @behaviour RenewCollab.Versioning.SnapshotterBehavior
+
+    def storage_key(), do: :thumbnail
+    def schema(), do: DocumentThumbnailLayer
+
+    def query(document_id) do
+      import Ecto.Query, warn: false
+
+      from(t in DocumentThumbnailLayer,
+        where: t.document_id == ^document_id,
+        select: %{
+          id: t.id,
+          layer_id: t.layer_id,
+          document_id: t.document_id
+        }
+      )
+    end
+  end
 end

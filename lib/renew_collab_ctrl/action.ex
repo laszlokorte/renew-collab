@@ -40,8 +40,7 @@ defmodule RenewCollabCtrl.Action do
         bonds: []
       }
     })
-    |> Commands.CreateDocument.multi()
-    |> RenewCollab.Repo.transact()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
     |> case do
       {:ok, %{insert_document: insert_document}} ->
         %ProjectDocument{project_id: project_id}
@@ -77,12 +76,23 @@ defmodule RenewCollabCtrl.Action do
     {:error, :not_implemented}
   end
 
-  def do_perform(%Actions.DocumentEditCreateLayer{}) do
+  def do_perform(%Actions.DocumentEditCreateLayerWithEdge{}) do
     {:error, :not_implemented}
   end
 
-  def do_perform(%Actions.DocumentEditCreateLayerWithEdge{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditCreateLayer{
+        document_id: document_id,
+        attrs: attrs,
+        base_layer_id: base_layer_id
+      }) do
+    Commands.CreateLayer.new(%{
+      document_id: document_id,
+      attrs: attrs,
+      base_layer_id: base_layer_id
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
   def do_perform(%Actions.DocumentEditCreateParentLayer{}) do
@@ -109,8 +119,33 @@ defmodule RenewCollabCtrl.Action do
     {:error, :not_implemented}
   end
 
-  def do_perform(%Actions.DocumentEditLayerAssignSocketSchema{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditImportFile{
+        document_id: document_id,
+        file_name: file_name,
+        file_content: file_content
+      }) do
+    %RenewCollab.Commands.InsertTransientDocument{
+      target_document_id: document_id,
+      converted_document: RenewCollab.Import.DocumentImport.import(file_name, file_content)
+    }
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
+  end
+
+  def do_perform(%Actions.DocumentEditLayerAssignSocketSchema{
+        document_id: document_id,
+        layer_id: layer_id,
+        socket_schema_id: socket_schema_id
+      }) do
+    RenewCollab.Commands.AssignLayerSocketSchema.new(%{
+      document_id: document_id,
+      layer_id: layer_id,
+      socket_schema_id: socket_schema_id
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
   def do_perform(%Actions.DocumentEditLayerBoxShape{}) do
@@ -167,8 +202,9 @@ defmodule RenewCollabCtrl.Action do
       layer_id: layer_id,
       box: box
     })
-    |> RenewCollab.LegacyCommander.run_document_command(false)
-    |> dbg
+    |> RenewCollab.DocumentCommander.run_document_command(false)
+
+    :ok
   end
 
   def do_perform(%Actions.DocumentEditLayerTextStyle{}) do
@@ -204,35 +240,22 @@ defmodule RenewCollabCtrl.Action do
   end
 
   def do_perform(%Actions.DocumentEditSetThumbnail{document_id: document_id, layer_id: layer_id}) do
-    alias RenewCollab.Repo
-    alias RenewCollab.Thumbnail.DocumentThumbnailLayer
+    Commands.SetThumbnail.new(%{
+      document_id: document_id,
+      layer_id: layer_id
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
 
-    Repo.insert(
-      %DocumentThumbnailLayer{document_id: document_id, layer_id: layer_id},
-      on_conflict: [set: [layer_id: layer_id]],
-      conflict_target: :document_id
-    )
-
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "document:#{document_id}",
-      {:document_changed, document_id}
-    )
+    :ok
   end
 
   def do_perform(%Actions.DocumentEditRemoveThumbnail{document_id: document_id}) do
-    import Ecto.Query
+    Commands.RemoveThumbnail.new(%{
+      document_id: document_id
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
 
-    alias RenewCollab.Repo
-    alias RenewCollab.Thumbnail.DocumentThumbnailLayer
-
-    Repo.delete_all(from(t in DocumentThumbnailLayer, where: t.document_id == ^document_id))
-
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "document:#{document_id}",
-      {:document_changed, document_id}
-    )
+    :ok
   end
 
   def do_perform(%Actions.DocumentEditSetLayerVisibility{}) do
@@ -251,8 +274,17 @@ defmodule RenewCollabCtrl.Action do
     {:error, :not_implemented}
   end
 
-  def do_perform(%Actions.DocumentSnapshotRestore{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentSnapshotRestore{
+        document_id: document_id,
+        snapshot_id: snapshot_id
+      }) do
+    RenewCollab.Commands.RestoreSnapshot.new(%{
+      document_id: document_id,
+      snapshot_id: snapshot_id
+    })
+    |> RenewCollab.DocumentCommander.run_document_command()
+
+    :ok
   end
 
   def do_perform(%Actions.DocumentSnapshotsPrune{}) do

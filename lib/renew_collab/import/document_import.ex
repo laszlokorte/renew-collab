@@ -504,7 +504,7 @@ defmodule RenewCollab.Import.DocumentImport do
     end
   end
 
-  defp convert_line_decoration(other), do: dbg(other)
+  defp convert_line_decoration(other), do: other
 
   defp convert_line_decoration_background(
          %Renewex.Storable{

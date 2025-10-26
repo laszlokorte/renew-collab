@@ -23,11 +23,11 @@ defmodule RenewCollab.Commands.UpdateLayerZIndex do
   def auto_snapshot(%__MODULE__{}), do: true
 
   def multi(
-        cmd = %__MODULE__{
+        %__MODULE__{
           document_id: document_id,
           layer_id: layer_id,
           z_index: z_index
-        }
+        } = cmd
       ) do
     Ecto.Multi.new()
     |> Ecto.Multi.put(:document_id, document_id)

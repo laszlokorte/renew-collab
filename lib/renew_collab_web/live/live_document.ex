@@ -907,20 +907,21 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def handle_event("import_document", _params, socket) do
-    [converted_document] =
+    [command] =
       consume_uploaded_entries(socket, :import_file, fn %{path: path}, %{client_name: filename} ->
         {:ok, content} = File.read(path)
 
-        with {:ok, converted = %RenewCollab.Import.Converted{}} =
-               RenewCollab.Import.DocumentImport.import(filename, content) do
+        with {:ok, converted = %RenewCollab.Import.Converted{}} <-
+               %RenewCollabCtrl.Actions.DocumentEditImportFile{
+                 document_id: socket.assigns.document.id,
+                 file_name: filename,
+                 file_content: content
+               } do
           {:ok, converted}
         end
       end)
 
-    RenewCollab.Commands.InsertTransientDocument.new(%{
-      target_document_id: socket.assigns.document.id,
-      converted_document: converted_document
-    })
+    command
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply,
@@ -929,10 +930,11 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def handle_event("toggle_visible", %{"id" => layer_id}, socket) do
-    RenewCollab.Commands.ToggleVisible.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditSetLayerVisibility{
       document_id: socket.assigns.document.id,
-      layer_id: layer_id
-    })
+      layer_id: layer_id,
+      visible: :toggle
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -992,21 +994,21 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def handle_event("make-space", %{}, socket) do
-    RenewCollab.Commands.MakeSpaceBetween.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditMakeSpaceBetween{
       document_id: socket.assigns.document.id,
       base: {20, 0},
       direction: {100, 0}
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
   end
 
   def handle_event("detach-bond", %{"id" => bond_id}, socket) do
-    RenewCollab.Commands.DeleteBond.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditDeleteBond{
       document_id: socket.assigns.document.id,
       bond_id: bond_id
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1055,12 +1057,12 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.UpdateLayerStyle.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditLayerStyle{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       style_attr: style_attr,
       value: value
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1076,12 +1078,12 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.UpdateLayerEdgeStyle.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditLayerEdgeStyle{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       style_attr: style_attr,
       value: value
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1097,12 +1099,12 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.UpdateLayerTextStyle.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditLayerTextStyle{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       style_attr: style_attr,
       value: value
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1127,11 +1129,11 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def handle_event("update_text_body", %{"layer_id" => layer_id, "value" => new_body}, socket) do
-    RenewCollab.Commands.UpdateLayerTextBody.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditLayerTextBody{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       new_body: new_body
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1145,11 +1147,11 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.UpdateLayerBoxSize.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditLayerBoxSize{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       new_size: new_size
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1167,11 +1169,11 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.UpdateLayerTextPosition.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditLayerTextPosition{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       new_position: new_position
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1185,11 +1187,11 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.UpdateLayerEdgePosition.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditLayerEdgePosition{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       new_position: new_position
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1202,10 +1204,10 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.UpdateLayerEdgeReverseDirection.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditLayerEdgeSwapDirection{
       document_id: socket.assigns.document.id,
       layer_id: layer_id
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1224,12 +1226,12 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.UpdateLayerEdgeWaypointPosition.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditLayerEdgeWaypointPosition{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       waypoint_id: waypoint_id,
       new_position: new_position
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1243,11 +1245,11 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.DeleteLayerEdgeWaypoint.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditDeleteEdgeWaypoint{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       waypoint_id: waypoint_id
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1263,12 +1265,13 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.CreateLayerEdgeWaypoint.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditCreateEdgeWaypoint{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       prev_waypoint_id: prev_waypoint_id,
-      position: {position_x, position_y}
-    })
+      x: position_x,
+      y: position_y
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1282,11 +1285,11 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.CreateLayerEdgeWaypoint.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditCreateEdgeWaypoint{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       prev_waypoint_id: prev_waypoint_id
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1299,10 +1302,10 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.RemoveAllLayerEdgeWaypoints.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditEdgeRemoveAllWaypoints{
       document_id: socket.assigns.document.id,
       layer_id: layer_id
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1316,11 +1319,11 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.UpdateLayerSemanticTag.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditLayerSemanticTag{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       new_tag: new_tag
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1334,12 +1337,12 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.UpdateLayerBoxShape.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditLayerBoxShape{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       shape_id: shape_id,
       attributes: shape_attributes
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1355,12 +1358,13 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.ReorderLayer.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditReorderLayer{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       target_layer_id: target_layer_id,
-      target: RenewCollab.Commands.ReorderLayer.parse_hierarchy_position(order, relative)
-    })
+      target:
+        RenewCollabCtrl.Actions.DocumentEditReorderLayer.parse_hierarchy_position(order, relative)
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1375,12 +1379,12 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.MoveLayerRelative.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditMoveLayerRelative{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       dx: dx,
       dy: dy
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1391,11 +1395,11 @@ defmodule RenewCollabWeb.LiveDocument do
         %{"id" => layer_id},
         socket
       ) do
-    RenewCollab.Commands.DeleteLayer.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditDeleteLayer{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       delete_children: true
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket |> assign(:selection, nil)}
@@ -1406,12 +1410,12 @@ defmodule RenewCollabWeb.LiveDocument do
         %{"example" => "yes"},
         socket
       ) do
-    RenewCollab.Commands.CreateLayer.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditCreateLayer{
       document_id: socket.assigns.document.id,
       attrs: %{
         "semantic_tag" => "CH.ifa.draw.figures.GroupFigure"
       }
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1424,7 +1428,7 @@ defmodule RenewCollabWeb.LiveDocument do
       ) do
     {cx, cy} = viewbox_center(socket.assigns.viewbox)
 
-    RenewCollab.Commands.CreateLayer.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditCreateLayer{
       base_layer_id: socket.assigns.selection,
       document_id: socket.assigns.document.id,
       attrs: %{
@@ -1435,7 +1439,7 @@ defmodule RenewCollabWeb.LiveDocument do
           "body" => "Hello World"
         }
       }
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1456,7 +1460,7 @@ defmodule RenewCollabWeb.LiveDocument do
           {(source_x + target_x) / 2, (source_y + target_y) / 2}
       end
 
-    RenewCollab.Commands.CreateLayer.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditCreateLayer{
       base_layer_id: socket.assigns.selection,
       document_id: socket.assigns.document.id,
       attrs: %{
@@ -1470,7 +1474,7 @@ defmodule RenewCollabWeb.LiveDocument do
           "target_layer_id" => socket.assigns.selection
         }
       }
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1483,7 +1487,7 @@ defmodule RenewCollabWeb.LiveDocument do
       ) do
     {cx, cy} = viewbox_center(socket.assigns.viewbox)
 
-    RenewCollab.Commands.CreateLayer.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditCreateLayer{
       base_layer_id: socket.assigns.selection,
       document_id: socket.assigns.document.id,
       attrs: %{
@@ -1495,7 +1499,7 @@ defmodule RenewCollabWeb.LiveDocument do
           "height" => 100
         }
       }
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1508,7 +1512,7 @@ defmodule RenewCollabWeb.LiveDocument do
       ) do
     {cx, cy} = viewbox_center(socket.assigns.viewbox)
 
-    RenewCollab.Commands.CreateLayer.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditCreateLayer{
       base_layer_id: socket.assigns.selection,
       document_id: socket.assigns.document.id,
       attrs: %{
@@ -1520,7 +1524,7 @@ defmodule RenewCollabWeb.LiveDocument do
           "target_y" => cy + 50
         }
       }
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1533,7 +1537,7 @@ defmodule RenewCollabWeb.LiveDocument do
       ) do
     {cx, cy} = viewbox_center(socket.assigns.viewbox)
 
-    RenewCollab.Commands.CreateLayer.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditCreateLayer{
       base_layer_id: socket.assigns.selection,
       document_id: socket.assigns.document.id,
       attrs: %{
@@ -1548,7 +1552,7 @@ defmodule RenewCollabWeb.LiveDocument do
           "socket_schema_id" => "4FDF577B-DB81-462E-971E-FA842F0ABA1E"
         }
       }
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1561,7 +1565,7 @@ defmodule RenewCollabWeb.LiveDocument do
       ) do
     {cx, cy} = viewbox_center(socket.assigns.viewbox)
 
-    RenewCollab.Commands.CreateLayer.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditCreateLayer{
       base_layer_id: socket.assigns.selection,
       document_id: socket.assigns.document.id,
       attrs: %{
@@ -1577,7 +1581,7 @@ defmodule RenewCollabWeb.LiveDocument do
           "socket_schema_id" => "2C5DE751-2FB8-48DE-99B6-D99648EBDFFC"
         }
       }
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1588,7 +1592,7 @@ defmodule RenewCollabWeb.LiveDocument do
         %{} = edge,
         socket
       ) do
-    RenewCollab.Commands.CreateLayer.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditCreateLayer{
       base_layer_id: socket.assigns.selection,
       document_id: socket.assigns.document.id,
       attrs: %{
@@ -1601,7 +1605,7 @@ defmodule RenewCollabWeb.LiveDocument do
             "84DC6617-D555-4BAB-BA33-04A5FA442F00"
           )
       }
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1617,14 +1621,13 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.CreateEdgeBond.new(%{
-      base_layer_id: socket.assigns.selection,
+    %RenewCollabCtrl.Actions.DocumentEditCreateEdgeBond{
       document_id: socket.assigns.document.id,
       edge_id: edge_id,
       kind: kind,
       layer_id: layer_id,
       socket_id: socket_id
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1640,7 +1643,7 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.CreateLayer.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditCreateLayer{
       base_layer_id: socket.assigns.selection,
       document_id: socket.assigns.document.id,
       attrs: %{
@@ -1660,7 +1663,7 @@ defmodule RenewCollabWeb.LiveDocument do
           }
         }
       }
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1673,10 +1676,10 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.UnlinkLayer.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditUnlinkLayer{
       document_id: socket.assigns.document.id,
       layer_id: layer_id
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1690,11 +1693,11 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.LinkLayer.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditLinkLayer{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       target_layer_id: target_layer_id
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1708,11 +1711,11 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.AssignLayerSocketSchema.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditLayerAssignSocketSchema{
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       socket_schema_id: socket_schema_id
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1725,10 +1728,10 @@ defmodule RenewCollabWeb.LiveDocument do
         },
         socket
       ) do
-    RenewCollab.Commands.RemoveLayerSocketSchema.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditRemoveLayerSocketSchema{
       document_id: socket.assigns.document.id,
       layer_id: layer_id
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1739,7 +1742,9 @@ defmodule RenewCollabWeb.LiveDocument do
         %{},
         socket
       ) do
-    RenewCollab.Commands.CreateSnapshot.new(%{document_id: socket.assigns.document.id})
+    %RenewCollabCtrl.Actions.DocumentEditCreateSnapshot{
+      document_id: socket.assigns.document.id
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1750,10 +1755,10 @@ defmodule RenewCollabWeb.LiveDocument do
         %{"id" => snapshot_id},
         socket
       ) do
-    RenewCollab.Commands.RestoreSnapshot.new(%{
+    %RenewCollabCtrl.Actions.DocumentSnapshotRestore{
       document_id: socket.assigns.document.id,
       snapshot_id: snapshot_id
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1764,11 +1769,11 @@ defmodule RenewCollabWeb.LiveDocument do
         %{"snapshot_id" => snapshot_id, "description" => description},
         socket
       ) do
-    RenewCollab.Commands.CreateSnapshotLabel.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditSnapshotCreateLabel{
       document_id: socket.assigns.document.id,
       snapshot_id: snapshot_id,
       description: description
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1779,10 +1784,10 @@ defmodule RenewCollabWeb.LiveDocument do
         %{"id" => snapshot_id},
         socket
       ) do
-    RenewCollab.Commands.RemoveSnapshotLabel.new(%{
+    %RenewCollabCtrl.Actions.DocumentEditSnapshotRemoveLabel{
       document_id: socket.assigns.document.id,
       snapshot_id: snapshot_id
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1793,7 +1798,9 @@ defmodule RenewCollabWeb.LiveDocument do
         %{},
         socket
       ) do
-    RenewCollab.Commands.PruneSnapshots.new(%{document_id: socket.assigns.document.id})
+    %RenewCollabCtrl.Actions.DocumentSnapshotsPrune{
+      document_id: socket.assigns.document.id
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1804,10 +1811,10 @@ defmodule RenewCollabWeb.LiveDocument do
         meta,
         socket
       ) do
-    RenewCollab.Commands.UpdateDocumentMeta.new(%{
+    %RenewCollabCtrl.Actions.DocumentUpdateMeta{
       document_id: socket.assigns.document.id,
       meta: meta
-    })
+    }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
@@ -1823,10 +1830,10 @@ defmodule RenewCollabWeb.LiveDocument do
         nil
 
       id ->
-        RenewCollab.Commands.InsertDocument.new(%{
+        %RenewCollabCtrl.Actions.DocumentEditInsertDocument{
           target_document_id: socket.assigns.document.id,
           source_document_id: id
-        })
+        }
         |> Dispatcher.perform_as(socket.assigns.current_account)
     end
 
@@ -2042,12 +2049,12 @@ defmodule RenewCollabWeb.LiveDocument do
 
   defp move_relative(socket, rel, order) do
     with s when not is_nil(s) <- socket.assigns.selection do
-      RenewCollab.Commands.ReorderLayerRelative.new(%{
+      %RenewCollabCtrl.Actions.DocumentEditReorderLayerRelative{
         document_id: socket.assigns.document.id,
         layer_id: socket.assigns.selection,
         relative_direction: rel,
         target: order
-      })
+      }
       |> Dispatcher.perform_as(socket.assigns.current_account)
 
       {:noreply, socket}

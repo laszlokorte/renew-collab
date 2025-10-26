@@ -366,7 +366,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
       socket
       |> cancel_upload(:import_rnw_file, ref)
 
-    if(socket.assigns.import_rnw_form.params["main_net"] == ref) do
+    if socket.assigns.import_rnw_form.params["main_net"] == ref do
       {:noreply,
        new_socket
        |> assign(

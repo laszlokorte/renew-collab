@@ -26,12 +26,12 @@ defmodule RenewCollab.Commands.ReorderLayer do
   def auto_snapshot(%__MODULE__{}), do: true
 
   def multi(
-        cmd = %__MODULE__{
+        %__MODULE__{
           document_id: document_id,
           layer_id: layer_id,
           target_layer_id: target_layer_id,
           target: {order, relative}
-        }
+        } = cmd
       ) do
     Ecto.Multi.new()
     |> Ecto.Multi.put({cmd, :document_id}, document_id)

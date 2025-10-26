@@ -36,7 +36,7 @@ defmodule RenewCollabSim.Compiler.SnsCompiler do
         script_content =
           [
             "#{renewSetFormalism} #{compiler}",
-            "#{renewExport} #{renewShadowNetSystem} -a #{Enum.join(paths |> Enum.map(&"\"#{&1}\""), " ")} -o \"#{output_path}\""
+            "#{renewExport} #{renewShadowNetSystem} -a #{Enum.map_join(paths, " ", &"\"#{&1}\"")} -o \"#{output_path}\""
           ]
           |> Enum.join("\n")
 

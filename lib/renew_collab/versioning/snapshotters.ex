@@ -13,7 +13,8 @@ defmodule RenewCollab.Versioning.Snapshotters do
     RenewCollab.Connection.Waypoint.Snapshotter,
     RenewCollab.Connection.WaypointTangent.Snapshotter,
     RenewCollab.Connection.Hyperlink.Snapshotter,
-    RenewCollab.Connection.Bond.Snapshotter
+    RenewCollab.Connection.Bond.Snapshotter,
+    RenewCollab.Thumbnail.DocumentThumbnailLayer.Snapshotter
   ]
 
   def snapshotters() do

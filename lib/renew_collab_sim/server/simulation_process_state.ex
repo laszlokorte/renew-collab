@@ -122,7 +122,7 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
   end
 
   def append_command(
-        state = %{open_multi: {om_counter, open_multi}},
+        %{open_multi: {om_counter, open_multi}} = state,
         %{__struct__: module} = command
       ) do
     new_multi =

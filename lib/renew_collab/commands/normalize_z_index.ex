@@ -21,9 +21,9 @@ defmodule RenewCollab.Commands.NormalizeZIndex do
   def auto_snapshot(%__MODULE__{}), do: true
 
   def multi(
-        cmd = %__MODULE__{
+        %__MODULE__{
           document_id: document_id
-        }
+        } = cmd
       ) do
     Ecto.Multi.new()
     |> Ecto.Multi.put({cmd, :document_id}, document_id)

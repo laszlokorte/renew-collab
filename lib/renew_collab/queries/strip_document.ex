@@ -216,7 +216,7 @@ defmodule RenewCollab.Queries.StrippedDocument do
   defp deep_strip_filter({key, _}) when is_binary(key), do: not String.ends_with?(key, "_id")
   defp deep_strip_filter({_, _}), do: true
 
-  defp strip_not_loaded(value = %{}) do
+  defp strip_not_loaded(%{} = value) do
     value
     |> Enum.filter(fn
       {_k, %Ecto.Association.NotLoaded{}} -> false

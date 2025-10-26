@@ -161,11 +161,11 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
   @impl true
   def handle_event(
         "create_layer",
-        params = %{
+        %{
           "pos" => %{"x" => cx, "y" => cy},
           "shape_id" => shape_id,
           "with_edge" => with_edge
-        },
+        } = params,
         %{},
         %{:document_id => document_id, :account => _account},
         _socket
@@ -209,7 +209,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
   @impl true
   def handle_event(
         "create_layer",
-        params = %{"pos" => %{"x" => cx, "y" => cy}, "shape_id" => shape_id},
+        %{"pos" => %{"x" => cx, "y" => cy}, "shape_id" => shape_id} = params,
         %{},
         %{:document_id => document_id, :account => _account},
         _socket
@@ -252,10 +252,10 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
   @impl true
   def handle_event(
         "create_layer",
-        params = %{
+        %{
           "pos" => %{"x" => x, "y" => y, "width" => width, "height" => height},
           "image" => background_url
-        },
+        } = params,
         %{},
         %{:document_id => document_id, :account => _account},
         _socket
@@ -287,7 +287,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
   @impl true
   def handle_event(
         "create_layer",
-        params = %{"points" => points},
+        %{"points" => points} = params,
         %{},
         %{:document_id => document_id, :account => _account},
         _socket
@@ -333,7 +333,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
   @impl true
   def handle_event(
         "create_layer",
-        params = %{"pos" => %{"x" => position_x, "y" => position_y}, "body" => body},
+        %{"pos" => %{"x" => position_x, "y" => position_y}, "body" => body} = params,
         %{},
         %{:document_id => document_id, :account => _account},
         _socket
@@ -371,10 +371,10 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
   @impl true
   def handle_event(
         "create_layer",
-        params = %{
+        %{
           "source" => %{"socket_id" => source_socket_id, "layer_id" => source_layer_id},
           "target" => %{"socket_id" => target_socket_id, "layer_id" => target_layer_id}
-        },
+        } = params,
         %{},
         %{:document_id => document_id, :account => _account},
         _socket
@@ -413,9 +413,9 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
   @impl true
   def handle_event(
         "create_layer",
-        params = %{
+        %{
           "child_layer_id" => child_layer_id
-        },
+        } = params,
         %{},
         %{:document_id => document_id, :account => _account},
         _socket

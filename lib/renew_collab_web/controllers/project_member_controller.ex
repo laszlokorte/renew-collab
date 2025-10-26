@@ -5,7 +5,7 @@ defmodule RenewCollabWeb.ProjectMemberController do
     render(conn, :index)
   end
 
-  def create(conn, _params = %{"project_id" => _project_id, "email" => _email}) do
+  def create(conn, %{"project_id" => _project_id, "email" => _email}) do
     render(conn, :create)
   end
 end

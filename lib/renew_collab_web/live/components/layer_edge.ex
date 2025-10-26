@@ -278,7 +278,7 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
     style_or_default(edge, :stroke_color)
   end
 
-  defp style_or_default(layer = %{:style => _}, :tip_color) do
+  defp style_or_default(%{:style => _} = layer, :tip_color) do
     style_or_default(layer, :background_color)
   end
 
@@ -304,8 +304,7 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
   defp edge_path(edge, :linear) do
     waypoints =
       edge.waypoints
-      |> Enum.map(fn %{position_x: x, position_y: y} -> "L #{x} #{y}" end)
-      |> Enum.join(" ")
+      |> Enum.map(" ", fn %{position_x: x, position_y: y} -> "L #{x} #{y}" end)
 
     "M #{edge.source_x} #{edge.source_y} #{waypoints} L #{edge.target_x} #{edge.target_y}"
   end
@@ -325,10 +324,9 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
           |> then(&Enum.concat([{edge.source_x, edge.source_y}], &1))
           |> Enum.chunk_every(2, 1, :discard)
           |> Enum.drop(1)
-          |> Enum.map(fn [{x1, y1}, {x2, y2}] ->
+          |> Enum.map_join(":", fn [{x1, y1}, {x2, y2}] ->
             "Q #{x1} #{y1} #{(x2 + x1) / 2} #{(y2 + y1) / 2}"
           end)
-          |> Enum.join(" ")
 
         "M #{edge.source_x} #{edge.source_y} #{waypoints} T #{edge.target_x} #{edge.target_y}"
     end

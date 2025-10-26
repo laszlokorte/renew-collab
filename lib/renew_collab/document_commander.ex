@@ -1,4 +1,4 @@
-defmodule RenewCollab.LegacyCommander do
+defmodule RenewCollab.DocumentCommander do
   alias RenewCollab.Versioning
   alias RenewCollab.Repo
 
