@@ -15,7 +15,7 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
         <path
           stroke-dasharray={style_or_default(@layer.edge, :stroke_dash_array)}
           d={edge_path(@layer.edge, style_or_default(@layer.edge, :smoothness))}
-          fill="none"
+          fill={if(@layer.edge.cyclic, do: style_or_default(@layer, :background_color), else: "none")}
         >
         </path>
 
@@ -306,7 +306,7 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
       edge.waypoints
       |> Enum.map_join(" ", fn %{position_x: x, position_y: y} -> "L #{x} #{y}" end)
 
-    "M #{edge.source_x} #{edge.source_y} #{waypoints} L #{edge.target_x} #{edge.target_y}"
+    "M #{edge.source_x} #{edge.source_y} #{waypoints} L #{edge.target_x} #{edge.target_y} #{if(edge.cyclic, do: "z", else: "")}"
   end
 
   defp edge_path(edge, :autobezier) do

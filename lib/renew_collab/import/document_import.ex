@@ -7,8 +7,19 @@ defmodule RenewCollab.Import.DocumentImport do
     with {:ok, true} <- check_utf8_binary?(content),
          {:ok, %Renewex.Document{root: root, refs: refs}} <- Renewex.parse_document(content),
          parser <- Renewex.Parser.detect_document_version(Renewex.Tokenizer.scan(content)),
-         %Renewex.Storable{class_name: class_name, fields: %{figures: figures}} <- root do
+         %Renewex.Storable{class_name: class_name, fields: %{figures: figures} = root_fields} <-
+           root do
       refs_with_ids = Enum.map(refs, fn s -> {s, generate_layer_id()} end) |> Enum.to_list()
+
+      doc_icon = Map.get(root_fields, :icon, nil)
+
+      icon_id =
+        with {:ref, doc_icon_idx} <- doc_icon,
+             {_, new_id} <- Enum.at(refs_with_ids, doc_icon_idx) do
+          new_id
+        else
+          _ -> nil
+        end
 
       figures =
         figures
@@ -230,10 +241,18 @@ defmodule RenewCollab.Import.DocumentImport do
                           Map.get(
                             attrs,
                             "FillColor",
-                            convert_line_decoration_background(
-                              resolve_ref(refs, Map.get(fields, :start_decoration)),
-                              resolve_ref(refs, Map.get(fields, :end_decoration))
-                            )
+                            if Renewex.Hierarchy.is_subtype_of(
+                                 parser.grammar,
+                                 class_name,
+                                 "CH.ifa.draw.contrib.PolygonFigure"
+                               ) do
+                              "#70DB93"
+                            else
+                              convert_line_decoration_background(
+                                resolve_ref(refs, Map.get(fields, :start_decoration)),
+                                resolve_ref(refs, Map.get(fields, :end_decoration))
+                              )
+                            end
                           )
                         ),
                       "border_color" => convert_color(Map.get(attrs, "FrameColor", "black")),
@@ -443,7 +462,8 @@ defmodule RenewCollab.Import.DocumentImport do
          layers: layers,
          hierarchy: hierarchy,
          hyperlinks: hyperlinks,
-         bonds: bonds
+         bonds: bonds,
+         thumbnail: icon_id
        }}
     end
   end

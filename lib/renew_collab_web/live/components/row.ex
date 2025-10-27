@@ -25,10 +25,14 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
         style="cursor:pointer;"
         phx-click="make_thumbnail"
         phx-value-id={@layer.id}
+        bgcolor={
+          if(@document.thumbnail && @document.thumbnail.layer_id == @layer.id,
+            do: "#3a9",
+            else: "white"
+          )
+        }
       >
-        <%= if @document.thumbnail && @document.thumbnail.layer_id == @layer.id do %>
-          🖼
-        <% end %>
+        <img class="icon" src={"/documents/#{@document.id}/thumbnail/#{@layer.id}"} />
       </td>
       <td valign="top" width="20">
         <%= if @layer.outgoing_link do %>

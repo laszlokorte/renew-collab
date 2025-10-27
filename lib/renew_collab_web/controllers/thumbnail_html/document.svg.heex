@@ -5,8 +5,26 @@
   viewBox={RenewCollab.ViewBox.into_string(@viewbox)}
 >
   <%= with %RenewCollab.Document.Document{layers: layers} <- @document do %>
-    <%= for layer <- layers, is_nil(layer.direct_parent_hood) do %>
+    <%= for layer <- layers, (not is_nil(@document.thumbnail) and @document.thumbnail.layer_id == layer.id) || @layer_id == layer.id do %>
       <.layer layer={layer} document={@document} />
+    <% end %>
+    <%= if Enum.empty?(layers) do %>
+      <rect
+        x={@viewbox.x}
+        y={@viewbox.y}
+        width={@viewbox.width}
+        height={@viewbox.height}
+        fill="#eee"
+      />
+      <text
+        x={@viewbox.x + @viewbox.width / 2}
+        y={@viewbox.y + @viewbox.height / 2}
+        font-size={@viewbox.width / 8}
+        text-anchor="middle"
+        dominant-baseline="central"
+      >
+        No Thumbnail
+      </text>
     <% end %>
   <% end %>
 </svg>

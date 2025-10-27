@@ -38,7 +38,8 @@ defmodule RenewCollabCtrl.Action do
           layers: layers,
           hyperlinks: hyperlinks,
           hierarchy: hierarchy,
-          bonds: bonds
+          bonds: bonds,
+          thumbnail: thumbnail
         }
       }) do
     Commands.CreateDocument.new(%{
@@ -50,7 +51,8 @@ defmodule RenewCollabCtrl.Action do
         },
         parenthoods: hierarchy,
         hyperlinks: hyperlinks,
-        bonds: bonds
+        bonds: bonds,
+        thumbnail: thumbnail
       }
     })
     |> RenewCollab.DocumentCommander.run_document_command_sync()

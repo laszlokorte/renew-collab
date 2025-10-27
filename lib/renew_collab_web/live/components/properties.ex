@@ -254,6 +254,12 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
             Edge Path
           </legend>
 
+          <p>
+            <label>
+              <input type="checkbox" checked={@layer.edge.cyclic} /> Cyclic
+            </label>
+          </p>
+
           <button phx-click="update_edge_flip" phx-value-id={@layer.id}>Reverse Edge</button>
 
           <form
