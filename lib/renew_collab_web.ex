@@ -39,7 +39,7 @@ defmodule RenewCollabWeb do
   def controller do
     quote do
       use Phoenix.Controller,
-        formats: [:html, :json],
+        formats: [:html, :json, :svg],
         layouts: [html: RenewCollabWeb.Layouts]
 
       import Plug.Conn

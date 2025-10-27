@@ -18,6 +18,10 @@ defmodule RenewCollabWeb.Router do
     plug :fetch_current_account_by_header
   end
 
+  pipeline :svg do
+    plug :accepts, ["svg"]
+  end
+
   pipeline :protected_api do
     plug :accepts, ["json"]
     plug :fetch_current_account_by_header
@@ -135,6 +139,13 @@ defmodule RenewCollabWeb.Router do
     post "/login", LoginController, :login
     get "/signup", SignupController, :new
     post "/signup", SignupController, :create
+  end
+
+  scope "/", RenewCollabWeb do
+    pipe_through [:browser, :authenticated, :svg]
+
+    get "/documents/:id/thumbnail", ThumbnailController, :thumbnail
+    get "/documents/:id/thumbnail/:layer_id", ThumbnailController, :thumbnail
   end
 
   scope "/", RenewCollabWeb do

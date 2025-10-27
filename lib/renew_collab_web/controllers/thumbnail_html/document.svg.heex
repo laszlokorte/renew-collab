@@ -1,0 +1,36 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="200"
+  height="200"
+  viewBox={RenewCollab.ViewBox.into_string(@viewbox)}
+>
+  <%= with %RenewCollab.ViewBox{x: x, y: y, width: width, height: height} <- @viewbox do %>
+    <ellipse
+      cx={x + width / 2}
+      cy={y + height / 2}
+      rx={width / 2}
+      ry={height / 2}
+      stroke="none"
+      fill={
+        if(@layer_id == :thumbnail,
+          do: if(@document.thumbnail, do: "green", else: "#ddd"),
+          else: "orange"
+        )
+      }
+    />
+    <text
+      font-size="100"
+      x={x + width / 2}
+      y={y + height / 2}
+      text-anchor="middle"
+      dominant-baseline="central"
+    >
+      <%= with %{layer_id: lid} <- @document.thumbnail, true <- @layer_id == :thumbnail do %>
+        <tspan x={x + width / 2}>{@document.layers |> Enum.count()}</tspan>
+        <tspan x={x + width / 2} dy="100">{lid}</tspan>
+        <% else _ -> %>
+          ⊗
+      <% end %>
+    </text>
+  <% end %>
+</svg>
