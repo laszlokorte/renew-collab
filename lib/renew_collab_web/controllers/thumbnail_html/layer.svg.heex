@@ -1,0 +1,5 @@
+<.box layer={@layer} />
+<.edge layer={@layer} />
+<%= for %{direct_parent_hood: %{ancestor_id: parent_id}} = child <- @document.layers, parent_id == @layer.id do %>
+  <.layer layer={child} document={@document} />
+<% end %>

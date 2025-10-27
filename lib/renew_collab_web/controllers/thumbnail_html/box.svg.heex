@@ -1,0 +1,3 @@
+<%= with %RenewCollab.Element.Box{position_x: x, position_y: y, width: width, height: height} <- @layer.box do %>
+  <rect x={x} y={y} width={width} height={height} fill={background(@layer)} />
+<% end %>

@@ -1,0 +1,8 @@
+<%= with %RenewCollab.Element.Edge{source_x: x1, source_y: y1, target_x: x2, target_y: y2, waypoints: waypoints} <- @layer.edge do %>
+  <polyline
+    stroke="black"
+    fill="none"
+    stroke-width="10"
+    points={"#{x1} #{y1} #{waypoints|>Enum.map_join(" ", fn %{position_x: x, position_y: y} -> "#{x} #{y}" end)} #{x2} #{y2}"}
+  />
+<% end %>
