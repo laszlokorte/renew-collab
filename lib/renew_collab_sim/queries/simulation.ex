@@ -1,5 +1,4 @@
 defmodule RenewCollabSim.Queries.Simulation do
-  alias RenewCollabSim.Entities.SimulationLogEntry
   alias RenewCollabSim.Entities.Simulation
   import Ecto.Query
 

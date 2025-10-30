@@ -14,7 +14,7 @@ defmodule RenewCollabSim.SimulationCommander do
     |> run_simulation_transaction(apply(module, :tags, [command]))
   end
 
-  defp run_simulation_transaction(multi, tags) do
+  defp run_simulation_transaction(multi, _tags) do
     Repo.transact(multi)
   end
 end

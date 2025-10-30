@@ -1,13 +1,16 @@
 defmodule RenewCollabProj.Commands.CreateProject do
-  import Ecto.Query
+  alias RenewCollabProj.Entities.Project
 
-  defstruct []
+  defstruct [:name]
 
-  def new(%{}) do
-    %__MODULE__{}
+  def new(%{name: name}) do
+    %__MODULE__{name: name}
   end
 
-  def multi(%__MODULE__{}) do
+  def multi(%__MODULE__{name: name}) do
     Ecto.Multi.new()
+    |> Ecto.Multi.insert(:project, %Project{
+      name: name
+    })
   end
 end

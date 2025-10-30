@@ -11,6 +11,7 @@ defmodule RenewCollabSim.Commands.ResetTime do
   def multi(%__MODULE__{simulation_id: simulation_id}) do
     Ecto.Multi.new()
     |> Ecto.Multi.update_all(
+      :rest_time,
       from(s in Simulation,
         where: s.id == ^simulation_id,
         update: [set: [timestep: 0]]

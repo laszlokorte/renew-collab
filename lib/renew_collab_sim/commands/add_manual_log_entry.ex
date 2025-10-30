@@ -1,6 +1,5 @@
 defmodule RenewCollabSim.Commands.AddManualLogEntry do
   alias RenewCollabSim.Entities.SimulationLogEntry
-  import Ecto.Query
 
   defstruct [:simulation_id, :log_message]
 

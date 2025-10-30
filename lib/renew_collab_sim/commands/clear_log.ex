@@ -10,10 +10,11 @@ defmodule RenewCollabSim.Commands.ClearLog do
 
   def multi(%__MODULE__{simulation_id: simulation_id}) do
     Ecto.Multi.new()
-    |> Ecto.Muti.delete_all(
+    |> Ecto.Multi.delete_all(
       from(l in SimulationLogEntry,
         where: l.simulation_id == ^simulation_id
-      )
+      ),
+      []
     )
   end
 end

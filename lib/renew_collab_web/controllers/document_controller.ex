@@ -110,7 +110,8 @@ defmodule RenewCollabWeb.DocumentController do
   end
 
   def delete(conn, %{"id" => document_id}) do
-    Renew.delete_document(document_id)
+    %Actions.DocumentDeleteAsUser{document_id: document_id}
+    |> Dispatcher.perform_as(conn.assigns.current_account)
 
     conn
     |> put_status(:accepted)
@@ -118,7 +119,8 @@ defmodule RenewCollabWeb.DocumentController do
   end
 
   def duplicate(conn, %{"id" => document_id}) do
-    Renew.duplicate_document(document_id)
+    %Actions.DocumentDuplicateInProject{document_id: document_id}
+    |> Dispatcher.perform_as(conn.assigns.current_account)
     |> case do
       {:ok, %{insert_document: new_document}} ->
         conn
@@ -188,7 +190,7 @@ defmodule RenewCollabWeb.DocumentController do
       :error ->
         :error
 
-      imported ->
+      imported_documents ->
         with {:ok, content} <- File.read(path),
              {:ok, imported = %RenewCollab.Import.Converted{}} <-
                DocumentImport.import(filename, content),
@@ -198,7 +200,7 @@ defmodule RenewCollabWeb.DocumentController do
                  document_data: imported
                }
                |> Dispatcher.perform_as(conn.assigns.current_account) do
-          [document | imported]
+          [document | imported_documents]
         else
           _ ->
             :error

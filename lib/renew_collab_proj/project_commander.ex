@@ -14,7 +14,7 @@ defmodule RenewCollabProj.ProjectFetcher do
     |> run_project_transaction(apply(module, :tags, [command]))
   end
 
-  defp run_project_transaction(multi, tags) do
+  defp run_project_transaction(multi, _tags) do
     Repo.transact(multi)
   end
 end

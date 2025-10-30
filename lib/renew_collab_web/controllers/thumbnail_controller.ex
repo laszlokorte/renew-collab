@@ -6,11 +6,8 @@ defmodule RenewCollabWeb.ThumbnailController do
   alias RenewCollabCtrl.Fetcher
 
   action_fallback(RenewCollabWeb.FallbackController)
-  import Phoenix.Component, only: [render_to_string: 1]
 
   def thumbnail(conn, %{"id" => id, "layer_id" => layer_id}) do
-    import Phoenix.Component, only: [sigil_H: 2]
-
     case %Views.DocumentWithContent{
            document_id: id,
            root_layer_id: layer_id

@@ -6,13 +6,9 @@ defmodule RenewCollab.Renew do
   import Ecto.Query, warn: false
   alias RenewCollab.Versioning.Snapshot
   alias RenewCollab.Repo
-  alias RenewCollab.Commands
 
   alias RenewCollab.Document.Document
-  alias RenewCollab.Document.TransientDocument
   alias RenewCollab.Simulation.SimulationLink
-
-  alias RenewCollabProj.Entities.Project
 
   def count_documents do
     :deprecated

@@ -14,7 +14,7 @@ defmodule RenewCollabSim.Commands.ChangeShadowNetDocument do
         document_json: document_json
       }) do
     Ecto.Multi.new()
-    |> Ecto.Mutli.one(
+    |> Ecto.Multi.one(
       :shadow_net,
       from(sn in ShadowNet,
         where: sn.id == ^net_id and sn.shadow_net_system_id == ^sns_id
