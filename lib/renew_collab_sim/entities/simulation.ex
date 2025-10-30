@@ -1,5 +1,6 @@
 defmodule RenewCollabSim.Entites.Simulation do
   use Ecto.Schema
+  import Ecto.Changeset
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -19,5 +20,11 @@ defmodule RenewCollabSim.Entites.Simulation do
     has_one :project, through: [:project_assignment, :project]
 
     timestamps(type: :utc_datetime)
+  end
+
+  @doc false
+  def rename_changeset(simulation, attrs) do
+    simulation
+    |> cast(attrs, [:label], empty_values: [""])
   end
 end

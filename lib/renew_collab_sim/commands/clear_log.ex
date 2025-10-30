@@ -1,13 +1,19 @@
 defmodule RenewCollabSim.Commands.ClearLog do
+  alias RenewCollabSim.Entites.SimulationLogEntry
   import Ecto.Query
 
-  defstruct []
+  defstruct [:simulation_id]
 
-  def new(%{}) do
-    %__MODULE__{}
+  def new(%{simulation_id: simulation_id}) do
+    %__MODULE__{simulation_id: simulation_id}
   end
 
-  def multi(%__MODULE__{}) do
+  def multi(%__MODULE__{simulation_id: simulation_id}) do
     Ecto.Multi.new()
+    |> Ecto.Muti.delete_all(
+      from(l in SimulationLogEntry,
+        where: l.simulation_id == ^simulation_id
+      )
+    )
   end
 end

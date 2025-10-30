@@ -24,4 +24,17 @@ defmodule RenewCollabSim.Entites.ShadowNetSystem do
     |> cast_assoc(:nets)
     |> validate_required([:compiled, :main_net_name])
   end
+
+  @doc false
+  def main_net_changeset(shadow_net_sytem, attrs) do
+    shadow_net_sytem
+    |> cast(attrs, [:main_net])
+    |> validate_required([:main_net])
+  end
+
+  @doc false
+  def rename_changeset(shadow_net_sytem, attrs) do
+    shadow_net_sytem
+    |> cast(attrs, [:label], empty_values: [""])
+  end
 end

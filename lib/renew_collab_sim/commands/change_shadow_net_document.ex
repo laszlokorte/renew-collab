@@ -1,13 +1,27 @@
 defmodule RenewCollabSim.Commands.ChangeShadowNetDocument do
+  alias RenewCollabSim.Entites.ShadowNet
   import Ecto.Query
 
-  defstruct []
+  defstruct [:shadow_net_system_id, :shadow_net_id, :document_json]
 
-  def new(%{}) do
-    %__MODULE__{}
+  def new(%{shadow_net_system_id: sns_id, shadow_net_id: net_id, document_json: document_json}) do
+    %__MODULE__{shadow_net_system_id: sns_id, shadow_net_id: net_id, document_json: document_json}
   end
 
-  def multi(%__MODULE__{}) do
+  def multi(%__MODULE__{
+        shadow_net_system_id: sns_id,
+        shadow_net_id: net_id,
+        document_json: document_json
+      }) do
     Ecto.Multi.new()
+    |> Ecto.Mutli.one(
+      :shadow_net,
+      from(sn in ShadowNet,
+        where: sn.id == ^net_id and sn.shadow_net_system_id == ^sns_id
+      )
+    )
+    |> Ecto.Multi.update(:change_net, fn _, %{shadow_net: net} ->
+      ShadowNet.document_changeset(net, %{document_json: document_json})
+    end)
   end
 end

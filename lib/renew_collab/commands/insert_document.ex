@@ -1,5 +1,6 @@
 defmodule RenewCollab.Commands.InsertDocument do
   import Ecto.Query, warn: false
+  alias RenewCollab.Thumbnail
   alias RenewCollab.Document.TransientDocument
   alias RenewCollab.Hierarchy.Layer
   alias RenewCollab.Hierarchy.LayerParenthood
@@ -71,7 +72,8 @@ defmodule RenewCollab.Commands.InsertDocument do
            content: %{layers: layers},
            parenthoods: parenthoods,
            hyperlinks: hyperlinks,
-           bonds: bonds
+           bonds: bonds,
+           thumbnail: thumbnail
          }
        ) do
     layers
@@ -159,5 +161,16 @@ defmodule RenewCollab.Commands.InsertDocument do
         )
       end)
     end)
+    |> Ecto.Multi.insert_all(
+      :insert_thumbnail,
+      Thumbnail,
+      fn _ ->
+        if thumbnail do
+          [%{document_id: document_id, layer_id: thumbnail}]
+        else
+          []
+        end
+      end
+    )
   end
 end
