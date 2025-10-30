@@ -1,4 +1,4 @@
-defmodule RenewCollabSim.Entites.ShadowNet do
+defmodule RenewCollabSim.Entities.ShadowNet do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -7,7 +7,7 @@ defmodule RenewCollabSim.Entites.ShadowNet do
   schema "shadow_net" do
     field :name, :string
     field :document_json, :binary
-    belongs_to :shadow_net_system, RenewCollabSim.Entites.ShadowNetSystem
+    belongs_to :shadow_net_system, RenewCollabSim.Entities.ShadowNetSystem
 
     timestamps(type: :utc_datetime)
   end

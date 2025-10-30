@@ -1,4 +1,4 @@
-defmodule RenewCollabProj.Entites.ProjectMember do
+defmodule RenewCollabProj.Entities.ProjectMember do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -7,8 +7,8 @@ defmodule RenewCollabProj.Entites.ProjectMember do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "project_member" do
-    belongs_to :project, RenewCollabProj.Entites.Project
-    belongs_to :account, RenewCollabAuth.Entites.Account
+    belongs_to :project, RenewCollabProj.Entities.Project
+    belongs_to :account, RenewCollabAuth.Entities.Account
 
     field :role, Ecto.Enum, values: @member_roles
 

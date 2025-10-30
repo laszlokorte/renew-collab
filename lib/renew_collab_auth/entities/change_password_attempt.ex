@@ -1,4 +1,4 @@
-defmodule RenewCollabAuth.Entites.ChangePasswordAttempt do
+defmodule RenewCollabAuth.Entities.ChangePasswordAttempt do
   use Ecto.Schema
   import Ecto.Changeset
 

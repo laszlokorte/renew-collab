@@ -53,19 +53,19 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
             Ecto.Multi.new()
             |> Ecto.Multi.delete_all(
               :reset_net_instances_initial,
-              from(n in RenewCollabSim.Entites.SimulationNetInstance,
+              from(n in RenewCollabSim.Entities.SimulationNetInstance,
                 where: n.simulation_id == ^simulation.id
               )
             )
             |> Ecto.Multi.delete_all(
               :reset_logs_initial,
-              from(l in RenewCollabSim.Entites.SimulationLogEntry,
+              from(l in RenewCollabSim.Entities.SimulationLogEntry,
                 where: l.simulation_id == ^simulation.id
               )
             )
             |> Ecto.Multi.update_all(
               :reset_timestep_initial,
-              from(sim in RenewCollabSim.Entites.Simulation,
+              from(sim in RenewCollabSim.Entities.Simulation,
                 where: sim.id == ^simulation.id,
                 update: [set: [timestep: 0]]
               ),

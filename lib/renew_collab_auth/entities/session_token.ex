@@ -1,7 +1,7 @@
-defmodule RenewCollabAuth.Entites.SessionToken do
+defmodule RenewCollabAuth.Entities.SessionToken do
   use Ecto.Schema
   import Ecto.Query
-  alias RenewCollabAuth.Entites.SessionToken
+  alias RenewCollabAuth.Entities.SessionToken
 
   @hash_algorithm :sha256
   @rand_size 32
@@ -17,7 +17,7 @@ defmodule RenewCollabAuth.Entites.SessionToken do
     field :token, :string
     field :context, :string
     field :sent_to, :string
-    belongs_to :account, RenewCollabAuth.Entites.Account
+    belongs_to :account, RenewCollabAuth.Entities.Account
 
     timestamps(type: :utc_datetime, updated_at: false)
   end

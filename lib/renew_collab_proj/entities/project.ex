@@ -1,4 +1,4 @@
-defmodule RenewCollabProj.Entites.Project do
+defmodule RenewCollabProj.Entities.Project do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -7,11 +7,11 @@ defmodule RenewCollabProj.Entites.Project do
   schema "project" do
     field :name, :string
 
-    has_many :documents, RenewCollabProj.Entites.ProjectDocument
-    has_many :simulations, RenewCollabProj.Entites.ProjectSimulation
-    has_many :shadow_net_systems, RenewCollabProj.Entites.ProjectShadowNetSystem
-    has_many :members, RenewCollabProj.Entites.ProjectMember
-    has_many :ownerships, RenewCollabProj.Entites.ProjectMember, where: [role: :owner]
+    has_many :documents, RenewCollabProj.Entities.ProjectDocument
+    has_many :simulations, RenewCollabProj.Entities.ProjectSimulation
+    has_many :shadow_net_systems, RenewCollabProj.Entities.ProjectShadowNetSystem
+    has_many :members, RenewCollabProj.Entities.ProjectMember
+    has_many :ownerships, RenewCollabProj.Entities.ProjectMember, where: [role: :owner]
 
     timestamps(type: :utc_datetime)
   end
@@ -29,7 +29,7 @@ defmodule RenewCollabProj.Entites.Project do
     |> cast(attrs, [:name])
     |> cast_assoc(
       :ownerships,
-      with: &RenewCollabProj.Entites.ProjectMember.changeset_creation/2
+      with: &RenewCollabProj.Entities.ProjectMember.changeset_creation/2
     )
     |> validate_required([:name])
   end

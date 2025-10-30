@@ -4,7 +4,7 @@ defmodule RenewCollabWeb.ApiSessionController do
   action_fallback RenewCollabWeb.FallbackController
 
   def auth(conn, %{"email" => email, "password" => password}) do
-    with %RenewCollabAuth.Entites.Account{} = account <-
+    with %RenewCollabAuth.Entities.Account{} = account <-
            RenewCollabAuth.Auth.get_account_by_email_and_password(
              email,
              password

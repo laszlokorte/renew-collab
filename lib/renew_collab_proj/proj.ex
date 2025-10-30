@@ -5,17 +5,17 @@ defmodule RenewCollabProj.Projects do
 
   alias RenewCollabCtrl.Dispatcher
   alias RenewCollabCtrl.Actions
-  alias RenewCollabAuth.Entites.Account
-  alias RenewCollabProj.Entites.ProjectShadowNetSystem
-  alias RenewCollabProj.Entites.Project
+  alias RenewCollabAuth.Entities.Account
+  alias RenewCollabProj.Entities.ProjectShadowNetSystem
+  alias RenewCollabProj.Entities.Project
   alias RenewCollabProj.Repo
-  alias RenewCollabProj.Entites.ProjectMember
-  alias RenewCollabProj.Entites.ProjectDocument
-  alias RenewCollabProj.Entites.ProjectSimulation
+  alias RenewCollabProj.Entities.ProjectMember
+  alias RenewCollabProj.Entities.ProjectDocument
+  alias RenewCollabProj.Entities.ProjectSimulation
 
   import Ecto.Query, warn: false
 
-  def create_own_project(%RenewCollabAuth.Entites.Account{id: account_id}, params) do
+  def create_own_project(%RenewCollabAuth.Entities.Account{id: account_id}, params) do
     %Project{}
     |> Project.creation_changeset(
       params
@@ -61,7 +61,7 @@ defmodule RenewCollabProj.Projects do
 
   def list_own_projects(nil), do: []
 
-  def list_own_projects(%RenewCollabAuth.Entites.Account{id: account_id}) do
+  def list_own_projects(%RenewCollabAuth.Entities.Account{id: account_id}) do
     Repo.all(
       from(p in Project,
         left_join: m in assoc(p, :members),
@@ -85,7 +85,7 @@ defmodule RenewCollabProj.Projects do
 
   def find_own_project(nil, _), do: nil
 
-  def find_own_project(%RenewCollabAuth.Entites.Account{id: account_id}, project_id) do
+  def find_own_project(%RenewCollabAuth.Entities.Account{id: account_id}, project_id) do
     Repo.one(
       from(
         p in Project,
@@ -206,19 +206,19 @@ defmodule RenewCollabProj.Projects do
   end
 
   def find_shadow_net_systems() do
-    from(d in RenewCollabSim.Entites.ShadowNetSystem)
+    from(d in RenewCollabSim.Entities.ShadowNetSystem)
     |> RenewCollabSim.Repo.all()
     |> Repo.preload(project_assignment: [])
   end
 
   def find_simulations() do
-    from(s in RenewCollabSim.Entites.Simulation)
+    from(s in RenewCollabSim.Entities.Simulation)
     |> RenewCollabSim.Repo.all()
     |> Repo.preload(project_assignment: [])
   end
 
   def find_accounts() do
-    from(a in RenewCollabAuth.Entites.Account)
+    from(a in RenewCollabAuth.Entities.Account)
     |> RenewCollabAuth.Repo.all()
   end
 
@@ -307,10 +307,10 @@ defmodule RenewCollabProj.Projects do
     project |> Project.changeset(params) |> Repo.update()
   end
 
-  def member_roles(), do: RenewCollabProj.Entites.ProjectMember.roles()
+  def member_roles(), do: RenewCollabProj.Entities.ProjectMember.roles()
 
   def member_roles(%Account{is_admin: true}, _project),
-    do: RenewCollabProj.Entites.ProjectMember.roles()
+    do: RenewCollabProj.Entities.ProjectMember.roles()
 
   def member_roles(%Account{id: own_account_id}, project) do
     from(m in ProjectMember,
@@ -318,7 +318,7 @@ defmodule RenewCollabProj.Projects do
       select: m.role
     )
     |> Repo.one()
-    |> RenewCollabProj.Entites.ProjectMember.weaker_roles()
+    |> RenewCollabProj.Entities.ProjectMember.weaker_roles()
   end
 
   def can_force_remove(%Account{is_admin: true}, _project),
@@ -418,7 +418,7 @@ defmodule RenewCollabProj.Projects do
     end
   end
 
-  def assign_to_project(project, %RenewCollabSim.Entites.ShadowNetSystem{} = sns) do
+  def assign_to_project(project, %RenewCollabSim.Entities.ShadowNetSystem{} = sns) do
     %ProjectShadowNetSystem{project_id: project.id}
     |> ProjectShadowNetSystem.changeset(%{
       "shadow_net_system_id" => sns.id
@@ -430,7 +430,7 @@ defmodule RenewCollabProj.Projects do
     end
   end
 
-  def assign_to_project(project, %RenewCollabSim.Entites.Simulation{} = sim) do
+  def assign_to_project(project, %RenewCollabSim.Entities.Simulation{} = sim) do
     %ProjectSimulation{project_id: project.id}
     |> ProjectSimulation.changeset(%{
       "simulation_id" => sim.id

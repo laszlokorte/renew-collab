@@ -23,8 +23,8 @@ defmodule RenewCollab.Release do
     load_app()
 
     Ecto.Migrator.with_repo(RenewCollabAuth.Repo, fn r ->
-      %RenewCollabAuth.Entites.Account{}
-      |> RenewCollabAuth.Entites.Account.changeset(%{
+      %RenewCollabAuth.Entities.Account{}
+      |> RenewCollabAuth.Entities.Account.changeset(%{
         "email" => email,
         "new_password" => password,
         "is_admin" => true

@@ -1,6 +1,6 @@
 defmodule RenewCollabSim.Queries.ListShadowNetSystems do
-  alias RenewCollabSim.Entites.ShadowNetSystem
-  alias RenewCollabSim.Entites.Simulation
+  alias RenewCollabSim.Entities.ShadowNetSystem
+  alias RenewCollabSim.Entities.Simulation
   import Ecto.Query
 
   defstruct [:shadow_net_system_ids]

@@ -7,8 +7,8 @@ defmodule RenewCollabWeb.SignupController do
     conn
     |> render(:new, %{
       changeset:
-        RenewCollabAuth.Entites.Account.changeset(
-          %RenewCollabAuth.Entites.Account{},
+        RenewCollabAuth.Entities.Account.changeset(
+          %RenewCollabAuth.Entities.Account{},
           %{}
         )
     })

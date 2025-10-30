@@ -21,7 +21,7 @@ defmodule RenewCollab.Document.Document do
     has_one :current_snaptshot, through: [:latest_snapshot_marker, :snapshot]
     belongs_to :syntax, RenewCollab.Syntax.SyntaxType
 
-    has_one :project_assignment, RenewCollabProj.Entites.ProjectDocument
+    has_one :project_assignment, RenewCollabProj.Entities.ProjectDocument
     has_one :project, through: [:project_assignment, :project]
 
     has_one :thumbnail, RenewCollab.Thumbnail.DocumentThumbnailLayer

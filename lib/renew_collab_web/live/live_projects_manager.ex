@@ -184,7 +184,7 @@ defmodule RenewCollabWeb.LiveProjectsManager do
   end
 
   def handle_event("create_project", params, socket) do
-    with {:ok, %RenewCollabProj.Entites.Project{}} <-
+    with {:ok, %RenewCollabProj.Entities.Project{}} <-
            Projects.create_project(
              params
              |> Map.update("name", "", fn

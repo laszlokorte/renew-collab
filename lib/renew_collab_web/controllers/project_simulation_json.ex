@@ -1,5 +1,5 @@
 defmodule RenewCollabWeb.ProjectSimulationJSON do
-  alias RenewCollabSim.Entites.Simulation
+  alias RenewCollabSim.Entities.Simulation
   use RenewCollabWeb, :verified_routes
 
   def index(%{project_id: project_id, simulations: simulations, runnings: runnings}) do

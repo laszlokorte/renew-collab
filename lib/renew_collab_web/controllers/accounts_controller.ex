@@ -6,7 +6,7 @@ defmodule RenewCollabWeb.AccountsController do
   def index(conn, _params) do
     render(conn, :index,
       accounts: RenewCollabAuth.Auth.get_accounts(),
-      new: RenewCollabAuth.Auth.change_account(%RenewCollabAuth.Entites.Account{})
+      new: RenewCollabAuth.Auth.change_account(%RenewCollabAuth.Entities.Account{})
     )
   end
 

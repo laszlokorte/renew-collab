@@ -4,12 +4,12 @@ defmodule RenewCollabSim.Simulator do
   """
 
   import Ecto.Query, warn: false
-  alias RenewCollabSim.Entites.ShadowNet
-  alias RenewCollabSim.Entites.SimulationLogEntry
-  alias RenewCollabSim.Entites.SimulationNetInstance
-  alias RenewCollabSim.Entites.SimulationTransitionFiring
-  alias RenewCollabSim.Entites.ShadowNetSystem
-  alias RenewCollabSim.Entites.Simulation
+  alias RenewCollabSim.Entities.ShadowNet
+  alias RenewCollabSim.Entities.SimulationLogEntry
+  alias RenewCollabSim.Entities.SimulationNetInstance
+  alias RenewCollabSim.Entities.SimulationTransitionFiring
+  alias RenewCollabSim.Entities.ShadowNetSystem
+  alias RenewCollabSim.Entities.Simulation
   alias RenewCollabSim.Repo
   alias RenewCollab.Simulation.SimulationLink
 
@@ -256,7 +256,7 @@ defmodule RenewCollabSim.Simulator do
   end
 
   def create_simulation(shadow_net_system_id) do
-    %RenewCollabSim.Entites.Simulation{
+    %RenewCollabSim.Entities.Simulation{
       shadow_net_system_id: shadow_net_system_id
     }
     |> Repo.insert()
@@ -281,7 +281,7 @@ defmodule RenewCollabSim.Simulator do
   end
 
   def add_manual_log_entry(sim_id, content) do
-    %RenewCollabSim.Entites.SimulationLogEntry{
+    %RenewCollabSim.Entities.SimulationLogEntry{
       simulation_id: sim_id,
       content: content
     }
@@ -349,8 +349,8 @@ defmodule RenewCollabSim.Simulator do
   end
 
   def create_shadow_net(project, content, main_net_name, nets) do
-    %RenewCollabSim.Entites.ShadowNetSystem{}
-    |> RenewCollabSim.Entites.ShadowNetSystem.changeset(%{
+    %RenewCollabSim.Entities.ShadowNetSystem{}
+    |> RenewCollabSim.Entities.ShadowNetSystem.changeset(%{
       "compiled" => content,
       "main_net_name" => main_net_name,
       "nets" => nets
@@ -397,8 +397,8 @@ defmodule RenewCollabSim.Simulator do
              |> Enum.map(fn {name, rnw, _, _} -> {name, rnw} end)
            ),
          {:ok, %{id: sns_id} = sns} <-
-           %RenewCollabSim.Entites.ShadowNetSystem{}
-           |> RenewCollabSim.Entites.ShadowNetSystem.changeset(%{
+           %RenewCollabSim.Entities.ShadowNetSystem{}
+           |> RenewCollabSim.Entities.ShadowNetSystem.changeset(%{
              "compiled" => content,
              "main_net_name" => main_name,
              "nets" =>
@@ -413,7 +413,7 @@ defmodule RenewCollabSim.Simulator do
            |> Repo.insert() do
       RenewCollabProj.Projects.assign_to_project(project, sns)
 
-      %RenewCollabSim.Entites.Simulation{
+      %RenewCollabSim.Entities.Simulation{
         shadow_net_system_id: sns_id
       }
       |> Repo.insert()

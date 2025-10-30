@@ -1,5 +1,5 @@
 defmodule RenewCollabWeb.SimulationController do
-  alias RenewCollabSim.Entites.Simulation
+  alias RenewCollabSim.Entities.Simulation
 
   use RenewCollabWeb, :controller
 

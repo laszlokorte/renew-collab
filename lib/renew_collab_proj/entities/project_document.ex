@@ -1,11 +1,11 @@
-defmodule RenewCollabProj.Entites.ProjectDocument do
+defmodule RenewCollabProj.Entities.ProjectDocument do
   use Ecto.Schema
   import Ecto.Changeset
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "project_document" do
-    belongs_to :project, RenewCollabProj.Entites.Project
+    belongs_to :project, RenewCollabProj.Entities.Project
     belongs_to :document, RenewCollab.Document.Document
 
     timestamps(type: :utc_datetime)

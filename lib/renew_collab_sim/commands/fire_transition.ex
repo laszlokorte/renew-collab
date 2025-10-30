@@ -42,11 +42,11 @@ defmodule RenewCollabSim.Commands.FireTransition do
     Ecto.Multi.new()
     |> Ecto.Multi.one(
       {step_counter, :find_net_instances},
-      from(sn in RenewCollabSim.Entites.ShadowNet,
+      from(sn in RenewCollabSim.Entities.ShadowNet,
         where:
           sn.name == ^instance_name and
             sn.shadow_net_system_id == ^shadow_net_system_id,
-        join: sim in RenewCollabSim.Entites.Simulation,
+        join: sim in RenewCollabSim.Entities.Simulation,
         on: sim.id == ^simulation_id,
         select: %{
           sim_id: sim.id,
@@ -64,7 +64,7 @@ defmodule RenewCollabSim.Commands.FireTransition do
              net_id: net_id
            }
          } ->
-        %RenewCollabSim.Entites.SimulationNetInstance{}
+        %RenewCollabSim.Entities.SimulationNetInstance{}
         |> Ecto.Changeset.change(%{
           simulation_id: sim_id,
           label: "#{instance_name}[#{instance_number}]",
@@ -80,7 +80,7 @@ defmodule RenewCollabSim.Commands.FireTransition do
     )
     |> Ecto.Multi.one(
       {step_counter, :find_transition_firing},
-      from(n in RenewCollabSim.Entites.SimulationNetInstance,
+      from(n in RenewCollabSim.Entities.SimulationNetInstance,
         where:
           n.label == ^"#{instance_name}[#{instance_number}]" and
             n.simulation_id == ^simulation_id,
@@ -93,7 +93,7 @@ defmodule RenewCollabSim.Commands.FireTransition do
     |> Ecto.Multi.insert(
       {step_counter, :track_firing},
       fn %{{^step_counter, :find_transition_firing} => n} ->
-        %RenewCollabSim.Entites.SimulationTransitionFiring{
+        %RenewCollabSim.Entities.SimulationTransitionFiring{
           simulation_id: n.simulation_id,
           simulation_net_instance_id: n.id,
           transition_id: transition_id,

@@ -1,4 +1,4 @@
-defmodule RenewCollabSim.Entites.ShadowNetSystem do
+defmodule RenewCollabSim.Entities.ShadowNetSystem do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -8,10 +8,10 @@ defmodule RenewCollabSim.Entites.ShadowNetSystem do
     field :label, :string, default: nil
     field :compiled, :binary
     field :main_net_name, :string
-    has_many :nets, RenewCollabSim.Entites.ShadowNet, preload_order: [asc: :id]
-    has_many :simulations, RenewCollabSim.Entites.Simulation, preload_order: [desc: :inserted_at]
+    has_many :nets, RenewCollabSim.Entities.ShadowNet, preload_order: [asc: :id]
+    has_many :simulations, RenewCollabSim.Entities.Simulation, preload_order: [desc: :inserted_at]
 
-    has_one :project_assignment, RenewCollabProj.Entites.ProjectShadowNetSystem
+    has_one :project_assignment, RenewCollabProj.Entities.ProjectShadowNetSystem
     has_one :project, through: [:project_assignment, :project]
 
     timestamps(type: :utc_datetime)

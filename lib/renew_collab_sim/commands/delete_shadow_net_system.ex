@@ -1,5 +1,5 @@
 defmodule RenewCollabSim.Commands.DeleteShadowNetSystem do
-  alias RenewCollabSim.Entites.ShadowNetSystem
+  alias RenewCollabSim.Entities.ShadowNetSystem
   import Ecto.Query
 
   defstruct [:shadow_net_system_id]

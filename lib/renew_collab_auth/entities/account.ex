@@ -1,4 +1,4 @@
-defmodule RenewCollabAuth.Entites.Account do
+defmodule RenewCollabAuth.Entities.Account do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -38,7 +38,7 @@ defmodule RenewCollabAuth.Entites.Account do
   end
 
   def valid_password?(
-        %RenewCollabAuth.Entites.Account{password: hashed_password},
+        %RenewCollabAuth.Entities.Account{password: hashed_password},
         entered_pasword
       )
       when is_binary(hashed_password) and byte_size(entered_pasword) > 0 do

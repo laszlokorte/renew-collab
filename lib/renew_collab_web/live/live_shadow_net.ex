@@ -1,5 +1,5 @@
 defmodule RenewCollabWeb.LiveShadowNet do
-  alias RenewCollabProj.Entites.ProjectShadowNetSystem
+  alias RenewCollabProj.Entities.ProjectShadowNetSystem
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
   alias RenewCollabCtrl.Views

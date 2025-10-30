@@ -5,8 +5,8 @@ defmodule RenewCollabWeb.LoginController do
     render(conn, :index,
       accounts_initialized: RenewCollabAuth.Auth.count_accounts() > 0,
       changeset:
-        RenewCollabAuth.Entites.LoginAttempt.changeset(
-          %RenewCollabAuth.Entites.LoginAttempt{},
+        RenewCollabAuth.Entities.LoginAttempt.changeset(
+          %RenewCollabAuth.Entities.LoginAttempt{},
           %{}
         )
     )
@@ -14,8 +14,8 @@ defmodule RenewCollabWeb.LoginController do
 
   def login(conn, %{"login_attempt" => params}) do
     login =
-      RenewCollabAuth.Entites.LoginAttempt.changeset(
-        %RenewCollabAuth.Entites.LoginAttempt{},
+      RenewCollabAuth.Entities.LoginAttempt.changeset(
+        %RenewCollabAuth.Entities.LoginAttempt{},
         params
       )
 
@@ -25,7 +25,7 @@ defmodule RenewCollabWeb.LoginController do
       {:ok, %{email: email, password: password}} ->
         nil
 
-        with %RenewCollabAuth.Entites.Account{} = account <-
+        with %RenewCollabAuth.Entities.Account{} = account <-
                RenewCollabAuth.Auth.get_account_by_email_and_password(
                  email,
                  password

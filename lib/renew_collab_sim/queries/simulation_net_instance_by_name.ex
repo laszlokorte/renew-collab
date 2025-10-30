@@ -1,5 +1,5 @@
 defmodule RenewCollabSim.Queries.SimulationNetInstanceByName do
-  alias RenewCollabSim.Entites.SimulationNetInstance
+  alias RenewCollabSim.Entities.SimulationNetInstance
   import Ecto.Query
 
   defstruct [:simulation_id, :net_name, :integer_id]

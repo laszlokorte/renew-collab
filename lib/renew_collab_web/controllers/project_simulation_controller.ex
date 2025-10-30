@@ -1,6 +1,6 @@
 defmodule RenewCollabWeb.ProjectSimulationController do
   alias RenewCollabSim.Server.ProjectSimulationServer
-  alias RenewCollabSim.Entites.Simulation
+  alias RenewCollabSim.Entities.Simulation
   alias RenewCollabProj.Projects
   use RenewCollabWeb, :controller
 

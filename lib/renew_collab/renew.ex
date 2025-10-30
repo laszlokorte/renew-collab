@@ -12,7 +12,7 @@ defmodule RenewCollab.Renew do
   alias RenewCollab.Document.TransientDocument
   alias RenewCollab.Simulation.SimulationLink
 
-  alias RenewCollabProj.Entites.Project
+  alias RenewCollabProj.Entities.Project
 
   def count_documents do
     :deprecated

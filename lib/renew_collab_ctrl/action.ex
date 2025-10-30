@@ -1,8 +1,8 @@
 defmodule RenewCollabCtrl.Action do
-  alias RenewCollabProj.Entites.Project
+  alias RenewCollabProj.Entities.Project
   alias RenewCollab.Import.Converted
   alias RenewCollab.Commands
-  alias RenewCollabProj.Entites.ProjectDocument
+  alias RenewCollabProj.Entities.ProjectDocument
   alias RenewCollab.Document.TransientDocument
   alias RenewCollabCtrl.Actions
 

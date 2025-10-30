@@ -1,6 +1,6 @@
 defmodule RenewCollabWeb.LiveDocument do
   alias RenewCollabCtrl.Dispatcher
-  alias RenewCollabProj.Entites.ProjectDocument
+  alias RenewCollabProj.Entities.ProjectDocument
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
@@ -1904,7 +1904,7 @@ defmodule RenewCollabWeb.LiveDocument do
       RenewCollabSim.Compiler.SnsCompiler.normalize_net_name(socket.assigns.document.name)
     )
     |> case do
-      %RenewCollabSim.Entites.Simulation{} = sim ->
+      %RenewCollabSim.Entities.Simulation{} = sim ->
         case params do
           %{"redirect" => "no"} ->
             {:noreply, socket |> put_flash(:info, "Simulation created")}

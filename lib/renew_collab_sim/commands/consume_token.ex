@@ -32,7 +32,7 @@ defmodule RenewCollabSim.Commands.ConsumeToken do
     Ecto.Multi.new()
     |> Ecto.Multi.one(
       {step_counter, :find_remove_tokens},
-      from(t in RenewCollabSim.Entites.SimulationNetToken,
+      from(t in RenewCollabSim.Entities.SimulationNetToken,
         select: t.id,
         limit: 1,
         join: i in assoc(t, :simulation_net_instance),
@@ -47,12 +47,12 @@ defmodule RenewCollabSim.Commands.ConsumeToken do
       {step_counter, :remove_tokens},
       fn
         %{{^step_counter, :find_remove_tokens} => nil} ->
-          from(dt in RenewCollabSim.Entites.SimulationNetToken,
+          from(dt in RenewCollabSim.Entities.SimulationNetToken,
             where: false
           )
 
         %{{^step_counter, :find_remove_tokens} => to_delete} ->
-          from(dt in RenewCollabSim.Entites.SimulationNetToken,
+          from(dt in RenewCollabSim.Entities.SimulationNetToken,
             where: dt.id == ^to_delete
           )
       end

@@ -6,8 +6,8 @@ defmodule RenewCollabAuth.Auth do
   import Ecto.Query, warn: false
   alias RenewCollabAuth.Repo
 
-  alias RenewCollabAuth.Entites.Account
-  alias RenewCollabAuth.Entites.SessionToken
+  alias RenewCollabAuth.Entities.Account
+  alias RenewCollabAuth.Entities.SessionToken
 
   def get_accounts(), do: Repo.all(Account)
 

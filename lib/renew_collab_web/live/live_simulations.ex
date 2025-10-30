@@ -309,7 +309,7 @@ defmodule RenewCollabWeb.LiveSimulations do
       main_net
     )
     |> case do
-      %RenewCollabSim.Entites.Simulation{} ->
+      %RenewCollabSim.Entities.Simulation{} ->
         {:noreply,
          socket
          |> put_flash(:info, "Simulation created")

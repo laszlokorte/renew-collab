@@ -20,7 +20,7 @@ defmodule RenewCollabSim.Commands.SetupSimulation do
     Ecto.Multi.new()
     |> Ecto.Multi.update_all(
       {step_counter, :update_time},
-      from(sim in RenewCollabSim.Entites.Simulation,
+      from(sim in RenewCollabSim.Entities.Simulation,
         where: sim.id == ^simulation_id,
         update: [set: [timestep: 1]]
       ),

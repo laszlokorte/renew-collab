@@ -32,7 +32,7 @@ defmodule RenewCollabSim.Commands.InitToken do
     Ecto.Multi.new()
     |> Ecto.Multi.one(
       {step_counter, :find_instance_for_init_tokens},
-      from(n in RenewCollabSim.Entites.SimulationNetInstance,
+      from(n in RenewCollabSim.Entities.SimulationNetInstance,
         where:
           n.label == ^"#{instance_name}[#{instance_number}]" and
             n.simulation_id == ^simulation_id
@@ -41,7 +41,7 @@ defmodule RenewCollabSim.Commands.InitToken do
     |> Ecto.Multi.insert(
       {step_counter, :init_tokens},
       fn %{{^step_counter, :find_instance_for_init_tokens} => n} ->
-        %RenewCollabSim.Entites.SimulationNetToken{
+        %RenewCollabSim.Entities.SimulationNetToken{
           simulation_id: n.simulation_id,
           simulation_net_instance_id: n.id,
           place_id: place_id,

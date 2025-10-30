@@ -23,14 +23,14 @@ defmodule RenewCollabSim.Commands.LogEvent do
     Ecto.Multi.new()
     |> Ecto.Multi.insert(
       {step_counter, :log_entry},
-      %RenewCollabSim.Entites.SimulationLogEntry{
+      %RenewCollabSim.Entities.SimulationLogEntry{
         simulation_id: simulation_id,
         content: content
       }
     )
     |> Ecto.Multi.one(
       {step_counter, :oldest_to_keep},
-      from(t in RenewCollabSim.Entites.SimulationLogEntry,
+      from(t in RenewCollabSim.Entities.SimulationLogEntry,
         select: t.inserted_at,
         offset: 100,
         limit: 1,
@@ -43,14 +43,14 @@ defmodule RenewCollabSim.Commands.LogEvent do
       fn
         %{{^step_counter, :oldest_to_keep} => oldest_to_keep}
         when not is_nil(oldest_to_keep) ->
-          from(dt in RenewCollabSim.Entites.SimulationLogEntry,
+          from(dt in RenewCollabSim.Entities.SimulationLogEntry,
             where:
               dt.simulation_id == ^simulation_id and
                 dt.inserted_at < ^oldest_to_keep
           )
 
         _ ->
-          from(dt in RenewCollabSim.Entites.SimulationLogEntry, where: false)
+          from(dt in RenewCollabSim.Entities.SimulationLogEntry, where: false)
       end
     )
   end

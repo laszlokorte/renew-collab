@@ -1,5 +1,5 @@
 defmodule RenewCollabSim.Queries.ListSimulations do
-  alias RenewCollabSim.Entites.Simulation
+  alias RenewCollabSim.Entities.Simulation
   import Ecto.Query
 
   defstruct [:simulation_ids]

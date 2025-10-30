@@ -1,5 +1,5 @@
 defmodule RenewCollabSim.Commands.CreateSimulation do
-  alias RenewCollabSim.Entites.Simulation
+  alias RenewCollabSim.Entities.Simulation
   import Ecto.Query
 
   defstruct [:shadow_net_system_id]

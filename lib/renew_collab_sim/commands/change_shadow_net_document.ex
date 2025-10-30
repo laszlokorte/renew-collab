@@ -1,5 +1,5 @@
 defmodule RenewCollabSim.Commands.ChangeShadowNetDocument do
-  alias RenewCollabSim.Entites.ShadowNet
+  alias RenewCollabSim.Entities.ShadowNet
   import Ecto.Query
 
   defstruct [:shadow_net_system_id, :shadow_net_id, :document_json]

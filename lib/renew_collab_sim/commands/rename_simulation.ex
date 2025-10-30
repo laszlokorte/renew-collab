@@ -1,5 +1,5 @@
 defmodule RenewCollabSim.Commands.RenameSimulation do
-  alias RenewCollabSim.Entites.Simulation
+  alias RenewCollabSim.Entities.Simulation
   import Ecto.Query
 
   defstruct [:simulation_id, :new_name]

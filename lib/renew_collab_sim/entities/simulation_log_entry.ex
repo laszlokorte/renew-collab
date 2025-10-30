@@ -1,10 +1,10 @@
-defmodule RenewCollabSim.Entites.SimulationLogEntry do
+defmodule RenewCollabSim.Entities.SimulationLogEntry do
   use Ecto.Schema
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "simulation_log_entry" do
-    belongs_to :simulation, RenewCollabSim.Entites.Simulation
+    belongs_to :simulation, RenewCollabSim.Entities.Simulation
     field :content, :string
 
     timestamps(type: :utc_datetime)

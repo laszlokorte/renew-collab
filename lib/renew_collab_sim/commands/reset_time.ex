@@ -1,5 +1,5 @@
 defmodule RenewCollabSim.Commands.ResetTime do
-  alias RenewCollabSim.Entites.Simulation
+  alias RenewCollabSim.Entities.Simulation
   import Ecto.Query
 
   defstruct [:simulation_id]

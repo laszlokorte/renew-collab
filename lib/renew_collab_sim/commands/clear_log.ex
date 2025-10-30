@@ -1,5 +1,5 @@
 defmodule RenewCollabSim.Commands.ClearLog do
-  alias RenewCollabSim.Entites.SimulationLogEntry
+  alias RenewCollabSim.Entities.SimulationLogEntry
   import Ecto.Query
 
   defstruct [:simulation_id]

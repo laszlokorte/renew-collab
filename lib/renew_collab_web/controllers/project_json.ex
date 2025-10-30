@@ -1,5 +1,5 @@
 defmodule RenewCollabWeb.ProjectJSON do
-  alias RenewCollabProj.Entites.Project
+  alias RenewCollabProj.Entities.Project
 
   use RenewCollabWeb, :verified_routes
 

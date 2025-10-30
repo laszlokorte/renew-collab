@@ -1,5 +1,5 @@
 defmodule RenewCollabSim.Queries.CountShadowNetSystems do
-  alias RenewCollabSim.Entites.ShadowNetSystem
+  alias RenewCollabSim.Entities.ShadowNetSystem
   import Ecto.Query
 
   defstruct []

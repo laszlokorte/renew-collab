@@ -7,8 +7,8 @@ defmodule RenewCollabWeb.MyAccountController do
     conn
     |> render(:show, %{
       changeset:
-        RenewCollabAuth.Entites.ChangePasswordAttempt.changeset(
-          %RenewCollabAuth.Entites.ChangePasswordAttempt{},
+        RenewCollabAuth.Entities.ChangePasswordAttempt.changeset(
+          %RenewCollabAuth.Entities.ChangePasswordAttempt{},
           %{}
         )
     })

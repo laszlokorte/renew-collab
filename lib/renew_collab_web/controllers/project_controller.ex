@@ -64,7 +64,7 @@ defmodule RenewCollabWeb.ProjectController do
           import Ecto.Query
 
           sns_compiled =
-            from(sns in RenewCollabSim.Entites.ShadowNetSystem,
+            from(sns in RenewCollabSim.Entities.ShadowNetSystem,
               select: sns.compiled,
               where: sns.id == ^sns_id
             )

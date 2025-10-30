@@ -1,6 +1,6 @@
 defmodule RenewCollabSim.Commands.ClearInstances do
-  alias RenewCollabSim.Entites.SimulationTransitionFiring
-  alias RenewCollabSim.Entites.SimulationNetInstance
+  alias RenewCollabSim.Entities.SimulationTransitionFiring
+  alias RenewCollabSim.Entities.SimulationNetInstance
   import Ecto.Query
 
   defstruct [:simulation_id]
