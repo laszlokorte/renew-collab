@@ -108,26 +108,32 @@ defmodule RenewCollabCtrl.Action do
   end
 
   def do_perform(%Actions.DocumentDeleteAsUser{document_id: document_id}) do
-    RenewCollab.Commands.DeleteDocument.new(%{
-      document_id: document_id
-    })
-    |> RenewCollab.DocumentCommander.run_document_command(false)
-
-    RenewCollabProj.Projects.delete_document(document_id)
+    RenewCollabProj.Queries.DocumentsProject.new(%{document_id: document_id})
+    |> RenewCollabProj.ProjectFetcher.fetch()
     |> case do
-      %Project{id: project_id} ->
-        # TODO:broadcast
+      {:ok, %{document_id: doc_id, project_id: project_id}} ->
+        RenewCollab.Commands.DeleteDocument.new(%{
+          document_id: doc_id
+        })
+        |> RenewCollab.DocumentCommander.run_document_command(false)
+
+        RenewCollabProj.Commands.RemoveProjectDocument.new(%{
+          document_id: doc_id,
+          project_id: project_id
+        })
+        |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "project/#{project_id}/documents",
           :any
         )
 
-      _ ->
-        nil
-    end
+        :ok
 
-    :ok
+      _ ->
+        :error
+    end
   end
 
   def do_perform(%Actions.DocumentDuplicateInProject{

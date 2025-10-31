@@ -1,4 +1,11 @@
 defmodule RenewCollabWeb.LiveProjectSettings do
+  alias RenewCollabCtrl.Actions.ProjectRemoveMemberAsUser
+  alias RenewCollabCtrl.Actions
+  alias RenewCollabCtrl.Actions.ProjectDelete
+  alias RenewCollabCtrl.Actions.ProjectRename
+  alias RenewCollabCtrl.WriteAccess
+  alias RenewCollabCtrl.Fetcher
+  alias RenewCollabCtrl.Views
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
@@ -6,8 +13,14 @@ defmodule RenewCollabWeb.LiveProjectSettings do
 
   @topic "project"
 
-  def mount(%{"project_id" => id}, _session, socket) do
-    Projects.find_own_project(socket.assigns.current_account, id)
+  def mount(%{"project_id" => project_id}, _session, socket) do
+    account = socket.assigns.current_account
+
+    %Views.MyProject{
+      account_id: account.id,
+      project_id: project_id
+    }
+    |> Fetcher.fetch_as(account)
     |> case do
       nil ->
         {:ok, socket |> put_flash(:error, "Project not found") |> redirect(to: ~p"/projects")}
@@ -19,7 +32,13 @@ defmodule RenewCollabWeb.LiveProjectSettings do
         socket =
           socket
           |> assign(:project, proj)
-          |> assign(:shadow_net_systems, Projects.find_shadow_net_systems())
+          |> assign(
+            :members,
+            %Views.ProjectMembersList{
+              project_id: project_id
+            }
+            |> Fetcher.fetch_as(account)
+          )
 
         {:ok, socket}
     end
@@ -48,7 +67,7 @@ defmodule RenewCollabWeb.LiveProjectSettings do
       </div>
 
       <div style="padding: 0 1em">
-        <%= if Projects.can_rename(@current_account, @project) do %>
+        <%= if WriteAccess.can(@current_account, %ProjectRename{project_id: @project.id}) do %>
           <h3>Project Name</h3>
 
           <form method="post" phx-submit="rename" accept-charset="utf-8">
@@ -65,10 +84,10 @@ defmodule RenewCollabWeb.LiveProjectSettings do
         <h3>Project Members</h3>
         <%= if  not Enum.empty?(@project.members) do %>
           <ul style="list-style: none; padding: 0; margin: 0">
-            <%= for m <- @project.members do %>
+            <%= for m <- @members do %>
               <%= with acc = %{} <- m.account do %>
                 <li>
-                  <%= if Projects.can_remove(@current_account, m) do %>
+                  <%= if WriteAccess.can(@current_account, %ProjectRemoveMemberAsUser{project_id: @project.id, member_account_id: acc.id}) do %>
                     <button
                       type="button"
                       phx-click="remove_member"
@@ -101,7 +120,7 @@ defmodule RenewCollabWeb.LiveProjectSettings do
           <p>None</p>
         <% end %>
 
-        <%= if Projects.can_invite(@current_account, @project) do %>
+        <%= if WriteAccess.can(@current_account, %Actions.ProjectAddMemberAsUser{project_id: @project.id}) do %>
           <h3>Invite Member</h3>
           <form method="post" phx-submit="add_member" accept-charset="utf-8">
             <label>
@@ -123,7 +142,7 @@ defmodule RenewCollabWeb.LiveProjectSettings do
           </form>
         <% end %>
 
-        <%= if Projects.can_delete(@current_account, @project) do %>
+        <%= if WriteAccess.can(@current_account, %ProjectDelete{project_id: @project.id}) do %>
           <h3>Delete Project</h3>
 
           <form method="post" phx-submit="delete" accept-charset="utf-8">

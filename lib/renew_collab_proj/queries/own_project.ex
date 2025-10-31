@@ -14,7 +14,11 @@ defmodule RenewCollabProj.Queries.OwnProject do
       :result,
       from(p in Project,
         join: mem in assoc(p, :members),
-        where: mem.account_id == ^account_id and p.id == ^project_id
+        left_join: m in assoc(p, :members),
+        where: mem.account_id == ^account_id and p.id == ^project_id,
+        preload: [
+          members: m
+        ]
       )
     )
   end

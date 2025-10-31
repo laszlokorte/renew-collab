@@ -1,5 +1,5 @@
 defmodule RenewCollabProj.Queries.ShadowNetsProject do
-  alias RenewCollabProj.Entities.Project
+  alias RenewCollabProj.Entities.ProjectShadowNetSystem
   import Ecto.Query
 
   defstruct [:shadow_net_system_id]
@@ -12,9 +12,9 @@ defmodule RenewCollabProj.Queries.ShadowNetsProject do
     Ecto.Multi.new()
     |> Ecto.Multi.one(
       :result,
-      from(p in Project,
-        join: sns in assoc(p, :shadow_net_systems),
-        where: sns.shadow_net_system_id == ^shadow_net_system_id
+      from(p in ProjectShadowNetSystem,
+        join: proj in assoc(p, :project),
+        where: p.shadow_net_system_id == ^shadow_net_system_id
       )
     )
   end

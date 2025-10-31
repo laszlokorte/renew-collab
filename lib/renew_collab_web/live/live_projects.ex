@@ -1,9 +1,14 @@
 defmodule RenewCollabWeb.LiveProjects do
+  alias RenewCollabCtrl.WriteAccess
+  alias RenewCollabCtrl.Actions
+  alias RenewCollabCtrl.ReadAccess
+  alias RenewCollabCtrl.Views
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
   alias RenewCollabProj.Projects
 
+  alias RenewCollabCtrl.Fetcher
   @topic "projects"
 
   def mount(_params, _session, socket) do
@@ -11,17 +16,19 @@ defmodule RenewCollabWeb.LiveProjects do
     RenewCollabWeb.Endpoint.subscribe(@topic)
 
     socket =
-      socket
-      |> assign(:projects, Projects.list_own_projects(socket.assigns.current_account))
-      |> assign(:accounts, Projects.find_accounts())
-      |> assign(
-        create_form:
-          to_form(%{
-            "owner" => socket.assigns.current_account.id
-          })
-      )
+      socket |> assign(load_data(socket.assigns.current_account))
 
     {:ok, socket}
+  end
+
+  def load_data(account) do
+    %{
+      projects: %Views.MyProjectsList{account_id: account.id} |> Fetcher.fetch_as(account),
+      create_form:
+        to_form(%{
+          "name" => ""
+        })
+    }
   end
 
   def render(assigns) do
@@ -43,16 +50,6 @@ defmodule RenewCollabWeb.LiveProjects do
 
           <.form for={@create_form} phx-submit="create_project" phx-change="validate_project">
             <div style="display: flex; align-items: stretch; gap: 0.1em; flex-direction: column;">
-              <%!-- <input type="hidden" name="ownerships[0][role]" value="owner" />
-            <label>
-              Owner:
-              <.input
-                field={@create_form[:owner]}
-                name="ownerships[0][account_id]"
-                type="select"
-                options={@accounts |> Enum.map(&{&1.email, &1.id})}
-              />
-            </label> --%>
               <input
                 type="text"
                 name="name"
@@ -169,18 +166,20 @@ defmodule RenewCollabWeb.LiveProjects do
                     </a>
                   </td>
                   <td width="50">
-                    <button
-                      type="button"
-                      phx-click="duplicate_project"
-                      phx-value-id={project.id}
-                      style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
-                    >
-                      Duplicate
-                    </button>
+                    <%= if WriteAccess.can(@current_account, %Actions.ProjectDuplicateAsUser{project_id: project.id}) do %>
+                      <button
+                        type="button"
+                        phx-click="duplicate_project"
+                        phx-value-id={project.id}
+                        style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+                      >
+                        Duplicate
+                      </button>
+                    <% end %>
                   </td>
 
                   <td width="50">
-                    <%= if Projects.can_delete(@current_account, project) do %>
+                    <%= if WriteAccess.can(@current_account, %Actions.ProjectDelete{project_id: project.id}) do %>
                       <button
                         type="button"
                         phx-click="delete_project"

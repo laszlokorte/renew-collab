@@ -37,6 +37,7 @@ defmodule RenewCollabSim.Queries.Simulation do
       else
         sim
       end
+      |> then(&{:ok, &1})
     end)
   end
 end

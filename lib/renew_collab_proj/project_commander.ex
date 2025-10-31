@@ -1,4 +1,4 @@
-defmodule RenewCollabProj.ProjectFetcher do
+defmodule RenewCollabProj.ProjectCommander do
   alias RenewCollabProj.Repo
 
   def run_project_command(command)
@@ -11,10 +11,10 @@ defmodule RenewCollabProj.ProjectFetcher do
 
   def run_project_command_sync(%{__struct__: module} = command) do
     apply(module, :multi, [command])
-    |> run_project_transaction(apply(module, :tags, [command]))
+    |> run_project_transaction()
   end
 
-  defp run_project_transaction(multi, _tags) do
+  defp run_project_transaction(multi) do
     Repo.transact(multi)
   end
 end

@@ -1,5 +1,5 @@
-defmodule RenewCollabProj.ProjectFetcher do
-  alias RenewCollabProj.Repo
+defmodule RenewCollabAuth.AuthFetcher do
+  alias RenewCollabAuth.Repo
 
   def fetch(%{__struct__: module} = query) do
     apply(module, :multi, [query])

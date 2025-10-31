@@ -8,7 +8,13 @@ defmodule RenewCollabWeb.LiveDocuments do
   alias RenewCollabCtrl.Dispatcher
 
   def mount(%{"project_id" => project_id}, _session, socket) do
-    RenewCollabProj.Projects.find_project(project_id)
+    account = socket.assigns.current_account
+
+    %Views.MyProject{
+      account_id: account.id,
+      project_id: project_id
+    }
+    |> Fetcher.fetch_as(account)
     |> case do
       nil ->
         {:ok, socket |> put_flash(:error, "Project not found") |> redirect(to: ~p"/projects")}
@@ -19,20 +25,24 @@ defmodule RenewCollabWeb.LiveDocuments do
 
         socket =
           socket
-          |> assign(:project, project)
-          |> assign(
-            :documents,
-            %Views.ProjectDocumentsList{
-              project_id: project.id
-            }
-            |> Fetcher.fetch_as(socket.assigns.current_account)
-          )
-          |> assign(create_form: to_form(%{}))
-          |> assign(import_form: to_form(%{}))
+          |> assign(load_data(project, account))
           |> allow_upload(:import_file, accept: ~w(.rnw .aip), max_entries: 10)
 
         {:ok, socket}
     end
+  end
+
+  def load_data(project, account) do
+    %{
+      project: project,
+      documents:
+        %Views.ProjectDocumentsList{
+          project_id: project.id
+        }
+        |> Fetcher.fetch_as(account),
+      create_form: to_form(%{}),
+      import_form: to_form(%{})
+    }
   end
 
   defp error_to_string(:too_large), do: "The selected file is too large."
@@ -372,12 +382,6 @@ defmodule RenewCollabWeb.LiveDocuments do
   def handle_info(:any, socket) do
     {:noreply,
      socket
-     |> assign(
-       :documents,
-       %Views.ProjectDocumentsList{
-         project_id: socket.assigns.project.id
-       }
-       |> Fetcher.fetch_as(socket.assigns.current_account)
-     )}
+     |> assign(load_data(socket.assigns.project, socket.assigns.current_account))}
   end
 end

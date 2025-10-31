@@ -1,5 +1,5 @@
 defmodule RenewCollabProj.Queries.DocumentsProject do
-  alias RenewCollabProj.Entities.Project
+  alias RenewCollabProj.Entities.ProjectDocument
   import Ecto.Query
 
   defstruct [:document_id]
@@ -12,9 +12,9 @@ defmodule RenewCollabProj.Queries.DocumentsProject do
     Ecto.Multi.new()
     |> Ecto.Multi.one(
       :result,
-      from(p in Project,
-        join: docs in assoc(p, :documents),
-        where: docs.document_id == ^document_id
+      from(p in ProjectDocument,
+        join: proj in assoc(p, :project),
+        where: p.document_id == ^document_id
       )
     )
   end

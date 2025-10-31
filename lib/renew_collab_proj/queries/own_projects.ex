@@ -10,11 +10,24 @@ defmodule RenewCollabProj.Queries.OwnProjects do
 
   def multi(%__MODULE__{account_id: account_id}) do
     Ecto.Multi.new()
-    |> Ecto.Multi.one(
+    |> Ecto.Multi.all(
       :result,
       from(p in Project,
         join: mem in assoc(p, :members),
-        where: mem.account_id == ^account_id
+        where: mem.account_id == ^account_id,
+        left_join: m in assoc(p, :members),
+        left_join: o in assoc(p, :ownerships),
+        left_join: ssn in assoc(p, :shadow_net_systems),
+        left_join: d in assoc(p, :documents),
+        left_join: s in assoc(p, :simulations),
+        order_by: [desc: :inserted_at],
+        preload: [
+          ownerships: o,
+          members: m,
+          documents: d,
+          shadow_net_systems: ssn,
+          simulations: s
+        ]
       )
     )
   end

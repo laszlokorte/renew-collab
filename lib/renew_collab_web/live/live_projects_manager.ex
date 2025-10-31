@@ -1,4 +1,9 @@
 defmodule RenewCollabWeb.LiveProjectsManager do
+  alias RenewCollabCtrl.Dispatcher
+  alias RenewCollabCtrl.Actions
+  alias RenewCollabProj.Commands
+  alias RenewCollabCtrl.Fetcher
+  alias RenewCollabCtrl.Views
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
@@ -10,18 +15,17 @@ defmodule RenewCollabWeb.LiveProjectsManager do
     # TODO:subscription
     RenewCollabWeb.Endpoint.subscribe(@topic)
 
-    socket =
-      socket
-      |> assign(:projects, Projects.list_all_projects())
-      |> assign(:accounts, Projects.find_accounts())
-      |> assign(
-        create_form:
-          to_form(%{
-            "owner" => socket.assigns.current_account.id
-          })
-      )
+    socket = socket |> assign(load_data(socket.assigns.current_account))
 
     {:ok, socket}
+  end
+
+  def load_data(account) do
+    %{
+      projects: %Views.GlobalProjects{} |> Fetcher.fetch_as(account),
+      accounts: %Views.GlobalAccounts{} |> Fetcher.fetch_as(account),
+      create_form: to_form(%{name: nil})
+    }
   end
 
   def render(assigns) do
@@ -43,16 +47,6 @@ defmodule RenewCollabWeb.LiveProjectsManager do
 
           <.form for={@create_form} phx-submit="create_project" phx-change="validate_project">
             <div style="display: flex; align-items: stretch; gap: 0.1em; flex-direction: column;">
-              <%!-- <input type="hidden" name="ownerships[0][role]" value="owner" />
-            <label>
-              Owner:
-              <.input
-                field={@create_form[:owner]}
-                name="ownerships[0][account_id]"
-                type="select"
-                options={@accounts |> Enum.map(&{&1.email, &1.id})}
-              />
-            </label> --%>
               <input
                 type="text"
                 name="name"
@@ -162,16 +156,14 @@ defmodule RenewCollabWeb.LiveProjectsManager do
                   </td>
 
                   <td width="50">
-                    <%= if Projects.can_delete(@current_account, project) do %>
-                      <button
-                        type="button"
-                        phx-click="delete_project"
-                        phx-value-id={project.id}
-                        style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
-                      >
-                        Delete
-                      </button>
-                    <% end %>
+                    <button
+                      type="button"
+                      phx-click="delete_project"
+                      phx-value-id={project.id}
+                      style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               <% end %>
@@ -183,23 +175,21 @@ defmodule RenewCollabWeb.LiveProjectsManager do
     """
   end
 
-  def handle_event("create_project", params, socket) do
-    with {:ok, %RenewCollabProj.Entities.Project{}} <-
-           Projects.create_project(
-             params
-             |> Map.update("name", "", fn
-               "" -> "untitled"
-               n -> n
-             end)
-           ) do
-      socket
-      |> put_flash(:info, "Project created")
-      |> assign(create_form: to_form(%{}))
-      |> reload()
-    else
-      _ ->
-        {:noreply, socket}
-    end
+  def handle_event("create_project", %{"name" => name}, socket) do
+    %Actions.ProjectCreateAsAdmin{
+      project_name:
+        name
+        |> case do
+          "" -> "untitled"
+          n -> n
+        end
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+
+    socket
+    |> put_flash(:info, "Project created")
+    |> assign(create_form: to_form(%{}))
+    |> reload()
   end
 
   def handle_event("validate_project", params, socket) do
@@ -207,9 +197,8 @@ defmodule RenewCollabWeb.LiveProjectsManager do
   end
 
   def handle_event("delete_project", %{"id" => id}, socket) do
-    if Projects.can_delete(socket.assigns.current_account, Projects.find_project(id)) do
-      Projects.delete_project(id)
-    end
+    %Actions.ProjectDelete{project_id: id}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
 
     socket
     |> put_flash(:info, "Project deleted")
@@ -217,7 +206,8 @@ defmodule RenewCollabWeb.LiveProjectsManager do
   end
 
   def handle_event("duplicate_project", %{"id" => id}, socket) do
-    Projects.duplicate_project(id)
+    %Actions.ProjectDuplicateAsAdmin{project_id: id}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
 
     socket
     |> put_flash(:info, "Project duplicated")

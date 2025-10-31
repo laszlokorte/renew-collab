@@ -2,6 +2,7 @@ defmodule RenewCollabCtrl.ReadAccess do
   alias RenewCollabCtrl.Views
   def can(_, _)
 
+  def can(_account, %Views.ProjectMembersList{}), do: true
   def can(_account, %Views.ProjectDocumentsList{}), do: true
   def can(_account, %Views.DocumentWithContent{}), do: true
   def can(_account, %Views.DocumentVersionsList{}), do: true
@@ -19,6 +20,10 @@ defmodule RenewCollabCtrl.ReadAccess do
   def can(_account, %Views.DocumentHierarchyInvalids{}), do: true
   def can(_account, %Views.SystemHealthReport{}), do: true
   def can(_account, %Views.DocumentLayerRelative{}), do: true
+  def can(_account, %Views.GlobalAccounts{}), do: true
+  def can(_account, %Views.GlobalProjects{}), do: true
+  def can(%{id: account_id}, %Views.MyProjectsList{account_id: account_id}), do: true
+  def can(%{id: account_id}, %Views.MyProject{account_id: account_id}), do: true
 
   def can(_account, %Views.ProjectSimulationsList{}), do: true
   def can(_account, %Views.ProjectShadowNetSystemsList{}), do: true

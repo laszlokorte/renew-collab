@@ -1,3 +1,3 @@
 defmodule RenewCollabCtrl.Views.MyProjectsList do
-  defstruct []
+  defstruct [:account_id]
 end

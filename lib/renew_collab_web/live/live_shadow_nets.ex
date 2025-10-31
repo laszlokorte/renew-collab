@@ -9,7 +9,13 @@ defmodule RenewCollabWeb.LiveShadowNets do
   def file_count_limit, do: @file_count_limit
 
   def mount(%{"project_id" => project_id}, _session, socket) do
-    RenewCollabProj.Projects.find_project(project_id)
+    account = socket.assigns.current_account
+
+    %Views.MyProject{
+      account_id: account.id,
+      project_id: project_id
+    }
+    |> Fetcher.fetch_as(account)
     |> case do
       nil ->
         {:ok, socket |> put_flash(:error, "Project not found") |> redirect(to: ~p"/projects")}
@@ -24,7 +30,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
             %Views.ProjectShadowNetSystemsList{
               project_id: project_id
             }
-            |> Fetcher.fetch_as(socket.assigns.current_account)
+            |> Fetcher.fetch_as(account)
           )
           |> assign(
             import_rnw_form:
@@ -41,6 +47,9 @@ defmodule RenewCollabWeb.LiveShadowNets do
         RenewCollabWeb.Endpoint.subscribe("projects/#{socket.assigns.project.id}/shadow_nets")
         {:ok, socket}
     end
+  end
+
+  def load_data(project, account) do
   end
 
   def handle_info(:any, socket) do

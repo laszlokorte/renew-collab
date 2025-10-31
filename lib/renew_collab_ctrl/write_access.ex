@@ -1,6 +1,8 @@
 defmodule RenewCollabCtrl.WriteAccess do
   alias RenewCollabCtrl.Actions
   def can(account, action)
+  def can(_account, %Actions.ProjectDuplicateAsUser{}), do: true
+  def can(_account, %Actions.ProjectDelete{}), do: true
   def can(_account, %Actions.DocumentEditLayerTextSizeHint{}), do: true
   def can(_account, %Actions.DocumentEditSetThumbnail{}), do: true
   def can(_account, %Actions.DocumentEditRemoveThumbnail{}), do: true

@@ -20,8 +20,14 @@ defmodule RenewCollabWeb.LiveShadowNet do
       sns ->
         # TODO:subscription
         RenewCollabWeb.Endpoint.subscribe("#{@topic}:#{shadow_net_system_id}")
-        RenewCollabWeb.Endpoint.subscribe("projects/#{sns.project.id}/simulations")
-        RenewCollabWeb.Endpoint.subscribe("projects/#{sns.project.id}/shadow_net_systems")
+
+        RenewCollabWeb.Endpoint.subscribe(
+          "projects/#{sns.project_assignment.project_id}/simulations"
+        )
+
+        RenewCollabWeb.Endpoint.subscribe(
+          "projects/#{sns.project_assignment.project_id}/shadow_net_systems"
+        )
 
         socket =
           socket

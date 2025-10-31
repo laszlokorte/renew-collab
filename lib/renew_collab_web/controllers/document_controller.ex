@@ -2,7 +2,6 @@ defmodule RenewCollabWeb.DocumentController do
   use RenewCollabWeb, :controller
 
   alias RenewCollab.ViewBox
-  alias RenewCollab.Renew
   alias RenewCollab.Document.Document
   alias RenewCollab.Import.DocumentImport
   alias RenewCollabCtrl.Views
