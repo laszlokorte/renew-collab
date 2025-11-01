@@ -1,9 +1,7 @@
 defmodule RenewCollabCtrl.Action do
   alias RenewCollab.Syntax
   alias RenewCollab.Sockets
-  alias RenewCollab.Connection.SocketSchema
   alias RenewCollab.Primitives
-  alias RenewCollabProj.Entities.Project
   alias RenewCollab.Import.Converted
   alias RenewCollab.Commands
   alias RenewCollabProj.Entities.ProjectDocument
@@ -905,7 +903,6 @@ defmodule RenewCollabCtrl.Action do
           end
       end)
     )
-    |> dbg
   end
 
   def do_perform(%Actions.GlobalPrimitivesDeleteDefinition{definition_id: definition_id}) do

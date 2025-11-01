@@ -4,12 +4,7 @@ defmodule RenewCollabSim.Simulator do
   """
 
   import Ecto.Query, warn: false
-  alias RenewCollabSim.Entities.ShadowNet
-  alias RenewCollabSim.Entities.SimulationLogEntry
-  alias RenewCollabSim.Entities.SimulationNetInstance
-  alias RenewCollabSim.Entities.SimulationTransitionFiring
-  alias RenewCollabSim.Entities.ShadowNetSystem
-  alias RenewCollabSim.Entities.Simulation
+
   alias RenewCollabSim.Repo
   alias RenewCollab.Simulation.SimulationLink
 

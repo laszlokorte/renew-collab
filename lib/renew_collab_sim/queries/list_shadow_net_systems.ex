@@ -9,6 +9,30 @@ defmodule RenewCollabSim.Queries.ListShadowNetSystems do
     %__MODULE__{shadow_net_system_ids: ids}
   end
 
+  def multi(%__MODULE__{shadow_net_system_ids: :all}) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.all(
+      :result,
+      from(s in ShadowNetSystem,
+        as: :ssn,
+        left_join: nets in assoc(s, :nets),
+        left_join: sims in assoc(s, :simulations),
+        order_by: [desc: s.inserted_at],
+        preload: [nets: nets],
+        select: map(s, ^ShadowNetSystem.__schema__(:fields)),
+        select_merge: %{
+          simulation_count:
+            subquery(
+              from(sims in Simulation,
+                where: sims.shadow_net_system_id == parent_as(:ssn).id,
+                select: count(sims.id)
+              )
+            )
+        }
+      )
+    )
+  end
+
   def multi(%__MODULE__{shadow_net_system_ids: ids}) do
     Ecto.Multi.new()
     |> Ecto.Multi.all(

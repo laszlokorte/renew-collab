@@ -1,7 +1,6 @@
 defmodule RenewCollabWeb.LiveProjectsManager do
   alias RenewCollabCtrl.Dispatcher
   alias RenewCollabCtrl.Actions
-  alias RenewCollabProj.Commands
   alias RenewCollabCtrl.Fetcher
   alias RenewCollabCtrl.Views
   use RenewCollabWeb, :live_view
@@ -24,7 +23,7 @@ defmodule RenewCollabWeb.LiveProjectsManager do
     %{
       projects: %Views.GlobalProjects{} |> Fetcher.fetch_as(account),
       accounts: %Views.GlobalAccounts{} |> Fetcher.fetch_as(account),
-      create_form: to_form(%{name: nil})
+      create_form: to_form(%{"name" => nil})
     }
   end
 

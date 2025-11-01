@@ -54,8 +54,6 @@ defmodule RenewCollabCtrl.WriteAccess do
 
   def can(_account, %Actions.DocumentEditDeleteLayer{}), do: true
 
-  def can(_account, %Actions.DocumentEditCreateLayer{}), do: true
-
   def can(_account, %Actions.DocumentEditCreateEdgeBond{}), do: true
 
   def can(_account, %Actions.DocumentEditUnlinkLayer{}), do: true

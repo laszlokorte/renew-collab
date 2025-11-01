@@ -1,7 +1,6 @@
 defmodule RenewCollabWeb.LiveProjects do
   alias RenewCollabCtrl.WriteAccess
   alias RenewCollabCtrl.Actions
-  alias RenewCollabCtrl.ReadAccess
   alias RenewCollabCtrl.Views
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
@@ -225,15 +224,11 @@ defmodule RenewCollabWeb.LiveProjects do
   end
 
   def handle_event("delete_project", %{"id" => id}, socket) do
-    if Projects.can_delete(socket.assigns.current_account, Projects.find_project(id)) do
-      Projects.delete_project(id)
+    Projects.delete_project(id)
 
-      socket
-      |> put_flash(:info, "Project deleted")
-      |> reload()
-    else
-      {:noreply, socket}
-    end
+    socket
+    |> put_flash(:info, "Project deleted")
+    |> reload()
   end
 
   def handle_event("duplicate_project", %{"id" => id}, socket) do

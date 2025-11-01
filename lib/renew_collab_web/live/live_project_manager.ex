@@ -1,4 +1,7 @@
 defmodule RenewCollabWeb.LiveProjectManager do
+  alias RenewCollabCtrl.WriteAccess
+  alias RenewCollabCtrl.Fetcher
+  alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Dispatcher
   alias RenewCollabCtrl.Actions
   use RenewCollabWeb, :live_view
@@ -8,19 +11,46 @@ defmodule RenewCollabWeb.LiveProjectManager do
 
   @topic "project"
 
-  def mount(%{"project_id" => id}, _session, socket) do
-    # TODO:subscription
-    RenewCollabWeb.Endpoint.subscribe(@topic)
+  def mount(%{"project_id" => project_id}, _session, socket) do
+    account = socket.assigns.current_account
 
-    socket =
-      socket
-      |> assign(:project, Projects.find_project(id))
-      |> assign(:accounts, Projects.find_accounts())
-      |> assign(:documents, Projects.find_documents())
-      |> assign(:simulations, Projects.find_simulations())
-      |> assign(:shadow_net_systems, Projects.find_shadow_net_systems())
+    %Views.GlobalProject{
+      project_id: project_id
+    }
+    |> Fetcher.fetch_as(account)
+    |> case do
+      nil ->
+        socket
+        |> put_flash(:error, "Project not found")
+        |> redirect(to: ~p"/manage/projects")
+        |> then(&{:ok, &1})
 
-    {:ok, socket}
+      project ->
+        # TODO:subscription
+        RenewCollabWeb.Endpoint.subscribe(@topic)
+
+        socket
+        |> assign(load_data(project, account))
+        |> then(&{:ok, &1})
+    end
+  end
+
+  def load_data(project, account) do
+    %{
+      project: project,
+      accounts:
+        %Views.GlobalAccounts{}
+        |> Fetcher.fetch_as(account),
+      documents:
+        %Views.GlobalDocumentsList{}
+        |> Fetcher.fetch_as(account),
+      simulations:
+        %Views.GlobalSimulationsList{}
+        |> Fetcher.fetch_as(account),
+      shadow_net_systems:
+        %Views.GlobalShadowNetSystemsList{}
+        |> Fetcher.fetch_as(account)
+    }
   end
 
   def render(assigns) do
@@ -36,7 +66,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
       </div>
 
       <div style="padding: 1em">
-        <%= if Projects.can_rename(@current_account, @project) do %>
+        <%= if WriteAccess.can(@current_account, %Actions.ProjectRename{project_id: @project.id}) do %>
           <h3>Rename Project</h3>
 
           <form method="post" phx-submit="rename" accept-charset="utf-8">
@@ -56,7 +86,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
             <%= for m <- @project.members do %>
               <%= with acc = %{} <- m.account do %>
                 <li>
-                  <%= if Projects.can_force_remove(@current_account, m) do %>
+                  <%= if WriteAccess.can(@current_account, %Actions.ProjectRemoveMemberAsUser{project_id: @project.id}) do %>
                     <button
                       type="button"
                       phx-click="remove_member"
@@ -70,7 +100,6 @@ defmodule RenewCollabWeb.LiveProjectManager do
                     [{m.role}]
                   </span>
                   <img class="icon" src="/assets/icon-user.svg" />
-                  {acc.email}
                 </li>
                 <% else nil -> %>
                   <li>
@@ -96,17 +125,13 @@ defmodule RenewCollabWeb.LiveProjectManager do
           <p>None</p>
         <% end %>
 
-        <%= if Projects.can_invite(@current_account, @project) do %>
+        <%= if WriteAccess.can(@current_account, %Actions.ProjectAddMemberAsAdmin{project_id: @project.id}) do %>
           <form method="post" phx-submit="add_member" accept-charset="utf-8">
             <select name="account_id">
               <option value="">---</option>
               <%= for a <- @accounts do %>
-                <option
-                  value={a.id}
-                  disabled={@project.members |> Enum.any?(&(&1.account_id == a.id))}
-                >
-                  {a.email}
-                </option>
+                <option value={a.id}>Enum.any?(&(&1.account_id == a.id))}
+                  > {a.email}</option>
               <% end %>
             </select>
             <select name="role">
@@ -140,8 +165,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
                     Remove
                   </button>
                   <img class="icon" src="/assets/icon-document.svg" />
-                  {doc.name}
-                  <small>({doc.id})</small>
+                  <small>({d.document_id})</small>
                 </li>
                 <% else nil -> %>
                   <li>
@@ -169,7 +193,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
           <select name="document_id">
             <option value="">---</option>
             <%= for d <- @documents do %>
-              <option value={d.id} disabled={d.project_assignment != nil}>{d.name}({d.id})</option>
+              <option value={d.id}>{d.name}({d.id})</option>
             <% end %>
           </select>
           <button
@@ -237,7 +261,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
           <select name="shadow_net_system_id">
             <option value="">---</option>
             <%= for s <- @shadow_net_systems do %>
-              <option value={s.id} disabled={s.project_assignment != nil}>{s.id}</option>
+              <option value={s.id}>{s.id}</option>
             <% end %>
           </select>
           <button
@@ -290,7 +314,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
           <select name="simulation_id">
             <option value="">---</option>
             <%= for s <- @simulations do %>
-              <option value={s.id} disabled={s.project_assignment != nil}>{s.id}</option>
+              <option value={s.id}>{s.id}</option>
             <% end %>
           </select>
           <button
@@ -300,7 +324,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
             Assign
           </button>
         </form>
-        <%= if Projects.can_delete(@current_account, @project) do %>
+        <%= if WriteAccess.can(@current_account, %Actions.ProjectDelete{project_id: @project.id}) do %>
           <h3>Delete Project</h3>
 
           <form method="post" phx-submit="delete" accept-charset="utf-8">

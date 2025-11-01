@@ -4,7 +4,6 @@ defmodule RenewCollabWeb.LiveSyntax do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
-  alias RenewCollab.Syntax
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Fetcher
 

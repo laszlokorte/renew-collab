@@ -74,6 +74,12 @@ defmodule RenewCollabCtrl.View do
     |> RenewCollabProj.ProjectFetcher.fetch()
   end
 
+  def do_fetch(_account, %Views.GlobalProject{project_id: project_id}) do
+    %{project_id: project_id}
+    |> RenewCollabProj.Queries.ProjectDetails.new()
+    |> RenewCollabProj.ProjectFetcher.fetch()
+  end
+
   def do_fetch(_account, %Views.GlobalAccounts{}) do
     RenewCollabAuth.Queries.AllAccounts.new(%{})
     |> RenewCollabAuth.AuthFetcher.fetch()
@@ -84,7 +90,8 @@ defmodule RenewCollabCtrl.View do
   end
 
   def do_fetch(_account, %Views.GlobalDocumentsList{}) do
-    {:error, :not_implemented}
+    RenewCollab.Queries.DocumentList.new(%{document_ids: :all})
+    |> RenewCollab.DocumentFetcher.fetch()
   end
 
   def do_fetch(_account, %Views.GlobalPrimitives{}) do
@@ -92,12 +99,14 @@ defmodule RenewCollabCtrl.View do
     |> then(&{:ok, &1})
   end
 
-  def do_fetch(_account, %Views.GlobalShadowNetsList{}) do
-    {:error, :not_implemented}
+  def do_fetch(_account, %Views.GlobalSimulationsList{}) do
+    RenewCollabSim.Queries.ListSimulations.new(%{simulation_ids: :all})
+    |> RenewCollabSim.SimulationFetcher.fetch()
   end
 
-  def do_fetch(_account, %Views.GlobalSimulationsList{}) do
-    {:error, :not_implemented}
+  def do_fetch(_account, %Views.GlobalShadowNetSystemsList{}) do
+    RenewCollabSim.Queries.ListShadowNetSystems.new(%{shadow_net_system_ids: :all})
+    |> RenewCollabSim.SimulationFetcher.fetch()
   end
 
   def do_fetch(_account, %Views.GlobalSocketById{}) do
@@ -170,7 +179,8 @@ defmodule RenewCollabCtrl.View do
 
         accounts_by_id = Map.new(accounts, &{&1.id, &1})
 
-        Enum.map(members, fn member ->
+        members
+        |> Enum.map(fn member ->
           case Map.fetch(accounts_by_id, member.account_id) do
             {:ok, account} ->
               %{member | account: account} |> Ecto.put_meta(state: :loaded)

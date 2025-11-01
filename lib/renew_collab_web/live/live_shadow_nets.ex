@@ -49,9 +49,6 @@ defmodule RenewCollabWeb.LiveShadowNets do
     end
   end
 
-  def load_data(project, account) do
-  end
-
   def handle_info(:any, socket) do
     {:noreply,
      socket

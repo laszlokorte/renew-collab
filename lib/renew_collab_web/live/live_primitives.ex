@@ -7,8 +7,6 @@ defmodule RenewCollabWeb.LivePrimitives do
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Fetcher
 
-  alias RenewCollab.Primitives
-
   @topic "primitives"
 
   def mount(_params, _session, socket) do

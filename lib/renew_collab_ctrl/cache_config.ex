@@ -12,7 +12,7 @@ defmodule RenewCollabCtrl.CacheConfig do
   def key_for_view(_account, %Views.GlobalDocumentCount{}), do: nil
   def key_for_view(_account, %Views.GlobalDocumentsList{}), do: nil
   def key_for_view(_account, %Views.GlobalPrimitives{}), do: nil
-  def key_for_view(_account, %Views.GlobalShadowNetsList{}), do: nil
+  def key_for_view(_account, %Views.GlobalShadowNetSystemsList{}), do: nil
   def key_for_view(_account, %Views.GlobalSimulationsList{}), do: nil
   def key_for_view(_account, %Views.GlobalSocketById{}), do: nil
   def key_for_view(_account, %Views.GlobalSocketIdsByName{}), do: nil
@@ -40,7 +40,7 @@ defmodule RenewCollabCtrl.CacheConfig do
   def tags_for_view(_account, %Views.GlobalDocumentCount{}), do: []
   def tags_for_view(_account, %Views.GlobalDocumentsList{}), do: []
   def tags_for_view(_account, %Views.GlobalPrimitives{}), do: []
-  def tags_for_view(_account, %Views.GlobalShadowNetsList{}), do: []
+  def tags_for_view(_account, %Views.GlobalShadowNetSystemsList{}), do: []
   def tags_for_view(_account, %Views.GlobalSimulationsList{}), do: []
   def tags_for_view(_account, %Views.GlobalSocketById{}), do: []
   def tags_for_view(_account, %Views.GlobalSocketIdsByName{}), do: []
@@ -68,7 +68,7 @@ defmodule RenewCollabCtrl.CacheConfig do
   def ttl_for_view(%Views.GlobalDocumentCount{}), do: :infinity
   def ttl_for_view(%Views.GlobalDocumentsList{}), do: :infinity
   def ttl_for_view(%Views.GlobalPrimitives{}), do: :infinity
-  def ttl_for_view(%Views.GlobalShadowNetsList{}), do: :infinity
+  def ttl_for_view(%Views.GlobalShadowNetSystemsList{}), do: :infinity
   def ttl_for_view(%Views.GlobalSimulationsList{}), do: :infinity
   def ttl_for_view(%Views.GlobalSocketById{}), do: :infinity
   def ttl_for_view(%Views.GlobalSocketIdsByName{}), do: :infinity
