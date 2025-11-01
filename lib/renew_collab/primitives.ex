@@ -12,7 +12,7 @@ defmodule RenewCollab.Primitives do
     |> Repo.all()
   end
 
-  def create(params) do
+  def create_group(params) do
     %PredefinedPrimitiveGroup{}
     |> PredefinedPrimitiveGroup.changeset(params)
     |> Repo.insert()

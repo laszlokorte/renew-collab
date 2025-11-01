@@ -1,4 +1,6 @@
 defmodule RenewCollabWeb.LiveSyntax do
+  alias RenewCollabCtrl.Dispatcher
+  alias RenewCollabCtrl.Actions
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
@@ -540,66 +542,124 @@ defmodule RenewCollabWeb.LiveSyntax do
     {:noreply, socket |> assign(:create_form, to_form(%{"name" => name}, as: :create_syntax))}
   end
 
-  def handle_event("save", %{"create_syntax" => params}, socket) do
-    Syntax.create(params)
+  def handle_event("save", %{"create_syntax" => attrs}, socket) do
+    %Actions.GlobalSyntaxCreate{attributes: attrs}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
     |> case do
       {:ok, _} ->
-        {:noreply, socket |> assign(:create_form, to_form(%{"name" => ""}, as: :create_syntax))}
+        {:noreply,
+         socket
+         |> put_flash(:info, "Syntax created")
+         |> assign(:create_form, to_form(%{"name" => ""}, as: :create_syntax))}
 
       _ ->
-        {:noreply, socket}
+        {:noreply,
+         socket
+         |> put_flash(:info, "Error creating syntax")}
     end
   end
 
   def handle_event("delete_syntax", %{"value" => syntax_id}, socket) do
-    Syntax.delete(syntax_id)
-    {:noreply, socket}
+    %Actions.GlobalSyntaxDelete{syntax_id: syntax_id}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Syntax deleted")}
+
+      _ ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Error deleting syntax")}
+    end
   end
 
-  def handle_event("delete_whitelist", %{"value" => syntax_id}, socket) do
-    Syntax.delete_whitelist(syntax_id)
-    {:noreply, socket}
+  def handle_event("delete_whitelist", %{"value" => whitelist_id}, socket) do
+    %Actions.GlobalSyntaxDeleteWhitelistEntry{whitelist_id: whitelist_id}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Whitelist entry removed")}
+
+      _ ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Error removing whitelist entry")}
+    end
   end
 
-  def handle_event("delete_autonode", %{"value" => syntax_id}, socket) do
-    Syntax.delete_autonode(syntax_id)
-    {:noreply, socket}
+  def handle_event("delete_autonode", %{"value" => auto_target_id}, socket) do
+    %Actions.GlobalSyntaxDeleteAutoTargetEntry{auto_target_id: auto_target_id}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Auto Node Rule removed")}
+
+      _ ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Error removing Auto Node Rule entry")}
+    end
   end
 
   def handle_event("make_default", %{"value" => syntax_id}, socket) do
-    Syntax.make_default(syntax_id)
-    {:noreply, socket}
+    %Actions.GlobalSyntaxMakeDefault{syntax_id: syntax_id}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Default syntax changed")}
+
+      _ ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Error changing default syntax")}
+    end
   end
 
   def handle_event(
         "add_whitelist",
-        params,
+        attrs,
         socket
       ) do
-    Syntax.add_whitelist(params)
+    %Actions.GlobalSyntaxAddWhitelistEntry{attributes: attrs}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Added whitelist entry")}
 
-    {:noreply, socket}
+      _ ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Error adding whitelist entry")}
+    end
   end
 
   def handle_event(
         "add_autonode",
-        params,
+        attrs,
         socket
       ) do
-    Syntax.add_autonode(
-      params
-      |> Map.update("style", nil, fn
-        "" ->
-          nil
+    %Actions.GlobalSyntaxAddAutoTargetEntry{attributes: attrs}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Added auto target entry")}
 
-        s ->
-          case Jason.decode(s) do
-            {:ok, j} -> j
-            _ -> s
-          end
-      end)
-    )
-
-    {:noreply, socket}
+      _ ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Error adding auto target entry")}
+    end
   end
 end

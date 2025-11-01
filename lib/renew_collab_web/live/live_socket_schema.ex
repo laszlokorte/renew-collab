@@ -1,4 +1,6 @@
 defmodule RenewCollabWeb.LiveSocketSchema do
+  alias RenewCollabCtrl.Dispatcher
+  alias RenewCollabCtrl.Actions
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
   alias RenewCollabCtrl.Views
@@ -310,7 +312,9 @@ defmodule RenewCollabWeb.LiveSocketSchema do
               </tbody>
               <tfoot>
                 <tr>
-                  <td><input form="create_form" type="text" name="name" value={@preview.name} /></td>
+                  <td>
+                    <input required form="create_form" type="text" name="name" value={@preview.name} />
+                  </td>
 
                   <td>
                     <input
@@ -435,16 +439,31 @@ defmodule RenewCollabWeb.LiveSocketSchema do
     """
   end
 
-  def handle_event("change_stencil", params, socket) do
-    RenewCollab.Sockets.change_schema(socket.assigns.socket_schema_id, params)
+  def handle_event("change_stencil", attrs, socket) do
+    %Actions.GlobalSocketSchemaUpdate{
+      socket_schema_id: socket.assigns.socket_schema_id,
+      attributes: attrs
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        {:noreply, load_data(socket) |> put_flash(:info, "Socket Schema updated")}
 
-    {:noreply, load_data(socket)}
+      _ ->
+        {:noreply, socket |> put_flash(:error, "Error changing Socket Schema")}
+    end
   end
 
   def handle_event("delete_socket", %{"value" => id}, socket) do
-    RenewCollab.Sockets.delete_socket(id)
+    %Actions.GlobalSocketSchemaDeleteSocket{socket_schema_socket_id: id}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        {:noreply, load_data(socket) |> put_flash(:info, "Socket deleted")}
 
-    {:noreply, load_data(socket)}
+      _ ->
+        {:noreply, socket |> put_flash(:error, "Error deleting Socket")}
+    end
   end
 
   def handle_event("copy_socket", %{"value" => id}, socket) do
@@ -465,12 +484,21 @@ defmodule RenewCollabWeb.LiveSocketSchema do
      )}
   end
 
-  def handle_event("create_socket", params, socket) do
-    RenewCollab.Sockets.create_socket(params)
+  def handle_event("create_socket", attrs, socket) do
+    RenewCollab.Sockets.create_socket(attrs)
 
-    {:noreply,
-     load_data(socket)
-     |> assign(:preview, %RenewCollab.Connection.Socket{})}
+    %Actions.GlobalSocketSchemaCreateSocket{attributes: attrs}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        {:noreply,
+         load_data(socket)
+         |> assign(:preview, %RenewCollab.Connection.Socket{})
+         |> put_flash(:info, "Socket created")}
+
+      _ ->
+        {:noreply, socket |> put_flash(:error, "Error creating Socket")}
+    end
   end
 
   def handle_event("preview_socket", params, socket) do

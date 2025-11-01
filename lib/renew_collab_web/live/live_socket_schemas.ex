@@ -1,4 +1,6 @@
 defmodule RenewCollabWeb.LiveSocketSchemas do
+  alias RenewCollabCtrl.Dispatcher
+  alias RenewCollabCtrl.Actions
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
   alias RenewCollabCtrl.Views
@@ -196,15 +198,27 @@ defmodule RenewCollabWeb.LiveSocketSchemas do
     """
   end
 
-  def handle_event("create", params, socket) do
-    RenewCollab.Sockets.create_socket_schema(params)
+  def handle_event("create", attributes, socket) do
+    %Actions.GlobalSocketSchemaCreate{attributes: attributes}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        {:noreply, load_data(socket) |> put_flash(:info, "Socket Schema created")}
 
-    {:noreply, load_data(socket)}
+      _ ->
+        {:noreply, socket |> put_flash(:error, "Error creating Socket Schema")}
+    end
   end
 
   def handle_event("delete", %{"value" => id}, socket) do
-    RenewCollab.Sockets.delete_socket_schema(id)
+    %Actions.GlobalSocketSchemaDelete{socket_schema_id: id}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        {:noreply, load_data(socket) |> put_flash(:info, "Socket Schema deleted")}
 
-    {:noreply, load_data(socket)}
+      _ ->
+        {:noreply, socket |> put_flash(:error, "Error deleting Socket Schema")}
+    end
   end
 end

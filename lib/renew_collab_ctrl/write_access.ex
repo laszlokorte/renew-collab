@@ -42,8 +42,6 @@ defmodule RenewCollabCtrl.WriteAccess do
 
   def can(_account, %Actions.DocumentEditCreateEdgeWaypoint{}), do: true
 
-  def can(_account, %Actions.DocumentEditCreateEdgeWaypoint{}), do: true
-
   def can(_account, %Actions.DocumentEditEdgeRemoveAllWaypoints{}), do: true
 
   def can(_account, %Actions.DocumentEditLayerSemanticTag{}), do: true
@@ -83,5 +81,25 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(_account, %Actions.DocumentEditInsertDocument{}), do: true
 
   def can(_account, %Actions.DocumentEditReorderLayerRelative{}), do: true
+
+  def can(_account, %Actions.GlobalPrimitivesCreateGroup{}), do: true
+  def can(_account, %Actions.GlobalPrimitivesDeleteGroup{}), do: true
+  def can(_account, %Actions.GlobalPrimitivesDeleteDefinition{}), do: true
+  def can(_account, %Actions.GlobalPrimitivesCreateDefinition{}), do: true
+
+  def can(_account, %Actions.GlobalSocketSchemaDeleteSocket{}), do: true
+  def can(_account, %Actions.GlobalSocketSchemaCreateSocket{}), do: true
+  def can(_account, %Actions.GlobalSocketSchemaCreate{}), do: true
+  def can(_account, %Actions.GlobalSocketSchemaDelete{}), do: true
+  def can(_account, %Actions.GlobalSocketSchemaUpdate{}), do: true
+
+  def can(_account, %Actions.GlobalSyntaxCreate{}), do: true
+  def can(_account, %Actions.GlobalSyntaxDelete{}), do: true
+  def can(_account, %Actions.GlobalSyntaxDeleteWhitelistEntry{}), do: true
+  def can(_account, %Actions.GlobalSyntaxDeleteAutoTargetEntry{}), do: true
+  def can(_account, %Actions.GlobalSyntaxMakeDefault{}), do: true
+  def can(_account, %Actions.GlobalSyntaxAddWhitelistEntry{}), do: true
+  def can(_account, %Actions.GlobalSyntaxAddAutoTargetEntry{}), do: true
+
   def can(_account, _action), do: false
 end

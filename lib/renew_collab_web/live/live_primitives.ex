@@ -1,4 +1,6 @@
 defmodule RenewCollabWeb.LivePrimitives do
+  alias RenewCollabCtrl.Dispatcher
+  alias RenewCollabCtrl.Actions
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
@@ -217,42 +219,51 @@ defmodule RenewCollabWeb.LivePrimitives do
     {:noreply, socket |> assign(:create_form, to_form(%{"name" => name}, as: :create_group))}
   end
 
-  def handle_event("save", %{"create_group" => params}, socket) do
-    Primitives.create(params)
+  def handle_event("save", %{"create_group" => attributes}, socket) do
+    %Actions.GlobalPrimitivesCreateGroup{attributes: attributes}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    # Primitives.create(params)
     |> case do
       {:ok, _} ->
-        {:noreply, socket |> assign(:create_form, to_form(%{"name" => ""}, as: :create_group))}
+        {:noreply,
+         socket
+         |> put_flash(:info, "Group created")}
 
       _ ->
-        {:noreply, socket}
+        {:noreply,
+         socket
+         |> put_flash(:error, "Could not create group")}
     end
   end
 
-  def handle_event("delete_group", %{"value" => syntax_id}, socket) do
-    Primitives.delete_group(syntax_id)
-    {:noreply, socket}
+  def handle_event("delete_group", %{"value" => group_id}, socket) do
+    %Actions.GlobalPrimitivesDeleteGroup{group_id: group_id}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+
+    {:noreply, socket |> put_flash(:info, "Group deleted")}
   end
 
-  def handle_event("delete_primitive", %{"value" => syntax_id}, socket) do
-    Primitives.delete_primitive(syntax_id)
-    {:noreply, socket}
+  def handle_event("delete_primitive", %{"value" => definition_id}, socket) do
+    %Actions.GlobalPrimitivesDeleteDefinition{definition_id: definition_id}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+
+    {:noreply, socket |> put_flash(:info, "Definition deleted")}
   end
 
-  def handle_event("add_primitive", params, socket) do
-    Primitives.create_primitive(
-      params
-      |> Map.update("data", nil, fn
-        "" ->
-          nil
+  def handle_event("add_primitive", attributes, socket) do
+    %Actions.GlobalPrimitivesCreateDefinition{attributes: attributes}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Definition created")
+         |> assign(:create_form, to_form(%{"name" => ""}, as: :create_group))}
 
-        s ->
-          case Jason.decode(s) do
-            {:ok, j} -> j
-            _ -> s
-          end
-      end)
-    )
-
-    {:noreply, socket}
+      _ ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "Could not create definition")}
+    end
   end
 end

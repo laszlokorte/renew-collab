@@ -1,4 +1,8 @@
 defmodule RenewCollabCtrl.Action do
+  alias RenewCollab.Syntax
+  alias RenewCollab.Sockets
+  alias RenewCollab.Connection.SocketSchema
+  alias RenewCollab.Primitives
   alias RenewCollabProj.Entities.Project
   alias RenewCollab.Import.Converted
   alias RenewCollab.Commands
@@ -877,5 +881,85 @@ defmodule RenewCollabCtrl.Action do
 
   def do_perform(%Actions.SystemReinstall{}) do
     :ok
+  end
+
+  def do_perform(%Actions.GlobalPrimitivesCreateGroup{attributes: attrs}) do
+    Primitives.create_group(attrs)
+  end
+
+  def do_perform(%Actions.GlobalPrimitivesDeleteGroup{group_id: group_id}) do
+    Primitives.delete_group(group_id)
+  end
+
+  def do_perform(%Actions.GlobalPrimitivesCreateDefinition{attributes: attrs}) do
+    Primitives.create_primitive(
+      attrs
+      |> Map.update("data", nil, fn
+        "" ->
+          nil
+
+        s ->
+          case Jason.decode(s) do
+            {:ok, j} -> j
+            _ -> s
+          end
+      end)
+    )
+    |> dbg
+  end
+
+  def do_perform(%Actions.GlobalPrimitivesDeleteDefinition{definition_id: definition_id}) do
+    Primitives.delete_primitive(definition_id)
+  end
+
+  def do_perform(%Actions.GlobalSocketSchemaDeleteSocket{socket_schema_socket_id: socket_id}) do
+    Sockets.delete_socket(socket_id)
+  end
+
+  def do_perform(%Actions.GlobalSocketSchemaCreateSocket{attributes: attrs}) do
+    Sockets.create_socket(attrs)
+  end
+
+  def do_perform(%Actions.GlobalSocketSchemaCreate{attributes: attrs}) do
+    Sockets.create_socket_schema(attrs)
+  end
+
+  def do_perform(%Actions.GlobalSocketSchemaDelete{socket_schema_id: socket_schema_id}) do
+    Sockets.delete_socket_schema(socket_schema_id)
+  end
+
+  def do_perform(%Actions.GlobalSocketSchemaUpdate{
+        socket_schema_id: socket_schema_id,
+        attributes: attrs
+      }) do
+    Sockets.change_schema(socket_schema_id, attrs)
+  end
+
+  def do_perform(%Actions.GlobalSyntaxCreate{attributes: attrs}) do
+    Syntax.create(attrs)
+  end
+
+  def do_perform(%Actions.GlobalSyntaxDelete{syntax_id: syntax_id}) do
+    Syntax.delete(syntax_id)
+  end
+
+  def do_perform(%Actions.GlobalSyntaxDeleteWhitelistEntry{whitelist_id: whitelist_list_id}) do
+    Syntax.delete_whitelist(whitelist_list_id)
+  end
+
+  def do_perform(%Actions.GlobalSyntaxDeleteAutoTargetEntry{auto_target_id: auto_target_id}) do
+    Syntax.delete_autonode(auto_target_id)
+  end
+
+  def do_perform(%Actions.GlobalSyntaxMakeDefault{syntax_id: syntax_id}) do
+    Syntax.make_default(syntax_id)
+  end
+
+  def do_perform(%Actions.GlobalSyntaxAddWhitelistEntry{attributes: attrs}) do
+    Syntax.add_whitelist(attrs)
+  end
+
+  def do_perform(%Actions.GlobalSyntaxAddAutoTargetEntry{attributes: attrs}) do
+    Syntax.add_autonode(attrs)
   end
 end
