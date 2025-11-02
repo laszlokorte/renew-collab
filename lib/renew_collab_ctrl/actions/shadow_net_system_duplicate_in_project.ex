@@ -1,3 +1,3 @@
 defmodule RenewCollabCtrl.Actions.ShadowNetSystemDuplicateInProject do
-  defstruct [:ssn_id]
+  defstruct [:sns_id]
 end

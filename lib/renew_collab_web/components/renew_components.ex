@@ -33,7 +33,7 @@ defmodule RenewCollabWeb.RenewComponents do
     assigns = assigns |> assign(:editor_url, editor_url())
 
     ~H"""
-    <div style="display: grid; grid-template: [stack-start] 1fr [stack-end] / [stack-start] 1fr [stack-end];">
+    <div style="position: fixed; top: 0; left: 0; right: 0; height: 3em; display: grid; grid-template: [stack-start] 1fr [stack-end] / [stack-start] 1fr [stack-end];">
       <div style="grid-area: stack;z-index: 10;pointer-events: none; align-self: center; justify-self: center;">
         <.flash_group flash={@flash || nil} />
       </div>
@@ -94,6 +94,7 @@ defmodule RenewCollabWeb.RenewComponents do
         </div>
       </header>
     </div>
+    <hr style="margin: 0 0 3em 0; height: 0; border: none;" />
     """
   end
 

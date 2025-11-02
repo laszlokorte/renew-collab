@@ -13,10 +13,10 @@ defmodule RenewCollabSim.Queries.ListSimulations do
     |> Ecto.Multi.all(
       :result,
       from(s in Simulation,
-        inner_join: ssn in assoc(s, :shadow_net_system),
+        inner_join: sns in assoc(s, :shadow_net_system),
         order_by: [desc: s.inserted_at],
         preload: [
-          shadow_net_system: ssn
+          shadow_net_system: sns
         ]
       )
     )
@@ -28,10 +28,10 @@ defmodule RenewCollabSim.Queries.ListSimulations do
       :result,
       from(s in Simulation,
         where: s.id in ^ids,
-        inner_join: ssn in assoc(s, :shadow_net_system),
+        inner_join: sns in assoc(s, :shadow_net_system),
         order_by: [desc: s.inserted_at],
         preload: [
-          shadow_net_system: ssn
+          shadow_net_system: sns
         ]
       )
     )

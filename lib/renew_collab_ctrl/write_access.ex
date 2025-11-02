@@ -105,5 +105,20 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(_account, %Actions.ProjectCreateAsAdmin{}), do: true
   def can(_account, %Actions.ProjectRename{}), do: true
 
+  def can(_account, %Actions.ProjectRemoveMemberAsAdmin{}), do: true
+  def can(_account, %Actions.ProjectAddMemberAsAdmin{}), do: true
+  def can(_account, %Actions.ProjectDelete{}), do: true
+  def can(_account, %Actions.ProjectAddMemberAsAdmin{}), do: true
+  def can(_account, %Actions.ProjectRemoveMemberAsAdmin{}), do: true
+  def can(_account, %Actions.ProjectAddDocumentAsAdmin{}), do: true
+  def can(_account, %Actions.DocumentDuplicateInProject{}), do: true
+  def can(_account, %Actions.ProjectRemoveDocumentAsAdmin{}), do: true
+  def can(_account, %Actions.ProjectAddSimulationAsAdmin{}), do: true
+  def can(_account, %Actions.ProjectRemoveSimulationAsAdmin{}), do: true
+  def can(_account, %Actions.ProjectAddShadowNetSystemAsAdmin{}), do: true
+  def can(_account, %Actions.ProjectRemoveShadowNetSystemAsAdmin{}), do: true
+  def can(_account, %Actions.ProjectRename{}), do: true
+  def can(_account, %Actions.ProjectDelete{}), do: true
+
   def can(_account, _action), do: false
 end

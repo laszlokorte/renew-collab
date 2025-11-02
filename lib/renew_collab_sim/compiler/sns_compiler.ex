@@ -2,13 +2,13 @@ defmodule RenewCollabSim.Compiler.SnsCompiler do
   def compile(formalism, nets) do
     {:ok, compiler} = compiler_name(formalism)
 
-    uuid_dir = "petristation/renew-ssn-compilation-#{UUID.uuid4(:default)}"
+    uuid_dir = "petristation/renew-sns-compilation-#{UUID.uuid4(:default)}"
     {:ok, output_root} = Path.safe_relative_to(uuid_dir, System.tmp_dir!())
     output_root = Path.absname(output_root, System.tmp_dir!())
 
     {:ok, output_root_upload} = Path.safe_relative_to("uploads", output_root)
 
-    {:ok, output_path} = Path.safe_relative_to("compiled.ssn", output_root)
+    {:ok, output_path} = Path.safe_relative_to("compiled.sns", output_root)
     {:ok, script_path} = Path.safe_relative_to("compile-script", output_root)
 
     output_root_upload = Path.absname(output_root_upload, output_root)
@@ -31,7 +31,7 @@ defmodule RenewCollabSim.Compiler.SnsCompiler do
         conf = Application.fetch_env!(:renew_collab, RenewCollabSim.Commands)
         renewSetFormalism = Keyword.get(conf, :set_formalism)
         renewExport = Keyword.get(conf, :export)
-        renewShadowNetSystem = Keyword.get(conf, :ssn)
+        renewShadowNetSystem = Keyword.get(conf, :sns)
 
         script_content =
           [

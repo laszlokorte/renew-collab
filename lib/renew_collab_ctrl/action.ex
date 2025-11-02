@@ -779,7 +779,7 @@ defmodule RenewCollabCtrl.Action do
     {:error, :not_implemented}
   end
 
-  def do_perform(%Actions.ProjectAddSsnAsAdmin{}) do
+  def do_perform(%Actions.ProjectAddShadowNetSystemAsAdmin{}) do
     {:error, :not_implemented}
   end
 
@@ -903,7 +903,11 @@ defmodule RenewCollabCtrl.Action do
     {:error, :not_implemented}
   end
 
-  def do_perform(%Actions.ProjectRemoveSsnAsAdmin{}) do
+  def do_perform(%Actions.ProjectRemoveShadowNetSystemAsAdmin{}) do
+    {:error, :not_implemented}
+  end
+
+  def do_perform(%Actions.ProjectRemoveMemberAsAdmin{}) do
     {:error, :not_implemented}
   end
 

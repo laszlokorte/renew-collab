@@ -183,7 +183,7 @@ if config_env() == :prod do
     sim_step: System.get_env("SIM_RENEW_CMD_STEP") || "step",
     set_formalism: System.get_env("SIM_RENEW_CMD_SETFORMALISM") || "setFormalism",
     export: System.get_env("SIM_RENEW_CMD_EXPORT") || "ex",
-    ssn: System.get_env("SIM_RENEW_CMD_SSN") || "ShadowNetSystem"
+    sns: System.get_env("SIM_RENEW_CMD_SNS") || "ShadowNetSystem"
 
   config :renew_collab, RenewCollab.TextMeasure.MeasureServer,
     script: System.get_env("RENEW_TEXT_MEASURE") || raise("RENEW_TEXT_MEASURE is missing")

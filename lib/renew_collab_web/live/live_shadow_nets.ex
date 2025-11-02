@@ -415,7 +415,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
         {:ok, {Path.basename(filename), file_content}}
       end)
 
-    RenewCollabSim.Simulator.compile_rnws_to_ssn(
+    RenewCollabSim.Simulator.compile_rnws_to_sns(
       socket.assigns.project,
       formalism,
       paths,

@@ -106,7 +106,7 @@ config :renew_collab, RenewCollabSim.Commands,
   sim_step: "step",
   set_formalism: "setFormalism",
   export: "ex",
-  ssn: "ShadowNetSystem"
+  sns: "ShadowNetSystem"
 
 # Enable dev routes for dashboard and mailbox
 config :renew_collab, dev_routes: true

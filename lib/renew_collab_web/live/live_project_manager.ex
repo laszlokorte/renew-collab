@@ -70,20 +70,22 @@ defmodule RenewCollabWeb.LiveProjectManager do
 
       <div style="padding: 1em">
         <%= if WriteAccess.can(@current_account, %Actions.ProjectRename{project_id: @project.id}) do %>
-          <h3>Rename Project</h3>
+          <div style="border: 2px dashed #aaa; margin: 1em 0">
+            <h3>Rename Project</h3>
 
-          <form method="post" phx-submit="rename" accept-charset="utf-8">
-            <input type="text" name="name" value={@project.name} />
-            <button
-              type="submit"
-              style="cursor: pointer; padding: 1ex; border: none; background: #3aa; color: #fff"
-            >
-              Rename
-            </button>
-          </form>
+            <form method="post" phx-submit="rename" accept-charset="utf-8">
+              <input type="text" name="name" value={@project.name} />
+              <button
+                type="submit"
+                style="cursor: pointer; padding: 1ex; border: none; background: #3aa; color: #fff"
+              >
+                Rename
+              </button>
+            </form>
+          </div>
         <% end %>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(40em, 1fr)); gap: 2em;">
-          <div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(40em, 1fr)); gap: 1em;">
+          <div style="border: 2px dashed #aaa">
             <h3>Members</h3>
             <%= if  not Enum.empty?(@project.members) do %>
               <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px">
@@ -94,29 +96,27 @@ defmodule RenewCollabWeb.LiveProjectManager do
                         type="button"
                         phx-click="remove_member"
                         style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
-                        phx-value-id={m.id}
+                        phx-value-id={m.account_id}
                       >
                         Remove
                       </button>
                     <% end %>
+                    <img class="icon" src="/assets/icon-user.svg" style="vertical-align: middle" />
                     <%= case  m.account do %>
                       <% %{id: account_id, email: account_email} -> %>
                         <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
                           [{m.role}] {account_email}
                         </span>
-                        <img class="icon" src="/assets/icon-user.svg" />
                       <% %Ecto.Association.NotLoaded{} -> %>
                         <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
                           [{m.role}]
                         </span>
-                        <img class="icon" src="/assets/icon-user.svg" />
                         <em>Account not loaded</em>
                         (ID: <code>{m.account_id}</code>)
                       <% nil -> %>
                         <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
                           [{m.role}]
                         </span>
-                        <img class="icon" src="/assets/icon-user.svg" />
                         <em>Account deleted</em>
                         (ID: <code>{m.account_id}</code>)
                     <% end %>
@@ -156,7 +156,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
               </form>
             <% end %>
           </div>
-          <div>
+          <div style="border: 2px dashed #aaa">
             <h3>Documents</h3>
             <%= if  not Enum.empty?(@project.documents) do %>
               <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px">
@@ -166,7 +166,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
                       type="button"
                       style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
                       phx-click="remove_document"
-                      phx-value-id={d.id}
+                      phx-value-id={d.document_id}
                     >
                       Remove
                     </button>
@@ -228,7 +228,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
               </button>
             </form>
           </div>
-          <div>
+          <div style="border: 2px dashed #aaa">
             <h3>Shadow Net Systems</h3>
             <%= if  not Enum.empty?(@project.shadow_net_systems) do %>
               <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px">
@@ -237,21 +237,20 @@ defmodule RenewCollabWeb.LiveProjectManager do
                     <button
                       type="button"
                       style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
-                      phx-click="remove_ssn"
-                      phx-value-id={s.id}
+                      phx-click="remove_sns"
+                      phx-value-id={s.shadow_net_system_id}
                     >
                       Remove
                     </button>
+                    <img class="icon" src="/assets/icon-network.svg" style="vertical-align: middle" />
                     <%= case s.shadow_net_system do %>
-                      <% %{id: ssn_id} -> %>
-                        <img class="icon" src="/assets/icon-network.svg" />
-                        <small>({ssn_id})</small>
+                      <% %{id: sns_id} -> %>
+                        <small>({sns_id})</small>
                       <% %Ecto.Association.NotLoaded{} -> %>
-                        <img class="icon" src="/assets/icon-network.svg" />
-                        <em>SSN not loaded</em> (ID: <code>{s.shadow_net_system_id}</code>)
+                        <em>Shadow Net System not loaded</em>
+                        (ID: <code>{s.shadow_net_system_id}</code>)
                       <% nil -> %>
-                        <img class="icon" src="/assets/icon-network.svg" />
-                        <em>SSN deleted</em> (ID: <code>{s.shadow_net_system_id}</code>)
+                        <em>Shadow Net System deleted</em> (ID: <code>{s.shadow_net_system_id}</code>)
                     <% end %>
                   </li>
                 <% end %>
@@ -260,7 +259,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
               <p>None</p>
             <% end %>
 
-            <form method="post" phx-submit="add_ssn" accept-charset="utf-8">
+            <form method="post" phx-submit="add_sns" accept-charset="utf-8">
               <select name="shadow_net_system_id">
                 <option value="">---</option>
                 <%= for s <- @shadow_net_systems do %>
@@ -280,7 +279,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
               </button>
             </form>
           </div>
-          <div>
+          <div style="border: 2px dashed #aaa">
             <h3>Simulations</h3>
             <%= if  not Enum.empty?(@project.simulations) do %>
               <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px">
@@ -290,19 +289,22 @@ defmodule RenewCollabWeb.LiveProjectManager do
                       type="button"
                       style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
                       phx-click="remove_simulation"
-                      phx-value-id={s.id}
+                      phx-value-id={s.simulation_id}
                     >
                       Remove
                     </button>
+
+                    <img
+                      class="icon"
+                      src="/assets/icon-simulation.svg"
+                      style="vertical-align: middle"
+                    />
                     <%= case s.simulation do %>
                       <% %{id: sim_id, label: sim_label} -> %>
-                        <img class="icon" src="/assets/icon-simulation.svg" />
                         {sim_label || "Untitled"} <small>({sim_id})</small>
                       <% %Ecto.Association.NotLoaded{} -> %>
-                        <img class="icon" src="/assets/icon-simulation.svg" />
                         <em>Simulation not loaded</em> (ID: <code>{s.simulation_id}</code>)
                       <% nil -> %>
-                        <img class="icon" src="/assets/icon-simulation.svg" />
                         <em>Simulation deleted</em> (ID: <code>{s.simulation_id}</code>)
                     <% end %>
                   </li>
@@ -359,23 +361,54 @@ defmodule RenewCollabWeb.LiveProjectManager do
     {:noreply, socket}
   end
 
-  def handle_event("add_member", params, socket) do
-    Projects.add_member(socket.assigns.project, params)
-    socket |> put_flash(:info, "Project member added") |> reload
+  def handle_event("add_member", %{"account_id" => account_id, "role" => role}, socket) do
+    %Actions.ProjectAddMemberAsAdmin{
+      project_id: socket.assigns.project.id,
+      account_id: account_id,
+      role: role
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        socket |> put_flash(:info, "Project member added") |> reload
+
+      _ ->
+        socket |> put_flash(:error, "Adding project member failed") |> reload
+    end
   end
 
-  def handle_event("remove_member", %{"id" => member_id}, socket) do
-    Projects.force_remove_member(socket.assigns.project, member_id)
-    socket |> put_flash(:info, "Project member removed") |> reload
+  def handle_event("remove_member", %{"id" => account_id}, socket) do
+    %Actions.ProjectRemoveMemberAsAdmin{
+      project_id: socket.assigns.project.id,
+      member_account_id: account_id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        socket |> put_flash(:info, "Member removed from project") |> reload
+
+      _ ->
+        socket |> put_flash(:error, "Removing member failed") |> reload
+    end
   end
 
   def handle_event("add_document", %{"document_id" => ""}, socket) do
     {:noreply, socket}
   end
 
-  def handle_event("add_document", params, socket) do
-    Projects.add_document(socket.assigns.project, params)
-    socket |> put_flash(:info, "Document added") |> reload
+  def handle_event("add_document", %{"document_id" => document_id}, socket) do
+    %Actions.ProjectAddDocumentAsAdmin{
+      project_id: socket.assigns.project.id,
+      document_id: document_id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        socket |> put_flash(:info, "Document assigned to project") |> reload
+
+      _ ->
+        socket |> put_flash(:error, "Assigning document failed") |> reload
+    end
   end
 
   def handle_event("dup_document", %{"document_id" => ""}, socket) do
@@ -392,33 +425,83 @@ defmodule RenewCollabWeb.LiveProjectManager do
     socket |> put_flash(:info, "Document duplicated") |> reload
   end
 
-  def handle_event("remove_document", %{"id" => proj_document_id}, socket) do
-    Projects.remove_document(socket.assigns.project, proj_document_id)
-    socket |> put_flash(:info, "Document removed") |> reload
+  def handle_event("remove_document", %{"id" => document_id}, socket) do
+    %Actions.ProjectRemoveDocumentAsAdmin{
+      project_id: socket.assigns.project.id,
+      document_id: document_id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        socket |> put_flash(:info, "Document removed from project") |> reload
+
+      _ ->
+        socket |> put_flash(:error, "Removing document failed") |> reload
+    end
   end
 
   def handle_event("add_simulation", %{"simulation_id" => ""}, socket) do
     {:noreply, socket}
   end
 
-  def handle_event("add_simulation", params, socket) do
-    Projects.add_simulation(socket.assigns.project, params)
-    socket |> put_flash(:info, "Simulation added") |> reload
+  def handle_event("add_simulation", %{"simulation_id" => simulation_id}, socket) do
+    %Actions.ProjectAddSimulationAsAdmin{
+      project_id: socket.assigns.project.id,
+      simulation_id: simulation_id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        socket |> put_flash(:info, "Simlation assigned to project") |> reload
+
+      _ ->
+        socket |> put_flash(:error, "Assigning simulation failed") |> reload
+    end
   end
 
-  def handle_event("remove_simulation", %{"id" => proj_simulation_id}, socket) do
-    Projects.remove_simulation(socket.assigns.project, proj_simulation_id)
-    socket |> put_flash(:info, "Simulation removed") |> reload
+  def handle_event("remove_simulation", %{"id" => simulation_id}, socket) do
+    %Actions.ProjectRemoveSimulationAsAdmin{
+      project_id: socket.assigns.project.id,
+      simulation_id: simulation_id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        socket |> put_flash(:info, "Simulation removed from project") |> reload
+
+      _ ->
+        socket |> put_flash(:error, "Removing Simulation failed") |> reload
+    end
   end
 
-  def handle_event("add_ssn", params, socket) do
-    Projects.add_shadow_net_system(socket.assigns.project, params)
-    socket |> put_flash(:info, "Shadow net system added") |> reload
+  def handle_event("add_sns", %{"shadow_net_system_id" => sns_id}, socket) do
+    %Actions.ProjectAddShadowNetSystemAsAdmin{
+      project_id: socket.assigns.project.id,
+      sns_id: sns_id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        socket |> put_flash(:info, "Shadow Net System assigned to project") |> reload
+
+      _ ->
+        socket |> put_flash(:error, "Assigning Shadow Net System failed") |> reload
+    end
   end
 
-  def handle_event("remove_ssn", %{"id" => proj_ssn_id}, socket) do
-    Projects.remove_shadow_net_system(socket.assigns.project, proj_ssn_id)
-    socket |> put_flash(:info, "Shadow net system removed") |> reload
+  def handle_event("remove_sns", %{"id" => sns_id}, socket) do
+    %Actions.ProjectRemoveShadowNetSystemAsAdmin{
+      project_id: socket.assigns.project.id,
+      sns_id: sns_id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        socket |> put_flash(:info, "Shadow Net System removed from project") |> reload
+
+      _ ->
+        socket |> put_flash(:error, "Removing Shadow Net System failed") |> reload
+    end
   end
 
   def handle_event("rename", %{"name" => name}, socket) do

@@ -1,3 +1,3 @@
 defmodule RenewCollabCtrl.Actions.ShadowNetSystemDeleteAsUser do
-  defstruct [:ssn_id]
+  defstruct [:sns_id]
 end

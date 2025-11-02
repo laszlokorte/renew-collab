@@ -16,14 +16,14 @@ defmodule RenewCollabProj.Queries.ProjectDetails do
         p in Project,
         left_join: m in assoc(p, :members),
         left_join: d in assoc(p, :documents),
-        left_join: ssn in assoc(p, :shadow_net_systems),
+        left_join: sns in assoc(p, :shadow_net_systems),
         left_join: s in assoc(p, :simulations),
         where: p.id == ^project_id,
         order_by: [asc: m.inserted_at, asc: d.inserted_at, asc: s.inserted_at],
         preload: [
           members: m,
           documents: d,
-          shadow_net_systems: ssn,
+          shadow_net_systems: sns,
           simulations: s
         ]
       )

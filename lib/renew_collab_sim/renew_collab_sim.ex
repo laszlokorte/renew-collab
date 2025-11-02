@@ -19,7 +19,7 @@ defmodule RenewCollabSim.Simulator do
   # def list_shadow_net_systems(project) do
   #   Repo.all(
   #     from(s in ShadowNetSystem,
-  #       as: :ssn,
+  #       as: :sns,
   #       left_join: nets in assoc(s, :nets),
   #       left_join: sims in assoc(s, :simulations),
   #       where: s.id in ^Enum.map(project.shadow_net_systems, & &1.shadow_net_system_id),
@@ -30,7 +30,7 @@ defmodule RenewCollabSim.Simulator do
   #         simulation_count:
   #           subquery(
   #             from(sims in Simulation,
-  #               where: sims.shadow_net_system_id == parent_as(:ssn).id,
+  #               where: sims.shadow_net_system_id == parent_as(:sns).id,
   #               select: count(sims.id)
   #             )
   #           )
@@ -43,10 +43,10 @@ defmodule RenewCollabSim.Simulator do
   #   Repo.all(
   #     from(s in Simulation,
   #       where: s.id in ^Enum.map(project.simulations, & &1.simulation_id),
-  #       inner_join: ssn in assoc(s, :shadow_net_system),
+  #       inner_join: sns in assoc(s, :shadow_net_system),
   #       order_by: [desc: s.inserted_at],
   #       preload: [
-  #         shadow_net_system: ssn
+  #         shadow_net_system: sns
   #       ]
   #     )
   #   )
@@ -355,7 +355,7 @@ defmodule RenewCollabSim.Simulator do
   #   end
   # end
 
-  def compile_rnws_to_ssn(formalism, paths, main_net_name) do
+  def compile_rnws_to_sns(formalism, paths, main_net_name) do
     with {:ok, content} <- RenewCollabSim.Compiler.SnsCompiler.compile(formalism, paths) do
       RenewCollabSim.Commands.CreateShadowNetSystem.new(%{
         label: nil,
@@ -366,7 +366,7 @@ defmodule RenewCollabSim.Simulator do
     end
   end
 
-  # def compile_rnws_to_ssn(project, formalism, paths, main_net_name) do
+  # def compile_rnws_to_sns(project, formalism, paths, main_net_name) do
   #   with {:ok, content} <- RenewCollabSim.Compiler.SnsCompiler.compile(formalism, paths) do
   #     create_shadow_net(
   #       project,
@@ -377,7 +377,7 @@ defmodule RenewCollabSim.Simulator do
   #   end
   # end
 
-  def compile_documents_to_ssn(formalism, documents, main_net_name) do
+  def compile_documents_to_sns(formalism, documents, main_net_name) do
     nets =
       try do
         documents
@@ -395,7 +395,7 @@ defmodule RenewCollabSim.Simulator do
 
     with [{default_main_name, _, _, _} | _] <- nets,
          main_name <- main_net_name || default_main_name do
-      compile_rnws_to_ssn(
+      compile_rnws_to_sns(
         formalism,
         nets
         |> Enum.map(fn {name, rnw, _, _} -> {name, rnw} end),

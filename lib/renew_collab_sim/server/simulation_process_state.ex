@@ -86,7 +86,7 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
     {:ok, output_root} = Path.safe_relative_to(uuid_dir, System.tmp_dir!())
     output_root = Path.absname(output_root, System.tmp_dir!())
 
-    {:ok, sns_path} = Path.safe_relative_to("compiled-shadow-net.ssn", output_root)
+    {:ok, sns_path} = Path.safe_relative_to("compiled-shadow-net.sns", output_root)
     {:ok, script_path} = Path.safe_relative_to("simulation-script", output_root)
 
     sns_path = Path.absname(sns_path, output_root)

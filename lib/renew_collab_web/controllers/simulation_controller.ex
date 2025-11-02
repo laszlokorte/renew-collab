@@ -34,7 +34,7 @@ defmodule RenewCollabWeb.SimulationController do
       _ ->
         conn
         |> put_status(:bad_request)
-        |> Phoenix.Controller.json(%{message: "Compiling SSN failed"})
+        |> Phoenix.Controller.json(%{message: "Compiling Shadow Net System failed"})
         |> halt()
     end
   end

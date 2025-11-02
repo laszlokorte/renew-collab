@@ -14,7 +14,7 @@ defmodule RenewCollabSim.Queries.ListShadowNetSystems do
     |> Ecto.Multi.all(
       :result,
       from(s in ShadowNetSystem,
-        as: :ssn,
+        as: :sns,
         left_join: nets in assoc(s, :nets),
         left_join: sims in assoc(s, :simulations),
         order_by: [desc: s.inserted_at],
@@ -24,7 +24,7 @@ defmodule RenewCollabSim.Queries.ListShadowNetSystems do
           simulation_count:
             subquery(
               from(sims in Simulation,
-                where: sims.shadow_net_system_id == parent_as(:ssn).id,
+                where: sims.shadow_net_system_id == parent_as(:sns).id,
                 select: count(sims.id)
               )
             )
@@ -38,7 +38,7 @@ defmodule RenewCollabSim.Queries.ListShadowNetSystems do
     |> Ecto.Multi.all(
       :result,
       from(s in ShadowNetSystem,
-        as: :ssn,
+        as: :sns,
         left_join: nets in assoc(s, :nets),
         left_join: sims in assoc(s, :simulations),
         where: s.id in ^ids,
@@ -49,7 +49,7 @@ defmodule RenewCollabSim.Queries.ListShadowNetSystems do
           simulation_count:
             subquery(
               from(sims in Simulation,
-                where: sims.shadow_net_system_id == parent_as(:ssn).id,
+                where: sims.shadow_net_system_id == parent_as(:sns).id,
                 select: count(sims.id)
               )
             )

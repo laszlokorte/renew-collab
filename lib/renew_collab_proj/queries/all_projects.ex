@@ -15,7 +15,7 @@ defmodule RenewCollabProj.Queries.AllProjects do
       from(p in Project,
         left_join: m in assoc(p, :members),
         left_join: o in assoc(p, :ownerships),
-        left_join: ssn in assoc(p, :shadow_net_systems),
+        left_join: sns in assoc(p, :shadow_net_systems),
         left_join: d in assoc(p, :documents),
         left_join: s in assoc(p, :simulations),
         order_by: [desc: :inserted_at],
@@ -23,7 +23,7 @@ defmodule RenewCollabProj.Queries.AllProjects do
           ownerships: o,
           members: m,
           documents: d,
-          shadow_net_systems: ssn,
+          shadow_net_systems: sns,
           simulations: s
         ]
       )

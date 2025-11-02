@@ -45,7 +45,7 @@ defmodule RenewCollabProj.Projects do
   #     from(p in Project,
   #       left_join: m in assoc(p, :members),
   #       left_join: o in assoc(p, :ownerships),
-  #       left_join: ssn in assoc(p, :shadow_net_systems),
+  #       left_join: sns in assoc(p, :shadow_net_systems),
   #       left_join: d in assoc(p, :documents),
   #       left_join: s in assoc(p, :simulations),
   #       order_by: [desc: :inserted_at],
@@ -53,7 +53,7 @@ defmodule RenewCollabProj.Projects do
   #         ownerships: o,
   #         members: m,
   #         documents: d,
-  #         shadow_net_systems: ssn,
+  #         shadow_net_systems: sns,
   #         simulations: s
   #       ]
   #     )
@@ -68,7 +68,7 @@ defmodule RenewCollabProj.Projects do
   #       left_join: m in assoc(p, :members),
   #       left_join: o in assoc(p, :ownerships),
   #       left_join: d in assoc(p, :documents),
-  #       left_join: ssn in assoc(p, :shadow_net_systems),
+  #       left_join: sns in assoc(p, :shadow_net_systems),
   #       left_join: s in assoc(p, :simulations),
   #       inner_join: mm in assoc(p, :members),
   #       where: mm.account_id == ^account_id,
@@ -77,7 +77,7 @@ defmodule RenewCollabProj.Projects do
   #         ownerships: o,
   #         members: m,
   #         documents: d,
-  #         shadow_net_systems: ssn,
+  #         shadow_net_systems: sns,
   #         simulations: s
   #       ]
   #     )
@@ -92,7 +92,7 @@ defmodule RenewCollabProj.Projects do
   #       p in Project,
   #       left_join: m in assoc(p, :members),
   #       left_join: d in assoc(p, :documents),
-  #       left_join: ssn in assoc(p, :shadow_net_systems),
+  #       left_join: sns in assoc(p, :shadow_net_systems),
   #       left_join: s in assoc(p, :simulations),
   #       inner_join: mm in assoc(p, :members),
   #       where: p.id == ^project_id,
@@ -101,7 +101,7 @@ defmodule RenewCollabProj.Projects do
   #       preload: [
   #         members: m,
   #         documents: d,
-  #         shadow_net_systems: ssn,
+  #         shadow_net_systems: sns,
   #         simulations: s
   #       ]
   #     )
@@ -117,14 +117,14 @@ defmodule RenewCollabProj.Projects do
   #       p in Project,
   #       left_join: m in assoc(p, :members),
   #       left_join: d in assoc(p, :documents),
-  #       left_join: ssn in assoc(p, :shadow_net_systems),
+  #       left_join: sns in assoc(p, :shadow_net_systems),
   #       left_join: s in assoc(p, :simulations),
   #       where: p.id == ^id,
   #       order_by: [asc: m.inserted_at, asc: d.inserted_at, asc: s.inserted_at],
   #       preload: [
   #         members: m,
   #         documents: d,
-  #         shadow_net_systems: ssn,
+  #         shadow_net_systems: sns,
   #         simulations: s
   #       ]
   #     )
@@ -267,11 +267,11 @@ defmodule RenewCollabProj.Projects do
   #   |> Repo.insert()
   # end
 
-  # def add_shadow_net_system(%Project{id: project_id}, ssn) do
+  # def add_shadow_net_system(%Project{id: project_id}, sns) do
   #   %ProjectShadowNetSystem{
   #     project_id: project_id
   #   }
-  #   |> ProjectShadowNetSystem.changeset(ssn)
+  #   |> ProjectShadowNetSystem.changeset(sns)
   #   |> Repo.insert()
   # end
 
@@ -294,8 +294,8 @@ defmodule RenewCollabProj.Projects do
   #   |> Repo.delete_all()
   # end
 
-  # def remove_shadow_net_system(%Project{id: project_id}, ssn_id) do
-  #   from(m in ProjectShadowNetSystem, where: m.id == ^ssn_id and m.project_id == ^project_id)
+  # def remove_shadow_net_system(%Project{id: project_id}, sns_id) do
+  #   from(m in ProjectShadowNetSystem, where: m.id == ^sns_id and m.project_id == ^project_id)
   #   |> Repo.delete_all()
   # end
 
@@ -385,10 +385,10 @@ defmodule RenewCollabProj.Projects do
 
   # def list_project_shadow_net_systems(project_id) do
   #   from(p in Project,
-  #     left_join: ssn in assoc(p, :shadow_net_systems),
+  #     left_join: sns in assoc(p, :shadow_net_systems),
   #     where: p.id == ^project_id,
   #     preload: [
-  #       shadow_net_systems: ssn
+  #       shadow_net_systems: sns
   #     ]
   #   )
   #   |> Repo.one()
