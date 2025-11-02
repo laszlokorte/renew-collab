@@ -2,6 +2,9 @@ defmodule RenewCollabCtrl.WriteAccess do
   alias RenewCollabCtrl.Actions
   def can(account, action)
   def can(_account, %Actions.ProjectDuplicateAsUser{}), do: true
+  def can(_account, %Actions.ProjectDuplicateAsAdmin{}), do: true
+  def can(_account, %Actions.ProjectAddMemberAsAdmin{}), do: true
+  def can(_account, %Actions.ProjectRemoveMemberAsAdmin{}), do: true
   def can(_account, %Actions.ProjectDelete{}), do: true
   def can(_account, %Actions.DocumentEditLayerTextSizeHint{}), do: true
   def can(_account, %Actions.DocumentEditSetThumbnail{}), do: true
@@ -100,6 +103,7 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(_account, %Actions.GlobalSyntaxAddAutoTargetEntry{}), do: true
   def can(%{id: account_id}, %Actions.ProjectCreateAsUser{account_id: account_id}), do: true
   def can(_account, %Actions.ProjectCreateAsAdmin{}), do: true
+  def can(_account, %Actions.ProjectRename{}), do: true
 
   def can(_account, _action), do: false
 end

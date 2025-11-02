@@ -49,6 +49,9 @@ defmodule RenewCollabWeb.LiveProjectManager do
         |> Fetcher.fetch_as(account),
       shadow_net_systems:
         %Views.GlobalShadowNetSystemsList{}
+        |> Fetcher.fetch_as(account),
+      assigned_to_project:
+        %Views.GlobalProjectAllAssignments{}
         |> Fetcher.fetch_as(account)
     }
   end
@@ -79,95 +82,85 @@ defmodule RenewCollabWeb.LiveProjectManager do
             </button>
           </form>
         <% end %>
-
-        <h3>Members</h3>
-        <%= if  not Enum.empty?(@project.members) do %>
-          <ul style="list-style: none; padding: 0; margin: 0">
-            <%= for m <- @project.members do %>
-              <%= with acc = %{} <- m.account do %>
-                <li>
-                  <%= if WriteAccess.can(@current_account, %Actions.ProjectRemoveMemberAsUser{project_id: @project.id}) do %>
-                    <button
-                      type="button"
-                      phx-click="remove_member"
-                      style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
-                      phx-value-id={m.id}
-                    >
-                      Remove
-                    </button>
-                  <% end %>
-                  <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
-                    [{m.role}]
-                  </span>
-                  <img class="icon" src="/assets/icon-user.svg" />
-                </li>
-                <% else nil -> %>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(40em, 1fr)); gap: 2em;">
+          <div>
+            <h3>Members</h3>
+            <%= if  not Enum.empty?(@project.members) do %>
+              <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px">
+                <%= for m <- @project.members do %>
                   <li>
-                    <button
-                      type="button"
-                      phx-click="remove_member"
-                      style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
-                      phx-value-id={m.id}
-                    >
-                      Remove
-                    </button>
-                    <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
-                      [{m.role}]
-                    </span>
-                    <img class="icon" src="/assets/icon-user.svg" />
-                    <em>Account deleted</em>
-                    (ID: <code>{m.account_id}</code>)
+                    <%= if WriteAccess.can(@current_account, %Actions.ProjectRemoveMemberAsAdmin{project_id: @project.id, member_account_id: m.account_id}) do %>
+                      <button
+                        type="button"
+                        phx-click="remove_member"
+                        style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
+                        phx-value-id={m.id}
+                      >
+                        Remove
+                      </button>
+                    <% end %>
+                    <%= case  m.account do %>
+                      <% %{id: account_id, email: account_email} -> %>
+                        <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
+                          [{m.role}] {account_email}
+                        </span>
+                        <img class="icon" src="/assets/icon-user.svg" />
+                      <% %Ecto.Association.NotLoaded{} -> %>
+                        <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
+                          [{m.role}]
+                        </span>
+                        <img class="icon" src="/assets/icon-user.svg" />
+                        <em>Account not loaded</em>
+                        (ID: <code>{m.account_id}</code>)
+                      <% nil -> %>
+                        <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
+                          [{m.role}]
+                        </span>
+                        <img class="icon" src="/assets/icon-user.svg" />
+                        <em>Account deleted</em>
+                        (ID: <code>{m.account_id}</code>)
+                    <% end %>
                   </li>
-              <% end %>
+                <% end %>
+              </ul>
+            <% else %>
+              <p>None</p>
             <% end %>
-          </ul>
-        <% else %>
-          <p>None</p>
-        <% end %>
 
-        <%= if WriteAccess.can(@current_account, %Actions.ProjectAddMemberAsAdmin{project_id: @project.id}) do %>
-          <form method="post" phx-submit="add_member" accept-charset="utf-8">
-            <select name="account_id">
-              <option value="">---</option>
-              <%= for a <- @accounts do %>
-                <option value={a.id}>Enum.any?(&(&1.account_id == a.id))}
-                  > {a.email}</option>
-              <% end %>
-            </select>
-            <select name="role">
-              <%= for r <- RenewCollabProj.Projects.member_roles(@current_account, @project) do %>
-                <option value={r}>
-                  {r}
-                </option>
-              <% end %>
-            </select>
-            <button
-              type="submit"
-              style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
-            >
-              Invite
-            </button>
-          </form>
-        <% end %>
-
-        <h3>Documents</h3>
-        <%= if  not Enum.empty?(@project.documents) do %>
-          <ul style="list-style: none; padding: 0; margin: 0">
-            <%= for d <- @project.documents do %>
-              <%= with doc = %{} <- d.document do %>
-                <li>
-                  <button
-                    type="button"
-                    style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
-                    phx-click="remove_document"
-                    phx-value-id={d.id}
-                  >
-                    Remove
-                  </button>
-                  <img class="icon" src="/assets/icon-document.svg" />
-                  <small>({d.document_id})</small>
-                </li>
-                <% else nil -> %>
+            <%= if WriteAccess.can(@current_account, %Actions.ProjectAddMemberAsAdmin{project_id: @project.id}) do %>
+              <form method="post" phx-submit="add_member" accept-charset="utf-8">
+                <select name="account_id">
+                  <option value="">---</option>
+                  <%= for a <- @accounts do %>
+                    <option
+                      value={a.id}
+                      disabled={Enum.any?(@project.members, &(&1.account_id == a.id))}
+                    >
+                      {a.email}
+                    </option>
+                  <% end %>
+                </select>
+                <select name="role">
+                  <%= for r <- RenewCollabProj.Projects.member_roles(@current_account, @project) do %>
+                    <option value={r}>
+                      {r}
+                    </option>
+                  <% end %>
+                </select>
+                <button
+                  type="submit"
+                  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+                >
+                  Invite
+                </button>
+              </form>
+            <% end %>
+          </div>
+          <div>
+            <h3>Documents</h3>
+            <%= if  not Enum.empty?(@project.documents) do %>
+              <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px">
+                <%= for d <- @project.documents do %>
                   <li>
                     <button
                       type="button"
@@ -177,66 +170,69 @@ defmodule RenewCollabWeb.LiveProjectManager do
                     >
                       Remove
                     </button>
-                    <img class="icon" src="/assets/icon-document.svg" />
-                    <em>Document deleted</em>
-                    (ID: <code>{d.document_id}</code>)
+
+                    <img class="icon" src="/assets/icon-document.svg" style="vertical-align: middle" />
+                    <img
+                      class="icon"
+                      src={"/documents/#{d.document_id}/thumbnail"}
+                      style="vertical-align: middle"
+                    />
+                    <%= case  d.document do %>
+                      <% %{id: doc_id} -> %>
+                        <small>({d.document_id})</small>
+                      <% %Ecto.Association.NotLoaded{} -> %>
+                        <em>Document not loaded</em> (ID: <code>{d.document_id}</code>)
+                      <% nil -> %>
+                        <em>Document deleted</em> (ID: <code>{d.document_id}</code>)
+                    <% end %>
                   </li>
-              <% end %>
+                <% end %>
+              </ul>
+            <% else %>
+              <p>None</p>
             <% end %>
-          </ul>
-        <% else %>
-          <p>None</p>
-        <% end %>
 
-        <form method="post" phx-submit="add_document" accept-charset="utf-8">
-          <h4>Unassigned Documents</h4>
-          <select name="document_id">
-            <option value="">---</option>
-            <%= for d <- @documents do %>
-              <option value={d.id}>{d.name}({d.id})</option>
-            <% end %>
-          </select>
-          <button
-            type="submit"
-            style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
-          >
-            Assign
-          </button>
-        </form>
-        <h4>All Documents</h4>
-        <form method="post" phx-submit="dup_document" accept-charset="utf-8">
-          <select name="document_id">
-            <option value="">---</option>
-            <%= for d <- @documents do %>
-              <option value={d.id}>{d.name} ({d.id})</option>
-            <% end %>
-          </select>
-          <button
-            type="submit"
-            style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
-          >
-            Copy into this project
-          </button>
-        </form>
-
-        <h3>Shadow Net Systems</h3>
-        <%= if  not Enum.empty?(@project.shadow_net_systems) do %>
-          <ul style="list-style: none; padding: 0; margin: 0">
-            <%= for s <- @project.shadow_net_systems do %>
-              <%= with ssn = %{} <- s.shadow_net_system do %>
-                <li>
-                  <button
-                    type="button"
-                    style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
-                    phx-click="remove_ssn"
-                    phx-value-id={s.id}
+            <form method="post" phx-submit="add_document" accept-charset="utf-8">
+              <h4>Unassigned Documents</h4>
+              <select name="document_id">
+                <option value="">---</option>
+                <%= for d <- @documents do %>
+                  <option
+                    value={d.id}
+                    disabled={@assigned_to_project.documents |> MapSet.member?(d.id)}
                   >
-                    Remove
-                  </button>
-                  <img class="icon" src="/assets/icon-network.svg" />
-                  {ssn.label || "Untitled"} <small>({ssn.id})</small>
-                </li>
-                <% else nil -> %>
+                    {d.name}({d.id})
+                  </option>
+                <% end %>
+              </select>
+              <button
+                type="submit"
+                style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+              >
+                Assign
+              </button>
+            </form>
+            <h4>All Documents</h4>
+            <form method="post" phx-submit="dup_document" accept-charset="utf-8">
+              <select name="document_id">
+                <option value="">---</option>
+                <%= for d <- @documents do %>
+                  <option value={d.id}>{d.name} ({d.id})</option>
+                <% end %>
+              </select>
+              <button
+                type="submit"
+                style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+              >
+                Copy into this project
+              </button>
+            </form>
+          </div>
+          <div>
+            <h3>Shadow Net Systems</h3>
+            <%= if  not Enum.empty?(@project.shadow_net_systems) do %>
+              <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px">
+                <%= for s <- @project.shadow_net_systems do %>
                   <li>
                     <button
                       type="button"
@@ -246,50 +242,49 @@ defmodule RenewCollabWeb.LiveProjectManager do
                     >
                       Remove
                     </button>
-                    <img class="icon" src="/assets/icon-network.svg" />
-                    <em>SSN deleted</em>
-                    (ID: <code>{s.shadow_net_system_id}</code>)
+                    <%= case s.shadow_net_system do %>
+                      <% %{id: ssn_id} -> %>
+                        <img class="icon" src="/assets/icon-network.svg" />
+                        <small>({ssn_id})</small>
+                      <% %Ecto.Association.NotLoaded{} -> %>
+                        <img class="icon" src="/assets/icon-network.svg" />
+                        <em>SSN not loaded</em> (ID: <code>{s.shadow_net_system_id}</code>)
+                      <% nil -> %>
+                        <img class="icon" src="/assets/icon-network.svg" />
+                        <em>SSN deleted</em> (ID: <code>{s.shadow_net_system_id}</code>)
+                    <% end %>
                   </li>
-              <% end %>
+                <% end %>
+              </ul>
+            <% else %>
+              <p>None</p>
             <% end %>
-          </ul>
-        <% else %>
-          <p>None</p>
-        <% end %>
 
-        <form method="post" phx-submit="add_ssn" accept-charset="utf-8">
-          <select name="shadow_net_system_id">
-            <option value="">---</option>
-            <%= for s <- @shadow_net_systems do %>
-              <option value={s.id}>{s.id}</option>
-            <% end %>
-          </select>
-          <button
-            type="submit"
-            style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
-          >
-            Assign
-          </button>
-        </form>
-
-        <h3>Simulations</h3>
-        <%= if  not Enum.empty?(@project.simulations) do %>
-          <ul style="list-style: none; padding: 0; margin: 0">
-            <%= for s <- @project.simulations do %>
-              <%= with sim = %{} <- s.simulation do %>
-                <li>
-                  <button
-                    type="button"
-                    style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
-                    phx-click="remove_simulation"
-                    phx-value-id={s.id}
+            <form method="post" phx-submit="add_ssn" accept-charset="utf-8">
+              <select name="shadow_net_system_id">
+                <option value="">---</option>
+                <%= for s <- @shadow_net_systems do %>
+                  <option
+                    value={s.id}
+                    disabled={@assigned_to_project.shadow_net_systems |> MapSet.member?(s.id)}
                   >
-                    Remove
-                  </button>
-                  <img class="icon" src="/assets/icon-simulation.svg" />
-                  {sim.label || "Untitled"} <small>({sim.id})</small>
-                </li>
-                <% else nil -> %>
+                    {s.id}
+                  </option>
+                <% end %>
+              </select>
+              <button
+                type="submit"
+                style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+              >
+                Assign
+              </button>
+            </form>
+          </div>
+          <div>
+            <h3>Simulations</h3>
+            <%= if  not Enum.empty?(@project.simulations) do %>
+              <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px">
+                <%= for s <- @project.simulations do %>
                   <li>
                     <button
                       type="button"
@@ -299,35 +294,50 @@ defmodule RenewCollabWeb.LiveProjectManager do
                     >
                       Remove
                     </button>
-                    <img class="icon" src="/assets/icon-simulation.svg" />
-                    <em>Simulation deleted</em>
-                    (ID: <code>{s.simulation_id}</code>)
+                    <%= case s.simulation do %>
+                      <% %{id: sim_id, label: sim_label} -> %>
+                        <img class="icon" src="/assets/icon-simulation.svg" />
+                        {sim_label || "Untitled"} <small>({sim_id})</small>
+                      <% %Ecto.Association.NotLoaded{} -> %>
+                        <img class="icon" src="/assets/icon-simulation.svg" />
+                        <em>Simulation not loaded</em> (ID: <code>{s.simulation_id}</code>)
+                      <% nil -> %>
+                        <img class="icon" src="/assets/icon-simulation.svg" />
+                        <em>Simulation deleted</em> (ID: <code>{s.simulation_id}</code>)
+                    <% end %>
                   </li>
-              <% end %>
+                <% end %>
+              </ul>
+            <% else %>
+              <p>None</p>
             <% end %>
-          </ul>
-        <% else %>
-          <p>None</p>
-        <% end %>
 
-        <form method="post" phx-submit="add_simulation" accept-charset="utf-8">
-          <select name="simulation_id">
-            <option value="">---</option>
-            <%= for s <- @simulations do %>
-              <option value={s.id}>{s.id}</option>
-            <% end %>
-          </select>
-          <button
-            type="submit"
-            style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
-          >
-            Assign
-          </button>
-        </form>
+            <form method="post" phx-submit="add_simulation" accept-charset="utf-8">
+              <select name="simulation_id">
+                <option value="">---</option>
+                <%= for s <- @simulations do %>
+                  <option
+                    value={s.id}
+                    disabled={@assigned_to_project.shadow_net_systems |> MapSet.member?(s.id)}
+                  >
+                    {s.id}
+                  </option>
+                <% end %>
+              </select>
+              <button
+                type="submit"
+                style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+              >
+                Assign
+              </button>
+            </form>
+          </div>
+        </div>
         <%= if WriteAccess.can(@current_account, %Actions.ProjectDelete{project_id: @project.id}) do %>
+          <hr />
           <h3>Delete Project</h3>
 
-          <form method="post" phx-submit="delete" accept-charset="utf-8">
+          <form method="post" phx-submit="delete" phx-value-id={@project.id} accept-charset="utf-8">
             <button
               type="submit"
               style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
@@ -411,23 +421,44 @@ defmodule RenewCollabWeb.LiveProjectManager do
     socket |> put_flash(:info, "Shadow net system removed") |> reload
   end
 
-  def handle_event("rename", params, socket) do
-    Projects.update_project(socket.assigns.project, params)
-    socket |> put_flash(:info, "Project name changed") |> reload
+  def handle_event("rename", %{"name" => name}, socket) do
+    %Actions.ProjectRename{project_id: socket.assigns.project.id, new_name: name}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        socket |> put_flash(:info, "Project name changed") |> reload
+
+      _ ->
+        socket |> put_flash(:error, "Project rename failed") |> reload
+    end
   end
 
-  def handle_event("delete", _params, socket) do
-    Projects.delete_project(socket.assigns.project.id)
+  def handle_event("delete", %{"id" => project_id}, socket) do
+    %Actions.ProjectDelete{project_id: project_id}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        socket |> put_flash(:info, "Project deleted") |> redirect(to: "/manage/projects")
 
-    {:noreply, socket |> put_flash(:info, "Project deleted") |> redirect(to: "/manage/projects")}
+      _ ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Project deletion failed")}
+    end
+    |> then(&{:noreply, &1})
   end
 
   def reload(socket) do
     {:noreply,
      socket
-     |> assign(:project, Projects.find_project(socket.assigns.project.id))
-     |> assign(:accounts, Projects.find_accounts())
-     |> assign(:documents, Projects.find_documents())
-     |> assign(:simulations, Projects.find_simulations())}
+     |> assign(
+       load_data(
+         %Views.GlobalProject{
+           project_id: socket.assigns.project.id
+         }
+         |> Fetcher.fetch_as(socket.assigns.current_account),
+         socket.assigns.current_account
+       )
+     )}
   end
 end

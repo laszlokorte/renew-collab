@@ -142,7 +142,13 @@ defmodule RenewCollabWeb.LiveProjectsManager do
                   <td>
                     <RenewCollabWeb.RenewComponents.timestamp value={project.inserted_at} />
                   </td>
-                  <td width="50"></td>
+                  <td width="50">
+                    <a target="_blank" href={~p"/projects/#{project.id}/export"}>
+                      <button style="cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff">
+                        Export
+                      </button>
+                    </a>
+                  </td>
                   <td width="50">
                     <button
                       type="button"
@@ -200,10 +206,17 @@ defmodule RenewCollabWeb.LiveProjectsManager do
   def handle_event("delete_project", %{"id" => id}, socket) do
     %Actions.ProjectDelete{project_id: id}
     |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        socket
+        |> put_flash(:info, "Project deleted")
+        |> reload()
 
-    socket
-    |> put_flash(:info, "Project deleted")
-    |> reload()
+      _ ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Project deletion failed")}
+    end
   end
 
   def handle_event("duplicate_project", %{"id" => id}, socket) do

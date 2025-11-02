@@ -2,6 +2,7 @@ defmodule RenewCollabProj.Projects do
   @moduledoc """
   The Renew context.
   """
+  alias RenewCollabAuth.Entities.Account
 
   # alias RenewCollabCtrl.Dispatcher
   # alias RenewCollabCtrl.Actions
@@ -307,19 +308,10 @@ defmodule RenewCollabProj.Projects do
   #   project |> Project.changeset(params) |> Repo.update()
   # end
 
-  # def member_roles(), do: RenewCollabProj.Entities.ProjectMember.roles()
+  def member_roles(), do: RenewCollabProj.Entities.ProjectMember.roles()
 
-  # def member_roles(%Account{is_admin: true}, _project),
-  #   do: RenewCollabProj.Entities.ProjectMember.roles()
-
-  # def member_roles(%Account{id: own_account_id}, project) do
-  #   from(m in ProjectMember,
-  #     where: m.project_id == ^project.id and m.account_id == ^own_account_id,
-  #     select: m.role
-  #   )
-  #   |> Repo.one()
-  #   |> RenewCollabProj.Entities.ProjectMember.weaker_roles()
-  # end
+  def member_roles(%Account{is_admin: true}, _project),
+    do: RenewCollabProj.Entities.ProjectMember.roles()
 
   # def can_force_remove(%Account{is_admin: true}, _project),
   #   do: true

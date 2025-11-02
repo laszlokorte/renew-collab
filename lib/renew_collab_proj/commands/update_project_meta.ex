@@ -13,10 +13,10 @@ defmodule RenewCollabProj.Commands.UpdateProjectMeta do
     |> Ecto.Multi.one(
       :project,
       from(proj in Project,
-        where: proj.shadow_net_system_id == ^project_id
+        where: proj.id == ^project_id
       )
     )
-    |> Ecto.Multi.update(:change_project, fn _, %{project: project} ->
+    |> Ecto.Multi.update(:change_project, fn %{project: project} ->
       Project.changeset(project, attributes)
     end)
   end

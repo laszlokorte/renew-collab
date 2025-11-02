@@ -310,4 +310,9 @@ defmodule RenewCollabCtrl.View do
     }
     |> then(&{:ok, &1})
   end
+
+  def do_fetch(_account, %Views.GlobalProjectAllAssignments{}) do
+    RenewCollabProj.Queries.AllProjectAssignments.new(%{})
+    |> RenewCollabProj.ProjectFetcher.fetch()
+  end
 end
