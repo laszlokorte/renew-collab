@@ -176,19 +176,21 @@ defmodule RenewCollabWeb.LiveProjectsManager do
 
   def handle_event("create_project", %{"name" => name}, socket) do
     %Actions.ProjectCreateAsAdmin{
-      project_name:
-        name
-        |> case do
-          "" -> "untitled"
-          n -> n
-        end
+      project_name: name
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        socket
+        |> put_flash(:info, "Project created")
+        |> assign(create_form: to_form(%{}))
+        |> reload()
 
-    socket
-    |> put_flash(:info, "Project created")
-    |> assign(create_form: to_form(%{}))
-    |> reload()
+      _ ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Project creation failed")}
+    end
   end
 
   def handle_event("validate_project", params, socket) do
@@ -218,6 +220,6 @@ defmodule RenewCollabWeb.LiveProjectsManager do
   end
 
   def reload(socket) do
-    {:noreply, socket |> assign(:projects, Projects.list_all_projects())}
+    {:noreply, socket |> assign(load_data(socket.assigns.current_account))}
   end
 end

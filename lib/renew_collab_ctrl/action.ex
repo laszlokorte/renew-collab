@@ -777,10 +777,6 @@ defmodule RenewCollabCtrl.Action do
     {:error, :not_implemented}
   end
 
-  def do_perform(%Actions.ProjectCreateAsAdmin{}) do
-    {:error, :not_implemented}
-  end
-
   def do_perform(%Actions.ProjectCreateAsUser{project_name: name, account_id: account_id}) do
     %RenewCollabProj.Commands.CreateProject{name: name, owner_account_id: account_id}
     |> RenewCollabProj.ProjectCommander.run_project_command_sync()
@@ -793,6 +789,11 @@ defmodule RenewCollabCtrl.Action do
           :any
         )
     end
+  end
+
+  def do_perform(%Actions.ProjectCreateAsAdmin{project_name: name}) do
+    %RenewCollabProj.Commands.CreateProject{name: name}
+    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
   end
 
   def do_perform(%Actions.ProjectDelete{project_id: project_id}) do

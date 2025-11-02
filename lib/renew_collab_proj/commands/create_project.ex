@@ -7,6 +7,17 @@ defmodule RenewCollabProj.Commands.CreateProject do
     %__MODULE__{name: name, owner_account_id: owner_account_id}
   end
 
+  def multi(%__MODULE__{name: name, owner_account_id: nil}) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(
+      :project,
+      %Project{}
+      |> Project.creation_changeset(%{
+        name: name
+      })
+    )
+  end
+
   def multi(%__MODULE__{name: name, owner_account_id: owner_account_id}) do
     Ecto.Multi.new()
     |> Ecto.Multi.insert(

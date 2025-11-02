@@ -276,13 +276,11 @@ defmodule RenewCollabCtrl.View do
     %{
       installed_socket_schema:
         RenewCollab.Queries.SocketSchemasList.new()
-        |> RenewCollab.Queries.SocketSchemasList.multi()
-        |> RenewCollab.Repo.transact()
+        |> RenewCollab.DocumentFetcher.fetch()
         |> then(fn {:ok, r} -> r end),
       installed_symbols:
         RenewCollab.Queries.SymbolIdsByName.new()
-        |> RenewCollab.Queries.SymbolIdsByName.multi()
-        |> RenewCollab.Repo.transact()
+        |> RenewCollab.DocumentFetcher.fetch()
         |> then(fn {:ok, r} -> r end),
       number_of_accounts: RenewCollabAuth.Auth.count_accounts(),
       number_of_sessions: RenewCollabAuth.Auth.count_sessions(),
@@ -292,9 +290,18 @@ defmodule RenewCollabCtrl.View do
         |> RenewCollab.DocumentFetcher.fetch()
         |> then(fn {:ok, r} -> r end),
       number_of_snapshots: RenewCollab.Renew.count_snapshots(),
-      number_of_shadow_net_systems: RenewCollabSim.Simulator.count_shadow_net_systems(),
-      number_of_simulations: RenewCollabSim.Simulator.count_simulations(),
-      number_of_projects: RenewCollabProj.Projects.count_projects(),
+      number_of_shadow_net_systems:
+        RenewCollabSim.Queries.CountShadowNetSystems.new(%{})
+        |> RenewCollabSim.SimulationFetcher.fetch()
+        |> then(fn {:ok, r} -> r end),
+      number_of_simulations:
+        RenewCollabSim.Queries.CountSimulations.new(%{})
+        |> RenewCollabSim.SimulationFetcher.fetch()
+        |> then(fn {:ok, r} -> r end),
+      number_of_projects:
+        RenewCollabProj.Queries.CountProjects.new(%{})
+        |> RenewCollabProj.ProjectFetcher.fetch()
+        |> then(fn {:ok, r} -> r end),
       hierarchy_missing_count: RenewCollab.Hierarchy.count_missing_global(),
       hierarchy_invalid_count: RenewCollab.Hierarchy.count_invalids_global(),
       cache_size: RenewCollabCtrl.CacheServer.size(),
