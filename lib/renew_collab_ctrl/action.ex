@@ -781,20 +781,69 @@ defmodule RenewCollabCtrl.Action do
     {:error, :not_implemented}
   end
 
-  def do_perform(%Actions.ProjectCreateAsUser{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.ProjectCreateAsUser{project_name: name, account_id: account_id}) do
+    %RenewCollabProj.Commands.CreateProject{name: name, owner_account_id: account_id}
+    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+    |> case do
+      {:ok, _project} ->
+        # TODO:broadcast
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "my_projects:#{account_id}",
+          :any
+        )
+    end
   end
 
-  def do_perform(%Actions.ProjectDelete{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.ProjectDelete{project_id: project_id}) do
+    %RenewCollabProj.Commands.DeleteProject{project_id: project_id}
+    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
   end
 
   def do_perform(%Actions.ProjectDuplicateAsAdmin{}) do
     {:error, :not_implemented}
   end
 
-  def do_perform(%Actions.ProjectDuplicateAsUser{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.ProjectDuplicateAsUser{account_id: account_id, project_id: project_id}) do
+    %RenewCollabProj.Queries.ProjectDetails{project_id: project_id}
+    |> RenewCollabProj.ProjectFetcher.fetch()
+    |> case do
+      {:ok, %{name: original_name} = original_project} ->
+        new_name = original_name |> RenewCollabCtrl.Naming.name_for_copy()
+
+        %RenewCollabProj.Commands.CreateProject{name: new_name, owner_account_id: account_id}
+        |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+        |> case do
+          {:ok, %{project: %{id: new_project_id}}} ->
+            for %{document_id: original_document_id} <- original_project.documents, reduce: :ok do
+              :ok ->
+                RenewCollab.Commands.DuplicateDocument.new(%{
+                  document_id: original_document_id,
+                  keep_name: true
+                })
+                |> RenewCollab.DocumentCommander.run_document_command_sync(true)
+                |> case do
+                  {:ok,
+                   %{
+                     insert_document: %RenewCollab.Document.Document{id: new_document_id}
+                   }} ->
+                    %ProjectDocument{project_id: new_project_id}
+                    |> ProjectDocument.changeset(%{
+                      "document_id" => new_document_id
+                    })
+                    |> RenewCollabProj.Repo.insert()
+
+                    :ok
+
+                  err ->
+                    err
+                end
+
+              err ->
+                err
+            end
+        end
+    end
   end
 
   def do_perform(%Actions.ProjectRemoveDocumentAsAdmin{}) do

@@ -98,6 +98,7 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(_account, %Actions.GlobalSyntaxMakeDefault{}), do: true
   def can(_account, %Actions.GlobalSyntaxAddWhitelistEntry{}), do: true
   def can(_account, %Actions.GlobalSyntaxAddAutoTargetEntry{}), do: true
+  def can(%{id: account_id}, %Actions.ProjectCreateAsUser{account_id: account_id}), do: true
 
   def can(_account, _action), do: false
 end

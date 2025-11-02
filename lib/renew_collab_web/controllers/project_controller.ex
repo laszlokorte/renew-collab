@@ -33,13 +33,15 @@ defmodule RenewCollabWeb.ProjectController do
   end
 
   def export(conn, %{"id" => project_id} = params) do
-    project = Projects.find_own_project(own_account(conn), project_id)
+    project =
+      %Views.MyProject{project_id: project_id, account_id: conn.assigns.current_account.id}
+      |> Fetcher.fetch_as(conn.assigns.current_account)
 
     files =
-      for %{document: document} <- project.documents do
+      for %{document_id: document_id} <- project.documents do
         doc_content =
           %Views.DocumentWithContent{
-            document_id: document.id
+            document_id: document_id
           }
           |> Fetcher.fetch_as(conn.assigns.current_account)
 
@@ -47,7 +49,7 @@ defmodule RenewCollabWeb.ProjectController do
 
         stripped_document =
           %Views.DocumentStripped{
-            document_id: document.id,
+            document_id: document_id,
             original_ids: true
           }
           |> Fetcher.fetch_as(conn.assigns.current_account)
@@ -55,8 +57,8 @@ defmodule RenewCollabWeb.ProjectController do
           |> Kernel.inspect(pretty: true, limit: :infinity)
 
         [
-          {"renew/#{document.name}.rnw", output},
-          {"ex/#{document.name}.ex", stripped_document}
+          {"renew/#{doc_content.name}.rnw", output},
+          {"ex/#{doc_content.name}.ex", stripped_document}
         ]
       end
       |> Enum.concat(
@@ -77,7 +79,12 @@ defmodule RenewCollabWeb.ProjectController do
       )
       |> List.flatten()
       |> dedup_tuples()
-      |> Enum.map(fn {name, content} -> {String.to_charlist(name), content} end)
+      |> Enum.concat([
+        {"info.txt", "Project: #{project.name} (#{project.id})"}
+      ])
+      |> Enum.map(fn {name, content} ->
+        {String.to_charlist("#{project.id}/#{name}"), content}
+      end)
 
     # Create zip in memory
     {:ok, {zip_name, zip_data}} =
@@ -86,7 +93,7 @@ defmodule RenewCollabWeb.ProjectController do
     conn
     |> put_resp_header(
       "content-disposition",
-      "#{if(Map.has_key?(params, "inline"), do: "inline", else: "attachment")}; filename=\"#{zip_name}.zip\""
+      "#{if(Map.has_key?(params, "inline"), do: "inline", else: "attachment")}; filename=\"#{zip_name}\""
     )
     |> put_resp_header(
       "content-type",

@@ -5,7 +5,7 @@ defmodule RenewCollabProj.Entities.Project do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "project" do
-    field :name, :string
+    field :name, :string, default: "Untitled"
 
     has_many :documents, RenewCollabProj.Entities.ProjectDocument
     has_many :simulations, RenewCollabProj.Entities.ProjectSimulation
@@ -19,8 +19,7 @@ defmodule RenewCollabProj.Entities.Project do
   @doc false
   def changeset(project, attrs) do
     project
-    |> cast(attrs, [:name])
-    |> validate_required([:name])
+    |> cast(attrs, [:name], empty_values: [""])
   end
 
   @doc false
@@ -31,6 +30,5 @@ defmodule RenewCollabProj.Entities.Project do
       :ownerships,
       with: &RenewCollabProj.Entities.ProjectMember.changeset_creation/2
     )
-    |> validate_required([:name])
   end
 end

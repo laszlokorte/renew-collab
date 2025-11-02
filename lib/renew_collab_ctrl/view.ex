@@ -161,7 +161,7 @@ defmodule RenewCollabCtrl.View do
 
   def do_fetch(_account, %Views.MyProject{account_id: account_id, project_id: project_id}) do
     %{account_id: account_id, project_id: project_id}
-    |> RenewCollabProj.Queries.OwnProject.new()
+    |> RenewCollabProj.Queries.ProjectDetails.new()
     |> RenewCollabProj.ProjectFetcher.fetch()
   end
 

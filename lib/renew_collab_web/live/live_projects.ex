@@ -1,4 +1,5 @@
 defmodule RenewCollabWeb.LiveProjects do
+  alias RenewCollabCtrl.Dispatcher
   alias RenewCollabCtrl.WriteAccess
   alias RenewCollabCtrl.Actions
   alias RenewCollabCtrl.Views
@@ -8,11 +9,10 @@ defmodule RenewCollabWeb.LiveProjects do
   alias RenewCollabProj.Projects
 
   alias RenewCollabCtrl.Fetcher
-  @topic "projects"
 
   def mount(_params, _session, socket) do
     # TODO:subscription
-    RenewCollabWeb.Endpoint.subscribe(@topic)
+    RenewCollabWeb.Endpoint.subscribe("my_projects:#{socket.assigns.current_account.id}")
 
     socket =
       socket |> assign(load_data(socket.assigns.current_account))
@@ -199,23 +199,23 @@ defmodule RenewCollabWeb.LiveProjects do
     """
   end
 
-  def handle_event("create_project", params, socket) do
-    with {:ok, %RenewCollabProj.Entities.Project{}} <-
-           Projects.create_own_project(
-             socket.assigns.current_account,
-             params
-             |> Map.update("name", "", fn
-               "" -> "untitled"
-               n -> n
-             end)
-           ) do
-      socket
-      |> put_flash(:info, "Project created")
-      |> assign(create_form: to_form(%{}))
-      |> reload()
-    else
+  def handle_event("create_project", %{"name" => name}, socket) do
+    %Actions.ProjectCreateAsUser{
+      project_name: name,
+      account_id: socket.assigns.current_account.id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, %RenewCollabProj.Entities.Project{}} ->
+        socket
+        |> put_flash(:info, "Project created")
+        |> assign(create_form: to_form(%{}))
+        |> reload()
+
       _ ->
-        {:noreply, socket}
+        {:noreply,
+         socket
+         |> put_flash(:info, "Project creation failed")}
     end
   end
 
@@ -223,20 +223,46 @@ defmodule RenewCollabWeb.LiveProjects do
     {:noreply, assign(socket, create_form: to_form(params))}
   end
 
-  def handle_event("delete_project", %{"id" => id}, socket) do
-    Projects.delete_project(id)
+  def handle_event("delete_project", %{"id" => project_id}, socket) do
+    %Actions.ProjectDelete{
+      project_id: project_id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        socket
+        |> put_flash(:info, "Project deleted")
+        |> assign(create_form: to_form(%{}))
+        |> reload()
+
+      _ ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Project deletion failed")}
+    end
 
     socket
     |> put_flash(:info, "Project deleted")
     |> reload()
   end
 
-  def handle_event("duplicate_project", %{"id" => id}, socket) do
-    Projects.duplicate_project_to_own(socket.assigns.current_account, id)
+  def handle_event("duplicate_project", %{"id" => project_id}, socket) do
+    %Actions.ProjectDuplicateAsUser{
+      project_id: project_id,
+      account_id: socket.assigns.current_account.id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        socket
+        |> put_flash(:info, "Project duplicated")
+        |> reload()
 
-    socket
-    |> put_flash(:info, "Project duplicated")
-    |> reload()
+      _ ->
+        socket
+        |> put_flash(:info, "Project duplication failed")
+        |> reload()
+    end
   end
 
   def handle_info(:any, socket) do
@@ -244,7 +270,6 @@ defmodule RenewCollabWeb.LiveProjects do
   end
 
   def reload(socket) do
-    {:noreply,
-     socket |> assign(:projects, Projects.list_own_projects(socket.assigns.current_account))}
+    {:noreply, socket |> assign(load_data(socket.assigns.current_account))}
   end
 end
