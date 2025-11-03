@@ -763,24 +763,63 @@ defmodule RenewCollabCtrl.Action do
     :ok
   end
 
-  def do_perform(%Actions.ProjectAddDocumentAsAdmin{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.ProjectAddMemberAsAdmin{
+        project_id: project_id,
+        account_id: account_id,
+        role: role
+      }) do
+    RenewCollabProj.Commands.AssignProjectMember.new(%{
+      project_id: project_id,
+      account_id: account_id,
+      role: role
+    })
+    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
   end
 
-  def do_perform(%Actions.ProjectAddMemberAsAdmin{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.ProjectAddDocumentAsAdmin{
+        project_id: project_id,
+        document_id: document_id
+      }) do
+    RenewCollabProj.Commands.AssignProjectDocument.new(%{
+      project_id: project_id,
+      document_id: document_id
+    })
+    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
   end
 
-  def do_perform(%Actions.ProjectAddMemberAsUser{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.ProjectAddMemberAsUser{
+        project_id: project_id,
+        account_id: account_id,
+        role: role
+      }) do
+    RenewCollabProj.Commands.AssignProjectMember.new(%{
+      project_id: project_id,
+      account_id: account_id,
+      role: role
+    })
+    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
   end
 
-  def do_perform(%Actions.ProjectAddSimulationAsAdmin{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.ProjectAddSimulationAsAdmin{
+        project_id: project_id,
+        simulation_id: simulation_id
+      }) do
+    RenewCollabProj.Commands.AssignProjectSimulation.new(%{
+      project_id: project_id,
+      simulation_id: simulation_id
+    })
+    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
   end
 
-  def do_perform(%Actions.ProjectAddShadowNetSystemAsAdmin{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.ProjectAddShadowNetSystemAsAdmin{
+        project_id: project_id,
+        shadow_net_system_id: shadow_net_system_id
+      }) do
+    RenewCollabProj.Commands.AssignProjectShadowNetSystem.new(%{
+      project_id: project_id,
+      shadow_net_system_id: shadow_net_system_id
+    })
+    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
   end
 
   def do_perform(%Actions.ProjectCreateAsUser{project_name: name, account_id: account_id}) do
@@ -891,24 +930,59 @@ defmodule RenewCollabCtrl.Action do
     end
   end
 
-  def do_perform(%Actions.ProjectRemoveDocumentAsAdmin{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.ProjectRemoveDocumentAsAdmin{
+        project_id: project_id,
+        document_id: document_id
+      }) do
+    RenewCollabProj.Commands.RemoveProjectDocument.new(%{
+      project_id: project_id,
+      document_id: document_id
+    })
+    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
   end
 
-  def do_perform(%Actions.ProjectRemoveMemberAsUser{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.ProjectRemoveMemberAsUser{
+        project_id: project_id,
+        account_id: account_id
+      }) do
+    RenewCollabProj.Commands.RemoveProjectMember.new(%{
+      project_id: project_id,
+      account_id: account_id
+    })
+    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
   end
 
-  def do_perform(%Actions.ProjectRemoveSimulationAsAdmin{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.ProjectRemoveSimulationAsAdmin{
+        project_id: project_id,
+        simulation_id: simulation_id
+      }) do
+    RenewCollabProj.Commands.RemoveProjectSimulation.new(%{
+      project_id: project_id,
+      simulation_id: simulation_id
+    })
+    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
   end
 
-  def do_perform(%Actions.ProjectRemoveShadowNetSystemAsAdmin{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.ProjectRemoveShadowNetSystemAsAdmin{
+        project_id: project_id,
+        shadow_net_system_id: shadow_net_system_id
+      }) do
+    RenewCollabProj.Commands.RemoveProjectShadowNetSystem.new(%{
+      project_id: project_id,
+      shadow_net_system_id: shadow_net_system_id
+    })
+    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
   end
 
-  def do_perform(%Actions.ProjectRemoveMemberAsAdmin{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.ProjectRemoveMemberAsAdmin{
+        project_id: project_id,
+        account_id: account_id
+      }) do
+    RenewCollabProj.Commands.RemoveProjectMember.new(%{
+      project_id: project_id,
+      account_id: account_id
+    })
+    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
   end
 
   def do_perform(%Actions.DocumentRename{}) do

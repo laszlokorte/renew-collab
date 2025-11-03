@@ -1,3 +1,3 @@
 defmodule RenewCollabCtrl.Actions.ProjectRemoveMemberAsUser do
-  defstruct [:project_id, :member_account_id]
+  defstruct [:project_id, :account_id]
 end

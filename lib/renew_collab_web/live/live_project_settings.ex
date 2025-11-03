@@ -87,7 +87,7 @@ defmodule RenewCollabWeb.LiveProjectSettings do
             <%= for m <- @members do %>
               <%= with acc = %{} <- m.account do %>
                 <li>
-                  <%= if WriteAccess.can(@current_account, %ProjectRemoveMemberAsUser{project_id: @project.id, member_account_id: acc.id}) do %>
+                  <%= if WriteAccess.can(@current_account, %ProjectRemoveMemberAsUser{project_id: @project.id, account_id: acc.id}) do %>
                     <button
                       type="button"
                       phx-click="remove_member"

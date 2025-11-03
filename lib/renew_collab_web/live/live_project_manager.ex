@@ -69,9 +69,19 @@ defmodule RenewCollabWeb.LiveProjectManager do
       </div>
 
       <div style="padding: 1em">
+        <dl>
+          <dt>Created at</dt>
+          <dd>{@project.inserted_at}</dd>
+        </dl>
+        <dl>
+          <dt>Last Update</dt>
+          <dd>{@project.updated_at}</dd>
+        </dl>
+      </div>
+      <div style="padding: 1em">
         <%= if WriteAccess.can(@current_account, %Actions.ProjectRename{project_id: @project.id}) do %>
-          <div style="border: 2px dashed #aaa; margin: 1em 0">
-            <h3>Rename Project</h3>
+          <div style="border: 1px solid #ddd; margin: 1em 0; padding: 1em">
+            <h3 style="margin-top: 0;border-bottom: 1px solid #aaa;">Rename Project</h3>
 
             <form method="post" phx-submit="rename" accept-charset="utf-8">
               <input type="text" name="name" value={@project.name} />
@@ -85,13 +95,13 @@ defmodule RenewCollabWeb.LiveProjectManager do
           </div>
         <% end %>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(40em, 1fr)); gap: 1em;">
-          <div style="border: 2px dashed #aaa">
-            <h3>Members</h3>
+          <div style="border: 1px solid #ddd; padding: 1em">
+            <h3 style="margin-top: 0;border-bottom: 1px solid #aaa;">Members</h3>
             <%= if  not Enum.empty?(@project.members) do %>
               <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px">
                 <%= for m <- @project.members do %>
                   <li>
-                    <%= if WriteAccess.can(@current_account, %Actions.ProjectRemoveMemberAsAdmin{project_id: @project.id, member_account_id: m.account_id}) do %>
+                    <%= if WriteAccess.can(@current_account, %Actions.ProjectRemoveMemberAsAdmin{project_id: @project.id, account_id: m.account_id}) do %>
                       <button
                         type="button"
                         phx-click="remove_member"
@@ -105,8 +115,9 @@ defmodule RenewCollabWeb.LiveProjectManager do
                     <%= case  m.account do %>
                       <% %{id: account_id, email: account_email} -> %>
                         <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
-                          [{m.role}] {account_email}
+                          [{m.role}]
                         </span>
+                        {account_email}
                       <% %Ecto.Association.NotLoaded{} -> %>
                         <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
                           [{m.role}]
@@ -156,8 +167,8 @@ defmodule RenewCollabWeb.LiveProjectManager do
               </form>
             <% end %>
           </div>
-          <div style="border: 2px dashed #aaa">
-            <h3>Documents</h3>
+          <div style="border: 1px solid #ddd; padding: 1em">
+            <h3 style="margin-top: 0;border-bottom: 1px solid #aaa;">Documents</h3>
             <%= if  not Enum.empty?(@project.documents) do %>
               <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px">
                 <%= for d <- @project.documents do %>
@@ -178,8 +189,8 @@ defmodule RenewCollabWeb.LiveProjectManager do
                       style="vertical-align: middle"
                     />
                     <%= case  d.document do %>
-                      <% %{id: doc_id} -> %>
-                        <small>({d.document_id})</small>
+                      <% %{id: doc_id, name: document_name} -> %>
+                        <small>{document_name} ({d.document_id})</small>
                       <% %Ecto.Association.NotLoaded{} -> %>
                         <em>Document not loaded</em> (ID: <code>{d.document_id}</code>)
                       <% nil -> %>
@@ -201,7 +212,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
                     value={d.id}
                     disabled={@assigned_to_project.documents |> MapSet.member?(d.id)}
                   >
-                    {d.name}({d.id})
+                    {d.name} &mdash; ({d.id})
                   </option>
                 <% end %>
               </select>
@@ -217,7 +228,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
               <select name="document_id">
                 <option value="">---</option>
                 <%= for d <- @documents do %>
-                  <option value={d.id}>{d.name} ({d.id})</option>
+                  <option value={d.id}>{d.name} &mdash; ({d.id})</option>
                 <% end %>
               </select>
               <button
@@ -228,8 +239,8 @@ defmodule RenewCollabWeb.LiveProjectManager do
               </button>
             </form>
           </div>
-          <div style="border: 2px dashed #aaa">
-            <h3>Shadow Net Systems</h3>
+          <div style="border: 1px solid #ddd; padding: 1em">
+            <h3 style="margin-top: 0;border-bottom: 1px solid #aaa;">Shadow Net Systems</h3>
             <%= if  not Enum.empty?(@project.shadow_net_systems) do %>
               <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px">
                 <%= for s <- @project.shadow_net_systems do %>
@@ -244,8 +255,8 @@ defmodule RenewCollabWeb.LiveProjectManager do
                     </button>
                     <img class="icon" src="/assets/icon-network.svg" style="vertical-align: middle" />
                     <%= case s.shadow_net_system do %>
-                      <% %{id: sns_id} -> %>
-                        <small>({sns_id})</small>
+                      <% %{id: sns_id, label: sns_label} -> %>
+                        <small>{sns_label || "Untitled"} ({sns_id})</small>
                       <% %Ecto.Association.NotLoaded{} -> %>
                         <em>Shadow Net System not loaded</em>
                         (ID: <code>{s.shadow_net_system_id}</code>)
@@ -279,8 +290,8 @@ defmodule RenewCollabWeb.LiveProjectManager do
               </button>
             </form>
           </div>
-          <div style="border: 2px dashed #aaa">
-            <h3>Simulations</h3>
+          <div style="border: 1px solid #ddd; padding: 1em">
+            <h3 style="margin-top: 0;border-bottom: 1px solid #aaa;">Simulations</h3>
             <%= if  not Enum.empty?(@project.simulations) do %>
               <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px">
                 <%= for s <- @project.simulations do %>
@@ -320,7 +331,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
                 <%= for s <- @simulations do %>
                   <option
                     value={s.id}
-                    disabled={@assigned_to_project.shadow_net_systems |> MapSet.member?(s.id)}
+                    disabled={@assigned_to_project.simulations |> MapSet.member?(s.id)}
                   >
                     {s.id}
                   </option>
@@ -336,17 +347,18 @@ defmodule RenewCollabWeb.LiveProjectManager do
           </div>
         </div>
         <%= if WriteAccess.can(@current_account, %Actions.ProjectDelete{project_id: @project.id}) do %>
-          <hr />
-          <h3>Delete Project</h3>
+          <div style="border: 1px solid #ddd; margin: 1em 0; padding: 1em">
+            <h3 style="margin-top: 0;border-bottom: 1px solid #aaa;">Delete Project</h3>
 
-          <form method="post" phx-submit="delete" phx-value-id={@project.id} accept-charset="utf-8">
-            <button
-              type="submit"
-              style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
-            >
-              Delete
-            </button>
-          </form>
+            <form method="post" phx-submit="delete" phx-value-id={@project.id} accept-charset="utf-8">
+              <button
+                type="submit"
+                style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
+              >
+                Delete
+              </button>
+            </form>
+          </div>
         <% end %>
       </div>
     </div>
@@ -365,7 +377,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
     %Actions.ProjectAddMemberAsAdmin{
       project_id: socket.assigns.project.id,
       account_id: account_id,
-      role: role
+      role: RenewCollabProj.Entities.ProjectMember.parse_role(role)
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
     |> case do
@@ -380,7 +392,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
   def handle_event("remove_member", %{"id" => account_id}, socket) do
     %Actions.ProjectRemoveMemberAsAdmin{
       project_id: socket.assigns.project.id,
-      member_account_id: account_id
+      account_id: account_id
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
     |> case do
@@ -477,7 +489,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
   def handle_event("add_sns", %{"shadow_net_system_id" => sns_id}, socket) do
     %Actions.ProjectAddShadowNetSystemAsAdmin{
       project_id: socket.assigns.project.id,
-      sns_id: sns_id
+      shadow_net_system_id: sns_id
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
     |> case do
@@ -492,7 +504,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
   def handle_event("remove_sns", %{"id" => sns_id}, socket) do
     %Actions.ProjectRemoveShadowNetSystemAsAdmin{
       project_id: socket.assigns.project.id,
-      sns_id: sns_id
+      shadow_net_system_id: sns_id
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
     |> case do

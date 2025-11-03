@@ -31,9 +31,14 @@ defmodule RenewCollabProj.Entities.ProjectMember do
     # |> dbg
   end
 
+  defmacro roles_list, do: quote(do: unquote(@member_roles))
   def roles(), do: @member_roles
 
   def weaker_roles(:owner), do: [:editor, :reader]
   def weaker_roles(:editor), do: [:reader]
   def weaker_roles(_), do: []
+
+  def parse_role("owner"), do: :owner
+  def parse_role("editor"), do: :editor
+  def parse_role("reader"), do: :reader
 end

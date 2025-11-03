@@ -78,6 +78,50 @@ defmodule RenewCollabCtrl.View do
     %{project_id: project_id}
     |> RenewCollabProj.Queries.ProjectDetails.new()
     |> RenewCollabProj.ProjectFetcher.fetch()
+    |> case do
+      {:ok, project} ->
+        preloads = [
+          {:simulations, :simulation_id, :simulation, &%{simulation_ids: &1},
+           RenewCollabSim.Queries.ListSimulations, RenewCollabSim.SimulationFetcher},
+          {:shadow_net_systems, :shadow_net_system_id, :shadow_net_system,
+           &%{shadow_net_system_ids: &1}, RenewCollabSim.Queries.ListShadowNetSystems,
+           RenewCollabSim.SimulationFetcher},
+          {:members, :account_id, :account, &%{account_ids: &1},
+           RenewCollabAuth.Queries.AccountsWithIds, RenewCollabAuth.AuthFetcher},
+          {:documents, :document_id, :document, &%{document_ids: &1},
+           RenewCollab.Queries.DocumentList, RenewCollab.DocumentFetcher}
+        ]
+
+        for {coll, fk, assoc, attrs, cmd, fetcher} <- preloads, reduce: {:ok, project} do
+          {:ok, proj} ->
+            {:ok, entries} =
+              Enum.map(Map.get(proj, coll), &Map.get(&1, fk))
+              |> then(attrs)
+              |> cmd.new()
+              |> fetcher.fetch()
+
+            entries_by_id =
+              Map.new(entries, &{&1.id, &1})
+
+            {:ok,
+             proj
+             |> Map.update(coll, [], fn assignments ->
+               assignments
+               |> Enum.map(fn asgn ->
+                 case Map.fetch(entries_by_id, Map.get(asgn, fk)) do
+                   {:ok, entry} ->
+                     %{asgn | assoc => entry} |> Ecto.put_meta(state: :loaded)
+
+                   :error ->
+                     asgn
+                 end
+               end)
+             end)}
+        end
+
+      err ->
+        err
+    end
   end
 
   def do_fetch(_account, %Views.GlobalAccounts{}) do
