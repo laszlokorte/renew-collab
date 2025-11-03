@@ -1065,8 +1065,6 @@ defmodule RenewCollabCtrl.Action do
         })
         |> RenewCollabProj.ProjectCommander.run_project_command_sync()
 
-        RenewCollabSim.Server.ScopedSimulationServer.setup(project_id, sim_id)
-
         # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
@@ -1346,6 +1344,13 @@ defmodule RenewCollabCtrl.Action do
     RenewCollabSim.Commands.RenameSimulation.new(%{
       simulation_id: simulation_id,
       new_name: new_name
+    })
+    |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
+  end
+
+  def do_perform(%Actions.SimulationReset{simulation_id: simulation_id}) do
+    RenewCollabSim.Commands.ClearSimulation.new(%{
+      simulation_id: simulation_id
     })
     |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
   end

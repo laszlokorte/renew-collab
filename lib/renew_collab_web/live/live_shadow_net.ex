@@ -417,47 +417,73 @@ defmodule RenewCollabWeb.LiveShadowNet do
   end
 
   def handle_event("setup", %{"id" => simulation_id}, socket) do
-    RenewCollabSim.Server.ScopedSimulationServer.setup_and_wait(
-      socket.assigns.project_id,
-      simulation_id
-    )
+    %Actions.SimulationInitialize{
+      simulation_id: simulation_id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      :ok ->
+        {:noreply, socket |> put_flash(:info, "Initializing simulation")}
 
-    {:noreply,
-     socket
-     |> assign(
-       :running,
-       RenewCollabSim.Server.ScopedSimulationServer.running_ids(
-         socket.assigns.shadow_net_system.project_assignment.project_id
-       )
-       |> MapSet.new()
-     )}
+      _ ->
+        {:noreply, socket |> put_flash(:error, "Initializing simulation failed")}
+    end
   end
 
   def handle_event("stop", %{"id" => simulation_id}, socket) do
-    RenewCollabSim.Server.ScopedSimulationServer.stop(
-      socket.assigns.project_id,
-      simulation_id
-    )
+    %Actions.SimulationTerminate{
+      simulation_id: simulation_id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      :ok ->
+        {:noreply, socket |> put_flash(:info, "Stopping simulation")}
 
-    {:noreply, socket}
+      _ ->
+        {:noreply, socket |> put_flash(:error, "Stopping simulation failed")}
+    end
   end
 
   def handle_event("step", %{"id" => simulation_id}, socket) do
-    RenewCollabSim.Server.ScopedSimulationServer.step(socket.assigns.project_id, simulation_id)
+    %Actions.SimulationStep{
+      simulation_id: simulation_id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      :ok ->
+        {:noreply, socket |> put_flash(:info, "Stepping simulation")}
 
-    {:noreply, socket}
+      _ ->
+        {:noreply, socket |> put_flash(:error, "Stepping simulation failed")}
+    end
   end
 
   def handle_event("play", %{"id" => simulation_id}, socket) do
-    RenewCollabSim.Server.ScopedSimulationServer.play(socket.assigns.project_id, simulation_id)
+    %Actions.SimulationPlay{
+      simulation_id: simulation_id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      :ok ->
+        {:noreply, socket |> put_flash(:info, "Playing simulation")}
 
-    {:noreply, socket}
+      _ ->
+        {:noreply, socket |> put_flash(:error, "Playing simulation failed")}
+    end
   end
 
   def handle_event("pause", %{"id" => simulation_id}, socket) do
-    RenewCollabSim.Server.ScopedSimulationServer.pause(socket.assigns.project_id, simulation_id)
+    %Actions.SimulationPause{
+      simulation_id: simulation_id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      :ok ->
+        {:noreply, socket |> put_flash(:info, "Pausing simulation")}
 
-    {:noreply, socket}
+      _ ->
+        {:noreply, socket |> put_flash(:error, "Payusing simulation failed")}
+    end
   end
 
   def handle_event("change_main_net", %{"main_net" => ""}, socket) do

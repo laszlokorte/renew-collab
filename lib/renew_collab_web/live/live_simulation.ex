@@ -373,8 +373,13 @@ defmodule RenewCollabWeb.LiveSimulation do
       simulation_id: socket.assigns.simulation.id
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        {:noreply, socket |> reload() |> put_flash(:info, "Simulation log cleared")}
 
-    {:noreply, socket |> reload() |> put_flash(:info, "Simulation log cleared")}
+      _ ->
+        {:noreply, socket |> put_flash(:error, "Clearing failed")}
+    end
   end
 
   def handle_event("clear_instances", %{}, socket) do
@@ -382,8 +387,13 @@ defmodule RenewCollabWeb.LiveSimulation do
       simulation_id: socket.assigns.simulation.id
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        {:noreply, socket |> reload() |> put_flash(:info, "Simulation instances cleared")}
 
-    {:noreply, socket |> reload() |> put_flash(:info, "Simulation net instances cleared")}
+      _ ->
+        {:noreply, socket |> put_flash(:error, "Clearing failed")}
+    end
   end
 
   def handle_event("reset", %{}, socket) do
@@ -391,8 +401,13 @@ defmodule RenewCollabWeb.LiveSimulation do
       simulation_id: socket.assigns.simulation.id
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        {:noreply, socket |> reload() |> put_flash(:info, "Simulation reset")}
 
-    {:noreply, socket}
+      _ ->
+        {:noreply, socket |> put_flash(:error, "Reset failed")}
+    end
   end
 
   def handle_event("step", %{}, socket) do
@@ -400,8 +415,13 @@ defmodule RenewCollabWeb.LiveSimulation do
       simulation_id: socket.assigns.simulation.id
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      :ok ->
+        {:noreply, socket |> put_flash(:info, "Stepping")}
 
-    {:noreply, socket}
+      _ ->
+        {:noreply, socket |> put_flash(:error, "Stepping failed failed")}
+    end
   end
 
   def handle_event("play", %{}, socket) do
@@ -409,8 +429,13 @@ defmodule RenewCollabWeb.LiveSimulation do
       simulation_id: socket.assigns.simulation.id
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      :ok ->
+        {:noreply, socket |> put_flash(:info, "Start playing simulation")}
 
-    {:noreply, socket}
+      _ ->
+        {:noreply, socket |> put_flash(:error, "Playing simulation failed")}
+    end
   end
 
   def handle_event("pause", %{}, socket) do
@@ -418,8 +443,13 @@ defmodule RenewCollabWeb.LiveSimulation do
       simulation_id: socket.assigns.simulation.id
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      :ok ->
+        {:noreply, socket |> put_flash(:info, "Pause playing simulation")}
 
-    {:noreply, socket}
+      _ ->
+        {:noreply, socket |> put_flash(:error, "Pausing simulation failed")}
+    end
   end
 
   def handle_event("terminate", %{}, socket) do
@@ -427,8 +457,13 @@ defmodule RenewCollabWeb.LiveSimulation do
       simulation_id: socket.assigns.simulation.id
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      :ok ->
+        {:noreply, socket |> put_flash(:info, "Terminating simulation")}
 
-    {:noreply, socket}
+      _ ->
+        {:noreply, socket |> put_flash(:error, "Termination failed")}
+    end
   end
 
   def handle_event("initialize", %{}, socket) do
@@ -436,8 +471,13 @@ defmodule RenewCollabWeb.LiveSimulation do
       simulation_id: socket.assigns.simulation.id
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      :ok ->
+        {:noreply, socket |> put_flash(:info, "Initializing simulation")}
 
-    {:noreply, socket}
+      _ ->
+        {:noreply, socket |> put_flash(:error, "Initializing simulation failed")}
+    end
   end
 
   def handle_event("delete", %{}, socket) do

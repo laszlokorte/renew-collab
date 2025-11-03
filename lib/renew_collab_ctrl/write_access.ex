@@ -131,6 +131,7 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(_account, %Actions.SimulationPlay{}), do: true
   def can(_account, %Actions.SimulationStep{}), do: true
   def can(_account, %Actions.SimulationTerminate{}), do: true
+  def can(_account, %Actions.SimulationReset{}), do: true
 
   def can(_account, _action), do: false
 end
