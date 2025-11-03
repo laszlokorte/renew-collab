@@ -838,15 +838,23 @@ defmodule RenewCollabCtrl.Action do
 
   def do_perform(%Actions.ProjectAddMemberAsUser{
         project_id: project_id,
-        account_id: account_id,
+        email: email,
         role: role
       }) do
-    RenewCollabProj.Commands.AssignProjectMember.new(%{
-      project_id: project_id,
-      account_id: account_id,
-      role: role
-    })
-    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+    RenewCollabAuth.Queries.AccountByEmail.new(%{email: email})
+    |> RenewCollabAuth.AuthFetcher.fetch()
+    |> case do
+      {:ok, %{id: account_id}} ->
+        RenewCollabProj.Commands.AssignProjectMember.new(%{
+          project_id: project_id,
+          account_id: account_id,
+          role: role
+        })
+        |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+
+      _ ->
+        {:error, nil}
+    end
   end
 
   def do_perform(%Actions.ProjectAddSimulationAsAdmin{
@@ -994,11 +1002,11 @@ defmodule RenewCollabCtrl.Action do
 
   def do_perform(%Actions.ProjectRemoveMemberAsUser{
         project_id: project_id,
-        account_id: account_id
+        member_id: member_id
       }) do
     RenewCollabProj.Commands.RemoveProjectMember.new(%{
       project_id: project_id,
-      account_id: account_id
+      member_id: member_id
     })
     |> RenewCollabProj.ProjectCommander.run_project_command_sync()
   end

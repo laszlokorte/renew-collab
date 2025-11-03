@@ -11,9 +11,7 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(_account, %Actions.DocumentEditRemoveThumbnail{}), do: true
   def can(_account, %Actions.DocumentCreateInProject{}), do: true
   def can(_account, %Actions.DocumentEditCreateLayer{}), do: true
-  def can(_account, %Actions.DocumentSnapshotRestore{}), do: true
   def can(_account, %Actions.DocumentDuplicateInProject{}), do: true
-  def can(_account, %Actions.DocumentEditLayerAssignSocketSchema{}), do: true
   def can(_account, %Actions.DocumentEditImportFile{}), do: true
   def can(_account, %Actions.DocumentDeleteAsUser{}), do: true
 
@@ -113,10 +111,8 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(_account, %Actions.ProjectCreateAsAdmin{}), do: true
   def can(_account, %Actions.ProjectRename{}), do: true
 
-  def can(_account, %Actions.ProjectRemoveMemberAsAdmin{}), do: true
   def can(_account, %Actions.ProjectAddMemberAsAdmin{}), do: true
   def can(_account, %Actions.ProjectAddMemberAsAdmin{}), do: true
-  def can(_account, %Actions.ProjectRemoveMemberAsAdmin{}), do: true
   def can(_account, %Actions.ProjectAddDocumentAsAdmin{}), do: true
   def can(_account, %Actions.DocumentDuplicateInProject{}), do: true
   def can(_account, %Actions.ProjectRemoveDocumentAsAdmin{}), do: true
@@ -124,7 +120,7 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(_account, %Actions.ProjectRemoveSimulationAsAdmin{}), do: true
   def can(_account, %Actions.ProjectAddShadowNetSystemAsAdmin{}), do: true
   def can(_account, %Actions.ProjectRemoveShadowNetSystemAsAdmin{}), do: true
-  def can(_account, %Actions.ProjectRename{}), do: true
-
+  def can(_account, %Actions.ProjectRemoveMemberAsUser{}), do: true
+  def can(_account, %Actions.ProjectAddMemberAsUser{}), do: true
   def can(_account, _action), do: false
 end

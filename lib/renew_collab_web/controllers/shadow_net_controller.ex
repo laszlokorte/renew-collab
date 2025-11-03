@@ -4,7 +4,6 @@ defmodule RenewCollabWeb.ShadowNetController do
   alias RenewCollabCtrl.Actions
   alias RenewCollabCtrl.Fetcher
   alias RenewCollabCtrl.Views
-  alias RenewCollabSim.Simulator
 
   action_fallback RenewCollabWeb.FallbackController
 
@@ -43,7 +42,7 @@ defmodule RenewCollabWeb.ShadowNetController do
     %Views.ShadowNetSystem{shadow_net_system_id: shadow_net_system_id}
     |> Fetcher.fetch_as(conn.assigns.current_account)
     |> case do
-      %{id: sns_id, project_assignment: %{project_id: project_id}} ->
+      %{id: _sns_id, project_assignment: %{project_id: project_id}} ->
         %Actions.SimulationCreateFromShadowNetSystemInProject{
           project_id: project_id,
           shadow_net_system_id: shadow_net_system_id

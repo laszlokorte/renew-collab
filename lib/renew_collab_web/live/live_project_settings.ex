@@ -88,7 +88,7 @@ defmodule RenewCollabWeb.LiveProjectSettings do
             <%= for m <- @members do %>
               <%= with acc = %{} <- m.account do %>
                 <li>
-                  <%= if WriteAccess.can(@current_account, %ProjectRemoveMemberAsUser{project_id: @project.id, account_id: acc.id}) do %>
+                  <%= if WriteAccess.can(@current_account, %ProjectRemoveMemberAsUser{project_id: @project.id, member_id: m.id}) do %>
                     <button
                       type="button"
                       phx-click="remove_member"
@@ -168,19 +168,47 @@ defmodule RenewCollabWeb.LiveProjectSettings do
     {:noreply, socket}
   end
 
-  def handle_event("add_member", params, socket) do
-    Projects.add_member(socket.assigns.project, params)
-    reload(socket |> put_flash(:info, "Project member invited"))
+  def handle_event("add_member", %{"account_email" => email, "role" => role}, socket) do
+    %Actions.ProjectAddMemberAsUser{
+      project_id: socket.assigns.project,
+      email: email,
+      role: RenewCollabProj.Entities.ProjectMember.parse_role(role)
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        reload(socket |> put_flash(:info, "Member added to project"))
+
+      {:error, _} ->
+        reload(socket |> put_flash(:error, "Adding member failed"))
+    end
   end
 
   def handle_event("remove_member", %{"id" => member_id}, socket) do
-    Projects.remove_member(socket.assigns.project, member_id)
-    reload(socket |> put_flash(:info, "Project member removed"))
+    %Actions.ProjectRemoveMemberAsUser{
+      project_id: socket.assigns.project,
+      member_id: member_id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        reload(socket |> put_flash(:info, "Member removed"))
+
+      {:error, _} ->
+        reload(socket |> put_flash(:error, "Removing member failed"))
+    end
   end
 
-  def handle_event("rename", params, socket) do
-    Projects.update_project(socket.assigns.project, params)
-    reload(socket |> put_flash(:info, "Project name changed"))
+  def handle_event("rename", %{"name" => name}, socket) do
+    %Actions.ProjectRename{project_id: socket.assigns.project.id, new_name: name}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        socket |> put_flash(:info, "Project name changed") |> reload
+
+      _ ->
+        socket |> put_flash(:error, "Project rename failed") |> reload
+    end
   end
 
   def handle_event("delete", _params, socket) do
@@ -198,6 +226,13 @@ defmodule RenewCollabWeb.LiveProjectSettings do
   def reload(socket) do
     {:noreply,
      socket
-     |> assign(:project, Projects.find_project(socket.assigns.project.id))}
+     |> assign(
+       :project,
+       %Views.MyProject{
+         account_id: socket.assigns.current_account.id,
+         project_id: socket.assigns.project.id
+       }
+       |> Fetcher.fetch_as(socket.assigns.current_account)
+     )}
   end
 end

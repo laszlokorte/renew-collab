@@ -3,7 +3,6 @@ defmodule RenewCollabProj.Queries.AllProjectAssignments do
   alias RenewCollabProj.Entities.ProjectShadowNetSystem
   alias RenewCollabProj.Entities.ProjectSimulation
   alias RenewCollabProj.Entities.ProjectDocument
-  alias RenewCollabProj.Entities.Project
   import Ecto.Query
 
   defstruct []

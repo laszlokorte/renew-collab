@@ -7,8 +7,6 @@ defmodule RenewCollabWeb.LiveProjectManager do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
-  alias RenewCollabProj.Projects
-
   @topic "project"
 
   def mount(%{"project_id" => project_id}, _session, socket) do
@@ -119,7 +117,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
                         <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
                           [{m.role}]
                         </span>
-                        {account_email}
+                        {account_email} <small>({account_id})</small>
                       <% %Ecto.Association.NotLoaded{} -> %>
                         <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
                           [{m.role}]
@@ -191,7 +189,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
                       style="vertical-align: middle"
                     />
                     <%= case  d.document do %>
-                      <% %{id: doc_id, name: document_name} -> %>
+                      <% %{name: document_name} -> %>
                         <small>{document_name} ({d.document_id})</small>
                       <% %Ecto.Association.NotLoaded{} -> %>
                         <em>Document not loaded</em> (ID: <code>{d.document_id}</code>)

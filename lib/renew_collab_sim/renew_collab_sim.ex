@@ -5,9 +5,6 @@ defmodule RenewCollabSim.Simulator do
 
   import Ecto.Query, warn: false
 
-  alias RenewCollabSim.Repo
-  alias RenewCollab.Simulation.SimulationLink
-
   # def count_shadow_net_systems do
   #   from(sns in ShadowNetSystem, select: count(sns.id)) |> Repo.one()
   # end

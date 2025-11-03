@@ -1,3 +1,3 @@
 defmodule RenewCollabCtrl.Actions.ProjectAddMemberAsUser do
-  defstruct [:project_id, :account_id, :role]
+  defstruct [:project_id, :email, :role]
 end

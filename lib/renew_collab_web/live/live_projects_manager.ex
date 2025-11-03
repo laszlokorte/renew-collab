@@ -6,8 +6,6 @@ defmodule RenewCollabWeb.LiveProjectsManager do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
-  alias RenewCollabProj.Projects
-
   @topic "projects"
 
   def mount(_params, _session, socket) do
