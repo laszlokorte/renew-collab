@@ -274,9 +274,14 @@ defmodule RenewCollabWeb.LiveShadowNets do
                   <td width="100%">
                     <div style="color: #078; display: flex; align-items: center; gap: 1ex; justify-content: start;">
                       <img class="icon" src="/assets/icon-network.svg" />
-                      <.link navigate={~p"/shadow_net/#{sns.id}"}>
-                        <code>{sns.id}</code>
-                      </.link>
+                      <span>
+                        <.link navigate={~p"/shadow_net/#{sns.id}"}>
+                          {sns.label || sns.id}
+                        </.link>
+                        <%= if sns.label do %>
+                          <br /><code style="color: black"><small>{sns.id}</small></code>
+                        <% end %>
+                      </span>
                     </div>
                   </td>
 
@@ -408,7 +413,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
           false
       end)
 
-    paths =
+    rnws =
       consume_uploaded_entries(socket, :import_rnw_file, fn %{path: path},
                                                             %{
                                                               client_name: filename
@@ -417,12 +422,13 @@ defmodule RenewCollabWeb.LiveShadowNets do
         {:ok, {Path.basename(filename), file_content}}
       end)
 
-    RenewCollabSim.Simulator.compile_rnws_to_sns(
-      socket.assigns.project,
-      formalism,
-      paths,
-      main_net_name
-    )
+    %Actions.ShadowNetSystemCreateFromRnwInProject{
+      project_id: socket.assigns.project.id,
+      formalism: formalism,
+      rnws: rnws,
+      main_net_name: main_net_name
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
     |> case do
       {:error, _} ->
         {:noreply, socket |> put_flash(:error, "Import failed")}
@@ -434,24 +440,23 @@ defmodule RenewCollabWeb.LiveShadowNets do
 
   def handle_event("import_sns", %{"main_net" => main_net_name}, socket) do
     if socket.assigns.is_admin do
-      [_sns] =
-        consume_uploaded_entries(socket, :import_sns_file, fn %{path: path}, %{} ->
-          {:ok, file_content} = File.read(path)
+      consume_uploaded_entries(socket, :import_sns_file, fn %{path: path}, %{} ->
+        {:ok, file_content} = File.read(path)
 
-          RenewCollabSim.Simulator.create_shadow_net(
-            socket.assigns.project,
-            file_content,
-            main_net_name,
-            [
-              %{"name" => main_net_name}
-            ]
-          )
-        end)
-
-      {:noreply,
-       socket
-       |> put_flash(:info, "Import successful")
-       |> assign(import_sns_form: to_form(%{"main_net" => nil}))}
+        %Actions.ShadowNetSystemImportFromSnsFileInProject{
+          sns_file: {Path.basename(path), file_content},
+          main_net_name: main_net_name,
+          project_id: socket.assigns.project.id
+        }
+        |> Dispatcher.perform_as(socket.assigns.current_account)
+      end)
+      |> case do
+        [%{id: _sns_id}] ->
+          {:noreply,
+           socket
+           |> put_flash(:info, "Import successful")
+           |> assign(import_sns_form: to_form(%{"main_net" => nil}))}
+      end
     else
       {:noreply, socket}
     end

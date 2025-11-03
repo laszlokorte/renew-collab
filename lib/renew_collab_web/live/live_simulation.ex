@@ -19,26 +19,11 @@ defmodule RenewCollabWeb.LiveSimulation do
         {:ok, socket |> put_flash(:error, "Simulation not found") |> redirect(to: ~p"/projects")}
 
       sim ->
-        project_id =
-          if(sim.project_assignment,
-            do: sim.project_assignment.project_id,
-            else: sim.shadow_net_system.project_assignment.project_id
-          )
-
         socket =
           socket
-          |> assign(:simulation_id, simulation_id)
-          |> assign(:project_id, project_id)
           |> assign(:rename_form, to_form(%{"name" => sim.label}))
           |> assign(:show_transitions, false)
-          |> assign(
-            :is_active,
-            RenewCollabSim.Server.ProjectSimulationServer.exists(
-              project_id,
-              simulation_id
-            )
-          )
-          |> assign(:simulation, sim)
+          |> assign(load_data(sim, socket.assigns.current_account))
 
         # TODO:subscription
         RenewCollabWeb.Endpoint.subscribe("#{@topic}:#{simulation_id}")
@@ -47,10 +32,21 @@ defmodule RenewCollabWeb.LiveSimulation do
     end
   end
 
+  def load_data(simulation, _account) do
+    %{
+      simulation: simulation,
+      is_active:
+        RenewCollabSim.Server.ProjectSimulationServer.exists(
+          simulation.project_assignment.project_id,
+          simulation.id
+        )
+    }
+  end
+
   def handle_info({:simulation_change, sim_id, _}, socket) do
     current_account = socket.assigns.current_account
 
-    if sim_id == socket.assigns.simulation_id do
+    if sim_id == socket.assigns.simulation.id do
       %Views.SimulationWithState{
         simulation_id: sim_id
       }
@@ -98,7 +94,7 @@ defmodule RenewCollabWeb.LiveSimulation do
       <RenewCollabWeb.RenewComponents.app_header
         flash={@flash}
         tab={:simulations}
-        project_id={@project_id}
+        project_id={@simulation.project_assignment.project_id}
       />
 
       <div style="padding: 1em">
@@ -342,19 +338,23 @@ defmodule RenewCollabWeb.LiveSimulation do
   end
 
   def handle_event("rename", %{"name" => new_name}, socket) do
-    RenewCollabSim.Simulator.rename_simulation(
-      socket.assigns.simulation_id,
-      new_name
-    )
+    %Actions.SimulationRename{simulation_id: socket.assigns.simulation.id, new_name: new_name}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        {:noreply, socket |> reload() |> put_flash(:info, "Simulation name changed")}
 
-    {:noreply, socket |> put_flash(:info, "Simulation name changed")}
+      _ ->
+        {:noreply, socket |> put_flash(:error, "Renaming Simulaton failed")}
+    end
   end
 
   def handle_event("debug", %{}, socket) do
-    RenewCollabSim.Simulator.add_manual_log_entry(
-      socket.assigns.simulation_id,
-      "Manual Test Entry"
-    )
+    %Actions.SimulationLogDebug{
+      simulation_id: socket.assigns.simulation.id,
+      message: "Manual Test Entry"
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
   end
@@ -364,49 +364,37 @@ defmodule RenewCollabWeb.LiveSimulation do
   end
 
   def handle_event("clear_log", %{}, socket) do
-    RenewCollabSim.Simulator.clear_log(socket.assigns.simulation_id)
+    RenewCollabSim.Simulator.clear_log(socket.assigns.simulation.id)
 
-    # TODO:broadcast
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "#{@topic}:#{socket.assigns.simulation_id}",
-      {:simulation_change, socket.assigns.simulation_id, :log}
-    )
+    %Actions.SimulationLogClear{
+      simulation_id: socket.assigns.simulation.id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket |> put_flash(:info, "Simulation log cleared")}
   end
 
   def handle_event("clear_instances", %{}, socket) do
-    RenewCollabSim.Simulator.clear_instances(socket.assigns.simulation_id)
-
-    # TODO:broadcast
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "#{@topic}:#{socket.assigns.simulation_id}",
-      {:simulation_change, socket.assigns.simulation_id, :records}
-    )
+    %Actions.SimulationInstancesClear{
+      simulation_id: socket.assigns.simulation.id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket |> put_flash(:info, "Simulation net instances cleared")}
   end
 
   def handle_event("reset", %{}, socket) do
-    RenewCollabSim.Simulator.reset_time(socket.assigns.simulation_id)
-    RenewCollabSim.Simulator.clear_instances(socket.assigns.simulation_id)
-    RenewCollabSim.Simulator.clear_log(socket.assigns.simulation_id)
-
-    # TODO:broadcast
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "#{@topic}:#{socket.assigns.simulation_id}",
-      {:simulation_change, socket.assigns.simulation_id, :reset}
-    )
+    %Actions.SimulationReset{
+      simulation_id: socket.assigns.simulation.id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket}
   end
 
   def handle_event("step", %{}, socket) do
     RenewCollabSim.Server.ProjectSimulationServer.step(
-      socket.assigns.project_id,
+      socket.assigns.simulation.project_assignment.project_id,
       socket.assigns.simulation.id
     )
 
@@ -415,7 +403,7 @@ defmodule RenewCollabWeb.LiveSimulation do
 
   def handle_event("play", %{}, socket) do
     RenewCollabSim.Server.ProjectSimulationServer.play(
-      socket.assigns.project_id,
+      socket.assigns.simulation.project_assignment.project_id,
       socket.assigns.simulation.id
     )
 
@@ -424,7 +412,7 @@ defmodule RenewCollabWeb.LiveSimulation do
 
   def handle_event("pause", %{}, socket) do
     RenewCollabSim.Server.ProjectSimulationServer.pause(
-      socket.assigns.project_id,
+      socket.assigns.simulation.project_assignment.project_id,
       socket.assigns.simulation.id
     )
 
@@ -433,7 +421,7 @@ defmodule RenewCollabWeb.LiveSimulation do
 
   def handle_event("terminate", %{}, socket) do
     RenewCollabSim.Server.ProjectSimulationServer.stop(
-      socket.assigns.project_id,
+      socket.assigns.simulation.project_assignment.project_id,
       socket.assigns.simulation.id
     )
 
@@ -442,9 +430,10 @@ defmodule RenewCollabWeb.LiveSimulation do
 
   def handle_event("initialize", %{}, socket) do
     RenewCollabSim.Server.ProjectSimulationServer.setup(
-      socket.assigns.project_id,
+      socket.assigns.simulation.project_assignment.project_id,
       socket.assigns.simulation.id
     )
+    |> dbg
 
     {:noreply, socket}
   end
@@ -462,5 +451,16 @@ defmodule RenewCollabWeb.LiveSimulation do
       {:error, _} ->
         {:noreply, socket |> put_flash(:error, "Failed to delete simulation")}
     end
+  end
+
+  def reload(socket) do
+    socket
+    |> assign(
+      :simulation,
+      %Views.SimulationWithState{
+        simulation_id: socket.assigns.simulation.id
+      }
+      |> Fetcher.fetch_as(socket.assigns.current_account)
+    )
   end
 end

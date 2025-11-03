@@ -69,13 +69,15 @@ defmodule RenewCollabWeb.LiveProjectManager do
       </div>
 
       <div style="padding: 1em">
-        <dl>
+        <dl style="display: grid; grid-template-columns: max-content max-content">
           <dt>Created at</dt>
-          <dd>{@project.inserted_at}</dd>
-        </dl>
-        <dl>
+          <dd>
+            <RenewCollabWeb.RenewComponents.timestamp value={@project.inserted_at} />
+          </dd>
           <dt>Last Update</dt>
-          <dd>{@project.updated_at}</dd>
+          <dd>
+            <RenewCollabWeb.RenewComponents.timestamp value={@project.updated_at} />
+          </dd>
         </dl>
       </div>
       <div style="padding: 1em">

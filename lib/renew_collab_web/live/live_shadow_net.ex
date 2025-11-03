@@ -258,6 +258,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
             <tr>
               <th style="border-bottom: 1px solid #333;" align="left" width="100%">Simulations</th>
 
+              <th style="border-bottom: 1px solid #333;" align="left" width="100%">Created at</th>
               <th style="border-bottom: 1px solid #333;" align="left" width="100%">Timestep</th>
 
               <th style="border-bottom: 1px solid #333;" align="right" colspan="5">Actions</th>
@@ -289,19 +290,24 @@ defmodule RenewCollabWeb.LiveShadowNet do
                   <td>
                     <div style="display: flex; align-items: center; gap: 1ex; justify-content: start;">
                       <img class="icon" src="/assets/icon-simulation.svg" />
-                      <%= if sim.label do %>
-                        <.link navigate={~p"/simulation/#{sim.id}"}>
-                          {sim.label}
-                        </.link>
-                        <br /><small><code>{sim.id}</code></small>
-                      <% else %>
-                        <.link navigate={~p"/simulation/#{sim.id}"}>
-                          <code>{sim.id}</code>
-                        </.link>
-                      <% end %>
+                      <span>
+                        <%= if sim.label do %>
+                          <.link navigate={~p"/simulation/#{sim.id}"}>
+                            {sim.label}
+                          </.link>
+                          <br /><small><code>{sim.id}</code></small>
+                        <% else %>
+                          <.link navigate={~p"/simulation/#{sim.id}"}>
+                            <code>{sim.id}</code>
+                          </.link>
+                        <% end %>
+                      </span>
                     </div>
                   </td>
 
+                  <td>
+                    <RenewCollabWeb.RenewComponents.timestamp value={sim.inserted_at} />
+                  </td>
                   <td>
                     {sim.timestep}
                   </td>

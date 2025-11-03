@@ -1176,8 +1176,57 @@ defmodule RenewCollabCtrl.Action do
     end
   end
 
-  def do_perform(%Actions.ShadowNetSystemCreateFromRnwInProject{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.ShadowNetSystemImportFromSnsFileInProject{
+        main_net_name: main_name,
+        project_id: project_id,
+        sns_file: {file_name, file_content}
+      }) do
+    {:ok, %{shadow_net_system: %{id: sns_id} = sns}} =
+      RenewCollabSim.Commands.CreateShadowNetSystem.new(%{
+        label: "Imported: #{file_name}",
+        compiled: file_content,
+        main_net_name: main_name,
+        nets: []
+      })
+      |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
+
+    RenewCollabProj.Commands.AssignProjectShadowNetSystem.new(%{
+      project_id: project_id,
+      shadow_net_system_id: sns_id
+    })
+    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+
+    {:ok, sns}
+  end
+
+  def do_perform(%Actions.ShadowNetSystemCreateFromRnwInProject{
+        formalism: formalism,
+        main_net_name: main_name,
+        project_id: project_id,
+        rnws: rnws
+      }) do
+    {:ok, content} =
+      RenewCollabSim.Compiler.SnsCompiler.compile(
+        formalism,
+        rnws
+      )
+
+    {:ok, %{shadow_net_system: %{id: sns_id} = sns}} =
+      RenewCollabSim.Commands.CreateShadowNetSystem.new(%{
+        label: "Fooo",
+        compiled: content,
+        main_net_name: main_name,
+        nets: []
+      })
+      |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
+
+    RenewCollabProj.Commands.AssignProjectShadowNetSystem.new(%{
+      project_id: project_id,
+      shadow_net_system_id: sns_id
+    })
+    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+
+    {:ok, sns}
   end
 
   def do_perform(%Actions.ShadowNetSystemDeleteAsUser{sns_id: shadow_net_system_id}) do
@@ -1241,7 +1290,7 @@ defmodule RenewCollabCtrl.Action do
     {:error, :not_implemented}
   end
 
-  def do_perform(%Actions.SimulationClear{}) do
+  def do_perform(%Actions.SimulationInstancesClear{}) do
     {:error, :not_implemented}
   end
 
@@ -1261,8 +1310,12 @@ defmodule RenewCollabCtrl.Action do
     {:error, :not_implemented}
   end
 
-  def do_perform(%Actions.SimulationRename{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.SimulationRename{simulation_id: simulation_id, new_name: new_name}) do
+    RenewCollabSim.Commands.RenameSimulation.new(%{
+      simulation_id: simulation_id,
+      new_name: new_name
+    })
+    |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
   end
 
   def do_perform(%Actions.SimulationStep{}) do

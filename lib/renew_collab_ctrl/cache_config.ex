@@ -154,7 +154,7 @@ defmodule RenewCollabCtrl.CacheConfig do
   def tags_for_action(%Actions.ShadowNetSystemRename{}, _result), do: []
   def tags_for_action(%Actions.SimulationDeleteAsUser{}, _result), do: []
   def tags_for_action(%Actions.SimulationInitialize{}, _result), do: []
-  def tags_for_action(%Actions.SimulationClear{}, _result), do: []
+  def tags_for_action(%Actions.SimulationInstancesClear{}, _result), do: []
   def tags_for_action(%Actions.SimulationLogClear{}, _result), do: []
   def tags_for_action(%Actions.SimulationLogDebug{}, _result), do: []
   def tags_for_action(%Actions.SimulationPause{}, _result), do: []

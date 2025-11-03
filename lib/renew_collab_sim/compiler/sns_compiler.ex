@@ -61,7 +61,7 @@ defmodule RenewCollabSim.Compiler.SnsCompiler do
     if Enum.member?(formalisms(), c) do
       {:ok, c}
     else
-      {:error, :c}
+      {:error, {:formalism, c}}
     end
   end
 

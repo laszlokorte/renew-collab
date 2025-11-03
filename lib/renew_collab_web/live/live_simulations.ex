@@ -139,6 +139,7 @@ defmodule RenewCollabWeb.LiveSimulations do
           <thead>
             <tr>
               <th style="border-bottom: 1px solid #333;" align="left" width="100%">Simulations</th>
+              <th style="border-bottom: 1px solid #333;" align="left" width="100%">Created</th>
 
               <th style="border-bottom: 1px solid #333;" align="left" width="100%">Timestep</th>
 
@@ -163,15 +164,20 @@ defmodule RenewCollabWeb.LiveSimulations do
                   <td>
                     <div style="color: #078; display: flex; align-items: center; gap: 1ex; justify-content: start;">
                       <img class="icon" src="/assets/icon-simulation.svg" />
-                      <.link navigate={~p"/simulation/#{sim.id}"}>
-                        {sim.label || sim.id}
-                      </.link>
-                      <%= if sim.label do %>
-                        <br /><small>{sim.id}</small>
-                      <% end %>
+                      <span>
+                        <.link navigate={~p"/simulation/#{sim.id}"}>
+                          {sim.label || sim.id}
+                        </.link>
+                        <%= if sim.label do %>
+                          <br /><small>{sim.id}</small>
+                        <% end %>
+                      </span>
                     </div>
                   </td>
 
+                  <td>
+                    <RenewCollabWeb.RenewComponents.timestamp value={sim.inserted_at} />
+                  </td>
                   <td>
                     {sim.timestep}
                   </td>

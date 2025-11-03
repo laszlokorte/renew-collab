@@ -22,6 +22,8 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(_account, %Actions.DocumentEditCreateParentLayer{}), do: true
   def can(_account, %Actions.DocumentEditMakeSpaceBetween{}), do: true
 
+  def can(_account, %Actions.ShadowNetSystemImportFromSnsFileInProject{}), do: true
+  def can(_account, %Actions.ShadowNetSystemCreateFromRnwInProject{}), do: true
   def can(_account, %Actions.SimulationCreateFromDocumentsInProject{}), do: true
   def can(_account, %Actions.SimulationCreateFromShadowNetSystemInProject{}), do: true
   def can(_account, %Actions.SimulationDeleteAsUser{}), do: true
@@ -86,6 +88,7 @@ defmodule RenewCollabCtrl.WriteAccess do
 
   def can(_account, %Actions.DocumentEditInsertDocument{}), do: true
 
+  def can(_account, %Actions.SimulationRename{}), do: true
   def can(_account, %Actions.DocumentEditReorderLayerRelative{}), do: true
 
   def can(_account, %Actions.GlobalPrimitivesCreateGroup{}), do: true

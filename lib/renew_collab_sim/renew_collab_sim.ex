@@ -355,16 +355,16 @@ defmodule RenewCollabSim.Simulator do
   #   end
   # end
 
-  def compile_rnws_to_sns(formalism, paths, main_net_name) do
-    with {:ok, content} <- RenewCollabSim.Compiler.SnsCompiler.compile(formalism, paths) do
-      RenewCollabSim.Commands.CreateShadowNetSystem.new(%{
-        label: nil,
-        compiled: content,
-        main_net_name: main_net_name,
-        nets: Enum.map(paths, &%{"name" => Path.rootname(Path.basename(elem(&1, 0)))})
-      })
-    end
-  end
+  # def compile_rnws_to_sns(formalism, paths, main_net_name) do
+  #   with {:ok, content} <- RenewCollabSim.Compiler.SnsCompiler.compile(formalism, paths) do
+  #     RenewCollabSim.Commands.CreateShadowNetSystem.new(%{
+  #       label: nil,
+  #       compiled: content,
+  #       main_net_name: main_net_name,
+  #       nets: Enum.map(paths, &%{"name" => Path.rootname(Path.basename(elem(&1, 0)))})
+  #     })
+  #   end
+  # end
 
   # def compile_rnws_to_sns(project, formalism, paths, main_net_name) do
   #   with {:ok, content} <- RenewCollabSim.Compiler.SnsCompiler.compile(formalism, paths) do
@@ -377,30 +377,30 @@ defmodule RenewCollabSim.Simulator do
   #   end
   # end
 
-  def compile_documents_to_sns(formalism, documents, main_net_name) do
-    nets =
-      try do
-        documents
-        |> Enum.map(fn document ->
-          {:ok, rnw} = RenewCollab.Export.DocumentExport.export(document, synthetic: true)
-          {:ok, json} = RenewCollabWeb.DocumentJSON.show_content(document) |> Jason.encode()
+  # def compile_documents_to_sns(formalism, documents, main_net_name) do
+  #   nets =
+  #     try do
+  #       documents
+  #       |> Enum.map(fn document ->
+  #         {:ok, rnw} = RenewCollab.Export.DocumentExport.export(document, synthetic: true)
+  #         {:ok, json} = RenewCollabWeb.DocumentJSON.show_content(document) |> Jason.encode()
 
-          {RenewCollabSim.Compiler.SnsCompiler.normalize_net_name(document.name), rnw, json,
-           {document.id, document.current_snaptshot.id}}
-        end)
-      rescue
-        e ->
-          {:error, {:export_error, e}}
-      end
+  #         {RenewCollabSim.Compiler.SnsCompiler.normalize_net_name(document.name), rnw, json,
+  #          {document.id, document.current_snaptshot.id}}
+  #       end)
+  #     rescue
+  #       e ->
+  #         {:error, {:export_error, e}}
+  #     end
 
-    with [{default_main_name, _, _, _} | _] <- nets,
-         main_name <- main_net_name || default_main_name do
-      compile_rnws_to_sns(
-        formalism,
-        nets
-        |> Enum.map(fn {name, rnw, _, _} -> {name, rnw} end),
-        main_name
-      )
-    end
-  end
+  #   with [{default_main_name, _, _, _} | _] <- nets,
+  #        main_name <- main_net_name || default_main_name do
+  #     compile_rnws_to_sns(
+  #       formalism,
+  #       nets
+  #       |> Enum.map(fn {name, rnw, _, _} -> {name, rnw} end),
+  #       main_name
+  #     )
+  #   end
+  # end
 end
