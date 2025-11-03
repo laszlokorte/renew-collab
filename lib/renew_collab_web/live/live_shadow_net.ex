@@ -1,4 +1,6 @@
 defmodule RenewCollabWeb.LiveShadowNet do
+  alias RenewCollabCtrl.Dispatcher
+  alias RenewCollabCtrl.Actions
   alias RenewCollabProj.Entities.ProjectShadowNetSystem
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
@@ -65,7 +67,10 @@ defmodule RenewCollabWeb.LiveShadowNet do
      socket
      |> assign(
        :shadow_net_system,
-       RenewCollabSim.Simulator.find_shadow_net_system(socket.assigns.shadow_net_system_id)
+       %Views.ShadowNetSystem{
+         shadow_net_system_id: socket.assigns.shadow_net_system.id
+       }
+       |> Fetcher.fetch_as(socket.assigns.current_account)
      )
      |> assign(
        :running,
@@ -81,7 +86,10 @@ defmodule RenewCollabWeb.LiveShadowNet do
      socket
      |> assign(
        :shadow_net_system,
-       RenewCollabSim.Simulator.find_shadow_net_system(socket.assigns.shadow_net_system_id)
+       %Views.ShadowNetSystem{
+         shadow_net_system_id: socket.assigns.shadow_net_system.id
+       }
+       |> Fetcher.fetch_as(socket.assigns.current_account)
      )
      |> assign(
        :running,
@@ -231,7 +239,11 @@ defmodule RenewCollabWeb.LiveShadowNet do
             New Simulation
           </button>
 
-          <a style="color: #078" href={~p"/shadow_net/#{@shadow_net_system.id}/binary"}>
+          <a
+            style="color: #078"
+            href={~p"/shadow_net/#{@shadow_net_system.id}/binary"}
+            target="_blank"
+          >
             <button
               type="button"
               style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff"
@@ -375,16 +387,18 @@ defmodule RenewCollabWeb.LiveShadowNet do
   end
 
   def handle_event("rename", %{"name" => new_name}, socket) do
-    RenewCollabSim.Simulator.rename_shadow_net_system(
-      socket.assigns.shadow_net_system_id,
-      new_name
-    )
+    %Actions.ShadowNetSystemRename{
+      sns_id: socket.assigns.shadow_net_system_id,
+      new_name: new_name
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
 
     {:noreply, socket |> put_flash(:info, "Shadow net System renamed")}
   end
 
   def handle_event("delete", %{"id" => simulation_id}, socket) do
-    RenewCollabSim.Simulator.delete_simulation(simulation_id)
+    %Actions.SimulationDeleteAsUser{simulation_id: simulation_id}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
 
     # TODO:broadcast
     Phoenix.PubSub.broadcast(
@@ -499,18 +513,17 @@ defmodule RenewCollabWeb.LiveShadowNet do
   end
 
   def handle_event("new-simulation", %{}, socket) do
-    RenewCollabSim.Simulator.create_and_start_simulation(
-      socket.assigns.project_id,
-      socket.assigns.shadow_net_system.id
-    )
+    %Actions.SimulationCreateFromShadowNetSystemInProject{
+      project_id: socket.assigns.project_id,
+      shadow_net_system_id: socket.assigns.shadow_net_system.id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        {:noreply, socket |> put_flash(:info, "Simulated created")}
 
-    # TODO:broadcast
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "#{@topic}:#{socket.assigns.shadow_net_system_id}",
-      :any
-    )
-
-    {:noreply, socket |> put_flash(:info, "Simulated created")}
+      _ ->
+        {:noreply, socket |> put_flash(:error, "Creating Simulation failed")}
+    end
   end
 end

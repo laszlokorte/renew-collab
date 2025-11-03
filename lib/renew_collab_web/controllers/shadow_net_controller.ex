@@ -1,11 +1,14 @@
 defmodule RenewCollabWeb.ShadowNetController do
   use RenewCollabWeb, :controller
 
+  alias RenewCollabCtrl.Actions
+  alias RenewCollabCtrl.Fetcher
+  alias RenewCollabCtrl.Views
   alias RenewCollabSim.Simulator
 
   action_fallback RenewCollabWeb.FallbackController
 
-  def download(conn, %{"id" => id}) do
+  def download(conn, %{"id" => shadow_net_system_id}) do
     content_type =
       with %{query_params: %{"text" => _}} <- conn do
         "text/plain"
@@ -13,13 +16,14 @@ defmodule RenewCollabWeb.ShadowNetController do
         _ -> "application/binary"
       end
 
-    Simulator.find_shadow_net_system(id)
+    %Views.ShadowNetSystem{shadow_net_system_id: shadow_net_system_id}
+    |> Fetcher.fetch_as(conn.assigns.current_account)
     |> case do
       %{compiled: compiled} ->
         conn
         |> put_resp_header(
           "content-disposition",
-          "inline; filename=\"#{id}.sns\""
+          "inline; filename=\"#{shadow_net_system_id}.sns\""
         )
         |> put_resp_header(
           "content-type",
@@ -35,11 +39,16 @@ defmodule RenewCollabWeb.ShadowNetController do
     end
   end
 
-  def create_simulation(conn, %{"id" => id}) do
-    Simulator.find_shadow_net_system(id)
+  def create_simulation(conn, %{"id" => shadow_net_system_id}) do
+    %Views.ShadowNetSystem{shadow_net_system_id: shadow_net_system_id}
+    |> Fetcher.fetch_as(conn.assigns.current_account)
     |> case do
-      %{id: sns_id} ->
-        RenewCollabSim.Simulator.create_simulation(sns_id)
+      %{id: sns_id, project_assignment: %{project_id: project_id}} ->
+        %Actions.SimulationCreateFromShadowNetSystemInProject{
+          project_id: project_id,
+          shadow_net_system_id: shadow_net_system_id
+        }
+        |> Dispatcher.perform_as(conn.assigns.current_account)
         |> case do
           {:ok, %{id: id}} ->
             conn

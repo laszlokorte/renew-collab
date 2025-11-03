@@ -312,9 +312,17 @@ defmodule RenewCollabWeb.LiveSimulations do
   end
 
   def handle_event("delete", %{"id" => simulation_id}, socket) do
-    RenewCollabSim.Simulator.delete_simulation(simulation_id)
+    %Actions.SimulationDeleteAsUser{simulation_id: simulation_id}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      :ok ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Simulation deleted")}
 
-    {:noreply, socket |> put_flash(:info, "Simulation deleted")}
+      {:error, _} ->
+        {:noreply, socket |> put_flash(:error, "Failed to delete simulation")}
+    end
   end
 
   def handle_event("setup", %{"id" => simulation_id}, socket) do

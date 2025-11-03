@@ -29,15 +29,19 @@ defmodule RenewCollabSim.Queries.Simulation do
         ]
       )
     )
-    |> Ecto.Multi.run(:result, fn repo, %{sim: sim} ->
-      if detailed do
-        sim
-        |> repo.preload(:log_entries)
-        |> repo.preload(net_instances: :firings)
-      else
-        sim
-      end
-      |> then(&{:ok, &1})
+    |> Ecto.Multi.run(:result, fn
+      _, %{sim: nil} ->
+        {:ok, nil}
+
+      repo, %{sim: sim} ->
+        if detailed do
+          sim
+          |> repo.preload(:log_entries)
+          |> repo.preload(net_instances: :firings)
+        else
+          sim
+        end
+        |> then(&{:ok, &1})
     end)
   end
 end

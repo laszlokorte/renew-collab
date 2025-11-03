@@ -23,9 +23,13 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(_account, %Actions.DocumentEditMakeSpaceBetween{}), do: true
 
   def can(_account, %Actions.SimulationCreateFromDocumentsInProject{}), do: true
+  def can(_account, %Actions.SimulationCreateFromShadowNetSystemInProject{}), do: true
+  def can(_account, %Actions.SimulationDeleteAsUser{}), do: true
   def can(_account, %Actions.DocumentEditDeleteBond{}), do: true
-  def can(_account, %Actions.DocumentEditLayerStyle{}), do: true
+  def can(_account, %Actions.ShadowNetSystemDeleteAsUser{}), do: true
 
+  def can(_account, %Actions.ShadowNetSystemRename{}), do: true
+  def can(_account, %Actions.DocumentEditLayerStyle{}), do: true
   def can(_account, %Actions.DocumentEditLayerEdgeStyle{}), do: true
 
   def can(_account, %Actions.DocumentEditLayerTextStyle{}), do: true
@@ -108,7 +112,6 @@ defmodule RenewCollabCtrl.WriteAccess do
 
   def can(_account, %Actions.ProjectRemoveMemberAsAdmin{}), do: true
   def can(_account, %Actions.ProjectAddMemberAsAdmin{}), do: true
-  def can(_account, %Actions.ProjectDelete{}), do: true
   def can(_account, %Actions.ProjectAddMemberAsAdmin{}), do: true
   def can(_account, %Actions.ProjectRemoveMemberAsAdmin{}), do: true
   def can(_account, %Actions.ProjectAddDocumentAsAdmin{}), do: true
@@ -119,7 +122,6 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(_account, %Actions.ProjectAddShadowNetSystemAsAdmin{}), do: true
   def can(_account, %Actions.ProjectRemoveShadowNetSystemAsAdmin{}), do: true
   def can(_account, %Actions.ProjectRename{}), do: true
-  def can(_account, %Actions.ProjectDelete{}), do: true
 
   def can(_account, _action), do: false
 end

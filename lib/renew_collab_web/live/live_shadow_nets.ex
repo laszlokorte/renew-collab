@@ -1,4 +1,6 @@
 defmodule RenewCollabWeb.LiveShadowNets do
+  alias RenewCollabCtrl.Dispatcher
+  alias RenewCollabCtrl.Actions
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
@@ -302,7 +304,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
                   </td>
 
                   <td width="50">
-                    <a style="color: #078" href={~p"/shadow_net/#{sns.id}/binary"}>
+                    <a style="color: #078" href={~p"/shadow_net/#{sns.id}/binary"} target="_blank">
                       <button
                         type="button"
                         style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff"
@@ -456,15 +458,14 @@ defmodule RenewCollabWeb.LiveShadowNets do
   end
 
   def handle_event("delete", %{"id" => sns_id}, socket) do
-    RenewCollabSim.Simulator.delete_shadow_net_system(sns_id)
+    %Actions.ShadowNetSystemDeleteAsUser{sns_id: sns_id}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      :ok ->
+        {:noreply, socket |> put_flash(:info, "Shadow Net system deleted")}
 
-    # TODO:broadcast
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "projects/#{socket.assigns.project.id}/shadow_nets",
-      :any
-    )
-
-    {:noreply, socket |> put_flash(:info, "Shadow Net system deleted")}
+      _ ->
+        {:noreply, socket |> put_flash(:error, "Deleting Shadow Net system failed")}
+    end
   end
 end

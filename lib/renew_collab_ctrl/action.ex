@@ -893,6 +893,8 @@ defmodule RenewCollabCtrl.Action do
   def do_perform(%Actions.ProjectDelete{project_id: project_id}) do
     %RenewCollabProj.Commands.DeleteProject{project_id: project_id}
     |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+
+    :ok
   end
 
   def do_perform(%Actions.ProjectDuplicateAsAdmin{project_id: project_id}) do
@@ -1038,6 +1040,39 @@ defmodule RenewCollabCtrl.Action do
     {:error, :not_implemented}
   end
 
+  def do_perform(%Actions.SimulationCreateFromShadowNetSystemInProject{
+        project_id: project_id,
+        shadow_net_system_id: sns_id
+      }) do
+    RenewCollabSim.Commands.CreateSimulation.new(%{
+      shadow_net_system_id: sns_id,
+      document_ids: []
+    })
+    |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
+    |> case do
+      {:ok, %{simulation: %{id: sim_id} = simulation}} ->
+        RenewCollabProj.Commands.AssignProjectSimulation.new(%{
+          project_id: project_id,
+          simulation_id: sim_id
+        })
+        |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+
+        RenewCollabSim.Server.ProjectSimulationServer.setup(project_id, sim_id)
+
+        # TODO:broadcast
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "projects/#{project_id}/simulations",
+          {:simulation_change, sim_id, :created}
+        )
+
+        {:ok, simulation}
+
+      e ->
+        {:error, e}
+    end
+  end
+
   def do_perform(%Actions.SimulationCreateFromDocumentsInProject{
         project_id: project_id,
         document_ids: document_ids,
@@ -1145,8 +1180,23 @@ defmodule RenewCollabCtrl.Action do
     {:error, :not_implemented}
   end
 
-  def do_perform(%Actions.ShadowNetSystemDeleteAsUser{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.ShadowNetSystemDeleteAsUser{sns_id: shadow_net_system_id}) do
+    {:ok, %{id: project_id}} =
+      %RenewCollabProj.Queries.ShadowNetsProject{shadow_net_system_id: shadow_net_system_id}
+      |> RenewCollabProj.ProjectFetcher.fetch()
+
+    RenewCollabProj.Commands.RemoveProjectShadowNetSystem.new(%{
+      project_id: project_id,
+      shadow_net_system_id: shadow_net_system_id
+    })
+    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+
+    RenewCollabSim.Commands.DeleteShadowNetSystem.new(%{
+      shadow_net_system_id: shadow_net_system_id
+    })
+    |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
+
+    :ok
   end
 
   def do_perform(%Actions.ShadowNetSystemDuplicateInProject{}) do
@@ -1157,12 +1207,34 @@ defmodule RenewCollabCtrl.Action do
     {:error, :not_implemented}
   end
 
-  def do_perform(%Actions.ShadowNetSystemRename{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.ShadowNetSystemRename{sns_id: sns_id, new_name: new_name}) do
+    RenewCollabSim.Commands.RenameShadowNetSystem.new(%{
+      shadow_net_system_id: sns_id,
+      new_name: new_name
+    })
+    |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
   end
 
-  def do_perform(%Actions.SimulationDeleteAsUser{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.SimulationDeleteAsUser{simulation_id: simulation_id}) do
+    {:ok, %{id: project_id}} =
+      %RenewCollabProj.Queries.SimulationsProject{simulation_id: simulation_id}
+      |> RenewCollabProj.ProjectFetcher.fetch()
+
+    RenewCollabProj.Commands.RemoveProjectSimulation.new(%{
+      project_id: project_id,
+      simulation_id: simulation_id
+    })
+    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+
+    RenewCollabSim.Commands.DeleteSimulation.new(%{simulation_id: simulation_id})
+    |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
+
+    RenewCollabSim.Server.ProjectSimulationServer.stop(
+      project_id,
+      simulation_id
+    )
+
+    :ok
   end
 
   def do_perform(%Actions.SimulationInitialize{}) do

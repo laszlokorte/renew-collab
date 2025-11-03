@@ -229,7 +229,7 @@ defmodule RenewCollabWeb.LiveProjects do
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
     |> case do
-      {:ok, _} ->
+      :ok ->
         socket
         |> put_flash(:info, "Project deleted")
         |> assign(create_form: to_form(%{}))

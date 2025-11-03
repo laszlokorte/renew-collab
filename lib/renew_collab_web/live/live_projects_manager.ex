@@ -207,7 +207,7 @@ defmodule RenewCollabWeb.LiveProjectsManager do
     %Actions.ProjectDelete{project_id: id}
     |> Dispatcher.perform_as(socket.assigns.current_account)
     |> case do
-      {:ok, _} ->
+      :ok ->
         socket
         |> put_flash(:info, "Project deleted")
         |> reload()

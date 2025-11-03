@@ -1,4 +1,6 @@
 defmodule RenewCollabWeb.LiveSimulation do
+  alias RenewCollabCtrl.Dispatcher
+  alias RenewCollabCtrl.Actions
   alias RenewCollabProj.Entities.ProjectSimulation
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
@@ -448,14 +450,17 @@ defmodule RenewCollabWeb.LiveSimulation do
   end
 
   def handle_event("delete", %{}, socket) do
-    shadow_net_system_id = socket.assigns.simulation.shadow_net_system_id
-    RenewCollabSim.Simulator.delete_simulation(socket.assigns.simulation_id)
+    %Actions.SimulationDeleteAsUser{simulation_id: socket.assigns.simulation.id}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      :ok ->
+        {:noreply,
+         socket
+         |> redirect(to: ~p"/shadow_net/#{socket.assigns.simulation.shadow_net_system_id}")
+         |> put_flash(:info, "Simulation deleted")}
 
-    RenewCollabSim.Server.ProjectSimulationServer.stop(
-      socket.assigns.project_id,
-      socket.assigns.simulation.id
-    )
-
-    {:noreply, socket |> redirect(to: ~p"/shadow_net/#{shadow_net_system_id}")}
+      {:error, _} ->
+        {:noreply, socket |> put_flash(:error, "Failed to delete simulation")}
+    end
   end
 end

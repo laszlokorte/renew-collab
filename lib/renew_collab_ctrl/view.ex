@@ -303,8 +303,11 @@ defmodule RenewCollabCtrl.View do
     RenewCollabSim.Queries.Simulation.new(%{simulation_id: simulation_id, detailed: true})
     |> RenewCollabSim.SimulationFetcher.fetch()
     |> case do
-      {:ok, simulation} ->
-        RenewCollabProj.Queries.SimulationsProject.new(%{simulation_id: simulation.id})
+      {:ok, nil} ->
+        {:ok, nil}
+
+      {:ok, %{} = simulation} ->
+        RenewCollabProj.Queries.SimulationsProject.new(%{simulation_id: simulation_id})
         |> RenewCollabProj.ProjectFetcher.fetch()
         |> case do
           {:ok, assignment} ->

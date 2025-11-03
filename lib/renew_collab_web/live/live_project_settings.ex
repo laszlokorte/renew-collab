@@ -1,4 +1,5 @@
 defmodule RenewCollabWeb.LiveProjectSettings do
+  alias RenewCollabCtrl.Dispatcher
   alias RenewCollabCtrl.Actions.ProjectRemoveMemberAsUser
   alias RenewCollabCtrl.Actions
   alias RenewCollabCtrl.Actions.ProjectDelete
@@ -183,9 +184,15 @@ defmodule RenewCollabWeb.LiveProjectSettings do
   end
 
   def handle_event("delete", _params, socket) do
-    Projects.delete_project(socket.assigns.project.id)
+    %Actions.ProjectDelete{project_id: socket.assigns.project.id}
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      :ok ->
+        {:noreply, socket |> put_flash(:info, "Project deleted") |> redirect(to: "/projects")}
 
-    {:noreply, socket |> put_flash(:info, "Project deleted") |> redirect(to: "/projects")}
+      _ ->
+        {:noreply, socket |> put_flash(:error, "Deleting project failed")}
+    end
   end
 
   def reload(socket) do
