@@ -11,10 +11,10 @@ defmodule RenewCollabSim.SimulationCommander do
 
   def run_simulation_command_sync(%{__struct__: module} = command) do
     apply(module, :multi, [command])
-    |> run_simulation_transaction(apply(module, :tags, [command]))
+    |> run_simulation_transaction()
   end
 
-  defp run_simulation_transaction(multi, _tags) do
+  defp run_simulation_transaction(multi) do
     Repo.transact(multi)
   end
 end

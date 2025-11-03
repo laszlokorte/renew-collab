@@ -13,7 +13,7 @@ defmodule RenewCollabSim.Commands.CreateSimulation do
 
   def multi(%__MODULE__{shadow_net_system_id: sns_id, document_ids: _document_ids}) do
     Ecto.Multi.new()
-    |> Ecto.Multi.insert(:sim, %Simulation{shadow_net_system_id: sns_id})
+    |> Ecto.Multi.insert(:simulation, %Simulation{shadow_net_system_id: sns_id})
 
     # TODO create simulation links
   end

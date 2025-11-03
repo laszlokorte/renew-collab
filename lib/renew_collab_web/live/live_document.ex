@@ -376,6 +376,15 @@ defmodule RenewCollabWeb.LiveDocument do
         <div style="display: flex; gap: 1ex; padding: 1ex 0">
           <button
             type="button"
+            phx-click="wrap_in_group"
+            disabled={is_nil(@selection)}
+            phx-value-layer_id={@selection}
+            style={"#{if(is_nil(@selection), do: "opacity: 0.3;", else: "cursor: pointer;")} padding: 1ex; border: none; background: #3a3; color: #fff"}
+          >
+            Wrap in Group
+          </button>
+          <button
+            type="button"
             phx-click="create_group"
             phx-value-example="yes"
             style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
@@ -1420,6 +1429,21 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def handle_event(
+        "wrap_in_group",
+        %{"layer_id" => layer_id},
+        socket
+      ) do
+    %Actions.DocumentEditCreateParentLayer{
+      document_id: socket.assigns.document.id,
+      child_layer_id: layer_id,
+      attrs: %{}
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
         "create_text",
         %{"example" => "yes"},
         socket
@@ -1897,14 +1921,16 @@ defmodule RenewCollabWeb.LiveDocument do
   def handle_event("simulate", %{} = params, socket) do
     formalism = RenewCollabSim.Compiler.SnsCompiler.default_formalism()
 
-    RenewCollabSim.Simulator.create_simulation_from_documents(
-      socket.assigns.document.project,
-      formalism,
-      [socket.assigns.document.id],
-      RenewCollabSim.Compiler.SnsCompiler.normalize_net_name(socket.assigns.document.name)
-    )
+    %Actions.SimulationCreateFromDocumentsInProject{
+      project_id: socket.assigns.document.project_assignment.project_id,
+      document_ids: [socket.assigns.document.id],
+      formalism: formalism,
+      main_net_name:
+        RenewCollabSim.Compiler.SnsCompiler.normalize_net_name(socket.assigns.document.name)
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
     |> case do
-      %RenewCollabSim.Entities.Simulation{} = sim ->
+      {:ok, %RenewCollabSim.Entities.Simulation{} = sim} ->
         case params do
           %{"redirect" => "no"} ->
             {:noreply, socket |> put_flash(:info, "Simulation created")}

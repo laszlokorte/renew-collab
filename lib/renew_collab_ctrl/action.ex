@@ -206,8 +206,46 @@ defmodule RenewCollabCtrl.Action do
     :ok
   end
 
-  def do_perform(%Actions.DocumentEditCreateLayerWithEdge{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditCreateLayerWithEdge{
+        document_id: document_id,
+        attrs:
+          attrs = %{
+            "pos" => %{"x" => cx, "y" => cy},
+            "shape_id" => shape_id,
+            "with_edge" => with_edge
+          },
+        base_layer_id: base_layer_id
+      }) do
+    width = Map.get(attrs, "width", 50)
+    height = Map.get(attrs, "height", 50)
+
+    RenewCollab.Commands.CreateLayerWithEdge.new(%{
+      base_layer_id: base_layer_id,
+      document_id: document_id,
+      edge: with_edge,
+      attrs: %{
+        "semantic_tag" => Map.get(attrs, "semantic_tag", nil),
+        "box" => %{
+          "position_x" => cx - width / 2,
+          "position_y" => cy - height / 2,
+          "width" => width,
+          "height" => height,
+          "symbol_shape_id" => shape_id
+        },
+        "style" => Map.get(attrs, "style", nil),
+        "interface" =>
+          case Map.get(attrs, "socket_schema_id", nil) do
+            nil ->
+              nil
+
+            id ->
+              %{
+                "socket_schema_id" => id
+              }
+          end
+      }
+    })
+    |> RenewCollab.Commander.run_document_command_sync()
   end
 
   def do_perform(%Actions.DocumentEditCreateLayer{
@@ -225,8 +263,19 @@ defmodule RenewCollabCtrl.Action do
     :ok
   end
 
-  def do_perform(%Actions.DocumentEditCreateParentLayer{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentEditCreateParentLayer{
+        document_id: document_id,
+        attrs: attrs,
+        child_layer_id: child_layer_id
+      }) do
+    RenewCollab.Commands.CreateParentLayer.new(%{
+      child_layer_id: child_layer_id,
+      document_id: document_id,
+      attrs: %{
+        "semantic_tag" => Map.get(attrs, "semantic_tag", "CH.ifa.draw.figures.GroupFigure")
+      }
+    })
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
   end
 
   def do_perform(%Actions.DocumentEditDeleteBond{document_id: document_id, bond_id: bond_id}) do
@@ -987,6 +1036,109 @@ defmodule RenewCollabCtrl.Action do
 
   def do_perform(%Actions.DocumentRename{}) do
     {:error, :not_implemented}
+  end
+
+  def do_perform(%Actions.SimulationCreateFromDocumentsInProject{
+        project_id: project_id,
+        document_ids: document_ids,
+        formalism: formalism,
+        main_net_name: main_net_name
+      }) do
+    {:ok, project} =
+      %RenewCollabProj.Queries.ProjectDetails{project_id: project_id}
+      |> RenewCollabProj.ProjectFetcher.fetch()
+
+    document_id_set = MapSet.new(document_ids)
+
+    actual_document_ids =
+      project.documents
+      |> Enum.map(fn %{document_id: id} -> id end)
+      |> Enum.filter(&MapSet.member?(document_id_set, &1))
+
+    nets =
+      try do
+        actual_document_ids
+        |> Enum.map(fn doc_id ->
+          document = RenewCollab.Renew.get_document_with_elements(doc_id)
+          {:ok, rnw} = RenewCollab.Export.DocumentExport.export(document, synthetic: true)
+          {:ok, json} = RenewCollabWeb.DocumentJSON.show_content(document) |> Jason.encode()
+
+          {RenewCollabSim.Compiler.SnsCompiler.normalize_net_name(document.name), rnw, json,
+           {document.id, document.current_snaptshot.id}}
+        end)
+      rescue
+        e ->
+          {:error, {:export_error, e}}
+      end
+
+    [{default_main_name, _, _, _} | _] = nets
+    main_name = main_net_name || default_main_name
+
+    {:ok, content} =
+      RenewCollabSim.Compiler.SnsCompiler.compile(
+        formalism,
+        nets
+        |> Enum.map(fn {name, rnw, _, _} -> {name, rnw} end)
+      )
+
+    {:ok, %{shadow_net_system: %{id: sns_id}}} =
+      RenewCollabSim.Commands.CreateShadowNetSystem.new(%{
+        label: "Fooo",
+        compiled: content,
+        main_net_name: main_name,
+        nets:
+          nets
+          |> Enum.map(fn {name, _, json, _} ->
+            %{
+              "name" => name,
+              "document_json" => json
+            }
+          end)
+      })
+      |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
+
+    RenewCollabProj.Commands.AssignProjectShadowNetSystem.new(%{
+      project_id: project_id,
+      shadow_net_system_id: sns_id
+    })
+    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+
+    RenewCollabSim.Commands.CreateSimulation.new(%{
+      shadow_net_system_id: sns_id,
+      document_ids: actual_document_ids
+    })
+    |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
+    |> case do
+      {:ok, %{simulation: %{id: sim_id} = simulation}} ->
+        RenewCollabProj.Commands.AssignProjectSimulation.new(%{
+          project_id: project_id,
+          simulation_id: sim_id
+        })
+        |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+
+        RenewCollabSim.Server.ProjectSimulationServer.setup(project.id, sim_id)
+
+        # TODO:broadcast
+        Phoenix.PubSub.broadcast(
+          RenewCollab.PubSub,
+          "projects/#{project.id}/simulations",
+          {:simulation_change, sim_id, :created}
+        )
+
+        for document_id <- actual_document_ids do
+          # TODO:broadcast
+          Phoenix.PubSub.broadcast(
+            RenewCollab.PubSub,
+            "document:#{document_id}",
+            {:document_simulated, document_id}
+          )
+        end
+
+        {:ok, simulation}
+
+      e ->
+        {:error, e}
+    end
   end
 
   def do_perform(%Actions.ShadowNetSystemCreateFromRnwInProject{}) do

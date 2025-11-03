@@ -365,11 +365,12 @@ defmodule RenewCollabWeb.LiveDocuments do
   end
 
   def handle_event("compile", %{"document_id" => document_id, "formalism" => formalism}, socket) do
-    RenewCollabSim.Simulator.create_simulation_from_documents(
-      socket.assigns.project,
-      formalism,
-      [document_id]
-    )
+    %Actions.SimulationCreateFromDocumentsInProject{
+      project_id: socket.assigns.project.id,
+      document_ids: [document_id],
+      formalism: formalism
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
     |> case do
       %RenewCollabSim.Entities.Simulation{} = sim ->
         {:noreply, redirect(socket, to: ~p"/simulation/#{sim.id}")}

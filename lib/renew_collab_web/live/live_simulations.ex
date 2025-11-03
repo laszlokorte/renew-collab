@@ -1,4 +1,6 @@
 defmodule RenewCollabWeb.LiveSimulations do
+  alias RenewCollabCtrl.Dispatcher
+  alias RenewCollabCtrl.Actions
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
   alias RenewCollabCtrl.Views
@@ -284,14 +286,15 @@ defmodule RenewCollabWeb.LiveSimulations do
         %{"documents" => documents, "main_net" => main_net, "formalism" => formalism},
         socket
       ) do
-    RenewCollabSim.Simulator.create_simulation_from_documents(
-      socket.assigns.project,
-      formalism,
-      documents,
-      main_net
-    )
+    %Actions.SimulationCreateFromDocumentsInProject{
+      project_id: socket.assigns.project.id,
+      document_ids: documents,
+      formalism: formalism,
+      main_net_name: main_net
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
     |> case do
-      %RenewCollabSim.Entities.Simulation{} ->
+      {:ok, %RenewCollabSim.Entities.Simulation{}} ->
         {:noreply,
          socket
          |> put_flash(:info, "Simulation created")

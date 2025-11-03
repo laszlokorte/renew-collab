@@ -19,10 +19,11 @@ defmodule RenewCollabCtrl.WriteAccess do
 
   def can(_account, %Actions.DocumentEditSetLayerVisibility{}), do: true
 
+  def can(_account, %Actions.DocumentEditCreateParentLayer{}), do: true
   def can(_account, %Actions.DocumentEditMakeSpaceBetween{}), do: true
 
+  def can(_account, %Actions.SimulationCreateFromDocumentsInProject{}), do: true
   def can(_account, %Actions.DocumentEditDeleteBond{}), do: true
-
   def can(_account, %Actions.DocumentEditLayerStyle{}), do: true
 
   def can(_account, %Actions.DocumentEditLayerEdgeStyle{}), do: true
