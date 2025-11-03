@@ -17,7 +17,7 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
     :cmds
   ]
 
-  def init(simulation) do
+  def init(parent, simulation, pubsub_channels) do
     try do
       import Ecto.Query
 
@@ -29,7 +29,7 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
         sim_step: Keyword.get(conf, :sim_step)
       }
 
-      {sim_process, directory} = init_process(simulation, Map.get(cmds, :sim_start))
+      {sim_process, directory} = init_process(parent, simulation, Map.get(cmds, :sim_start))
 
       {:ok,
        %__MODULE__{
@@ -41,10 +41,7 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
          retry: nil,
          playing: false,
          scheduled: false,
-         pubsub_channels: [
-           "projects/#{simulation.project.id}/simulations",
-           "simulation:#{simulation.id}"
-         ],
+         pubsub_channels: pubsub_channels,
          throttle: {100, :millisecond},
          logging: true,
          cmds: cmds,
@@ -73,14 +70,12 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
             )}
        }}
     rescue
-      _e ->
-        # dbg(e)
-        :error
+      e ->
+        {:error, e}
     end
   end
 
-  defp init_process(simulation, start_command) do
-    slf = self()
+  defp init_process(parent, simulation, start_command) do
     uuid_dir = "petristation/renew-simulation-#{simulation.id}/#{UUID.uuid4(:default)}"
 
     {:ok, output_root} = Path.safe_relative_to(uuid_dir, System.tmp_dir!())
@@ -105,7 +100,7 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
 
     sim_process =
       RenewCollabSim.Script.Runner.start_and_collect(script_path, fn log, _ ->
-        GenServer.cast(slf, {:log, log})
+        GenServer.cast(parent, {:log, log})
         nil
       end)
 

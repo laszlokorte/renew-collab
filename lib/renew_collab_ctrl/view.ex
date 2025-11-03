@@ -352,7 +352,7 @@ defmodule RenewCollabCtrl.View do
       hierarchy_missing_count: RenewCollab.Hierarchy.count_missing_global(),
       hierarchy_invalid_count: RenewCollab.Hierarchy.count_invalids_global(),
       cache_size: RenewCollabCtrl.CacheServer.size(),
-      simulation_active_count: RenewCollabSim.Server.ProjectSimulationServer.count_all(),
+      simulation_active_count: RenewCollabSim.Server.ScopedSimulationServer.count_all(),
       formalisms: RenewCollabSim.Compiler.SnsCompiler.formalisms()
     }
     |> then(&{:ok, &1})

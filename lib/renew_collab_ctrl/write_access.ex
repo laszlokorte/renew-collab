@@ -122,5 +122,15 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(_account, %Actions.ProjectRemoveShadowNetSystemAsAdmin{}), do: true
   def can(_account, %Actions.ProjectRemoveMemberAsUser{}), do: true
   def can(_account, %Actions.ProjectAddMemberAsUser{}), do: true
+
+  def can(_account, %Actions.SimulationLogDebug{}), do: true
+  def can(_account, %Actions.SimulationPause{}), do: true
+  def can(_account, %Actions.SimulationInitialize{}), do: true
+  def can(_account, %Actions.SimulationInstancesClear{}), do: true
+  def can(_account, %Actions.SimulationLogClear{}), do: true
+  def can(_account, %Actions.SimulationPlay{}), do: true
+  def can(_account, %Actions.SimulationStep{}), do: true
+  def can(_account, %Actions.SimulationTerminate{}), do: true
+
   def can(_account, _action), do: false
 end

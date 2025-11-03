@@ -372,7 +372,7 @@ defmodule RenewCollabWeb.LiveDocuments do
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
     |> case do
-      {:ok, %RenewCollabSim.Entities.Simulation{}} = sim ->
+      {:ok, %RenewCollabSim.Entities.Simulation{} = sim} ->
         {:noreply, redirect(socket, to: ~p"/simulation/#{sim.id}")}
 
       {:error, _} ->

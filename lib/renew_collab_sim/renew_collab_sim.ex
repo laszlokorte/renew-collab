@@ -225,7 +225,7 @@ defmodule RenewCollabSim.Simulator do
 
   #   Repo.delete(simulation)
 
-  #   RenewCollabSim.Server.ProjectSimulationServer.stop(
+  #   RenewCollabSim.Server.ScopedSimulationServer.stop(
   #     simulation.project_assignment.project_id,
   #     id
   #   )
@@ -243,7 +243,7 @@ defmodule RenewCollabSim.Simulator do
   # def create_and_start_simulation(project_id, shadow_net_system_id) do
   #   create_simulation(shadow_net_system_id)
   #   |> case do
-  #     {:ok, %{id: id}} -> RenewCollabSim.Server.ProjectSimulationServer.setup(project_id, id)
+  #     {:ok, %{id: id}} -> RenewCollabSim.Server.ScopedSimulationServer.setup(project_id, id)
   #   end
   # end
 

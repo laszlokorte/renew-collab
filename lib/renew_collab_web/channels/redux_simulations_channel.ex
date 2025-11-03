@@ -14,7 +14,7 @@ defmodule RenewCollabWeb.ReduxSimulationsChannel do
            RenewCollabProj.Projects.list_project_simulations(project_id)
          ),
        runnings:
-         RenewCollabSim.Server.ProjectSimulationServer.running_ids(project_id) |> MapSet.new()
+         RenewCollabSim.Server.ScopedSimulationServer.running_ids(project_id) |> MapSet.new()
      }), {:project_id, project_id}}
   end
 
@@ -32,7 +32,7 @@ defmodule RenewCollabWeb.ReduxSimulationsChannel do
            RenewCollabProj.Projects.list_project_simulations(project_id)
          ),
        runnings:
-         RenewCollabSim.Server.ProjectSimulationServer.running_ids(project_id) |> MapSet.new()
+         RenewCollabSim.Server.ScopedSimulationServer.running_ids(project_id) |> MapSet.new()
      })}
   end
 
@@ -43,21 +43,21 @@ defmodule RenewCollabWeb.ReduxSimulationsChannel do
 
   @impl true
   def handle_event("step", %{"id" => id}, _state, {:project_id, project_id}, _socket) do
-    RenewCollabSim.Server.ProjectSimulationServer.step(project_id, id)
+    RenewCollabSim.Server.ScopedSimulationServer.step(project_id, id)
 
     :silent
   end
 
   @impl true
   def handle_event("stop", %{"id" => id}, _state, {:project_id, project_id}, _socket) do
-    RenewCollabSim.Server.ProjectSimulationServer.stop(project_id, id)
+    RenewCollabSim.Server.ScopedSimulationServer.stop(project_id, id)
 
     :silent
   end
 
   @impl true
   def handle_event("start", %{"id" => id}, _state, {:project_id, project_id}, _socket) do
-    RenewCollabSim.Server.ProjectSimulationServer.setup(project_id, id)
+    RenewCollabSim.Server.ScopedSimulationServer.setup(project_id, id)
 
     :silent
   end
@@ -65,7 +65,7 @@ defmodule RenewCollabWeb.ReduxSimulationsChannel do
   @impl true
   def handle_event("delete", %{"id" => id}, _state, {:project_id, project_id}, _socket) do
     RenewCollabSim.Simulator.delete_simulation(id)
-    RenewCollabSim.Server.ProjectSimulationServer.stop(project_id, id)
+    RenewCollabSim.Server.ScopedSimulationServer.stop(project_id, id)
 
     :silent
   end

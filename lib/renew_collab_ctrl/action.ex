@@ -1065,7 +1065,7 @@ defmodule RenewCollabCtrl.Action do
         })
         |> RenewCollabProj.ProjectCommander.run_project_command_sync()
 
-        RenewCollabSim.Server.ProjectSimulationServer.setup(project_id, sim_id)
+        RenewCollabSim.Server.ScopedSimulationServer.setup(project_id, sim_id)
 
         # TODO:broadcast
         Phoenix.PubSub.broadcast(
@@ -1159,7 +1159,7 @@ defmodule RenewCollabCtrl.Action do
         })
         |> RenewCollabProj.ProjectCommander.run_project_command_sync()
 
-        RenewCollabSim.Server.ProjectSimulationServer.setup(project.id, sim_id)
+        RenewCollabSim.Server.ScopedSimulationServer.setup(project.id, sim_id)
 
         # TODO:broadcast
         Phoenix.PubSub.broadcast(
@@ -1286,7 +1286,7 @@ defmodule RenewCollabCtrl.Action do
     RenewCollabSim.Commands.DeleteSimulation.new(%{simulation_id: simulation_id})
     |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
 
-    RenewCollabSim.Server.ProjectSimulationServer.stop(
+    RenewCollabSim.Server.ScopedSimulationServer.stop(
       project_id,
       simulation_id
     )
@@ -1294,28 +1294,52 @@ defmodule RenewCollabCtrl.Action do
     :ok
   end
 
-  def do_perform(%Actions.SimulationInitialize{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.SimulationInitialize{simulation_id: simulation_id}) do
+    {:ok, %{project_id: project_id}} =
+      %RenewCollabProj.Queries.SimulationsProject{simulation_id: simulation_id}
+      |> RenewCollabProj.ProjectFetcher.fetch()
+
+    RenewCollabSim.Server.ScopedSimulationServer.setup(project_id, simulation_id, [
+      "projects/#{project_id}/simulations"
+    ])
   end
 
-  def do_perform(%Actions.SimulationInstancesClear{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.SimulationInstancesClear{simulation_id: simulation_id}) do
+    RenewCollabSim.Commands.ClearInstances.new(%{
+      simulation_id: simulation_id
+    })
+    |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
   end
 
-  def do_perform(%Actions.SimulationLogClear{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.SimulationLogClear{simulation_id: simulation_id}) do
+    RenewCollabSim.Commands.ClearLog.new(%{
+      simulation_id: simulation_id
+    })
+    |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
   end
 
-  def do_perform(%Actions.SimulationLogDebug{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.SimulationLogDebug{simulation_id: simulation_id, message: message}) do
+    RenewCollabSim.Commands.AddManualLogEntry.new(%{
+      simulation_id: simulation_id,
+      log_message: "[MANUAL DEBUG] #{message}"
+    })
+    |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
   end
 
-  def do_perform(%Actions.SimulationPause{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.SimulationPause{simulation_id: simulation_id}) do
+    {:ok, %{project_id: project_id}} =
+      %RenewCollabProj.Queries.SimulationsProject{simulation_id: simulation_id}
+      |> RenewCollabProj.ProjectFetcher.fetch()
+
+    RenewCollabSim.Server.ScopedSimulationServer.pause(project_id, simulation_id)
   end
 
-  def do_perform(%Actions.SimulationPlay{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.SimulationPlay{simulation_id: simulation_id}) do
+    {:ok, %{project_id: project_id}} =
+      %RenewCollabProj.Queries.SimulationsProject{simulation_id: simulation_id}
+      |> RenewCollabProj.ProjectFetcher.fetch()
+
+    RenewCollabSim.Server.ScopedSimulationServer.play(project_id, simulation_id)
   end
 
   def do_perform(%Actions.SimulationRename{simulation_id: simulation_id, new_name: new_name}) do
@@ -1326,12 +1350,21 @@ defmodule RenewCollabCtrl.Action do
     |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
   end
 
-  def do_perform(%Actions.SimulationStep{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.SimulationStep{simulation_id: simulation_id}) do
+    {:ok, %{project_id: project_id}} =
+      %RenewCollabProj.Queries.SimulationsProject{simulation_id: simulation_id}
+      |> RenewCollabProj.ProjectFetcher.fetch()
+
+    RenewCollabSim.Server.ScopedSimulationServer.step(project_id, simulation_id)
   end
 
-  def do_perform(%Actions.SimulationTerminate{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.SimulationTerminate{simulation_id: simulation_id}) do
+    {:ok, %{project_id: project_id}} =
+      %RenewCollabProj.Queries.SimulationsProject{simulation_id: simulation_id}
+      |> RenewCollabProj.ProjectFetcher.fetch()
+
+    RenewCollabSim.Server.ScopedSimulationServer.stop(project_id, simulation_id)
+    :ok
   end
 
   def do_perform(%Actions.SystemReinstall{}) do

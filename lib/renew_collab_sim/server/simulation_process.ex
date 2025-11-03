@@ -3,9 +3,13 @@ defmodule RenewCollabSim.Server.SimulationProcess do
 
   alias RenewCollabSim.Server.SimulationProcess.State
 
-  def start_monitor(simulation_id) do
+  def start_monitor(simulation_id, pubsub_channels) do
     with {:ok, pid} <-
-           GenServer.start(__MODULE__, %{simulation_id: simulation_id, latest_update: nil}) do
+           GenServer.start(__MODULE__, %{
+             pubsub_channels: pubsub_channels,
+             simulation_id: simulation_id,
+             latest_update: nil
+           }) do
       Process.monitor(pid)
       {:ok, pid}
     else
@@ -79,13 +83,22 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   end
 
   @impl true
-  def init(%{simulation_id: simulation_id}) do
-    with simulation when not is_nil(simulation) <-
-           RenewCollabSim.Simulator.find_simulation(simulation_id),
-         {:ok, state} <- State.init(simulation) do
+  def init(%{simulation_id: simulation_id, pubsub_channels: pubsub_channels}) do
+    with {:ok, simulation} when not is_nil(simulation) <-
+           RenewCollabSim.Queries.Simulation.new(%{simulation_id: simulation_id})
+           |> RenewCollabSim.SimulationFetcher.fetch(),
+         {:ok, project} when not is_nil(simulation) <-
+           RenewCollabProj.Queries.SimulationsProject.new(%{simulation_id: simulation_id})
+           |> RenewCollabProj.ProjectFetcher.fetch(),
+         {:ok, state} <-
+           State.init(
+             self(),
+             simulation,
+             pubsub_channels
+           ) do
       {:ok, state}
     else
-      _ ->
+      _e ->
         :ignore
     end
   end

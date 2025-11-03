@@ -23,7 +23,7 @@ defmodule RenewCollab.Application do
       # Start to serve requests, typically the last entry
       RenewCollabWeb.Endpoint,
       RenewCollabWeb.Presence,
-      RenewCollabSim.Server.ProjectSimulationServer,
+      RenewCollabSim.Server.ScopedSimulationServer,
       RenewCollab.TextMeasure.MeasureServer
     ]
 

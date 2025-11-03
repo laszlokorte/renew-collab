@@ -1,9 +1,12 @@
 defmodule RenewCollabSim.Server.SimulationServer do
   use GenServer
 
-  def start_monitor(project_id) do
+  def start_monitor(project_id, pubsub_channels) do
     with {:ok, pid} <-
-           GenServer.start_link(__MODULE__, %{project_id: project_id}) do
+           GenServer.start_link(__MODULE__, %{
+             project_id: project_id,
+             pubsub_channels: pubsub_channels
+           }) do
       Process.monitor(pid)
       {:ok, pid}
     else
@@ -61,16 +64,20 @@ defmodule RenewCollabSim.Server.SimulationServer do
   # Callbacks
 
   @impl true
-  def init(%{project_id: project_id}) do
-    {:ok, %{project_id: project_id, processes: %{}}}
+  def init(%{project_id: project_id, pubsub_channels: pubsub_channels}) do
+    {:ok, %{project_id: project_id, pubsub_channels: pubsub_channels, processes: %{}}}
   end
 
   @impl true
-  def handle_cast({:setup, simulation_id}, %{project_id: project_id, processes: procs} = state) do
+  def handle_cast(
+        {:setup, simulation_id},
+        %{project_id: project_id, processes: procs, pubsub_channels: pubsub_channels} = state
+      ) do
     if Map.has_key?(procs, simulation_id) do
       {:noreply, state}
     else
-      with {:ok, pid} <- RenewCollabSim.Server.SimulationProcess.start_monitor(simulation_id) do
+      with {:ok, pid} <-
+             RenewCollabSim.Server.SimulationProcess.start_monitor(simulation_id, pubsub_channels) do
         broadcast_state_change(state, project_id, simulation_id)
 
         {:noreply,
@@ -128,12 +135,13 @@ defmodule RenewCollabSim.Server.SimulationServer do
   def handle_call(
         {:setup, simulation_id},
         _from,
-        %{project_id: project_id, processes: procs} = state
+        %{project_id: project_id, processes: procs, pubsub_channels: pubsub_channels} = state
       ) do
     if Map.has_key?(procs, simulation_id) do
       {:noreply, state}
     else
-      with {:ok, pid} <- RenewCollabSim.Server.SimulationProcess.start_monitor(simulation_id) do
+      with {:ok, pid} <-
+             RenewCollabSim.Server.SimulationProcess.start_monitor(simulation_id, pubsub_channels) do
         broadcast_state_change(state, project_id, simulation_id)
 
         {:reply, :ok,

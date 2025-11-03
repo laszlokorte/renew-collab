@@ -60,7 +60,7 @@ defmodule RenewCollabWeb.SimulationController do
         render(conn, :show,
           simulation: sim,
           running:
-            RenewCollabSim.Server.ProjectSimulationServer.exists(
+            RenewCollabSim.Server.ScopedSimulationServer.exists(
               sim.project_assignment.project_id,
               simulation_id
             )
