@@ -8,7 +8,7 @@ defmodule RenewCollabWeb.ProjectDocumentJSON do
   def index(%{project_id: project_id, documents: documents}) do
     %{
       href: url(~p"/api/projects/#{project_id}/documents"),
-      topic: "project/#{project_id}/documents",
+      topic: "project-documents:#{project_id}",
       content: index_content(%{documents: documents}),
       links: %{
         project: %{

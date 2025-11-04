@@ -11,6 +11,7 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(_account, %Actions.DocumentEditRemoveThumbnail{}), do: true
   def can(_account, %Actions.DocumentCreateInProject{}), do: true
   def can(_account, %Actions.DocumentEditCreateLayer{}), do: true
+  def can(_account, %Actions.DocumentEditCreateLayerWithEdge{}), do: true
   def can(_account, %Actions.DocumentDuplicateInProject{}), do: true
   def can(_account, %Actions.DocumentEditImportFile{}), do: true
   def can(_account, %Actions.DocumentDeleteAsUser{}), do: true

@@ -2,7 +2,7 @@ defmodule RenewCollabWeb.ReduxSocket do
   use Phoenix.Socket
 
   channel "redux_document:*", RenewCollabWeb.ReduxDocumentChannel
-  channel "redux_documents", RenewCollabWeb.ReduxDocumentsChannel
+  channel "project-documents:*", RenewCollabWeb.ReduxDocumentsChannel
 
   channel "redux_simulation:*", RenewCollabWeb.ReduxSimulationChannel
   channel "redux_simulations", RenewCollabWeb.ReduxSimulationsChannel

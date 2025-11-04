@@ -8,7 +8,7 @@ defmodule RenewCollabWeb.ReduxDocumentsChannel do
   alias RenewCollabCtrl.Fetcher
 
   @impl true
-  def init("redux_documents", _params, socket) do
+  def init("project-documents:" <> <<project_id::binary-size(36)>>, _params, socket) do
     # TODO:subscription
     Phoenix.PubSub.subscribe(RenewCollab.PubSub, "documents")
 
@@ -25,8 +25,8 @@ defmodule RenewCollabWeb.ReduxDocumentsChannel do
 
     push(socket, "presence_state", Presence.list(socket))
 
-    {:ok, load_state(socket.assigns.current_account, nil),
-     %{:project_id => nil, :account => socket.assigns.current_account}}
+    {:ok, load_state(socket.assigns.current_account, project_id),
+     %{:project_id => project_id, :account => socket.assigns.current_account}}
   end
 
   defp load_state(current_account, project_id) do
@@ -34,6 +34,7 @@ defmodule RenewCollabWeb.ReduxDocumentsChannel do
       project_id: project_id
     }
     |> Fetcher.fetch_as(current_account)
+    |> then(&%{documents: &1})
     |> RenewCollabWeb.ProjectDocumentJSON.index_content()
   end
 

@@ -184,7 +184,7 @@ defmodule RenewCollabCtrl.Action do
       layer_id: layer_id,
       socket_id: socket_id
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -201,49 +201,22 @@ defmodule RenewCollabCtrl.Action do
       prev_waypoint_id: prev_waypoint_id,
       position: position
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
 
   def do_perform(%Actions.DocumentEditCreateLayerWithEdge{
         document_id: document_id,
-        attrs:
-          attrs = %{
-            "pos" => %{"x" => cx, "y" => cy},
-            "shape_id" => shape_id,
-            "with_edge" => with_edge
-          },
+        attrs: attrs,
+        edge: with_edge,
         base_layer_id: base_layer_id
       }) do
-    width = Map.get(attrs, "width", 50)
-    height = Map.get(attrs, "height", 50)
-
     RenewCollab.Commands.CreateLayerWithEdge.new(%{
       base_layer_id: base_layer_id,
       document_id: document_id,
       edge: with_edge,
-      attrs: %{
-        "semantic_tag" => Map.get(attrs, "semantic_tag", nil),
-        "box" => %{
-          "position_x" => cx - width / 2,
-          "position_y" => cy - height / 2,
-          "width" => width,
-          "height" => height,
-          "symbol_shape_id" => shape_id
-        },
-        "style" => Map.get(attrs, "style", nil),
-        "interface" =>
-          case Map.get(attrs, "socket_schema_id", nil) do
-            nil ->
-              nil
-
-            id ->
-              %{
-                "socket_schema_id" => id
-              }
-          end
-      }
+      attrs: attrs
     })
     |> RenewCollab.DocumentCommander.run_document_command_sync()
   end
@@ -258,9 +231,7 @@ defmodule RenewCollabCtrl.Action do
       attrs: attrs,
       base_layer_id: base_layer_id
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
-
-    :ok
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
   end
 
   def do_perform(%Actions.DocumentEditCreateParentLayer{
@@ -283,7 +254,7 @@ defmodule RenewCollabCtrl.Action do
       document_id: document_id,
       bond_id: bond_id
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -298,7 +269,7 @@ defmodule RenewCollabCtrl.Action do
       layer_id: layer_id,
       waypoint_id: waypoint_id
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -313,7 +284,7 @@ defmodule RenewCollabCtrl.Action do
       layer_id: layer_id,
       delete_children: delete_children
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -326,7 +297,7 @@ defmodule RenewCollabCtrl.Action do
       document_id: document_id,
       layer_id: layer_id
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -341,7 +312,7 @@ defmodule RenewCollabCtrl.Action do
       target_document_id: target_document_id,
       position: position
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -357,7 +328,7 @@ defmodule RenewCollabCtrl.Action do
         converted_document: imported,
         position: {0, 0}
       }
-      |> RenewCollab.DocumentCommander.run_document_command()
+      |> RenewCollab.DocumentCommander.run_document_command_sync()
 
       :ok
     end
@@ -373,7 +344,7 @@ defmodule RenewCollabCtrl.Action do
       layer_id: layer_id,
       socket_schema_id: socket_schema_id
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -390,7 +361,7 @@ defmodule RenewCollabCtrl.Action do
       shape_id: shape_id,
       attributes: attributes
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -405,7 +376,7 @@ defmodule RenewCollabCtrl.Action do
       layer_id: layer_id,
       new_size: new_size
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -420,7 +391,7 @@ defmodule RenewCollabCtrl.Action do
       layer_id: layer_id,
       attributes: attributes
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -435,7 +406,7 @@ defmodule RenewCollabCtrl.Action do
       layer_id: layer_id,
       new_position: new_position
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -452,7 +423,7 @@ defmodule RenewCollabCtrl.Action do
       style_attr: style_attr,
       value: value
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -465,7 +436,7 @@ defmodule RenewCollabCtrl.Action do
       document_id: document_id,
       layer_id: layer_id
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -482,7 +453,7 @@ defmodule RenewCollabCtrl.Action do
       layer_id: layer_id,
       new_position: new_position
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -497,7 +468,7 @@ defmodule RenewCollabCtrl.Action do
       layer_id: layer_id,
       new_tag: new_tag
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -514,7 +485,7 @@ defmodule RenewCollabCtrl.Action do
       style_attr: style_attr,
       value: value
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -529,7 +500,7 @@ defmodule RenewCollabCtrl.Action do
       layer_id: layer_id,
       new_body: new_body
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -544,7 +515,7 @@ defmodule RenewCollabCtrl.Action do
       layer_id: layer_id,
       new_position: new_position
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -576,7 +547,7 @@ defmodule RenewCollabCtrl.Action do
       style_attr: style_attr,
       value: value
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -591,7 +562,7 @@ defmodule RenewCollabCtrl.Action do
       layer_id: layer_id,
       z_index: z_index
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -606,7 +577,7 @@ defmodule RenewCollabCtrl.Action do
       layer_id: layer_id,
       target_layer_id: target_layer_id
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -619,7 +590,7 @@ defmodule RenewCollabCtrl.Action do
       document_id: document_id,
       layer_id: layer_id
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -636,7 +607,7 @@ defmodule RenewCollabCtrl.Action do
       direction: direction,
       inverse: inverse
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -653,7 +624,7 @@ defmodule RenewCollabCtrl.Action do
       dx: dx,
       dy: dy
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -666,7 +637,7 @@ defmodule RenewCollabCtrl.Action do
       document_id: document_id,
       layer_id: layer_id
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -683,7 +654,7 @@ defmodule RenewCollabCtrl.Action do
       target_layer_id: target_layer_id,
       target: target
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -700,7 +671,7 @@ defmodule RenewCollabCtrl.Action do
       target: target,
       relative_direction: relative_direction
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -710,7 +681,7 @@ defmodule RenewCollabCtrl.Action do
       document_id: document_id,
       layer_id: layer_id
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -719,7 +690,7 @@ defmodule RenewCollabCtrl.Action do
     Commands.RemoveThumbnail.new(%{
       document_id: document_id
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -733,7 +704,7 @@ defmodule RenewCollabCtrl.Action do
       document_id: document_id,
       layer_id: layer_id
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -757,7 +728,7 @@ defmodule RenewCollabCtrl.Action do
       document_id: document_id,
       meta: meta
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -770,7 +741,7 @@ defmodule RenewCollabCtrl.Action do
       document_id: document_id,
       snapshot_id: snapshot_id
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -785,7 +756,7 @@ defmodule RenewCollabCtrl.Action do
       snapshot_id: snapshot_id,
       description: description
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -798,7 +769,7 @@ defmodule RenewCollabCtrl.Action do
       document_id: document_id,
       snapshot_id: snapshot_id
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end
@@ -807,7 +778,7 @@ defmodule RenewCollabCtrl.Action do
     RenewCollab.Commands.PruneSnapshots.new(%{
       document_id: document_id
     })
-    |> RenewCollab.DocumentCommander.run_document_command()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
 
     :ok
   end

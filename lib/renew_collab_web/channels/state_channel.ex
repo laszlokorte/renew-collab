@@ -139,21 +139,26 @@ defmodule RenewCollabWeb.StateChannel do
       end
 
       def handle_in("lvs_evt:" <> event_name, payload, %{assigns: assigns} = socket) do
-        if function_exported?(__MODULE__, :handle_event, 5) do
-          apply(__MODULE__, :handle_event, [
-            event_name,
-            payload,
-            Map.get(assigns, state_key()),
-            Map.get(assigns, scope_key()),
-            socket
-          ])
-        else
-          apply(__MODULE__, :handle_event, [
-            event_name,
-            payload,
-            Map.get(assigns, state_key()),
-            Map.get(assigns, scope_key())
-          ])
+        cond do
+          function_exported?(__MODULE__, :handle_event, 5) ->
+            apply(__MODULE__, :handle_event, [
+              event_name,
+              payload,
+              Map.get(assigns, state_key()),
+              Map.get(assigns, scope_key()),
+              socket
+            ])
+
+          function_exported?(__MODULE__, :handle_event, 4) ->
+            apply(__MODULE__, :handle_event, [
+              event_name,
+              payload,
+              Map.get(assigns, state_key()),
+              Map.get(assigns, scope_key())
+            ])
+
+          true ->
+            :silent
         end
         |> case do
           :silent ->
@@ -177,21 +182,26 @@ defmodule RenewCollabWeb.StateChannel do
       end
 
       def handle_in("lvs_evt:" <> event_name, payload, %{assigns: assigns} = socket) do
-        if function_exported?(__MODULE__, :handle_event, 5) do
-          apply(__MODULE__, :handle_event, [
-            event_name,
-            payload,
-            Map.get(assigns, state_key()),
-            Map.get(assigns, scope_key()),
-            socket
-          ])
-        else
-          apply(__MODULE__, :handle_event, [
-            event_name,
-            payload,
-            Map.get(assigns, state_key()),
-            Map.get(assigns, scope_key())
-          ])
+        cond do
+          function_exported?(__MODULE__, :handle_event, 5) ->
+            apply(__MODULE__, :handle_event, [
+              event_name,
+              payload,
+              Map.get(assigns, state_key()),
+              Map.get(assigns, scope_key()),
+              socket
+            ])
+
+          function_exported?(__MODULE__, :handle_event, 4) ->
+            apply(__MODULE__, :handle_event, [
+              event_name,
+              payload,
+              Map.get(assigns, state_key()),
+              Map.get(assigns, scope_key())
+            ])
+
+          true ->
+            {:noreply, Map.get(assigns, state_key())}
         end
         |> maybe_handle_reply(socket)
       end
@@ -224,8 +234,8 @@ defmodule RenewCollabWeb.StateChannel do
 
       def handle_message(_message, state, _scope), do: {:noreply, state}
 
-      def handle_event(_message, _payload, state, _scope), do: {:noreply, state}
-      def handle_event(_message, _payload, state, _scope, _socket), do: {:noreply, state}
+      # def handle_event(_message, _payload, state, _scope), do: {:noreply, state}
+      # def handle_event(_message, _payload, state, _scope, _socket), do: {:noreply, state}
 
       defp update_state(%{assigns: assigns} = socket, new_state) do
         current_state = Map.get(assigns, state_key())
@@ -277,6 +287,11 @@ defmodule RenewCollabWeb.StateChannel do
         update_state(socket, new_state)
       end
 
+      defp maybe_handle_reply({:reply, event_or_events}, socket) do
+        push_events(socket, event_or_events)
+        {:noreply, socket}
+      end
+
       defp maybe_handle_reply({:reply, event_or_events, new_state, new_socket}, socket) do
         push_events(new_socket, event_or_events)
         update_state(new_socket, new_state)
@@ -290,6 +305,10 @@ defmodule RenewCollabWeb.StateChannel do
 
       def push_event(socket, %Event{name: name, detail: detail}) do
         push(socket, name, detail)
+      end
+
+      def push_event(socket, %{} = detail) do
+        push(socket, "phx_reply", %{status: "ok", reponse: detail})
       end
 
       def push_error(socket, message) when is_binary(message) do
@@ -316,8 +335,6 @@ defmodule RenewCollabWeb.StateChannel do
                      handle_message: 3,
                      handle_in: 3,
                      handle_info: 2,
-                     handle_event: 5,
-                     handle_event: 4,
                      authorize: 3,
                      join: 3
     end

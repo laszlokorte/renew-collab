@@ -12,7 +12,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
     case %Views.DocumentWithContent{
            document_id: document_id
          }
-         |> Fetcher.fetch_as(socket.assigns.currentaccount) do
+         |> Fetcher.fetch_as(socket.assigns.current_account) do
       nil ->
         {:error, %{reason: "not found"}}
 
@@ -20,8 +20,8 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         # TODO:subscription
         Phoenix.PubSub.subscribe(RenewCollab.PubSub, "document:#{document_id}")
 
-        account_id = socket.assigns.currentaccount.account_id
-        username = socket.assigns.currentaccount.username
+        account_id = socket.assigns.current_account.account_id
+        username = socket.assigns.current_account.username
         connection_id = socket.assigns.connection_id
 
         Presence.track(socket, account_id, %{
@@ -35,7 +35,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         push(socket, "presence_state", Presence.list(socket))
 
         {:ok, RenewCollabWeb.DocumentJSON.show_content(doc),
-         %{:document_id => document_id, :account => socket.assigns.currentaccount}}
+         %{:document_id => document_id, :account => socket.assigns.current_account}}
     end
   end
 
@@ -64,7 +64,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
 
   @impl true
   def handle_event("cursor", %{"x" => x, "y" => y}, _state, _scope, socket) do
-    account_id = socket.assigns.currentaccount.account_id
+    account_id = socket.assigns.current_account.account_id
 
     Presence.update(
       socket,
@@ -79,7 +79,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
 
   @impl true
   def handle_event("cursor", %{}, _state, _scope, socket) do
-    account_id = socket.assigns.currentaccount.account_id
+    account_id = socket.assigns.current_account.account_id
 
     Presence.update(
       socket,
@@ -94,7 +94,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
 
   @impl true
   def handle_event("select", %{}, _state, _scope, socket) do
-    account_id = socket.assigns.currentaccount.account_id
+    account_id = socket.assigns.current_account.account_id
 
     Presence.update(
       socket,
@@ -109,7 +109,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
 
   @impl true
   def handle_event("select", layer_id, _state, _scope, socket) when is_binary(layer_id) do
-    account_id = socket.assigns.currentaccount.account_id
+    account_id = socket.assigns.current_account.account_id
 
     Presence.update(
       socket,
