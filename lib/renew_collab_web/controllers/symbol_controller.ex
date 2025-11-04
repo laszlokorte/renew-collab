@@ -3,7 +3,6 @@ defmodule RenewCollabWeb.SymbolController do
 
   alias RenewCollabCtrl.Fetcher
   alias RenewCollabCtrl.Views
-  alias RenewCollab.Symbols
 
   action_fallback RenewCollabWeb.FallbackController
 

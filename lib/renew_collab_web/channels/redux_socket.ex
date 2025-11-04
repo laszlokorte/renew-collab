@@ -5,7 +5,7 @@ defmodule RenewCollabWeb.ReduxSocket do
   channel "project-documents:*", RenewCollabWeb.ReduxDocumentsChannel
 
   channel "redux_simulation:*", RenewCollabWeb.ReduxSimulationChannel
-  channel "redux_simulations", RenewCollabWeb.ReduxSimulationsChannel
+  channel "project-simulations:*", RenewCollabWeb.ReduxSimulationsChannel
 
   channel "redux_net_instance:*", RenewCollabWeb.ReduxSimulationNetInstanceChannel
   channel "redux_simulation_links:*", RenewCollabWeb.ReduxSimulationLinksChannel

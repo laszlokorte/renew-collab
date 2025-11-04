@@ -854,13 +854,15 @@ defmodule RenewCollabCtrl.Action do
     %RenewCollabProj.Commands.CreateProject{name: name, owner_account_id: account_id}
     |> RenewCollabProj.ProjectCommander.run_project_command_sync()
     |> case do
-      {:ok, _project} ->
+      {:ok, %{project: project}} ->
         # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           "my_projects:#{account_id}",
           :any
         )
+
+        {:ok, project}
     end
   end
 

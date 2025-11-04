@@ -35,7 +35,10 @@ defmodule RenewCollabWeb.ProjectSimulationController do
     |> Dispatcher.perform_as(conn.assigns.current_account)
     |> case do
       {:ok, %Simulation{} = simulation} ->
-        render(conn, :created, simulation: simulation)
+        conn
+        |> put_status(:created)
+        |> Phoenix.Controller.json(%{id: simulation.id})
+        |> halt()
 
       {:error, :invalid_rnw} ->
         conn

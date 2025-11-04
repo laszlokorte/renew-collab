@@ -6,7 +6,7 @@ defmodule RenewCollabWeb.ReduxSimulationsChannel do
   use RenewCollabWeb.StateChannel, web_module: RenewCollabWeb
 
   @impl true
-  def init("redux_simulations", %{"project_id" => project_id}, socket) do
+  def init("project-simulations:" <> project_id, _params, socket) do
     # TODO:subscription
     Phoenix.PubSub.subscribe(RenewCollab.PubSub, "projects/#{project_id}/simulations")
 

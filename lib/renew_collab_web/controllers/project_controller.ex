@@ -1,6 +1,8 @@
 defmodule RenewCollabWeb.ProjectController do
   use RenewCollabWeb, :controller
 
+  alias RenewCollabCtrl.Dispatcher
+  alias RenewCollabCtrl.Actions
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Fetcher
 
@@ -12,6 +14,21 @@ defmodule RenewCollabWeb.ProjectController do
       |> Fetcher.fetch_as(conn.assigns.current_account)
 
     render(conn, :index, projects: projects)
+  end
+
+  def create(conn, %{}) do
+    %Actions.ProjectCreateAsUser{
+      project_name: "New Project",
+      account_id: conn.assigns.current_account.id
+    }
+    |> Dispatcher.perform_as(conn.assigns.current_account)
+    |> case do
+      {:ok, new_project} ->
+        conn
+        |> put_status(:created)
+        |> put_resp_header("location", ~p"/api/projects/#{new_project}")
+        |> json(%{id: new_project.id, url: ~p"/api/projects/#{new_project}"})
+    end
   end
 
   def show(conn, %{"id" => project_id}) do

@@ -12,10 +12,10 @@ defmodule RenewCollabWeb.ReduxSimulationChannel do
     %Views.SimulationWithState{simulation_id: simulation_id}
     |> Fetcher.fetch_as(socket.assigns.current_account)
     |> case do
-      {:ok, nil} ->
+      nil ->
         {:error, %{reason: "not found"}}
 
-      {:ok, %{} = sim} ->
+      %{} = sim ->
         # TODO:subscription
         Phoenix.PubSub.subscribe(RenewCollab.PubSub, "simulation:#{simulation_id}")
 

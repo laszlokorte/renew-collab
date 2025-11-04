@@ -36,6 +36,7 @@ defmodule RenewCollabCtrl.ReadAccess do
   def can(_account, %Views.GlobalShadowNetSystemsList{}), do: true
   def can(_account, %Views.GlobalProjectAllAssignments{}), do: true
   def can(_account, %Views.SimulationWithLogEntries{}), do: true
+  def can(_account, %Views.SimulationNetInstance{}), do: true
 
   def can(_account, _view), do: false
 end

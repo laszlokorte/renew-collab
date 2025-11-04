@@ -363,4 +363,22 @@ defmodule RenewCollabCtrl.View do
   def do_fetch(_account, %Views.SimulationWithLogEntries{}) do
     {:error, :not_implemented}
   end
+
+  def do_fetch(_acocunt, %Views.SimulationNetInstance{net_instance_id: net_instance_id}) do
+    RenewCollabSim.Queries.SimulationNetInstanceById.new(%{net_instance_id: net_instance_id})
+    |> RenewCollabSim.SimulationFetcher.fetch()
+  end
+
+  def do_fetch(_acocunt, %Views.SimulationNetInstanceByName{
+        simulation_id: simulation_id,
+        net_name: net_name,
+        integer_id: integer_id
+      }) do
+    RenewCollabSim.Queries.SimulationNetInstanceByName.new(%{
+      simulation_id: simulation_id,
+      net_name: net_name,
+      integer_id: integer_id
+    })
+    |> RenewCollabSim.SimulationFetcher.fetch()
+  end
 end
