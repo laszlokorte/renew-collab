@@ -1,5 +1,9 @@
+workflow:
+  rules:
+    - if: "$CI_COMMIT_BRANCH =~ /^(main|staging|dev)$/"
+    - when: never
 stages:
-   - build
+  - build
 
 build-sqlite-all:
   stage: build
@@ -12,7 +16,7 @@ build-sqlite-all:
     RENEW_SIM_DB_TYPE: sqlite
     RENEW_PROJ_DB_TYPE: sqlite
 
-    IMAGE_TAG: $CI_REGISTRY_IMAGE:sqlite-all-latest
+    IMAGE_TAG: $CI_REGISTRY_IMAGE:sqlite-all-$CI_COMMIT_BRANCH
     DOCKER_FILE: Dockerfile
 
     KANIKO_REGISTRY_CREDS: >-
@@ -44,7 +48,7 @@ build-mysql-all:
     RENEW_SIM_DB_TYPE: mysql
     RENEW_PROJ_DB_TYPE: mysql
 
-    IMAGE_TAG: $CI_REGISTRY_IMAGE:mysql-all-latest
+    IMAGE_TAG: $CI_REGISTRY_IMAGE:mysql-all-$CI_COMMIT_BRANCH
     DOCKER_FILE: Dockerfile
 
     KANIKO_REGISTRY_CREDS: >-
@@ -65,7 +69,6 @@ build-mysql-all:
   tags:
     - tgi
 
-
 build-postgresql-all:
   stage: build
   image:
@@ -77,7 +80,7 @@ build-postgresql-all:
     RENEW_SIM_DB_TYPE: postgresql
     RENEW_PROJ_DB_TYPE: postgresql
 
-    IMAGE_TAG: $CI_REGISTRY_IMAGE:postgresql-all-latest
+    IMAGE_TAG: $CI_REGISTRY_IMAGE:postgresql-all-$CI_COMMIT_BRANCH
     DOCKER_FILE: Dockerfile
 
     KANIKO_REGISTRY_CREDS: >-
