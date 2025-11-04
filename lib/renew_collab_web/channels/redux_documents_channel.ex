@@ -1,6 +1,8 @@
 defmodule RenewCollabWeb.ReduxDocumentsChannel do
   use RenewCollabWeb.StateChannel, web_module: RenewCollabWeb
 
+  alias RenewCollabCtrl.Dispatcher
+  alias RenewCollabCtrl.Actions
   alias RenewCollabWeb.Presence
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Fetcher
@@ -41,31 +43,43 @@ defmodule RenewCollabWeb.ReduxDocumentsChannel do
   end
 
   @impl true
-  def handle_message(_, state, _scope) do
+  def handle_message(_, state, %{account: _account}) do
     {:noreply, state}
   end
 
   @impl true
-  def handle_event("delete_document", %{"id" => document_id}, state, _scope) do
-    RenewCollab.Renew.delete_document(document_id)
+  def handle_event("delete_document", %{"id" => document_id}, state, %{account: account}) do
+    %Actions.DocumentDeleteAsUser{
+      document_id: document_id
+    }
+    |> Dispatcher.perform_as(account)
 
     {:noreply, state}
   end
 
   @impl true
-  def handle_event("duplicate_document", %{"id" => document_id}, state, _scope) do
-    RenewCollab.Renew.duplicate_document(document_id)
+  def handle_event("duplicate_document", %{"id" => document_id}, state, %{
+        account: account,
+        project_id: project_id
+      }) do
+    %Actions.DocumentDuplicateInProject{
+      document_id: document_id,
+      project_id: project_id
+    }
+    |> Dispatcher.perform_as(account)
 
     {:noreply, state}
   end
 
   @impl true
-  def handle_event("rename_document", %{"id" => document_id, "name" => name}, _state, _scope) do
-    RenewCollab.Commands.UpdateDocumentMeta.new(%{
+  def handle_event("rename_document", %{"id" => document_id, "name" => name}, _state, %{
+        account: account
+      }) do
+    %Actions.DocumentUpdateMeta{
       document_id: document_id,
       meta: %{name: name}
-    })
-    |> RenewCollab.Commander.run_document_command()
+    }
+    |> Dispatcher.perform_as(account)
 
     :ack
   end

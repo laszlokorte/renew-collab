@@ -245,7 +245,7 @@ defmodule RenewCollabCtrl.Action do
           end
       }
     })
-    |> RenewCollab.Commander.run_document_command_sync()
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
   end
 
   def do_perform(%Actions.DocumentEditCreateLayer{
@@ -1100,7 +1100,11 @@ defmodule RenewCollabCtrl.Action do
       try do
         actual_document_ids
         |> Enum.map(fn doc_id ->
-          document = RenewCollab.Renew.get_document_with_elements(doc_id)
+          {:ok, document} =
+            %{document_id: doc_id}
+            |> RenewCollab.Queries.DocumentWithElements.new()
+            |> RenewCollab.DocumentFetcher.fetch()
+
           {:ok, rnw} = RenewCollab.Export.DocumentExport.export(document, synthetic: true)
           {:ok, json} = RenewCollabWeb.DocumentJSON.show_content(document) |> Jason.encode()
 
@@ -1156,8 +1160,6 @@ defmodule RenewCollabCtrl.Action do
           simulation_id: sim_id
         })
         |> RenewCollabProj.ProjectCommander.run_project_command_sync()
-
-        RenewCollabSim.Server.ScopedSimulationServer.setup(project.id, sim_id)
 
         # TODO:broadcast
         Phoenix.PubSub.broadcast(
@@ -1453,5 +1455,43 @@ defmodule RenewCollabCtrl.Action do
 
   def do_perform(%Actions.GlobalSyntaxAddAutoTargetEntry{attributes: attrs}) do
     Syntax.add_autonode(attrs)
+  end
+
+  def do_perform(%Actions.ShadowNetSystemSetNetDocument{
+        shadow_net_system_id: sns_id,
+        net_id: net_id,
+        document_id: document_id
+      }) do
+    if is_nil(document_id) do
+      RenewCollabSim.Commands.ChangeShadowNetDocument.new(%{
+        shadow_net_system_id: sns_id,
+        shadow_net_id: net_id,
+        document_json: nil
+      })
+      |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
+    else
+      {:ok, document} =
+        %{document_id: document_id}
+        |> RenewCollab.Queries.DocumentWithElements.new()
+        |> RenewCollab.DocumentFetcher.fetch()
+
+      RenewCollabSim.Commands.ChangeShadowNetDocument.new(%{
+        shadow_net_system_id: sns_id,
+        shadow_net_id: net_id,
+        document_json: RenewCollabWeb.DocumentJSON.show(%{document: document}) |> JSON.encode!()
+      })
+      |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
+    end
+  end
+
+  def do_perform(%Actions.ShadowNetSystemSetMainNet{
+        shadow_net_system_id: sns_id,
+        main_net_name: main_net
+      }) do
+    RenewCollabSim.Commands.ChangeMainNetName.new(%{
+      shadow_net_system_id: sns_id,
+      main_net: main_net
+    })
+    |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
   end
 end

@@ -62,6 +62,17 @@ defmodule RenewCollabWeb.LiveShadowNet do
     end
   end
 
+  def reload(socket) do
+    socket
+    |> assign(
+      :shadow_net_system,
+      %Views.ShadowNetSystem{
+        shadow_net_system_id: socket.assigns.shadow_net_system.id
+      }
+      |> Fetcher.fetch_as(socket.assigns.current_account)
+    )
+  end
+
   def handle_info(:any, socket) do
     {:noreply,
      socket
@@ -399,7 +410,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
-    {:noreply, socket |> put_flash(:info, "Shadow net System renamed")}
+    {:noreply, socket |> reload() |> put_flash(:info, "Shadow net System renamed")}
   end
 
   def handle_event("delete", %{"id" => simulation_id}, socket) do
@@ -413,7 +424,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
       :any
     )
 
-    {:noreply, socket |> put_flash(:info, "Simulation deleted")}
+    {:noreply, socket |> reload() |> put_flash(:info, "Simulation deleted")}
   end
 
   def handle_event("setup", %{"id" => simulation_id}, socket) do
@@ -491,16 +502,13 @@ defmodule RenewCollabWeb.LiveShadowNet do
   end
 
   def handle_event("change_main_net", %{"main_net" => main_net}, socket) do
-    RenewCollabSim.Simulator.change_main_net(socket.assigns.shadow_net_system_id, main_net)
+    %Actions.ShadowNetSystemSetMainNet{
+      shadow_net_system_id: socket.assigns.shadow_net_system_id,
+      main_net_name: main_net
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
 
-    # TODO:broadcast
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "#{@topic}:#{socket.assigns.shadow_net_system_id}",
-      :any
-    )
-
-    {:noreply, socket}
+    {:noreply, socket |> reload()}
   end
 
   def handle_event(
@@ -508,19 +516,14 @@ defmodule RenewCollabWeb.LiveShadowNet do
         %{"value" => shadow_net_id},
         socket
       ) do
-    RenewCollabSim.Simulator.clear_net_document(
-      socket.assigns.shadow_net_system_id,
-      shadow_net_id
-    )
+    %Actions.ShadowNetSystemSetNetDocument{
+      shadow_net_system_id: socket.assigns.shadow_net_system_id,
+      net_id: shadow_net_id,
+      document_id: nil
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
 
-    # TODO:broadcast
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "#{@topic}:#{socket.assigns.shadow_net_system_id}",
-      :any
-    )
-
-    {:noreply, socket}
+    {:noreply, socket |> reload()}
   end
 
   def handle_event(
@@ -528,20 +531,14 @@ defmodule RenewCollabWeb.LiveShadowNet do
         %{"shadow_net_id" => shadow_net_id, "document_id" => document_id},
         socket
       ) do
-    RenewCollabSim.Simulator.change_net_document(
-      socket.assigns.shadow_net_system_id,
-      shadow_net_id,
-      document_id
-    )
+    %Actions.ShadowNetSystemSetNetDocument{
+      shadow_net_system_id: socket.assigns.shadow_net_system_id,
+      net_id: shadow_net_id,
+      document_id: document_id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
 
-    # TODO:broadcast
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "#{@topic}:#{socket.assigns.shadow_net_system_id}",
-      :any
-    )
-
-    {:noreply, socket}
+    {:noreply, socket |> reload()}
   end
 
   def handle_event("new-simulation", %{}, socket) do

@@ -45,6 +45,9 @@ defmodule RenewCollabWeb do
       import Plug.Conn
 
       unquote(verified_routes())
+
+      defp own_account(%{assigns: %{current_account: acc}}), do: acc
+      defp own_account(_), do: nil
     end
   end
 
@@ -54,6 +57,8 @@ defmodule RenewCollabWeb do
         layout: {RenewCollabWeb.Layouts, :app}
 
       unquote(html_helpers())
+      defp own_account(%{assigns: %{current_account: acc}}), do: acc
+      defp own_account(_), do: nil
     end
   end
 

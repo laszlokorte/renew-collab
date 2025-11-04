@@ -86,7 +86,6 @@ defmodule RenewCollabWeb.ProjectJSON do
     %{
       # id: document.id,
       href: url(~p"/api/projects/#{project}"),
-      topic: "redux_project:#{project.id}",
       id: project.id,
       links: %{
         documents: %{

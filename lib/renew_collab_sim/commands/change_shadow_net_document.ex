@@ -20,7 +20,7 @@ defmodule RenewCollabSim.Commands.ChangeShadowNetDocument do
         where: sn.id == ^net_id and sn.shadow_net_system_id == ^sns_id
       )
     )
-    |> Ecto.Multi.update(:change_net, fn _, %{shadow_net: net} ->
+    |> Ecto.Multi.update(:change_net, fn %{shadow_net: net} ->
       ShadowNet.document_changeset(net, %{document_json: document_json})
     end)
   end

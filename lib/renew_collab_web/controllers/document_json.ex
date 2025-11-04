@@ -87,6 +87,17 @@ defmodule RenewCollabWeb.DocumentJSON do
       topic: "redux_document:#{document.id}",
       id: document.id,
       links: %{
+        project:
+          with %{project_id: project_id} <- document.project_assignment do
+            %{
+              method: "GET",
+              id: project_id,
+              href: url(~p"/api/projects/#{project_id}")
+            }
+          else
+            _ ->
+              nil
+          end,
         symbols: %{
           href: url(~p"/api/symbols"),
           method: "get"

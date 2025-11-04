@@ -1,9 +1,13 @@
 defmodule RenewCollabWeb.ReduxSimulationNetInstanceChannel do
+  alias RenewCollabCtrl.Fetcher
+  alias RenewCollabCtrl.Views
   use RenewCollabWeb.StateChannel, web_module: RenewCollabWeb
 
   @impl true
-  def init("redux_net_instance:" <> net_instance_id, _params, _socket) do
-    case RenewCollabSim.Simulator.find_simulation_net_instance(net_instance_id) do
+  def init("redux_net_instance:" <> net_instance_id, _params, socket) do
+    %Views.SimulationNetInstance{net_instance_id: net_instance_id}
+    |> Fetcher.fetch_as(socket.assigns.current_account)
+    |> case do
       nil ->
         {:error, %{reason: "not found"}}
 
@@ -12,7 +16,7 @@ defmodule RenewCollabWeb.ReduxSimulationNetInstanceChannel do
         Phoenix.PubSub.subscribe(RenewCollab.PubSub, "simulation:#{net_instance.simulation_id}")
 
         {:ok, RenewCollabWeb.SimulationJSON.show_instance_content(net_instance),
-         {:net_instance_id, net_instance_id}}
+         %{net_instance_id: net_instance_id, account: socket.assigns.current_account}}
     end
   end
 
@@ -20,15 +24,16 @@ defmodule RenewCollabWeb.ReduxSimulationNetInstanceChannel do
   def handle_message(
         {:simulation_change, _simulation_id, _details},
         _state,
-        {:net_instance_id, net_instance_id}
+        %{net_instance_id: net_instance_id, account: account}
       ) do
-    RenewCollabSim.Simulator.find_simulation_net_instance(net_instance_id)
+    %Views.SimulationNetInstance{net_instance_id: net_instance_id}
+    |> Fetcher.fetch_as(account)
     |> case do
       nil ->
         :stop
 
-      ni ->
-        {:noreply, RenewCollabWeb.SimulationJSON.show_instance_content(ni)}
+      instance ->
+        {:noreply, RenewCollabWeb.SimulationJSON.show_instance_content(instance)}
     end
   end
 

@@ -1,7 +1,10 @@
 defmodule RenewCollabWeb.ProjectSimulationController do
+  alias RenewCollabCtrl.Fetcher
+  alias RenewCollabCtrl.Views
+  alias RenewCollabCtrl.Dispatcher
+  alias RenewCollabCtrl.Actions
   alias RenewCollabSim.Server.ScopedSimulationServer
   alias RenewCollabSim.Entities.Simulation
-  alias RenewCollabProj.Projects
   use RenewCollabWeb, :controller
 
   action_fallback RenewCollabWeb.FallbackController
@@ -10,9 +13,10 @@ defmodule RenewCollabWeb.ProjectSimulationController do
     render(conn, :index,
       project_id: project_id,
       simulations:
-        RenewCollabSim.Simulator.list_simulations(
-          RenewCollabProj.Projects.list_project_simulations(project_id)
-        ),
+        %Views.ProjectSimulationsList{
+          project_id: project_id
+        }
+        |> Fetcher.fetch_as(conn.assigns.current_account),
       runnings: ScopedSimulationServer.running_ids(project_id) |> MapSet.new()
     )
   end
@@ -22,16 +26,15 @@ defmodule RenewCollabWeb.ProjectSimulationController do
     formalism =
       Map.get(params, "formalism", RenewCollabSim.Compiler.SnsCompiler.default_formalism())
 
-    project =
-      Projects.find_own_project(conn.assigns.current_account, project_id)
-
-    case RenewCollabSim.Simulator.create_simulation_from_documents(
-           project,
-           formalism,
-           document_ids,
-           Map.get(params, "main_net_name")
-         ) do
-      %Simulation{} = simulation ->
+    %Actions.SimulationCreateFromDocumentsInProject{
+      project_id: project_id,
+      document_ids: document_ids,
+      formalism: formalism,
+      main_net_name: Map.get(params, "main_net_name")
+    }
+    |> Dispatcher.perform_as(conn.assigns.current_account)
+    |> case do
+      {:ok, %Simulation{} = simulation} ->
         render(conn, :created, simulation: simulation)
 
       {:error, :invalid_rnw} ->

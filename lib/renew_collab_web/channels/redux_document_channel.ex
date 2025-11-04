@@ -1,8 +1,9 @@
 defmodule RenewCollabWeb.ReduxDocumentChannel do
   use RenewCollabWeb.StateChannel, web_module: RenewCollabWeb
 
+  alias RenewCollabCtrl.Actions
   alias RenewCollabWeb.Presence
-
+  alias RenewCollabCtrl.Dispatcher
   alias RenewCollabCtrl.Fetcher
   alias RenewCollabCtrl.Views
 
@@ -11,7 +12,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
     case %Views.DocumentWithContent{
            document_id: document_id
          }
-         |> Fetcher.fetch_as(socket.assigns.current_account) do
+         |> Fetcher.fetch_as(socket.assigns.currentaccount) do
       nil ->
         {:error, %{reason: "not found"}}
 
@@ -19,8 +20,8 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         # TODO:subscription
         Phoenix.PubSub.subscribe(RenewCollab.PubSub, "document:#{document_id}")
 
-        account_id = socket.assigns.current_account.account_id
-        username = socket.assigns.current_account.username
+        account_id = socket.assigns.currentaccount.account_id
+        username = socket.assigns.currentaccount.username
         connection_id = socket.assigns.connection_id
 
         Presence.track(socket, account_id, %{
@@ -34,7 +35,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         push(socket, "presence_state", Presence.list(socket))
 
         {:ok, RenewCollabWeb.DocumentJSON.show_content(doc),
-         %{:document_id => document_id, :account => socket.assigns.current_account}}
+         %{:document_id => document_id, :account => socket.assigns.currentaccount}}
     end
   end
 
@@ -63,7 +64,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
 
   @impl true
   def handle_event("cursor", %{"x" => x, "y" => y}, _state, _scope, socket) do
-    account_id = socket.assigns.current_account.account_id
+    account_id = socket.assigns.currentaccount.account_id
 
     Presence.update(
       socket,
@@ -78,7 +79,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
 
   @impl true
   def handle_event("cursor", %{}, _state, _scope, socket) do
-    account_id = socket.assigns.current_account.account_id
+    account_id = socket.assigns.currentaccount.account_id
 
     Presence.update(
       socket,
@@ -93,7 +94,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
 
   @impl true
   def handle_event("select", %{}, _state, _scope, socket) do
-    account_id = socket.assigns.current_account.account_id
+    account_id = socket.assigns.currentaccount.account_id
 
     Presence.update(
       socket,
@@ -108,7 +109,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
 
   @impl true
   def handle_event("select", layer_id, _state, _scope, socket) when is_binary(layer_id) do
-    account_id = socket.assigns.current_account.account_id
+    account_id = socket.assigns.currentaccount.account_id
 
     Presence.update(
       socket,
@@ -126,15 +127,15 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "restore_snapshot",
         snapshot_id,
         _state,
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       )
       when is_binary(snapshot_id) do
-    RenewCollab.Commands.RestoreSnapshot.new(%{
+    %Actions.DocumentSnapshotRestore{
       document_id: document_id,
       snapshot_id: snapshot_id
-    })
-    |> RenewCollab.Commander.run_document_command()
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end
@@ -144,16 +145,16 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "delete_layer",
         layer_id,
         _state,
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       )
       when is_binary(layer_id) do
-    RenewCollab.Commands.DeleteLayer.new(%{
+    %Actions.DocumentEditDeleteLayer{
       document_id: document_id,
       layer_id: layer_id,
       delete_children: true
-    })
-    |> RenewCollab.Commander.run_document_command()
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end
@@ -167,13 +168,13 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "with_edge" => with_edge
         } = params,
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       ) do
     width = Map.get(params, "width", 50)
     height = Map.get(params, "height", 50)
 
-    RenewCollab.Commands.CreateLayerWithEdge.new(%{
+    %Actions.DocumentEditCreateLayerWithEdge{
       base_layer_id: Map.get(params, "base_layer_id", nil),
       document_id: document_id,
       edge: with_edge,
@@ -198,8 +199,8 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
               }
           end
       }
-    })
-    |> RenewCollab.Commander.run_document_command_sync()
+    }
+    |> Dispatcher.perform_as(account)
     |> case do
       {:ok, %{layer: layer}} ->
         {:reply, %{id: layer.id}}
@@ -211,13 +212,13 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "create_layer",
         %{"pos" => %{"x" => cx, "y" => cy}, "shape_id" => shape_id} = params,
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       ) do
     width = Map.get(params, "width", 50)
     height = Map.get(params, "height", 50)
 
-    RenewCollab.Commands.CreateLayer.new(%{
+    %Actions.DocumentEditCreateLayer{
       base_layer_id: Map.get(params, "base_layer_id", nil),
       document_id: document_id,
       attrs: %{
@@ -241,8 +242,8 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
               }
           end
       }
-    })
-    |> RenewCollab.Commander.run_document_command_sync()
+    }
+    |> Dispatcher.perform_as(account)
     |> case do
       {:ok, %{layer: layer}} ->
         {:reply, %{id: layer.id}}
@@ -257,10 +258,10 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "image" => background_url
         } = params,
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       ) do
-    RenewCollab.Commands.CreateLayer.new(%{
+    %Actions.DocumentEditCreateLayer{
       base_layer_id: Map.get(params, "base_layer_id", nil),
       document_id: document_id,
       attrs: %{
@@ -276,8 +277,8 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "border_width" => 0
         }
       }
-    })
-    |> RenewCollab.Commander.run_document_command_sync()
+    }
+    |> Dispatcher.perform_as(account)
     |> case do
       {:ok, %{layer: layer}} ->
         {:reply, %{id: layer.id}}
@@ -289,14 +290,14 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "create_layer",
         %{"points" => points} = params,
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       )
       when is_list(points) and length(points) > 1 do
     %{"x" => source_x, "y" => source_y} = Enum.at(points, 0)
     %{"x" => target_x, "y" => target_y} = Enum.at(points, -1)
 
-    RenewCollab.Commands.CreateLayer.new(%{
+    %Actions.DocumentEditCreateLayer{
       base_layer_id: Map.get(params, "base_layer_id", nil),
       document_id: document_id,
       attrs: %{
@@ -322,8 +323,8 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
             end)
         }
       }
-    })
-    |> RenewCollab.Commander.run_document_command_sync()
+    }
+    |> Dispatcher.perform_as(account)
     |> case do
       {:ok, %{layer: layer}} ->
         {:reply, %{id: layer.id}}
@@ -335,10 +336,10 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "create_layer",
         %{"pos" => %{"x" => position_x, "y" => position_y}, "body" => body} = params,
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       ) do
-    RenewCollab.Commands.CreateLayer.new(%{
+    %Actions.DocumentEditCreateLayer{
       base_layer_id: Map.get(params, "base_layer_id", nil),
       document_id: document_id,
       attrs: %{
@@ -360,8 +361,8 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
               }
           end
       }
-    })
-    |> RenewCollab.Commander.run_document_command_sync()
+    }
+    |> Dispatcher.perform_as(account)
     |> case do
       {:ok, %{layer: layer}} ->
         {:reply, %{id: layer.id}}
@@ -376,10 +377,10 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "target" => %{"socket_id" => target_socket_id, "layer_id" => target_layer_id}
         } = params,
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       ) do
-    RenewCollab.Commands.CreateLayer.new(%{
+    %Actions.DocumentEditCreateLayer{
       base_layer_id: Map.get(params, "base_layer_id", nil),
       document_id: document_id,
       attrs: %{
@@ -402,8 +403,8 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           }
         }
       }
-    })
-    |> RenewCollab.Commander.run_document_command_sync()
+    }
+    |> Dispatcher.perform_as(account)
     |> case do
       {:ok, %{layer: layer}} ->
         {:reply, %{id: layer.id}}
@@ -417,17 +418,17 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "child_layer_id" => child_layer_id
         } = params,
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       ) do
-    RenewCollab.Commands.CreateParentLayer.new(%{
+    %Actions.DocumentEditCreateParentLayer{
       child_layer_id: child_layer_id,
       document_id: document_id,
       attrs: %{
         "semantic_tag" => Map.get(params, "semantic_tag", "CH.ifa.draw.figures.GroupFigure")
       }
-    })
-    |> RenewCollab.Commander.run_document_command_sync()
+    }
+    |> Dispatcher.perform_as(account)
     |> case do
       {:ok, %{layer: layer}} ->
         {:reply, %{id: layer.id}}
@@ -442,15 +443,15 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "position" => %{"x" => x, "y" => y}
         },
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       ) do
-    RenewCollab.Commands.InsertDocument.new(%{
+    %Actions.DocumentEditInsertDocument{
       target_document_id: document_id,
       source_document_id: document_id,
       position: {x, y}
-    })
-    |> RenewCollab.Commander.run_document_command()
+    }
+    |> Dispatcher.perform_as(account)
 
     :ack
   end
@@ -460,17 +461,17 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "change_style",
         %{"type" => "text", "attr" => style_attr, "layer_id" => layer_id, "val" => value},
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       )
       when is_binary(style_attr) and is_binary(layer_id) do
-    RenewCollab.Commands.UpdateLayerTextStyle.new(%{
+    %Actions.DocumentEditLayerTextStyle{
       document_id: document_id,
       layer_id: layer_id,
       style_attr: style_attr,
       value: value
-    })
-    |> RenewCollab.Commander.run_document_command()
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end
@@ -480,17 +481,17 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "change_style",
         %{"type" => "edge", "attr" => style_attr, "layer_id" => layer_id, "val" => value},
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       )
       when is_binary(style_attr) and is_binary(layer_id) do
-    RenewCollab.Commands.UpdateLayerEdgeStyle.new(%{
+    %Actions.DocumentEditLayerEdgeStyle{
       document_id: document_id,
       layer_id: layer_id,
       style_attr: style_attr,
       value: value
-    })
-    |> RenewCollab.Commander.run_document_command()
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end
@@ -500,17 +501,17 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "change_style",
         %{"type" => "layer", "attr" => style_attr, "layer_id" => layer_id, "val" => value},
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       )
       when is_binary(style_attr) and is_binary(layer_id) do
-    RenewCollab.Commands.UpdateLayerStyle.new(%{
+    %Actions.DocumentEditLayerStyle{
       document_id: document_id,
       layer_id: layer_id,
       style_attr: style_attr,
       value: value
-    })
-    |> RenewCollab.Commander.run_document_command()
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end
@@ -520,16 +521,16 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "change_edge_attributes",
         %{"layer_id" => layer_id, "attrs" => attributes},
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       )
       when is_map(attributes) and is_binary(layer_id) do
-    RenewCollab.Commands.UpdateLayerEdgeAttributes.new(%{
+    %Actions.DocumentEditLayerEdgeAttributes{
       document_id: document_id,
       layer_id: layer_id,
       attributes: attributes
-    })
-    |> RenewCollab.Commander.run_document_command()
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end
@@ -539,15 +540,15 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "change_edge_direction",
         %{"layer_id" => layer_id},
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       )
       when is_binary(layer_id) do
-    RenewCollab.Commands.UpdateLayerEdgeReverseDirection.new(%{
+    %Actions.DocumentEditLayerEdgeSwapDirection{
       document_id: document_id,
       layer_id: layer_id
-    })
-    |> RenewCollab.Commander.run_document_command()
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end
@@ -557,16 +558,16 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "change_text_body",
         %{"layer_id" => layer_id, "val" => new_body},
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       )
       when is_binary(new_body) and is_binary(layer_id) do
-    RenewCollab.Commands.UpdateLayerTextBody.new(%{
+    %Actions.DocumentEditLayerTextBody{
       document_id: document_id,
       layer_id: layer_id,
       new_body: new_body
-    })
-    |> RenewCollab.Commander.run_document_command()
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end
@@ -576,17 +577,17 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "change_layer_shape",
         %{"layer_id" => layer_id, "shape_id" => shape_id},
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       )
       when is_binary(shape_id) and is_binary(layer_id) do
-    RenewCollab.Commands.UpdateLayerBoxShape.new(%{
+    %Actions.DocumentEditLayerBoxShape{
       document_id: document_id,
       layer_id: layer_id,
       shape_id: shape_id,
       attributes: %{}
-    })
-    |> RenewCollab.Commander.run_document_command()
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end
@@ -596,15 +597,15 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "set_visibility",
         %{"layer_id" => layer_id, "visible" => visible},
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       ) do
-    RenewCollab.Commands.SetVisibility.new(%{
+    %Actions.DocumentEditSetLayerVisibility{
       document_id: document_id,
       layer_id: layer_id,
       visible: visible
-    })
-    |> RenewCollab.Commander.run_document_command()
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end
@@ -614,15 +615,15 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "set_socket_schema",
         %{"layer_id" => layer_id, "val" => socket_schema_id},
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       ) do
-    RenewCollab.Commands.AssignLayerSocketSchema.new(%{
+    %Actions.DocumentEditLayerAssignSocketSchema{
       document_id: document_id,
       layer_id: layer_id,
       socket_schema_id: socket_schema_id
-    })
-    |> RenewCollab.Commander.run_document_command()
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end
@@ -632,15 +633,15 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "set_semantic_tag",
         %{"layer_id" => layer_id, "val" => new_tag},
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       ) do
-    RenewCollab.Commands.UpdateLayerSemanticTag.new(%{
+    %Actions.DocumentEditLayerSemanticTag{
       document_id: document_id,
       layer_id: layer_id,
       new_tag: new_tag
-    })
-    |> RenewCollab.Commander.run_document_command()
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end
@@ -653,15 +654,15 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "value" => new_size
         },
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       ) do
-    RenewCollab.Commands.UpdateLayerBoxSize.new(%{
+    %Actions.DocumentEditLayerBoxSize{
       document_id: document_id,
       layer_id: layer_id,
       new_size: new_size
-    })
-    |> RenewCollab.Commander.run_document_command()
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end
@@ -674,15 +675,15 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "waypoint_id" => waypoint_id
         },
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       ) do
-    RenewCollab.Commands.DeleteLayerEdgeWaypoint.new(%{
+    %Actions.DocumentEditDeleteEdgeWaypoint{
       document_id: document_id,
       layer_id: layer_id,
       waypoint_id: waypoint_id
-    })
-    |> RenewCollab.Commander.run_document_command()
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end
@@ -699,10 +700,10 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           }
         },
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       ) do
-    RenewCollab.Commands.UpdateLayerEdgeWaypointPosition.new(%{
+    %Actions.DocumentEditLayerEdgeWaypointPosition{
       document_id: document_id,
       layer_id: layer_id,
       waypoint_id: waypoint_id,
@@ -710,8 +711,8 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "position_x" => position_x,
         "position_y" => position_y
       }
-    })
-    |> RenewCollab.Commander.run_document_command()
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end
@@ -728,16 +729,16 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           }
         },
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       ) do
-    RenewCollab.Commands.CreateLayerEdgeWaypoint.new(%{
+    %Actions.DocumentEditCreateEdgeWaypoint{
       document_id: document_id,
       layer_id: layer_id,
       prev_waypoint_id: prev_waypoint_id,
       position: {position_x, position_y}
-    })
-    |> RenewCollab.Commander.run_document_command()
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end
@@ -750,15 +751,15 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "value" => new_position
         },
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       ) do
-    RenewCollab.Commands.UpdateLayerEdgePosition.new(%{
+    %Actions.DocumentEditLayerEdgePosition{
       document_id: document_id,
       layer_id: layer_id,
       new_position: new_position
-    })
-    |> RenewCollab.Commander.run_document_command_sync()
+    }
+    |> Dispatcher.perform_as(account)
     |> case do
       {:ok,
        %{
@@ -794,15 +795,15 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
             } = new_position
         },
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       ) do
-    RenewCollab.Commands.UpdateLayerTextPosition.new(%{
+    %Actions.DocumentEditLayerTextPosition{
       document_id: document_id,
       layer_id: layer_id,
       new_position: new_position
-    })
-    |> RenewCollab.Commander.run_document_command()
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end
@@ -817,16 +818,16 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "relative" => relative
         },
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       ) do
-    RenewCollab.Commands.ReorderLayer.new(%{
+    %Actions.DocumentEditReorderLayer{
       document_id: document_id,
       layer_id: layer_id,
       target_layer_id: target_layer_id,
-      target: RenewCollab.Commands.ReorderLayer.parse_hierarchy_position(order, relative)
-    })
-    |> RenewCollab.Commander.run_document_command()
+      target: Actions.DocumentEditReorderLayer.parse_hierarchy_position(order, relative)
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end
@@ -840,16 +841,16 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "dy" => dy
         },
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       ) do
-    RenewCollab.Commands.MoveLayerRelative.new(%{
+    %Actions.DocumentEditMoveLayerRelative{
       document_id: document_id,
       layer_id: layer_id,
       dx: dx,
       dy: dy
-    })
-    |> RenewCollab.Commander.run_document_command_sync()
+    }
+    |> Dispatcher.perform_as(account)
 
     :ack
   end
@@ -859,18 +860,18 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "reorder_relative",
         %{"id" => layer_id, "target_rel" => target_rel},
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       ) do
-    {rel, target} = RenewCollab.Commands.ReorderLayerRelative.parse_direction(target_rel)
+    {rel, target} = Actions.DocumentEditReorderLayerRelative.parse_direction(target_rel)
 
-    RenewCollab.Commands.ReorderLayerRelative.new(%{
+    %Actions.DocumentEditReorderLayerRelative{
       document_id: document_id,
       layer_id: layer_id,
       relative_direction: rel,
       target: target
-    })
-    |> RenewCollab.Commander.run_document_command()
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end
@@ -903,16 +904,16 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
           "dir" => %{"x" => dx, "y" => dy}
         } = params,
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       ) do
-    RenewCollab.Commands.MakeSpaceBetween.new(%{
+    %Actions.DocumentEditMakeSpaceBetween{
       document_id: document_id,
       base: {bx, by},
       direction: {dx, dy},
       inverse: Map.get(params, "inverse", false)
-    })
-    |> RenewCollab.Commander.run_document_command()
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end
@@ -922,14 +923,14 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         "set_meta",
         params,
         %{},
-        %{:document_id => document_id, :account => _account},
+        %{:document_id => document_id, :account => account},
         _socket
       ) do
-    RenewCollab.Commands.UpdateDocumentMeta.new(%{
+    %Actions.DocumentUpdateMeta{
       document_id: document_id,
       meta: params
-    })
-    |> RenewCollab.Commander.run_document_command()
+    }
+    |> Dispatcher.perform_as(account)
 
     :ack
   end

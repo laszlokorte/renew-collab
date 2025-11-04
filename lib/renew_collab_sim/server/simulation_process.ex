@@ -87,9 +87,6 @@ defmodule RenewCollabSim.Server.SimulationProcess do
     with {:ok, simulation} when not is_nil(simulation) <-
            RenewCollabSim.Queries.Simulation.new(%{simulation_id: simulation_id})
            |> RenewCollabSim.SimulationFetcher.fetch(),
-         {:ok, project} when not is_nil(simulation) <-
-           RenewCollabProj.Queries.SimulationsProject.new(%{simulation_id: simulation_id})
-           |> RenewCollabProj.ProjectFetcher.fetch(),
          {:ok, state} <-
            State.init(
              self(),

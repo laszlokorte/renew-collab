@@ -118,9 +118,6 @@ defmodule RenewCollabCtrl.View do
                end)
              end)}
         end
-
-      err ->
-        err
     end
   end
 

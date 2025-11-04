@@ -1,6 +1,7 @@
 defmodule RenewCollabWeb.ShadowNetController do
   use RenewCollabWeb, :controller
 
+  alias RenewCollabCtrl.Dispatcher
   alias RenewCollabCtrl.Actions
   alias RenewCollabCtrl.Fetcher
   alias RenewCollabCtrl.Views

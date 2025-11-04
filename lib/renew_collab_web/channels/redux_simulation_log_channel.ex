@@ -1,9 +1,15 @@
 defmodule RenewCollabWeb.ReduxSimulationLogChannel do
+  alias RenewCollabCtrl.Fetcher
+  alias RenewCollabCtrl.Views
   use RenewCollabWeb.StateChannel, web_module: RenewCollabWeb
 
   @impl true
-  def init("redux_simulation_log:" <> simulation_id, _params, _socket) do
-    case RenewCollabSim.Simulator.find_simulation_simple(simulation_id) do
+  def init("redux_simulation_log:" <> simulation_id, _params, socket) do
+    %Views.SimulationWithLogEntries{
+      simulation_id: simulation_id
+    }
+    |> Fetcher.fetch_as(socket.assigns.current_account)
+    |> case do
       nil ->
         {:error, %{reason: "not found"}}
 
@@ -12,8 +18,9 @@ defmodule RenewCollabWeb.ReduxSimulationLogChannel do
         Phoenix.PubSub.subscribe(RenewCollab.PubSub, "simulation:#{sim.id}")
 
         {:ok,
-         RenewCollabSim.Simulator.find_simulation_log_entries(simulation_id)
-         |> RenewCollabWeb.SimulationJSON.show_log_content(), {:simulation_id, simulation_id}}
+         sim.log_entries
+         |> RenewCollabWeb.SimulationJSON.show_log_content(),
+         %{simulation_id: simulation_id, account: socket.assigns.current_account}}
     end
   end
 
@@ -21,15 +28,19 @@ defmodule RenewCollabWeb.ReduxSimulationLogChannel do
   def handle_message(
         {:simulation_change, simulation_id, _event},
         _state,
-        {:simulation_id, simulation_id}
+        %{simulation_id: simulation_id, account: account}
       ) do
-    case RenewCollabSim.Simulator.find_simulation_simple(simulation_id) do
+    %Views.SimulationWithLogEntries{
+      simulation_id: simulation_id
+    }
+    |> Fetcher.fetch_as(account)
+    |> case do
       nil ->
         :stop
 
       sim ->
         {:noreply,
-         RenewCollabSim.Simulator.find_simulation_log_entries(sim.id)
+         sim.log_entries
          |> RenewCollabWeb.SimulationJSON.show_log_content()}
     end
   end

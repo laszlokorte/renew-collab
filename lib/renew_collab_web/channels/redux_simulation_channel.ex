@@ -1,15 +1,21 @@
 defmodule RenewCollabWeb.ReduxSimulationChannel do
   use RenewCollabWeb.StateChannel, web_module: RenewCollabWeb
 
+  alias RenewCollabCtrl.Fetcher
+  alias RenewCollabCtrl.Views
+  alias RenewCollabCtrl.Dispatcher
+  alias RenewCollabCtrl.Actions
   alias RenewCollabWeb.Presence
 
   @impl true
   def init("redux_simulation:" <> simulation_id, _params, socket) do
-    case RenewCollabSim.Simulator.find_simulation_simple(simulation_id) do
-      nil ->
+    %Views.SimulationWithState{simulation_id: simulation_id}
+    |> Fetcher.fetch_as(socket.assigns.current_account)
+    |> case do
+      {:ok, nil} ->
         {:error, %{reason: "not found"}}
 
-      sim ->
+      {:ok, %{} = sim} ->
         # TODO:subscription
         Phoenix.PubSub.subscribe(RenewCollab.PubSub, "simulation:#{simulation_id}")
 
@@ -38,7 +44,11 @@ defmodule RenewCollabWeb.ReduxSimulationChannel do
              sim.project_assignment.project_id,
              simulation_id
            )
-         ), {:project_id, sim.project_assignment.project_id, :simulation_id, simulation_id}}
+         ),
+         %{
+           simulation_id: simulation_id,
+           account: socket.assigns.current_account
+         }}
     end
   end
 
@@ -46,13 +56,15 @@ defmodule RenewCollabWeb.ReduxSimulationChannel do
   def handle_message(
         {:simulation_change, simulation_id, {_event, is_playing}},
         _state,
-        {:project_id, project_id, :simulation_id, simulation_id}
+        %{project_id: project_id, simulation_id: simulation_id, account: account}
       ) do
-    case RenewCollabSim.Simulator.find_simulation_simple(simulation_id) do
-      nil ->
+    %Views.SimulationWithState{simulation_id: simulation_id}
+    |> Fetcher.fetch_as(account)
+    |> case do
+      {:ok, nil} ->
         :stop
 
-      sim ->
+      {:ok, %{} = sim} ->
         {:noreply,
          RenewCollabWeb.SimulationJSON.show_content(
            sim,
@@ -66,13 +78,15 @@ defmodule RenewCollabWeb.ReduxSimulationChannel do
   def handle_message(
         {:simulation_change, simulation_id, _event},
         _state,
-        {:project_id, project_id, :simulation_id, simulation_id}
+        %{project_id: project_id, simulation_id: simulation_id, account: account}
       ) do
-    case RenewCollabSim.Simulator.find_simulation_simple(simulation_id) do
-      nil ->
+    %Views.SimulationWithState{simulation_id: simulation_id}
+    |> Fetcher.fetch_as(account)
+    |> case do
+      {:ok, nil} ->
         :stop
 
-      sim ->
+      {:ok, %{} = sim} ->
         {:noreply,
          RenewCollabWeb.SimulationJSON.show_content(
            sim,
@@ -88,22 +102,40 @@ defmodule RenewCollabWeb.ReduxSimulationChannel do
   end
 
   @impl true
-  def handle_event("step", %{}, _state, {:project_id, project_id, :simulation_id, simulation_id}) do
-    RenewCollabSim.Server.ScopedSimulationServer.step(project_id, simulation_id)
+  def handle_event("step", %{}, _state, %{
+        simulation_id: simulation_id,
+        account: account
+      }) do
+    %Actions.SimulationStep{
+      simulation_id: simulation_id
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end
 
   @impl true
-  def handle_event("play", %{}, _state, {:project_id, project_id, :simulation_id, simulation_id}) do
-    RenewCollabSim.Server.ScopedSimulationServer.play(project_id, simulation_id)
+  def handle_event("play", %{}, _state, %{
+        simulation_id: simulation_id,
+        account: account
+      }) do
+    %Actions.SimulationPlay{
+      simulation_id: simulation_id
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end
 
   @impl true
-  def handle_event("pause", %{}, _state, {:project_id, project_id, :simulation_id, simulation_id}) do
-    RenewCollabSim.Server.ScopedSimulationServer.pause(project_id, simulation_id)
+  def handle_event("pause", %{}, _state, %{
+        simulation_id: simulation_id,
+        account: account
+      }) do
+    %Actions.SimulationPause{
+      simulation_id: simulation_id
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end
@@ -113,19 +145,25 @@ defmodule RenewCollabWeb.ReduxSimulationChannel do
         "terminate",
         %{},
         _state,
-        {:project_id, project_id, :simulation_id, simulation_id}
+        %{simulation_id: simulation_id, account: account}
       ) do
-    RenewCollabSim.Server.ScopedSimulationServer.stop(
-      project_id,
-      simulation_id
-    )
+    %Actions.SimulationTerminate{
+      simulation_id: simulation_id
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end
 
   @impl true
-  def handle_event("init", %{}, _state, {:project_id, project_id, :simulation_id, simulation_id}) do
-    RenewCollabSim.Server.ScopedSimulationServer.setup(project_id, simulation_id)
+  def handle_event("init", %{}, _state, %{
+        simulation_id: simulation_id,
+        account: account
+      }) do
+    %Actions.SimulationInitialize{
+      simulation_id: simulation_id
+    }
+    |> Dispatcher.perform_as(account)
 
     :silent
   end

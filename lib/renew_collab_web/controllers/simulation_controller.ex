@@ -1,22 +1,28 @@
 defmodule RenewCollabWeb.SimulationController do
+  alias RenewCollabCtrl.Fetcher
+  alias RenewCollabCtrl.Views
+  alias RenewCollabCtrl.Actions
+  alias RenewCollabCtrl.Dispatcher
   alias RenewCollabSim.Entities.Simulation
 
   use RenewCollabWeb, :controller
 
   action_fallback RenewCollabWeb.FallbackController
 
-  def create(conn, params = %{"document_ids" => document_ids})
+  def create(conn, params = %{"project_id" => project_id, "document_ids" => document_ids})
       when is_list(document_ids) do
     formalism =
       Map.get(params, "formalism", RenewCollabSim.Compiler.SnsCompiler.default_formalism())
 
-    case RenewCollabSim.Simulator.create_simulation_from_documents(
-           nil,
-           formalism,
-           document_ids,
-           Map.get(params, "main_net_name")
-         ) do
-      %Simulation{} = simulation ->
+    %Actions.SimulationCreateFromDocumentsInProject{
+      project_id: project_id,
+      document_ids: document_ids,
+      formalism: formalism,
+      main_net_name: Map.get(params, "main_net_name")
+    }
+    |> Dispatcher.perform_as(conn.assigns.current_account)
+    |> case do
+      {:ok, %Simulation{} = simulation} ->
         render(conn, :created, simulation: simulation)
 
       {:error, :invalid_rnw} ->
@@ -40,7 +46,8 @@ defmodule RenewCollabWeb.SimulationController do
   end
 
   def delete(conn, %{"simulation_id" => simulation_id}) do
-    RenewCollabSim.Simulator.delete_simulation(simulation_id)
+    %Actions.SimulationDeleteAsUser{simulation_id: simulation_id}
+    |> Dispatcher.perform_as(conn.assigns.current_account)
 
     conn
     |> put_status(:ok)
@@ -48,7 +55,8 @@ defmodule RenewCollabWeb.SimulationController do
   end
 
   def show(conn, %{"id" => simulation_id}) do
-    RenewCollabSim.Simulator.find_simulation(simulation_id)
+    %Views.SimulationWithState{simulation_id: simulation_id}
+    |> Fetcher.fetch_as(conn.assigns.current_account)
     |> case do
       nil ->
         conn
@@ -69,14 +77,26 @@ defmodule RenewCollabWeb.SimulationController do
   end
 
   def log(conn, %{"id" => simulation_id}) do
+    sim =
+      %Views.SimulationWithLogEntries{
+        simulation_id: simulation_id
+      }
+      |> Fetcher.fetch_as(conn.assigns.current_account)
+
     render(conn, :log,
       simulation_id: simulation_id,
-      log_entries: RenewCollabSim.Simulator.find_simulation_log_entries(simulation_id)
+      log_entries: sim.log_entries
     )
   end
 
   def show_sns(conn, %{"id" => sns_id}) do
-    render(conn, :show_sns, sns: RenewCollabSim.Simulator.find_shadow_net_system(sns_id))
+    sns =
+      %Views.ShadowNetSystem{
+        shadow_net_system_id: sns_id
+      }
+      |> Fetcher.fetch_as(conn.assigns.current_account)
+
+    render(conn, :show_sns, sns: sns)
   end
 
   def step(conn, %{"id" => simulation_id}) do
@@ -92,10 +112,15 @@ defmodule RenewCollabWeb.SimulationController do
         "net_name" => net_name,
         "integer_id" => integer_id
       }) do
-    render(conn, :show_instance,
-      net_instance:
-        RenewCollabSim.Simulator.find_simulation_net_instance(simulation_id, net_name, integer_id)
-    )
+    net_instance =
+      %Views.SimulationNetInstanceByName{
+        simulation_id: simulation_id,
+        net_name: net_name,
+        integer_id: integer_id
+      }
+      |> Fetcher.fetch_as(conn.assigns.current_account)
+
+    render(conn, :show_instance, net_instance: net_instance)
   end
 
   def formalisms(conn, %{}) do

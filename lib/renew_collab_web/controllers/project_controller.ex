@@ -1,34 +1,68 @@
 defmodule RenewCollabWeb.ProjectController do
   use RenewCollabWeb, :controller
 
-  alias RenewCollabProj.Projects
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Fetcher
 
   action_fallback(RenewCollabWeb.FallbackController)
 
   def index(conn, _params) do
-    projects = Projects.list_own_projects(own_account(conn))
+    projects =
+      %Views.MyProjectsList{account_id: conn.assigns.current_account.id}
+      |> Fetcher.fetch_as(conn.assigns.current_account)
+
     render(conn, :index, projects: projects)
   end
 
   def show(conn, %{"id" => project_id}) do
-    project = Projects.find_own_project(own_account(conn), project_id)
+    account = conn.assigns.current_account
+
+    project =
+      %Views.MyProject{
+        account_id: account.id,
+        project_id: project_id
+      }
+      |> Fetcher.fetch_as(account)
+
     render(conn, :show, project: project)
   end
 
   def members(conn, %{"id" => project_id}) do
-    project = Projects.find_own_project(own_account(conn), project_id)
+    account = conn.assigns.current_account
+
+    project =
+      %Views.MyProject{
+        account_id: account.id,
+        project_id: project_id
+      }
+      |> Fetcher.fetch_as(account)
+
     render(conn, :members, project: project)
   end
 
   def documents(conn, %{"id" => project_id}) do
-    project = Projects.find_own_project(own_account(conn), project_id)
+    account = conn.assigns.current_account
+
+    project =
+      %Views.MyProject{
+        account_id: account.id,
+        project_id: project_id
+      }
+      |> Fetcher.fetch_as(account)
+
     render(conn, :documents, project: project)
   end
 
   def simulations(conn, %{"id" => project_id}) do
-    project = Projects.find_own_project(own_account(conn), project_id)
+    account = conn.assigns.current_account
+
+    project =
+      %Views.MyProject{
+        account_id: account.id,
+        project_id: project_id
+      }
+      |> Fetcher.fetch_as(account)
+
     render(conn, :simulations, project: project)
   end
 
@@ -120,13 +154,5 @@ defmodule RenewCollabWeb.ProjectController do
       end)
 
     Enum.reverse(result)
-  end
-
-  defp own_account(%{assigns: %{current_account: current_account}}) do
-    current_account
-  end
-
-  defp own_account(_) do
-    nil
   end
 end

@@ -6,20 +6,23 @@ defmodule RenewCollabWeb.ProjectSimulationJSON do
     %{
       href: url(~p"/api/projects/#{project_id}/simulations"),
       topic: "project/#{project_id}/simulations",
-      content:
-        index_content(%{project_id: project_id, simulations: simulations, runnings: runnings}),
+      content: index_content(%{simulations: simulations, runnings: runnings}),
       links: %{
         create: %{
           href: url(~p"/api/projects/#{project_id}/simulations"),
           method: "POST"
+        },
+        project: %{
+          method: "GET",
+          id: project_id,
+          href: url(~p"/api/projects/#{project_id}")
         }
       }
     }
   end
 
-  def index_content(%{project_id: project_id, simulations: simulations, runnings: runnings}) do
+  def index_content(%{simulations: simulations, runnings: runnings}) do
     %{
-      project_id: project_id,
       items: for(simulation <- simulations, do: list_data(simulation, runnings))
     }
   end

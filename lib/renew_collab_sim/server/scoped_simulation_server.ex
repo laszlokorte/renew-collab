@@ -131,7 +131,7 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
                RenewCollabSim.Server.SimulationServer.start_monitor(simulation_scope, [
                  "simulation:#{simulation_id}" | pubsub_channels
                ]) do
-          RenewCollabSim.Server.ScopedSimulationServer.setup_and_wait(pid, simulation_id)
+          RenewCollabSim.Server.SimulationServer.setup_and_wait(pid, simulation_id)
 
           {:reply, :ok,
            Map.put(state, simulation_scope, %{
@@ -246,7 +246,7 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
   end
 
   defp cleanup(_reason, state) do
-    for {scope_id, %{server_process: pid}} <- state do
+    for {_scope_id, %{server_process: pid}} <- state do
       RenewCollabSim.Server.SimulationServer.stop_all(pid)
     end
   end

@@ -44,6 +44,17 @@ defmodule RenewCollabWeb.SimulationJSON do
       topic: "redux_simulation:#{simulation.id}",
       id: simulation.id,
       links: %{
+        project:
+          with %{project_id: project_id} <- simulation.project_assignment do
+            %{
+              method: "GET",
+              id: project_id,
+              href: url(~p"/api/projects/#{project_id}")
+            }
+          else
+            _ ->
+              nil
+          end,
         log: %{
           href: url(~p"/api/simulations/#{simulation}/log"),
           method: "GET"
