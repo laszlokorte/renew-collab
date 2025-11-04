@@ -27,7 +27,11 @@ defmodule RenewCollabWeb.ProjectController do
         conn
         |> put_status(:created)
         |> put_resp_header("location", ~p"/api/projects/#{new_project}")
-        |> json(%{id: new_project.id, url: ~p"/api/projects/#{new_project}"})
+        |> json(%{
+          id: new_project.id,
+          url: url(~p"/api/projects/#{new_project}"),
+          content: %{name: new_project.name}
+        })
     end
   end
 

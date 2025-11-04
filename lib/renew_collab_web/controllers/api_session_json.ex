@@ -6,6 +6,6 @@ defmodule RenewCollabWeb.ApiSessionJSON do
   end
 
   def auth(%{account: %RenewCollabAuth.Entities.Account{id: id, email: email}}) do
-    %{token: RenewCollabWeb.Token.sign(%{account_id: id, email: email})}
+    %{token: RenewCollabWeb.Token.sign(%{account: %{id: id, email: email}})}
   end
 end

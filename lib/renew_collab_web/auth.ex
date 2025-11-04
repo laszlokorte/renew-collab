@@ -59,7 +59,7 @@ defmodule RenewCollabWeb.Auth do
   end
 
   def fetch_current_account_by_header(conn, _opts) do
-    with {%{account_id: account_id}, conn} <- ensure_account_header_token(conn),
+    with {%{account: %{id: account_id}}, conn} <- ensure_account_header_token(conn),
          account when not is_nil(account) <- Auth.get_account(account_id) do
       assign(conn, :current_account, account)
     else
@@ -69,7 +69,7 @@ defmodule RenewCollabWeb.Auth do
   end
 
   def debug_fetch_admin_account_by_header(conn, _opts) do
-    with {%{account_id: account_id}, conn} <- ensure_account_header_token(conn),
+    with {%{account: %{id: account_id}}, conn} <- ensure_account_header_token(conn),
          account when not is_nil(account) <- Auth.get_account(account_id) do
       assign(conn, :current_account, account)
     else

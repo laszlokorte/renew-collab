@@ -9,6 +9,7 @@ defmodule RenewCollabWeb.ProjectJSON do
   def index(%{projects: projects}) do
     %{
       href: url(~p"/api/projects"),
+      topic: "my-projects",
       content: index_content(%{projects: projects})
     }
   end

@@ -19,7 +19,7 @@ defmodule RenewCollabWeb.ReduxSimulationChannel do
         # TODO:subscription
         Phoenix.PubSub.subscribe(RenewCollab.PubSub, "simulation:#{simulation_id}")
 
-        account_id = socket.assigns.current_account.account_id
+        account_id = socket.assigns.current_account.id
         username = socket.assigns.current_account.username
         connection_id = socket.assigns.connection_id
 

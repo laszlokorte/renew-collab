@@ -1,4 +1,4 @@
-defmodule RenewCollabWeb.ReduxDocumentsChannel do
+defmodule RenewCollabWeb.ReduxProjectsChannel do
   use RenewCollabWeb.StateChannel, web_module: RenewCollabWeb
 
   alias RenewCollabCtrl.Dispatcher
@@ -8,9 +8,9 @@ defmodule RenewCollabWeb.ReduxDocumentsChannel do
   alias RenewCollabCtrl.Fetcher
 
   @impl true
-  def init("project-documents:" <> <<project_id::binary-size(36)>>, _params, socket) do
+  def init("my-projects", _params, socket) do
     # TODO:subscription
-    Phoenix.PubSub.subscribe(RenewCollab.PubSub, "documents")
+    Phoenix.PubSub.subscribe(RenewCollab.PubSub, "projects")
 
     account_id = socket.assigns.current_account.id
     username = socket.assigns.current_account.username
@@ -25,22 +25,22 @@ defmodule RenewCollabWeb.ReduxDocumentsChannel do
 
     push(socket, "presence_state", Presence.list(socket))
 
-    {:ok, load_state(socket.assigns.current_account, project_id),
-     %{:project_id => project_id, :account => socket.assigns.current_account}}
+    {:ok, load_state(socket.assigns.current_account),
+     %{:account => socket.assigns.current_account}}
   end
 
-  defp load_state(current_account, project_id) do
-    %Views.ProjectDocumentsList{
-      project_id: project_id
+  defp load_state(current_account) do
+    %Views.MyProjectsList{
+      account_id: current_account.id
     }
     |> Fetcher.fetch_as(current_account)
-    |> then(&%{documents: &1})
-    |> RenewCollabWeb.ProjectDocumentJSON.index_content()
+    |> then(&%{projects: &1})
+    |> RenewCollabWeb.ProjectJSON.index_content()
   end
 
   @impl true
   def handle_message(:any, _state, %{:project_id => project_id, :account => account}) do
-    {:noreply, load_state(account, project_id)}
+    {:noreply, load_state(account)}
   end
 
   @impl true
@@ -49,22 +49,8 @@ defmodule RenewCollabWeb.ReduxDocumentsChannel do
   end
 
   @impl true
-  def handle_event("delete_document", %{"id" => document_id}, state, %{account: account}) do
-    %Actions.DocumentDeleteAsUser{
-      document_id: document_id
-    }
-    |> Dispatcher.perform_as(account)
-
-    {:noreply, state}
-  end
-
-  @impl true
-  def handle_event("duplicate_document", %{"id" => document_id}, state, %{
-        account: account,
-        project_id: project_id
-      }) do
-    %Actions.DocumentDuplicateInProject{
-      document_id: document_id,
+  def handle_event("delete_project", %{"id" => project_id}, state, %{account: account}) do
+    %Actions.ProjectDelete{
       project_id: project_id
     }
     |> Dispatcher.perform_as(account)
@@ -73,12 +59,25 @@ defmodule RenewCollabWeb.ReduxDocumentsChannel do
   end
 
   @impl true
-  def handle_event("rename_document", %{"id" => document_id, "name" => name}, _state, %{
+  def handle_event("duplicate_project", %{"id" => project_id}, state, %{
         account: account
       }) do
-    %Actions.DocumentUpdateMeta{
-      document_id: document_id,
-      meta: %{name: name}
+    %Actions.ProjectDuplicateAsUser{
+      account_id: account.id,
+      project_id: project_id
+    }
+    |> Dispatcher.perform_as(account)
+
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_event("rename_project", %{"id" => project_id, "name" => name}, _state, %{
+        account: account
+      }) do
+    %Actions.ProjectRename{
+      project_id: project_id,
+      new_name: name
     }
     |> Dispatcher.perform_as(account)
 

@@ -20,7 +20,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         # TODO:subscription
         Phoenix.PubSub.subscribe(RenewCollab.PubSub, "document:#{document_id}")
 
-        account_id = socket.assigns.current_account.account_id
+        account_id = socket.assigns.current_account.id
         username = socket.assigns.current_account.username
         connection_id = socket.assigns.connection_id
 
@@ -64,7 +64,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
 
   @impl true
   def handle_event("cursor", %{"x" => x, "y" => y}, _state, _scope, socket) do
-    account_id = socket.assigns.current_account.account_id
+    account_id = socket.assigns.current_account.id
 
     Presence.update(
       socket,
@@ -79,7 +79,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
 
   @impl true
   def handle_event("cursor", %{}, _state, _scope, socket) do
-    account_id = socket.assigns.current_account.account_id
+    account_id = socket.assigns.current_account.id
 
     Presence.update(
       socket,
@@ -94,7 +94,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
 
   @impl true
   def handle_event("select", %{}, _state, _scope, socket) do
-    account_id = socket.assigns.current_account.account_id
+    account_id = socket.assigns.current_account.id
 
     Presence.update(
       socket,
@@ -109,7 +109,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
 
   @impl true
   def handle_event("select", layer_id, _state, _scope, socket) when is_binary(layer_id) do
-    account_id = socket.assigns.current_account.account_id
+    account_id = socket.assigns.current_account.id
 
     Presence.update(
       socket,

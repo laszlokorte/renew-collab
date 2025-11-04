@@ -6,6 +6,7 @@ defmodule RenewCollabWeb.ReduxSocket do
 
   channel "redux_simulation:*", RenewCollabWeb.ReduxSimulationChannel
   channel "project-simulations:*", RenewCollabWeb.ReduxSimulationsChannel
+  channel "my-projects", RenewCollabWeb.ReduxProjectsChannel
 
   channel "redux_net_instance:*", RenewCollabWeb.ReduxSimulationNetInstanceChannel
   channel "redux_simulation_links:*", RenewCollabWeb.ReduxSimulationLinksChannel
@@ -13,11 +14,11 @@ defmodule RenewCollabWeb.ReduxSocket do
 
   @impl true
   def connect(%{"token" => token}, socket, _connect_info) do
-    with {:ok, data} <- RenewCollabWeb.Token.verify(token) do
-      {:ok,
-       assign(socket, :current_account, %{account_id: data.account_id, username: data.email})}
+    with {:ok, %{account: %{id: account_id, email: email}}} <- RenewCollabWeb.Token.verify(token) do
+      {:ok, assign(socket, :current_account, %{id: account_id, username: email})}
     else
-      _error ->
+      error ->
+        dbg(error)
         {:error, "Invalid Token"}
     end
   end
