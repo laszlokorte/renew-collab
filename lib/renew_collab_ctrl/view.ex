@@ -359,4 +359,8 @@ defmodule RenewCollabCtrl.View do
     RenewCollabProj.Queries.AllProjectAssignments.new(%{})
     |> RenewCollabProj.ProjectFetcher.fetch()
   end
+
+  def do_fetch(_account, %Views.SimulationWithLogEntries{}) do
+    {:error, :not_implemented}
+  end
 end
