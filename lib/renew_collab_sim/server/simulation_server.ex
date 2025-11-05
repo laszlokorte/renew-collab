@@ -247,14 +247,12 @@ defmodule RenewCollabSim.Server.SimulationServer do
   end
 
   defp broadcast_state_change(_state, project_id, simulation_id) do
-    # TODO:broadcast
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
       "simulation:#{simulation_id}",
       {:simulation_change, simulation_id, :state}
     )
 
-    # TODO:broadcast
     Phoenix.PubSub.broadcast(
       RenewCollab.PubSub,
       "projects/#{project_id}/simulations",

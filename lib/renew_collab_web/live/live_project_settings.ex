@@ -12,8 +12,6 @@ defmodule RenewCollabWeb.LiveProjectSettings do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
-  @topic "project"
-
   def mount(%{"project_id" => project_id}, _session, socket) do
     account = socket.assigns.current_account
 
@@ -27,9 +25,6 @@ defmodule RenewCollabWeb.LiveProjectSettings do
         {:ok, socket |> put_flash(:error, "Project not found") |> redirect(to: ~p"/projects")}
 
       proj ->
-        # TODO:subscription
-        RenewCollabWeb.Endpoint.subscribe(@topic)
-
         socket =
           socket
           |> assign(:project, proj)

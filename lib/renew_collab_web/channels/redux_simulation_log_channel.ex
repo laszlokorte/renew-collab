@@ -14,7 +14,6 @@ defmodule RenewCollabWeb.ReduxSimulationLogChannel do
         {:error, %{reason: "not found"}}
 
       sim ->
-        # TODO:subscription
         Phoenix.PubSub.subscribe(RenewCollab.PubSub, "simulation:#{sim.id}")
 
         {:ok,

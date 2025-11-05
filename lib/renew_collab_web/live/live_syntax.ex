@@ -7,8 +7,6 @@ defmodule RenewCollabWeb.LiveSyntax do
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Fetcher
 
-  @topic "syntax"
-
   @semantic_tags (for {class_name, _} <- Renewex.Grammar.new(11).hierarchy do
                     class_name
                   end)
@@ -16,9 +14,6 @@ defmodule RenewCollabWeb.LiveSyntax do
   def semantic_tags(), do: @semantic_tags
 
   def mount(_params, _session, socket) do
-    # TODO:subscription
-    RenewCollabWeb.Endpoint.subscribe(@topic)
-
     {:ok, load_data(socket)}
   end
 

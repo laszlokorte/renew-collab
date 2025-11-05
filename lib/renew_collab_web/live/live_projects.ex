@@ -9,9 +9,6 @@ defmodule RenewCollabWeb.LiveProjects do
   alias RenewCollabCtrl.Fetcher
 
   def mount(_params, _session, socket) do
-    # TODO:subscription
-    RenewCollabWeb.Endpoint.subscribe("my_projects:#{socket.assigns.current_account.id}")
-
     socket =
       socket |> assign(load_data(socket.assigns.current_account))
 
@@ -83,7 +80,7 @@ defmodule RenewCollabWeb.LiveProjects do
             </thead>
             <tbody>
               <%= for {inv, di} <- @invitations|> Enum.with_index do %>
-                <tr>
+                <tr {if(rem(di, 2) == 0, do: [style: "background-color:#f5f5f5;"], else: [])}>
                   <td align="left" width="1000">
                     {inv.project.name}
                   </td>

@@ -9,9 +9,6 @@ defmodule RenewCollabWeb.ReduxProjectChannel do
 
   @impl true
   def init("project:" <> project_id, _params, socket) do
-    # TODO:subscription
-    Phoenix.PubSub.subscribe(RenewCollab.PubSub, "projects")
-
     account_id = socket.assigns.current_account.id
     username = socket.assigns.current_account.username
     connection_id = socket.assigns.connection_id

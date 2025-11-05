@@ -67,13 +67,6 @@ defmodule RenewCollabCtrl.Action do
         })
         |> RenewCollabProj.Repo.insert()
 
-        # TODO:broadcast
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "project/#{project_id}/documents",
-          :any
-        )
-
         {:ok, insert_document}
     end
   end
@@ -99,13 +92,6 @@ defmodule RenewCollabCtrl.Action do
         })
         |> RenewCollabProj.Repo.insert()
 
-        # TODO:broadcast
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "project/#{project_id}/documents",
-          :any
-        )
-
         {:ok, insert_document}
     end
   end
@@ -125,12 +111,6 @@ defmodule RenewCollabCtrl.Action do
           project_id: project_id
         })
         |> RenewCollabProj.ProjectCommander.run_project_command_sync()
-
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "project/#{project_id}/documents",
-          :any
-        )
 
         :ok
 
@@ -156,13 +136,6 @@ defmodule RenewCollabCtrl.Action do
           "document_id" => new_document_id
         })
         |> RenewCollabProj.Repo.insert()
-
-        # TODO:broadcast
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "project/#{project_id}/documents",
-          :any
-        )
 
         {:ok, new_document}
 
@@ -925,13 +898,6 @@ defmodule RenewCollabCtrl.Action do
     |> RenewCollabProj.ProjectCommander.run_project_command_sync()
     |> case do
       {:ok, %{project: project}} ->
-        # TODO:broadcast
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "my_projects:#{account_id}",
-          :any
-        )
-
         {:ok, project}
     end
   end
@@ -1121,13 +1087,6 @@ defmodule RenewCollabCtrl.Action do
         })
         |> RenewCollabProj.ProjectCommander.run_project_command_sync()
 
-        # TODO:broadcast
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "projects/#{project_id}/simulations",
-          {:simulation_change, sim_id, :created}
-        )
-
         {:ok, simulation}
 
       e ->
@@ -1216,22 +1175,6 @@ defmodule RenewCollabCtrl.Action do
           simulation_id: sim_id
         })
         |> RenewCollabProj.ProjectCommander.run_project_command_sync()
-
-        # TODO:broadcast
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "projects/#{project.id}/simulations",
-          {:simulation_change, sim_id, :created}
-        )
-
-        for document_id <- actual_document_ids do
-          # TODO:broadcast
-          Phoenix.PubSub.broadcast(
-            RenewCollab.PubSub,
-            "document:#{document_id}",
-            {:document_simulated, document_id}
-          )
-        end
 
         {:ok, simulation}
 

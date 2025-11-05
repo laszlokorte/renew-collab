@@ -6,12 +6,7 @@ defmodule RenewCollabWeb.LiveSocketSchemas do
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Fetcher
 
-  @topic "socket_schema"
-
   def mount(_params, _session, socket) do
-    # TODO:subscription
-    RenewCollabWeb.Endpoint.subscribe(@topic)
-
     {:ok, load_data(socket)}
   end
 

@@ -25,7 +25,7 @@ defmodule RenewCollab.DocumentCommander do
         else: &1
       )
     )
-    |> run_document_transaction(apply(module, :tags, [command]))
+    |> run_document_transaction()
   end
 
   def run_document_command_sync(
@@ -41,60 +41,10 @@ defmodule RenewCollab.DocumentCommander do
         else: Ecto.Multi.new()
       )
     end)
-    |> run_document_transaction(apply(module, :tags, [command]))
+    |> run_document_transaction()
   end
 
-  defp run_document_transaction(multi, tags) do
+  defp run_document_transaction(multi) do
     Repo.transact(multi)
-    |> case do
-      {:ok, values} ->
-        values
-        |> Enum.find_value(fn
-          {:document_id, document_id} -> document_id
-          {{_, :document_id}, document_id} -> document_id
-          _ -> false
-        end)
-        |> case do
-          document_id when is_binary(document_id) ->
-            for tag <- tags do
-              case tag do
-                :document_collection ->
-                  # TODO:broadcast
-                  Phoenix.PubSub.broadcast(
-                    RenewCollab.PubSub,
-                    "documents",
-                    :any
-                  )
-
-                {:document_content, ^document_id} ->
-                  # TODO:broadcast
-                  Phoenix.PubSub.broadcast(
-                    RenewCollab.PubSub,
-                    "document:#{document_id}",
-                    {:document_changed, document_id}
-                  )
-
-                {:document_versions, ^document_id} ->
-                  # TODO:broadcast
-                  Phoenix.PubSub.broadcast(
-                    RenewCollab.PubSub,
-                    "document:#{document_id}",
-                    {:versions_changed, document_id}
-                  )
-
-                _ ->
-                  nil
-              end
-            end
-
-            {:ok, values}
-
-          oo ->
-            dbg(oo)
-        end
-
-      other ->
-        other
-    end
   end
 end

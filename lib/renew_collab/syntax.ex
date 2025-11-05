@@ -43,20 +43,6 @@ defmodule RenewCollab.Syntax do
     %SyntaxType{}
     |> SyntaxType.changeset(params)
     |> Repo.insert()
-    |> case do
-      {:ok, s} ->
-        # TODO:broadcast
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "syntax",
-          {:created, s.id}
-        )
-
-        {:ok, s}
-
-      e ->
-        e
-    end
   end
 
   def delete(id) do
@@ -66,13 +52,6 @@ defmodule RenewCollab.Syntax do
     |> Repo.delete_all()
     |> case do
       {1, _} ->
-        # TODO:broadcast
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "syntax",
-          {:deleted, {:syntax, id}}
-        )
-
         :ok
     end
   end
@@ -84,13 +63,6 @@ defmodule RenewCollab.Syntax do
     |> Repo.delete_all()
     |> case do
       {1, _} ->
-        # TODO:broadcast
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "syntax",
-          {:deleted, {:whitlist, id}}
-        )
-
         :ok
     end
   end
@@ -102,13 +74,6 @@ defmodule RenewCollab.Syntax do
     |> Repo.delete_all()
     |> case do
       {1, _} ->
-        # TODO:broadcast
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "syntax",
-          {:deleted, {:autonode, id}}
-        )
-
         :ok
     end
   end
@@ -123,12 +88,7 @@ defmodule RenewCollab.Syntax do
     end)
     |> case do
       {:ok, _} ->
-        # TODO:broadcast
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "syntax",
-          {:default, {:syntax, id}}
-        )
+        nil
     end
   end
 
@@ -138,13 +98,6 @@ defmodule RenewCollab.Syntax do
     |> Repo.insert()
     |> case do
       {:ok, s} ->
-        # TODO:broadcast
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "syntax",
-          {:changed, s.id}
-        )
-
         {:ok, s}
 
       e ->
@@ -158,13 +111,6 @@ defmodule RenewCollab.Syntax do
     |> Repo.insert()
     |> case do
       {:ok, s} ->
-        # TODO:broadcast
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "syntax",
-          {:changed, s.id}
-        )
-
         {:ok, s}
 
       e ->

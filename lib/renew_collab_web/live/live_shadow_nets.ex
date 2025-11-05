@@ -45,8 +45,6 @@ defmodule RenewCollabWeb.LiveShadowNets do
           |> allow_upload(:import_rnw_file, accept: ~w(.rnw), max_entries: @file_count_limit)
           |> allow_upload(:import_sns_file, accept: ~w(.sns), max_entries: 1)
 
-        # TODO:subscription
-        RenewCollabWeb.Endpoint.subscribe("projects/#{socket.assigns.project.id}/shadow_nets")
         {:ok, socket}
     end
   end

@@ -1,5 +1,4 @@
 defmodule RenewCollabProj.Queries.AccountProjectInvitations do
-  alias RenewCollabProj.Entities.ProjectMember
   alias RenewCollabProj.Entities.ProjectInvitation
   import Ecto.Query
 

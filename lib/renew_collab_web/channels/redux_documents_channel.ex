@@ -9,9 +9,6 @@ defmodule RenewCollabWeb.ReduxDocumentsChannel do
 
   @impl true
   def init("project-documents:" <> <<project_id::binary-size(36)>>, _params, socket) do
-    # TODO:subscription
-    Phoenix.PubSub.subscribe(RenewCollab.PubSub, "documents")
-
     account_id = socket.assigns.current_account.id
     username = socket.assigns.current_account.username
     connection_id = socket.assigns.connection_id

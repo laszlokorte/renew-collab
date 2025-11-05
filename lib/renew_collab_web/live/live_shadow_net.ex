@@ -7,8 +7,6 @@ defmodule RenewCollabWeb.LiveShadowNet do
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Fetcher
 
-  @topic "shadow_net"
-
   def mount(%{"id" => shadow_net_system_id}, _session, socket) do
     %Views.ShadowNetSystem{
       shadow_net_system_id: shadow_net_system_id
@@ -20,17 +18,6 @@ defmodule RenewCollabWeb.LiveShadowNet do
          socket |> put_flash(:error, "Shadow Net System not found") |> redirect(to: ~p"/projects")}
 
       sns ->
-        # TODO:subscription
-        RenewCollabWeb.Endpoint.subscribe("#{@topic}:#{shadow_net_system_id}")
-
-        RenewCollabWeb.Endpoint.subscribe(
-          "projects/#{sns.project_assignment.project_id}/simulations"
-        )
-
-        RenewCollabWeb.Endpoint.subscribe(
-          "projects/#{sns.project_assignment.project_id}/shadow_net_systems"
-        )
-
         socket =
           socket
           |> assign(:shadow_net_system_id, shadow_net_system_id)
@@ -416,13 +403,6 @@ defmodule RenewCollabWeb.LiveShadowNet do
   def handle_event("delete", %{"id" => simulation_id}, socket) do
     %Actions.SimulationDeleteAsUser{simulation_id: simulation_id}
     |> Dispatcher.perform_as(socket.assigns.current_account)
-
-    # TODO:broadcast
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "#{@topic}:#{socket.assigns.shadow_net_system_id}",
-      :any
-    )
 
     {:noreply, socket |> reload() |> put_flash(:info, "Simulation deleted")}
   end

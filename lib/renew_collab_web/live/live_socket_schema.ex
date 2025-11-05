@@ -6,8 +6,6 @@ defmodule RenewCollabWeb.LiveSocketSchema do
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Fetcher
 
-  @topic "socket_schema"
-
   @dims [:width, :height, :minsize, :maxsize]
   @funcs [:sum, :min, :max]
 
@@ -25,9 +23,6 @@ defmodule RenewCollabWeb.LiveSocketSchema do
       )
       |> assign(:icon, nil)
       |> assign(:preview, %RenewCollab.Connection.Socket{})
-
-    # TODO:subscription
-    RenewCollabWeb.Endpoint.subscribe("#{@topic}-socket_schema_id")
 
     {:ok, load_data(socket)}
   end

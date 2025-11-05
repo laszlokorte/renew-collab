@@ -7,8 +7,6 @@ defmodule RenewCollabWeb.LiveSimulation do
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Fetcher
 
-  @topic "simulation"
-
   def mount(%{"id" => simulation_id}, _session, socket) do
     %Views.SimulationWithState{
       simulation_id: simulation_id
@@ -25,8 +23,7 @@ defmodule RenewCollabWeb.LiveSimulation do
           |> assign(:show_transitions, false)
           |> assign(load_data(sim, socket.assigns.current_account))
 
-        # TODO:subscription
-        RenewCollabWeb.Endpoint.subscribe("#{@topic}:#{simulation_id}")
+        RenewCollabWeb.Endpoint.subscribe("simulation:#{simulation_id}")
 
         {:ok, socket}
     end

@@ -20,9 +20,6 @@ defmodule RenewCollabWeb.LiveDocuments do
         {:ok, socket |> put_flash(:error, "Project not found") |> redirect(to: ~p"/projects")}
 
       project ->
-        # TODO:subscription
-        RenewCollabWeb.Endpoint.subscribe("project/#{project.id}/documents")
-
         socket =
           socket
           |> assign(load_data(project, account))

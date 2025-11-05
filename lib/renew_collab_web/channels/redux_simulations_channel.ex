@@ -7,7 +7,6 @@ defmodule RenewCollabWeb.ReduxSimulationsChannel do
 
   @impl true
   def init("project-simulations:" <> project_id, _params, socket) do
-    # TODO:subscription
     Phoenix.PubSub.subscribe(RenewCollab.PubSub, "projects/#{project_id}/simulations")
 
     %Views.ProjectSimulationsList{

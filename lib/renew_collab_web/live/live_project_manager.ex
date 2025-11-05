@@ -7,8 +7,6 @@ defmodule RenewCollabWeb.LiveProjectManager do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
-  @topic "project"
-
   def mount(%{"project_id" => project_id}, _session, socket) do
     account = socket.assigns.current_account
 
@@ -24,9 +22,6 @@ defmodule RenewCollabWeb.LiveProjectManager do
         |> then(&{:ok, &1})
 
       project ->
-        # TODO:subscription
-        RenewCollabWeb.Endpoint.subscribe(@topic)
-
         socket
         |> assign(load_data(project, account))
         |> then(&{:ok, &1})

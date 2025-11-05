@@ -16,20 +16,6 @@ defmodule RenewCollab.Primitives do
     %PredefinedPrimitiveGroup{}
     |> PredefinedPrimitiveGroup.changeset(params)
     |> Repo.insert()
-    |> case do
-      {:ok, s} ->
-        # TODO:broadcast
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "primitives",
-          {:created, s.id}
-        )
-
-        {:ok, s}
-
-      e ->
-        e
-    end
   end
 
   def delete_group(id) do
@@ -39,13 +25,6 @@ defmodule RenewCollab.Primitives do
     |> Repo.delete_all()
     |> case do
       {1, _} ->
-        # TODO:broadcast
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "primitives",
-          {:deleted, {:group, id}}
-        )
-
         :ok
     end
   end
@@ -57,13 +36,6 @@ defmodule RenewCollab.Primitives do
     |> Repo.delete_all()
     |> case do
       {1, _} ->
-        # TODO:broadcast
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "primitives",
-          {:deleted, {:primitive, id}}
-        )
-
         :ok
     end
   end
@@ -72,19 +44,5 @@ defmodule RenewCollab.Primitives do
     %PredefinedPrimitive{predefined_primitive_group_id: group_id}
     |> PredefinedPrimitive.changeset(params)
     |> Repo.insert()
-    |> case do
-      {:ok, s} ->
-        # TODO:broadcast
-        Phoenix.PubSub.broadcast(
-          RenewCollab.PubSub,
-          "primitives",
-          {:created, s.id}
-        )
-
-        {:ok, s}
-
-      e ->
-        e
-    end
   end
 end
