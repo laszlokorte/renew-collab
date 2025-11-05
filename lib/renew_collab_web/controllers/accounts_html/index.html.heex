@@ -1,7 +1,11 @@
 <RenewCollabWeb.RenewComponents.app_header flash={@flash} />
-<div style="text-align: center; margin-top: 1em;">
-  <a href={~p"/"}>Back</a>
-  <h2 style="text-align: center; align-items: center; display: flex; justify-content: center; gap:1ex;">
+
+<div style="padding: 1em">
+  <.link navigate={~p"/"}>
+    Dashboard
+  </.link>
+  / Accounts
+  <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
     <img class="icon" src="/assets/icon-user.svg" /> Accounts
   </h2>
 </div>

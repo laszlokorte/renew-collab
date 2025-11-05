@@ -251,7 +251,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
                 Number of Simulations
               </th>
 
-              <th style="border-bottom: 1px solid #333;" align="left" width="100" colspan="2">
+              <th style="border-bottom: 1px solid #333;" align="left" width="100" colspan="3">
                 Actions
               </th>
             </tr>
@@ -260,7 +260,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
           <tbody>
             <%= if Enum.empty?(@shadow_net_systems) do %>
               <tr>
-                <td colspan="7">
+                <td colspan="8">
                   <div style="padding: 2em; border: 3px dashed #aaa; text-align: center; font-style: italic;">
                     No Shadow nets yet.
                   </div>
@@ -306,6 +306,16 @@ defmodule RenewCollabWeb.LiveShadowNets do
                     </div>
                   </td>
 
+                  <td>
+                    <button
+                      type="button"
+                      phx-click="duplicate"
+                      phx-value-shadow_net_system_id={sns.id}
+                      style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+                    >
+                      Duplicate
+                    </button>
+                  </td>
                   <td width="50">
                     <a style="color: #078" href={~p"/shadow_net/#{sns.id}/binary"} target="_blank">
                       <button
@@ -335,6 +345,16 @@ defmodule RenewCollabWeb.LiveShadowNets do
       </div>
     </div>
     """
+  end
+
+  def handle_event("duplicate", %{"shadow_net_system_id" => shadow_net_system_id}, socket) do
+    %Actions.ShadowNetSystemDuplicateInProject{
+      shadow_net_system_id: shadow_net_system_id,
+      project_id: socket.assigns.project.id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+
+    {:noreply, socket |> put_flash(:info, "Shadow Net System duplicated")}
   end
 
   def handle_event("validate_rnw", params, socket) do

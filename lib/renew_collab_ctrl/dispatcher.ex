@@ -1,4 +1,5 @@
 defmodule RenewCollabCtrl.Dispatcher do
+  alias RenewCollabCtrl.Notification
   alias RenewCollabCtrl.WriteAccess
   alias RenewCollabCtrl.Action
   alias RenewCollabCtrl.CacheServer
@@ -26,9 +27,27 @@ defmodule RenewCollabCtrl.Dispatcher do
         res = {:error, _e} ->
           res
       end
+      |> case do
+        res = :ok ->
+          notify(action, res)
+          res
+
+        res = {:ok, result} ->
+          notify(action, res)
+          res
+
+        res ->
+          res
+      end
     else
       raise "Access denied: #{inspect(action)}"
       :access_denied
+    end
+  end
+
+  defp notify(action, result) do
+    for {channel, message} <- Notification.notifications_for(action, result) do
+      Phoenix.PubSub.broadcast(RenewCollab.PubSub, channel, message)
     end
   end
 

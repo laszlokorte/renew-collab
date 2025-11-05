@@ -94,7 +94,7 @@ defmodule RenewCollabWeb.RenewComponents do
         </div>
       </header>
     </div>
-    <hr style="margin: 0 0 3em 0; height: 0; border: none;" />
+    <hr style="margin: 0 0 3em 0; height: 0; border: none; display: block; clear: both;" />
     """
   end
 

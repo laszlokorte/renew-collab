@@ -67,6 +67,7 @@ defmodule RenewCollabWeb.LiveSimulations do
   def render(assigns) do
     ~H"""
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
+      div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
       <RenewCollabWeb.RenewComponents.app_header
         flash={@flash}
         tab={:simulations}
@@ -142,14 +143,14 @@ defmodule RenewCollabWeb.LiveSimulations do
 
               <th style="border-bottom: 1px solid #333;" align="left" width="100%">Timestep</th>
 
-              <th style="border-bottom: 1px solid #333;" align="right" colspan="5">Actions</th>
+              <th style="border-bottom: 1px solid #333;" align="right" colspan="6">Actions</th>
             </tr>
           </thead>
 
           <tbody>
             <%= if Enum.empty?(@simulations) do %>
               <tr>
-                <td colspan="7">
+                <td colspan="9">
                   <div style="padding: 2em; border: 3px dashed #aaa; text-align: center; font-style: italic;">
                     <p>
                       No Simulations created yet.
@@ -181,6 +182,16 @@ defmodule RenewCollabWeb.LiveSimulations do
                     {sim.timestep}
                   </td>
 
+                  <td>
+                    <button
+                      type="button"
+                      phx-click="duplicate"
+                      phx-value-simulation_id={sim.id}
+                      style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+                    >
+                      Duplicate
+                    </button>
+                  </td>
                   <%= if MapSet.member?(@running, sim.id) do %>
                     <td>
                       <button
@@ -254,6 +265,16 @@ defmodule RenewCollabWeb.LiveSimulations do
       </div>
     </div>
     """
+  end
+
+  def handle_event("duplicate", %{"simulation_id" => simulation_id}, socket) do
+    %Actions.SimulationDuplicateInProject{
+      simulation_id: simulation_id,
+      project_id: socket.assigns.project.id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+
+    {:noreply, socket |> put_flash(:info, "Simulation duplicated")}
   end
 
   def handle_event(

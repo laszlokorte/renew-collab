@@ -13,6 +13,8 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(_account, %Actions.DocumentEditCreateLayer{}), do: true
   def can(_account, %Actions.DocumentEditCreateLayerWithEdge{}), do: true
   def can(_account, %Actions.DocumentDuplicateInProject{}), do: true
+  def can(_account, %Actions.SimulationDuplicateInProject{}), do: true
+  def can(_account, %Actions.ShadowNetSystemDuplicateInProject{}), do: true
   def can(_account, %Actions.DocumentEditImportFile{}), do: true
   def can(_account, %Actions.DocumentDeleteAsUser{}), do: true
 
@@ -140,6 +142,7 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(_account, %Actions.ShadowNetSystemSetNetDocument{}), do: true
   def can(_account, %Actions.ShadowNetSystemSetMainNet{}), do: true
   def can(_account, %Actions.ProjectMediaCreateSvg{}), do: true
+  def can(_account, %Actions.DocumentMoveIntoProject{}), do: true
 
   def can(_account, _action), do: false
 end

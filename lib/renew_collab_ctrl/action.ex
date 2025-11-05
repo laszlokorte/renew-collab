@@ -698,8 +698,16 @@ defmodule RenewCollabCtrl.Action do
     :ok
   end
 
-  def do_perform(%Actions.DocumentMoveIntoProject{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentMoveIntoProject{
+        project_id: project_id,
+        document_id: document_id
+      }) do
+    RenewCollabProj.Commands.AssignProjectDocument.new(%{
+      project_id: project_id,
+      document_id: document_id,
+      allow_move: true
+    })
+    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
   end
 
   def do_perform(%Actions.ProjectRename{project_id: project_id, new_name: name}) do
@@ -1066,8 +1074,16 @@ defmodule RenewCollabCtrl.Action do
     |> RenewCollabProj.ProjectCommander.run_project_command_sync()
   end
 
-  def do_perform(%Actions.DocumentRename{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.DocumentRename{document_id: document_id, new_name: new_name}) do
+    RenewCollab.Commands.UpdateDocumentMeta.new(%{
+      document_id: document_id,
+      meta: %{
+        name: new_name
+      }
+    })
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
+
+    :ok
   end
 
   def do_perform(%Actions.SimulationCreateFromShadowNetSystemInProject{
@@ -1255,11 +1271,24 @@ defmodule RenewCollabCtrl.Action do
     :ok
   end
 
-  def do_perform(%Actions.ShadowNetSystemDuplicateInProject{}) do
+  def do_perform(%Actions.ShadowNetSystemDuplicateInProject{
+        project_id: project_id,
+        shadow_net_system_id: sns_id
+      }) do
     {:error, :not_implemented}
   end
 
-  def do_perform(%Actions.ShadowNetSystemImportIntoProject{}) do
+  def do_perform(%Actions.ShadowNetSystemImportIntoProject{
+        project_id: project_id,
+        sns_binary: sns_binary
+      }) do
+    {:error, :not_implemented}
+  end
+
+  def do_perform(%Actions.SimulationDuplicateInProject{
+        project_id: project_id,
+        simulation_id: simulation_id
+      }) do
     {:error, :not_implemented}
   end
 

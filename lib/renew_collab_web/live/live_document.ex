@@ -19,14 +19,16 @@ defmodule RenewCollabWeb.LiveDocument do
     @renew_grammar
   end
 
-  def mount(%{"id" => id}, _session, socket) do
+  def mount(%{"id" => document_id}, _session, socket) do
     account = socket.assigns.current_account
 
     with document when not is_nil(document) <-
            %Views.DocumentWithContent{
-             document_id: id
+             document_id: document_id
            }
            |> Fetcher.fetch_as(account) do
+      Phoenix.PubSub.subscribe(RenewCollab.PubSub, "document:#{document_id}")
+
       socket =
         socket
         |> assign(:auto_adjust_viewbox, false)
@@ -50,7 +52,7 @@ defmodule RenewCollabWeb.LiveDocument do
              %{
                undo_redo:
                  %Views.DocumentVersionState{
-                   document_id: id
+                   document_id: document_id
                  }
                  |> Fetcher.fetch_as(account),
                other_documents:
@@ -60,7 +62,7 @@ defmodule RenewCollabWeb.LiveDocument do
                  |> Fetcher.fetch_as(account),
                snapshots:
                  %Views.DocumentVersionsList{
-                   document_id: document.id
+                   document_id: document_id
                  }
                  |> Fetcher.fetch_as(account),
                socket_schemas:
@@ -72,13 +74,13 @@ defmodule RenewCollabWeb.LiveDocument do
                  |> Enum.map(fn s -> {s.id, s} end)
                  |> Map.new(),
                hierachy_missing:
-                 %Views.DocumentHierarchyMissings{document_id: id}
+                 %Views.DocumentHierarchyMissings{document_id: document_id}
                  |> Fetcher.fetch_as(account),
                hierachy_invalid:
-                 %Views.DocumentHierarchyInvalids{document_id: id}
+                 %Views.DocumentHierarchyInvalids{document_id: document_id}
                  |> Fetcher.fetch_as(account),
                simulation_links:
-                 %Views.DocumentSimulationLinks{document_id: id}
+                 %Views.DocumentSimulationLinks{document_id: document_id}
                  |> Fetcher.fetch_as(account)
              }}
           end
@@ -1945,7 +1947,7 @@ defmodule RenewCollabWeb.LiveDocument do
     end
   end
 
-  def handle_info({:document_changed, document_id}, socket) do
+  def handle_info({:document_modified, document_id}, socket) do
     account = socket.assigns.current_account
 
     if document_id == socket.assigns.document.id do

@@ -37,6 +37,11 @@ defmodule RenewCollabWeb.LiveDocuments do
           project_id: project.id
         }
         |> Fetcher.fetch_as(account),
+      projects:
+        %Views.MyProjectsList{
+          account_id: account.id
+        }
+        |> Fetcher.fetch_as(account),
       create_form: to_form(%{}),
       import_form: to_form(%{})
     }
@@ -245,14 +250,40 @@ defmodule RenewCollabWeb.LiveDocuments do
                   </td>
 
                   <td width="50">
-                    <button
-                      type="button"
-                      phx-click="duplicate"
-                      phx-value-id={document.id}
-                      style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
-                    >
-                      Duplicate
-                    </button>
+                    <div style="display: flex;gap:1px;">
+                      <button
+                        type="button"
+                        phx-click="duplicate"
+                        phx-value-document_id={document.id}
+                        style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+                      >
+                        Duplicate
+                      </button>
+                      <form phx-submit="duplicate">
+                        <input type="hidden" name="document_id" value={document.id} />
+                        <label style="display: grid;">
+                          <button
+                            type="submit"
+                            phx-disable-with="Duplicating..."
+                            style="grid-area: 1/1/-1/-1;cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+                          >
+                            ▽
+                          </button>
+                          <select
+                            onchange="this.previousElementSibling.click()"
+                            name="project_id"
+                            style="cursor: pointer; grid-area: 1/1/-1/-1;opacity: 0; width: 100%; "
+                          >
+                            <optgroup label="Copy Into Project">
+                              <option selected>---cancel---</option>
+                              <%= for p <- @projects do %>
+                                <option value={p.id}>{p.name}</option>
+                              <% end %>
+                            </optgroup>
+                          </select>
+                        </label>
+                      </form>
+                    </div>
                   </td>
 
                   <td width="50">
@@ -275,7 +306,21 @@ defmodule RenewCollabWeb.LiveDocuments do
     """
   end
 
-  def handle_event("duplicate", %{"id" => document_id}, socket) do
+  def handle_event(
+        "duplicate",
+        %{"document_id" => document_id, "project_id" => project_id},
+        socket
+      ) do
+    %Actions.DocumentDuplicateInProject{
+      document_id: document_id,
+      project_id: project_id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+
+    {:noreply, socket |> put_flash(:info, "Document duplicated")}
+  end
+
+  def handle_event("duplicate", %{"document_id" => document_id}, socket) do
     %Actions.DocumentDuplicateInProject{
       document_id: document_id,
       project_id: socket.assigns.project.id
