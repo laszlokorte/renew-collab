@@ -1,4 +1,5 @@
 defmodule RenewCollabCtrl.Action do
+  alias RenewCollab.Media
   alias RenewCollab.Syntax
   alias RenewCollab.Sockets
   alias RenewCollab.Primitives
@@ -843,6 +844,60 @@ defmodule RenewCollabCtrl.Action do
     end
   end
 
+  def do_perform(%Actions.ProjectInviteMember{project_id: project_id, email: email, role: role}) do
+    existing_account_id =
+      RenewCollabAuth.Queries.AccountByEmail.new(%{email: email})
+      |> RenewCollabAuth.AuthFetcher.fetch()
+      |> case do
+        {:ok, %{id: account_id}} ->
+          account_id
+
+        _ ->
+          nil
+      end
+
+    RenewCollabProj.Commands.CreateInvitation.new(%{
+      project_id: project_id,
+      email: email,
+      role: role,
+      account_id: existing_account_id
+    })
+    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+  end
+
+  def do_perform(%Actions.ProjectRevokeInvitation{
+        project_id: project_id,
+        invitation_id: invitation_id
+      }) do
+    RenewCollabProj.Commands.RevokeInvitation.new(%{
+      project_id: project_id,
+      invitation_id: invitation_id
+    })
+    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+  end
+
+  def do_perform(%Actions.ProjectRejectInvitation{
+        project_id: project_id,
+        invitation_id: invitation_id
+      }) do
+    RenewCollabProj.Commands.RevokeInvitation.new(%{
+      project_id: project_id,
+      invitation_id: invitation_id
+    })
+    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+  end
+
+  def do_perform(%Actions.ProjectAcceptInvitation{
+        project_id: project_id,
+        invitation_id: invitation_id
+      }) do
+    RenewCollabProj.Commands.AcceptInvitation.new(%{
+      project_id: project_id,
+      invitation_id: invitation_id
+    })
+    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+  end
+
   def do_perform(%Actions.ProjectAddSimulationAsAdmin{
         project_id: project_id,
         simulation_id: simulation_id
@@ -997,6 +1052,19 @@ defmodule RenewCollabCtrl.Action do
       member_id: member_id
     })
     |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+  end
+
+  def do_perform(%Actions.ProjectMemberWithdraw{
+        project_id: project_id,
+        account_id: account_id
+      }) do
+    RenewCollabProj.Commands.RemoveProjectMember.new(%{
+      project_id: project_id,
+      account_id: account_id
+    })
+    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+
+    :ok
   end
 
   def do_perform(%Actions.ProjectRemoveSimulationAsAdmin{
@@ -1439,6 +1507,10 @@ defmodule RenewCollabCtrl.Action do
 
   def do_perform(%Actions.GlobalSyntaxAddWhitelistEntry{attributes: attrs}) do
     Syntax.add_whitelist(attrs)
+  end
+
+  def do_perform(%Actions.ProjectMediaCreateSvg{project_id: project_id, svg: svg}) do
+    Media.create_svg(svg)
   end
 
   def do_perform(%Actions.GlobalSyntaxAddAutoTargetEntry{attributes: attrs}) do

@@ -15,7 +15,6 @@ defmodule RenewCollabProj.Repo.Migrations.AddProjectDocument do
 
       add :document_id, :binary_id, null: false
 
-
       timestamps(type: :utc_datetime)
     end
 

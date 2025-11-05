@@ -15,7 +15,6 @@ defmodule RenewCollabProj.Repo.Migrations.AddProjectSimulation do
 
       add :simulation_id, :binary_id, null: false
 
-
       timestamps(type: :utc_datetime)
     end
 

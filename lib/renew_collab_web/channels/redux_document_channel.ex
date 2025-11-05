@@ -439,16 +439,16 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
   def handle_event(
         "insert_document",
         %{
-          "document_id" => document_id,
+          "document_id" => source_document_id,
           "position" => %{"x" => x, "y" => y}
         },
         %{},
-        %{:document_id => document_id, :account => account},
+        %{:document_id => target_document_id, :account => account},
         _socket
       ) do
     %Actions.DocumentEditInsertDocument{
-      target_document_id: document_id,
-      source_document_id: document_id,
+      target_document_id: target_document_id,
+      source_document_id: source_document_id,
       position: {x, y}
     }
     |> Dispatcher.perform_as(account)

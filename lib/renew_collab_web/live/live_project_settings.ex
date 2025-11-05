@@ -1,4 +1,6 @@
 defmodule RenewCollabWeb.LiveProjectSettings do
+  alias RenewCollabCtrl.Actions.ProjectMemberWithdraw
+  alias RenewCollabCtrl.Actions.ProjectRevokeInvitation
   alias RenewCollabCtrl.Dispatcher
   alias RenewCollabCtrl.Actions.ProjectRemoveMemberAsUser
   alias RenewCollabCtrl.Actions
@@ -34,6 +36,13 @@ defmodule RenewCollabWeb.LiveProjectSettings do
           |> assign(
             :members,
             %Views.ProjectMembersList{
+              project_id: project_id
+            }
+            |> Fetcher.fetch_as(account)
+          )
+          |> assign(
+            :invitations,
+            %Views.ProjectInvitations{
               project_id: project_id
             }
             |> Fetcher.fetch_as(account)
@@ -84,49 +93,69 @@ defmodule RenewCollabWeb.LiveProjectSettings do
         <%= if  not Enum.empty?(@project.members) do %>
           <ul style="list-style: none; padding: 0; margin: 0">
             <%= for m <- @members do %>
-              <%= with acc = %{} <- m.account do %>
-                <li>
-                  <%= if WriteAccess.can(@current_account, %ProjectRemoveMemberAsUser{project_id: @project.id, member_id: m.id}) do %>
-                    <button
-                      type="button"
-                      phx-click="remove_member"
-                      style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
-                      phx-value-id={m.id}
-                    >
-                      Remove
-                    </button>
-                  <% end %>
+              <li>
+                <%= if WriteAccess.can(@current_account, %ProjectRemoveMemberAsUser{project_id: @project.id, member_id: m.id}) do %>
+                  <button
+                    type="button"
+                    phx-click="remove_member"
+                    style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
+                    phx-value-id={m.id}
+                  >
+                    Remove
+                  </button>
+                <% end %>
+                <%= with acc = %{} <- m.account do %>
                   <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
                     [{m.role}]
                   </span>
                   {acc.email}
-                </li>
-                <% else nil -> %>
-                  <li>
-                    <button type="button" phx-click="remove_member" phx-value-id={m.id}>
-                      Remove
-                    </button>
+                  <% else nil -> %>
                     <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
                       [{m.role}]
                     </span>
                     <em>Account deleted</em>
                     (ID: <code>{m.account_id}</code>)
-                  </li>
-              <% end %>
+                <% end %>
+              </li>
             <% end %>
           </ul>
         <% else %>
           <p>None</p>
         <% end %>
 
-        <%= if WriteAccess.can(@current_account, %Actions.ProjectAddMemberAsUser{project_id: @project.id}) do %>
+        <h3>Open invitations</h3>
+        <%= if  not Enum.empty?(@invitations) do %>
+          <ul style="list-style: none; padding: 0; margin: 0">
+            <%= for i <- @invitations do %>
+              <li>
+                <%= if WriteAccess.can(@current_account, %ProjectRevokeInvitation{project_id: @project.id, invitation_id: i.id}) do %>
+                  <button
+                    style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
+                    type="button"
+                    phx-click="revoke_invitation"
+                    phx-value-id={i.id}
+                  >
+                    Revoke
+                  </button>
+                <% end %>
+                <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
+                  [{i.role}]
+                </span>
+                {i.email}
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          None
+        <% end %>
+        <%= if WriteAccess.can(@current_account, %Actions.ProjectInviteMember{project_id: @project.id}) do %>
           <h3>Invite Member</h3>
-          <form method="post" phx-submit="add_member" accept-charset="utf-8">
+          <form method="post" phx-submit="invite_member" accept-charset="utf-8">
             <label>
               E-Mail: <input type="email" name="account_email" />
             </label>
             <select name="role">
-              <%= for r <- RenewCollabProj.Projects.member_roles(@current_account, @project) do %>
+              <%= for r <- [:editor, :reader] do %>
                 <option value={r}>
                   {r}
                 </option>
@@ -140,7 +169,18 @@ defmodule RenewCollabWeb.LiveProjectSettings do
             </button>
           </form>
         <% end %>
+        <%= if WriteAccess.can(@current_account, %ProjectMemberWithdraw{project_id: @project.id, account_id: @current_account.id}) do %>
+          <h3>Leave Project</h3>
 
+          <form method="post" phx-submit="withdraw" accept-charset="utf-8">
+            <button
+              type="submit"
+              style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
+            >
+              Leave project
+            </button>
+          </form>
+        <% end %>
         <%= if WriteAccess.can(@current_account, %ProjectDelete{project_id: @project.id}) do %>
           <h3>Delete Project</h3>
 
@@ -162,13 +202,13 @@ defmodule RenewCollabWeb.LiveProjectSettings do
     socket |> reload()
   end
 
-  def handle_event("add_member", %{"account_email" => ""}, socket) do
+  def handle_event("invite_member", %{"account_email" => ""}, socket) do
     {:noreply, socket}
   end
 
-  def handle_event("add_member", %{"account_email" => email, "role" => role}, socket) do
-    %Actions.ProjectAddMemberAsUser{
-      project_id: socket.assigns.project,
+  def handle_event("invite_member", %{"account_email" => email, "role" => role}, socket) do
+    %Actions.ProjectInviteMember{
+      project_id: socket.assigns.project.id,
       email: email,
       role: RenewCollabProj.Entities.ProjectMember.parse_role(role)
     }
@@ -184,7 +224,7 @@ defmodule RenewCollabWeb.LiveProjectSettings do
 
   def handle_event("remove_member", %{"id" => member_id}, socket) do
     %Actions.ProjectRemoveMemberAsUser{
-      project_id: socket.assigns.project,
+      project_id: socket.assigns.project.id,
       member_id: member_id
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
@@ -197,6 +237,21 @@ defmodule RenewCollabWeb.LiveProjectSettings do
     end
   end
 
+  def handle_event("revoke_invitation", %{"id" => invitation_id}, socket) do
+    %Actions.ProjectRevokeInvitation{
+      project_id: socket.assigns.project.id,
+      invitation_id: invitation_id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        reload(socket |> put_flash(:info, "Inviation revoked"))
+
+      {:error, _} ->
+        reload(socket |> put_flash(:error, "Revoking inviation failed"))
+    end
+  end
+
   def handle_event("rename", %{"name" => name}, socket) do
     %Actions.ProjectRename{project_id: socket.assigns.project.id, new_name: name}
     |> Dispatcher.perform_as(socket.assigns.current_account)
@@ -206,6 +261,21 @@ defmodule RenewCollabWeb.LiveProjectSettings do
 
       _ ->
         socket |> put_flash(:error, "Project rename failed") |> reload
+    end
+  end
+
+  def handle_event("withdraw", _params, socket) do
+    %Actions.ProjectMemberWithdraw{
+      project_id: socket.assigns.project.id,
+      account_id: socket.assigns.current_account.id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      :ok ->
+        {:noreply, socket |> put_flash(:info, "Project left") |> redirect(to: "/projects")}
+
+      _ ->
+        {:noreply, socket |> put_flash(:error, "Leaving project failed")}
     end
   end
 
@@ -224,6 +294,20 @@ defmodule RenewCollabWeb.LiveProjectSettings do
   def reload(socket) do
     {:noreply,
      socket
+     |> assign(
+       :invitations,
+       %Views.ProjectInvitations{
+         project_id: socket.assigns.project.id
+       }
+       |> Fetcher.fetch_as(socket.assigns.current_account.id)
+     )
+     |> assign(
+       :members,
+       %Views.ProjectMembersList{
+         project_id: socket.assigns.project.id
+       }
+       |> Fetcher.fetch_as(socket.assigns.current_account.id)
+     )
      |> assign(
        :project,
        %Views.MyProject{

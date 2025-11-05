@@ -39,7 +39,7 @@ defmodule RenewCollabWeb.ReduxProjectsChannel do
   end
 
   @impl true
-  def handle_message(:any, _state, %{:project_id => project_id, :account => account}) do
+  def handle_message(:any, _state, %{:account => account}) do
     {:noreply, load_state(account)}
   end
 

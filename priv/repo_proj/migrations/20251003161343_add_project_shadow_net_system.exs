@@ -15,7 +15,6 @@ defmodule RenewCollabProj.Repo.Migrations.AddProjectShadowNetSystem do
 
       add :shadow_net_system_id, :binary_id, null: false
 
-
       timestamps(type: :utc_datetime)
     end
 

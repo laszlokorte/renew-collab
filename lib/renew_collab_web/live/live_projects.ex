@@ -21,6 +21,8 @@ defmodule RenewCollabWeb.LiveProjects do
   def load_data(account) do
     %{
       projects: %Views.MyProjectsList{account_id: account.id} |> Fetcher.fetch_as(account),
+      invitations:
+        %Views.MyProjectInvitations{account_id: account.id} |> Fetcher.fetch_as(account),
       create_form:
         to_form(%{
           "name" => ""
@@ -67,6 +69,54 @@ defmodule RenewCollabWeb.LiveProjects do
       </div>
 
       <div style="padding: 1em">
+        <%= if not Enum.empty?(@invitations)  do %>
+          <h2>Invitations</h2>
+
+          <table style="width: 100%;" cellpadding="5">
+            <thead>
+              <tr>
+                <th style="border-bottom: 1px solid #333;" align="left" width="1000">Project</th>
+                <th style="border-bottom: 1px solid #333;" align="left" width="100">Role</th>
+                <th style="border-bottom: 1px solid #333;" align="left" width="100">Invited at</th>
+                <th style="border-bottom: 1px solid #333;" align="left" width="100">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <%= for {inv, di} <- @invitations|> Enum.with_index do %>
+                <tr>
+                  <td align="left" width="1000">
+                    {inv.project.name}
+                  </td>
+                  <td align="left" width="100">{inv.role}</td>
+                  <td>
+                    <RenewCollabWeb.RenewComponents.timestamp value={inv.inserted_at} />
+                  </td>
+                  <td align="left" width="100">
+                    <button
+                      type="button"
+                      phx-click="accept_invitation"
+                      phx-value-invitation_id={inv.id}
+                      phx-value-project_id={inv.project_id}
+                      style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+                    >
+                      Accept
+                    </button>
+                    <button
+                      type="button"
+                      phx-click="reject_invitation"
+                      phx-value-invitation_id={inv.id}
+                      phx-value-project_id={inv.project_id}
+                      style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
+                    >
+                      Reject
+                    </button>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        <% end %>
+
         <table style="width: 100%;" cellpadding="5">
           <thead>
             <tr>
@@ -242,6 +292,52 @@ defmodule RenewCollabWeb.LiveProjects do
     socket
     |> put_flash(:info, "Project deleted")
     |> reload()
+  end
+
+  def handle_event(
+        "accept_invitation",
+        %{"project_id" => project_id, "invitation_id" => invitation_id},
+        socket
+      ) do
+    %Actions.ProjectAcceptInvitation{
+      invitation_id: invitation_id,
+      project_id: project_id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        socket
+        |> put_flash(:info, "Invitation accepted")
+        |> reload()
+
+      _ ->
+        socket
+        |> put_flash(:info, "Accepting invitation failed")
+        |> reload()
+    end
+  end
+
+  def handle_event(
+        "reject_invitation",
+        %{"project_id" => project_id, "invitation_id" => invitation_id},
+        socket
+      ) do
+    %Actions.ProjectRejectInvitation{
+      invitation_id: invitation_id,
+      project_id: project_id
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+    |> case do
+      {:ok, _} ->
+        socket
+        |> put_flash(:info, "Invitation rejected")
+        |> reload()
+
+      _ ->
+        socket
+        |> put_flash(:info, "Rejecting invitation failed")
+        |> reload()
+    end
   end
 
   def handle_event("duplicate_project", %{"id" => project_id}, socket) do

@@ -169,7 +169,17 @@ defmodule RenewCollabWeb.DocumentJSON do
         linked_simulations: %{
           href: url(~p"/api/documents/#{document.id}/simulations"),
           method: "get"
-        }
+        },
+        upload_svg:
+          with %{project_id: project_id} <- document.project_assignment do
+            %{
+              method: "post",
+              href: url(~p"/api/projects/#{project_id}/media/svg")
+            }
+          else
+            _ ->
+              nil
+          end
       },
       content: show_content(document)
     }

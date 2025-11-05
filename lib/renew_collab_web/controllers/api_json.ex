@@ -36,10 +36,6 @@ defmodule RenewCollabWeb.ApiJSON do
           method: "GET",
           href: url(~p"/api/syntax")
         },
-        upload_svg: %{
-          method: "POST",
-          href: url(~p"/api/media/svg")
-        },
         live_socket: %{
           method: "GET",
           href:

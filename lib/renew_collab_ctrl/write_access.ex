@@ -121,6 +121,12 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(_account, %Actions.ProjectRemoveShadowNetSystemAsAdmin{}), do: true
   def can(_account, %Actions.ProjectRemoveMemberAsUser{}), do: true
   def can(_account, %Actions.ProjectAddMemberAsUser{}), do: true
+  def can(_account, %Actions.ProjectInviteMember{}), do: true
+  def can(_account, %Actions.ProjectRevokeInvitation{}), do: true
+  def can(_account, %Actions.ProjectRejectInvitation{}), do: true
+  def can(_account, %Actions.ProjectAcceptInvitation{}), do: true
+  def can(%{id: account_id}, %Actions.ProjectMemberWithdraw{account_id: account_id}), do: true
+  def can(_, %Actions.ProjectMemberWithdraw{}), do: false
 
   def can(_account, %Actions.SimulationLogDebug{}), do: true
   def can(_account, %Actions.SimulationPause{}), do: true
@@ -133,6 +139,7 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(_account, %Actions.SimulationReset{}), do: true
   def can(_account, %Actions.ShadowNetSystemSetNetDocument{}), do: true
   def can(_account, %Actions.ShadowNetSystemSetMainNet{}), do: true
+  def can(_account, %Actions.ProjectMediaCreateSvg{}), do: true
 
   def can(_account, _action), do: false
 end

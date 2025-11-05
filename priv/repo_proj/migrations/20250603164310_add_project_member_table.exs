@@ -17,6 +17,5 @@ defmodule RenewCollabProj.Repo.Migrations.AddProjectMemberTable do
 
       timestamps(type: :utc_datetime)
     end
-    
   end
 end

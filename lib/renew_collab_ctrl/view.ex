@@ -1,4 +1,5 @@
 defmodule RenewCollabCtrl.View do
+  alias RenewCollab.Media
   alias RenewCollabCtrl.Views
 
   def do_fetch(_account, %Views.DocumentLayerRelative{
@@ -203,6 +204,23 @@ defmodule RenewCollabCtrl.View do
   def do_fetch(_account, %Views.MyProject{account_id: account_id, project_id: project_id}) do
     %{account_id: account_id, project_id: project_id}
     |> RenewCollabProj.Queries.ProjectDetails.new()
+    |> RenewCollabProj.ProjectFetcher.fetch()
+  end
+
+  def do_fetch(_account, %Views.ProjectInvitations{project_id: project_id}) do
+    %{project_id: project_id}
+    |> RenewCollabProj.Queries.ProjectInvitations.new()
+    |> RenewCollabProj.ProjectFetcher.fetch()
+  end
+
+  def do_fetch(_account, %Views.MediaData{media_id: media_id}) do
+    Media.get_svg(media_id)
+    |> then(&{:ok, &1})
+  end
+
+  def do_fetch(_account, %Views.MyProjectInvitations{account_id: account_id}) do
+    %{account_id: account_id}
+    |> RenewCollabProj.Queries.AccountProjectInvitations.new()
     |> RenewCollabProj.ProjectFetcher.fetch()
   end
 
