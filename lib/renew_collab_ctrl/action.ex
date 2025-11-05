@@ -709,6 +709,21 @@ defmodule RenewCollabCtrl.Action do
     :ok
   end
 
+  def do_perform(%Actions.DocumentEditSetLayerVisibility{
+        document_id: document_id,
+        layer_id: layer_id,
+        visible: visible
+      }) do
+    Commands.SetVisibility.new(%{
+      document_id: document_id,
+      layer_id: layer_id,
+      visible: visible
+    })
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
+
+    :ok
+  end
+
   def do_perform(%Actions.DocumentMoveIntoProject{}) do
     {:error, :not_implemented}
   end

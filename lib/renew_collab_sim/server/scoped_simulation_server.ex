@@ -66,9 +66,10 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
     |> case do
       nil ->
         with {:ok, pid} <-
-               RenewCollabSim.Server.SimulationServer.start_monitor(simulation_scope, [
-                 "simulation:#{simulation_id}" | pubsub_channels
-               ]) do
+               RenewCollabSim.Server.SimulationServer.start_monitor(
+                 simulation_scope,
+                 pubsub_channels
+               ) do
           RenewCollabSim.Server.SimulationServer.setup(pid, simulation_id)
 
           {:noreply,
@@ -173,7 +174,7 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
 
   @impl true
   def handle_call({:is_playing, simulation_scope, simulation_id}, _from, state) do
-    Map.has_key?(state, simulation_scope)
+    Map.get(state, simulation_scope, nil)
     |> case do
       %{server_process: pid} ->
         RenewCollabSim.Server.SimulationServer.is_playing(pid, simulation_id)

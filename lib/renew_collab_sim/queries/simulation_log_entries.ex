@@ -1,5 +1,5 @@
 defmodule RenewCollabSim.Queries.SimulationLogEntries do
-  alias RenewCollabSim.Entities.SimulationLogEntry
+  alias RenewCollabSim.Entities.Simulation
   import Ecto.Query
 
   defstruct [:simulation_id]
@@ -10,12 +10,14 @@ defmodule RenewCollabSim.Queries.SimulationLogEntries do
 
   def multi(%__MODULE__{simulation_id: id}) do
     Ecto.Multi.new()
-    |> Ecto.Multi.all(
+    |> Ecto.Multi.one(
       :result,
-      from(sl in SimulationLogEntry,
-        where: sl.simulation_id == ^id,
-        order_by: [desc: sl.inserted_at],
-        limit: 10
+      from(sim in Simulation,
+        left_join: log in assoc(sim, :log_entries),
+        where: sim.id == ^id,
+        order_by: [desc: log.inserted_at],
+        limit: 10,
+        preload: [log_entries: log]
       )
     )
   end

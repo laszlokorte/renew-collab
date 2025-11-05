@@ -46,6 +46,7 @@ defmodule RenewCollabWeb.ReduxSimulationChannel do
            )
          ),
          %{
+           project_id: sim.project_assignment.project_id,
            simulation_id: simulation_id,
            account: socket.assigns.current_account
          }}
@@ -61,10 +62,10 @@ defmodule RenewCollabWeb.ReduxSimulationChannel do
     %Views.SimulationWithState{simulation_id: simulation_id}
     |> Fetcher.fetch_as(account)
     |> case do
-      {:ok, nil} ->
+      nil ->
         :stop
 
-      {:ok, %{} = sim} ->
+      %{} = sim ->
         {:noreply,
          RenewCollabWeb.SimulationJSON.show_content(
            sim,
@@ -83,10 +84,10 @@ defmodule RenewCollabWeb.ReduxSimulationChannel do
     %Views.SimulationWithState{simulation_id: simulation_id}
     |> Fetcher.fetch_as(account)
     |> case do
-      {:ok, nil} ->
+      nil ->
         :stop
 
-      {:ok, %{} = sim} ->
+      %{} = sim ->
         {:noreply,
          RenewCollabWeb.SimulationJSON.show_content(
            sim,

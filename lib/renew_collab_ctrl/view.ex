@@ -360,8 +360,9 @@ defmodule RenewCollabCtrl.View do
     |> RenewCollabProj.ProjectFetcher.fetch()
   end
 
-  def do_fetch(_account, %Views.SimulationWithLogEntries{}) do
-    {:error, :not_implemented}
+  def do_fetch(_account, %Views.SimulationWithLogEntries{simulation_id: simulation_id}) do
+    RenewCollabSim.Queries.SimulationLogEntries.new(%{simulation_id: simulation_id})
+    |> RenewCollabSim.SimulationFetcher.fetch()
   end
 
   def do_fetch(_acocunt, %Views.SimulationNetInstance{net_instance_id: net_instance_id}) do

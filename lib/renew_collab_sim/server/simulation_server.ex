@@ -77,7 +77,9 @@ defmodule RenewCollabSim.Server.SimulationServer do
       {:noreply, state}
     else
       with {:ok, pid} <-
-             RenewCollabSim.Server.SimulationProcess.start_monitor(simulation_id, pubsub_channels) do
+             RenewCollabSim.Server.SimulationProcess.start_monitor(simulation_id, [
+               "simulation:#{simulation_id}" | pubsub_channels
+             ]) do
         broadcast_state_change(state, project_id, simulation_id)
 
         {:noreply,
@@ -178,10 +180,10 @@ defmodule RenewCollabSim.Server.SimulationServer do
 
   @impl true
   def handle_call({:is_playing, simulation_id}, _from, %{processes: procs} = state) do
-    Map.has_key?(procs, simulation_id)
+    Map.get(procs, simulation_id, nil)
     |> case do
       %{sim_process: pid} -> RenewCollabSim.Server.SimulationProcess.is_playing(pid)
-      _ -> false
+      nil -> false
     end
     |> then(&{:reply, &1, state})
   end

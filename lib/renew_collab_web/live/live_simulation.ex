@@ -73,6 +73,8 @@ defmodule RenewCollabWeb.LiveSimulation do
              )
            )}
       end
+    else
+      {:noreply, socket}
     end
   end
 

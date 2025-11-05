@@ -57,6 +57,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
     if is_nil(latest_update) ||
          DateTime.diff(now, latest_update, throttle_unit) >= throttle_amount do
       for channel <- pubsub_channels do
+        dbg({pubsub_channels, {:simulation_change, sim_id, {event, playing}}})
         # TODO:broadcast
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,

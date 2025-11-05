@@ -88,6 +88,7 @@ defmodule RenewCollabWeb.ProjectJSON do
       # id: document.id,
       href: url(~p"/api/projects/#{project}"),
       id: project.id,
+      topic: "project:#{project.id}",
       links: %{
         documents: %{
           method: "GET",
@@ -112,7 +113,13 @@ defmodule RenewCollabWeb.ProjectJSON do
 
   def show_content(%Project{} = project) do
     %{
-      name: project.name
+      name: project.name,
+      members: %{
+        items:
+          for m <- project.members do
+            %{id: m.id, email: "foo"}
+          end
+      }
     }
   end
 end

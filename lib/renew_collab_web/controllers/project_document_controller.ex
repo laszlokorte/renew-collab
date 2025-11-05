@@ -29,7 +29,13 @@ defmodule RenewCollabWeb.ProjectDocumentController do
         conn
         |> put_status(:created)
         |> put_resp_header("location", ~p"/api/documents/#{document}")
-        |> json(%{id: document.id, url: ~p"/api/documents/#{document}"})
+        |> json(%{
+          id: document.id,
+          url: ~p"/api/documents/#{document}",
+          content: %{
+            name: document.name
+          }
+        })
     end
   end
 
@@ -43,7 +49,13 @@ defmodule RenewCollabWeb.ProjectDocumentController do
       conn
       |> put_status(:created)
       |> put_resp_header("location", ~p"/api/documents/#{document}")
-      |> json(%{id: document.id, url: ~p"/api/documents/#{document}"})
+      |> json(%{
+        id: document.id,
+        url: ~p"/api/documents/#{document}",
+        content: %{
+          name: document.name
+        }
+      })
     end
   end
 end

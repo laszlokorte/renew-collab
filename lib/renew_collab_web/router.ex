@@ -107,6 +107,8 @@ defmodule RenewCollabWeb.Router do
       get "/:project_id/simulations", ProjectSimulationController, :index
       post "/:project_id/simulations", ProjectSimulationController, :create
 
+      get "/:project_id/blueprints", BlueprintController, :index
+
       post "/:project_id/import", ProjectDocumentController, :import
     end
 

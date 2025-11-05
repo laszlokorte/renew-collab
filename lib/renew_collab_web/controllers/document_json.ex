@@ -98,6 +98,16 @@ defmodule RenewCollabWeb.DocumentJSON do
             _ ->
               nil
           end,
+        create_simulation:
+          with %{project_id: project_id} <- document.project_assignment do
+            %{
+              method: "post",
+              href: url(~p"/api/projects/#{project_id}/simulations")
+            }
+          else
+            _ ->
+              nil
+          end,
         symbols: %{
           href: url(~p"/api/symbols"),
           method: "get"
@@ -110,10 +120,19 @@ defmodule RenewCollabWeb.DocumentJSON do
           href: url(~p"/api/semantic_tags"),
           method: "get"
         },
-        blueprints: %{
-          href: url(~p"/api/blueprints"),
-          method: "get"
-        },
+        blueprints:
+          with %{project_id: project_id} <- document.project_assignment do
+            %{
+              href: url(~p"/api/projects/#{project_id}/blueprints"),
+              method: "GET"
+            }
+          else
+            _ ->
+              %{
+                href: url(~p"/api/blueprints"),
+                method: "get"
+              }
+          end,
         syntax:
           if document.syntax_id do
             %{
