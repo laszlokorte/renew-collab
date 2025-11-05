@@ -29,11 +29,11 @@ defmodule RenewCollabCtrl.Dispatcher do
       end
       |> case do
         res = :ok ->
-          notify(action, res)
+          notify(nil, action, :ok)
           res
 
         res = {:ok, result} ->
-          notify(action, res)
+          notify(nil, action, result)
           res
 
         res ->
@@ -45,8 +45,8 @@ defmodule RenewCollabCtrl.Dispatcher do
     end
   end
 
-  defp notify(action, result) do
-    for {channel, message} <- Notification.notifications_for(action, result) do
+  defp notify(project, action, result) do
+    for {channel, message} <- Notification.notifications_for(project, action, result) do
       Phoenix.PubSub.broadcast(RenewCollab.PubSub, channel, message)
     end
   end

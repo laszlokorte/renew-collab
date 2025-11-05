@@ -1483,6 +1483,17 @@ defmodule RenewCollabCtrl.Action do
 
   def do_perform(%Actions.ProjectMediaCreateSvg{project_id: project_id, svg: svg}) do
     Media.create_svg(svg)
+    |> case do
+      {:ok, %{insert_assignment: %{id: media_id}}} ->
+        RenewCollabProj.Commands.AssignProjectMedia.new(%{
+          project_id: project_id,
+          media_id: media_id
+        })
+        |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+
+      err ->
+        err
+    end
   end
 
   def do_perform(%Actions.GlobalSyntaxAddAutoTargetEntry{attributes: attrs}) do
