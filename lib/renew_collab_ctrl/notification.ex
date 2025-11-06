@@ -8,32 +8,32 @@ defmodule RenewCollabCtrl.Notification do
         %Actions.DocumentEditLayerTextSizeHint{document_id: doc_id},
         _result
       ),
-      do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+      do: [document_modified(doc_id)]
 
   def notifications_for(_proj, %Actions.DocumentEditSetThumbnail{document_id: doc_id}, _result),
-    do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+    do: [document_modified(doc_id)]
 
   def notifications_for(
         _proj,
         %Actions.DocumentEditRemoveThumbnail{document_id: doc_id},
         _result
       ),
-      do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+      do: [document_modified(doc_id)]
 
   def notifications_for(_proj, %Actions.DocumentCreateInProject{}, _result), do: []
 
   def notifications_for(_proj, %Actions.DocumentEditCreateLayer{document_id: doc_id}, _result),
-    do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+    do: [document_modified(doc_id)]
 
   def notifications_for(
         _proj,
         %Actions.DocumentEditCreateLayerWithEdge{document_id: doc_id},
         _result
       ),
-      do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+      do: [document_modified(doc_id)]
 
   def notifications_for(_proj, %Actions.DocumentEditImportFile{document_id: doc_id}, _result),
-    do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+    do: [document_modified(doc_id)]
 
   def notifications_for(_proj, %Actions.DocumentDeleteAsUser{}, _result), do: []
 
@@ -42,171 +42,171 @@ defmodule RenewCollabCtrl.Notification do
         %Actions.DocumentEditSetLayerVisibility{document_id: doc_id},
         _result
       ),
-      do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+      do: [document_modified(doc_id)]
 
   def notifications_for(
         _proj,
         %Actions.DocumentEditCreateParentLayer{document_id: doc_id},
         _result
       ),
-      do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+      do: [document_modified(doc_id)]
 
   def notifications_for(
         _proj,
         %Actions.DocumentEditMakeSpaceBetween{document_id: doc_id},
         _result
       ),
-      do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+      do: [document_modified(doc_id)]
 
   def notifications_for(_proj, %Actions.DocumentEditDeleteBond{document_id: doc_id}, _result),
-    do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+    do: [document_modified(doc_id)]
 
   def notifications_for(_proj, %Actions.DocumentEditLayerStyle{document_id: doc_id}, _result),
-    do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+    do: [document_modified(doc_id)]
 
   def notifications_for(_proj, %Actions.DocumentEditLayerEdgeStyle{document_id: doc_id}, _result),
-    do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+    do: [document_modified(doc_id)]
 
   def notifications_for(_proj, %Actions.DocumentEditLayerTextStyle{document_id: doc_id}, _result),
-    do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+    do: [document_modified(doc_id)]
 
   def notifications_for(_proj, %Actions.DocumentEditLayerTextBody{document_id: doc_id}, _result),
-    do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+    do: [document_modified(doc_id)]
 
   def notifications_for(_proj, %Actions.DocumentEditLayerBoxSize{document_id: doc_id}, _result),
-    do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+    do: [document_modified(doc_id)]
 
   def notifications_for(
         _proj,
         %Actions.DocumentEditLayerTextPosition{document_id: doc_id},
         _result
       ),
-      do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+      do: [document_modified(doc_id)]
 
   def notifications_for(
         _proj,
         %Actions.DocumentEditLayerEdgePosition{document_id: doc_id},
         _result
       ),
-      do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+      do: [document_modified(doc_id)]
 
   def notifications_for(
         _proj,
         %Actions.DocumentEditLayerEdgeSwapDirection{document_id: doc_id},
         _result
       ),
-      do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+      do: [document_modified(doc_id)]
 
   def notifications_for(
         _proj,
         %Actions.DocumentEditLayerEdgeWaypointPosition{document_id: doc_id},
         _result
       ),
-      do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+      do: [document_modified(doc_id)]
 
   def notifications_for(
         _proj,
         %Actions.DocumentEditDeleteEdgeWaypoint{document_id: doc_id},
         _result
       ),
-      do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+      do: [document_modified(doc_id)]
 
   def notifications_for(
         _proj,
         %Actions.DocumentEditCreateEdgeWaypoint{document_id: doc_id},
         _result
       ),
-      do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+      do: [document_modified(doc_id)]
 
   def notifications_for(
         _proj,
         %Actions.DocumentEditEdgeRemoveAllWaypoints{document_id: doc_id},
         _result
       ),
-      do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+      do: [document_modified(doc_id)]
 
   def notifications_for(
         _proj,
         %Actions.DocumentEditLayerSemanticTag{document_id: doc_id},
         _result
       ),
-      do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+      do: [document_modified(doc_id)]
 
   def notifications_for(_proj, %Actions.DocumentEditLayerBoxShape{document_id: doc_id}, _result),
-    do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+    do: [document_modified(doc_id)]
 
   def notifications_for(_proj, %Actions.DocumentEditReorderLayer{document_id: doc_id}, _result),
-    do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+    do: [document_modified(doc_id)]
 
   def notifications_for(
         _proj,
         %Actions.DocumentEditMoveLayerRelative{document_id: doc_id},
         _result
       ),
-      do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+      do: [document_modified(doc_id)]
 
   def notifications_for(_proj, %Actions.DocumentEditDeleteLayer{document_id: doc_id}, _result),
-    do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+    do: [document_modified(doc_id)]
 
   def notifications_for(_proj, %Actions.DocumentEditCreateEdgeBond{document_id: doc_id}, _result),
-    do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+    do: [document_modified(doc_id)]
 
   def notifications_for(_proj, %Actions.DocumentEditUnlinkLayer{document_id: doc_id}, _result),
-    do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+    do: [document_modified(doc_id)]
 
   def notifications_for(_proj, %Actions.DocumentEditLinkLayer{document_id: doc_id}, _result),
-    do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+    do: [document_modified(doc_id)]
 
   def notifications_for(
         _proj,
         %Actions.DocumentEditLayerAssignSocketSchema{document_id: doc_id},
         _result
       ),
-      do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+      do: [document_modified(doc_id)]
 
   def notifications_for(
         _proj,
         %Actions.DocumentEditRemoveLayerSocketSchema{document_id: doc_id},
         _result
       ),
-      do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+      do: [document_modified(doc_id)]
 
   def notifications_for(_proj, %Actions.DocumentEditCreateSnapshot{document_id: doc_id}, _result),
-    do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+    do: [document_modified(doc_id)]
 
   def notifications_for(_proj, %Actions.DocumentSnapshotRestore{document_id: doc_id}, _result),
-    do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+    do: [document_modified(doc_id)]
 
   def notifications_for(
         _proj,
         %Actions.DocumentEditSnapshotCreateLabel{document_id: doc_id},
         _result
       ),
-      do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+      do: [document_modified(doc_id)]
 
   def notifications_for(
         _proj,
         %Actions.DocumentEditSnapshotRemoveLabel{document_id: doc_id},
         _result
       ),
-      do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+      do: [document_modified(doc_id)]
 
   def notifications_for(
         _proj,
         %Actions.DocumentEditInsertDocument{target_document_id: doc_id},
         _result
       ),
-      do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+      do: [document_modified(doc_id)]
 
   def notifications_for(
         _proj,
         %Actions.DocumentEditReorderLayerRelative{document_id: doc_id},
         _result
       ),
-      do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+      do: [document_modified(doc_id)]
 
   def notifications_for(_proj, %Actions.DocumentSnapshotsPrune{document_id: doc_id}, _result),
-    do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+    do: [document_modified(doc_id)]
 
   def notifications_for(_proj, %Actions.DocumentDuplicateInProject{project_id: proj_id}, _result),
     do: []
@@ -395,5 +395,7 @@ defmodule RenewCollabCtrl.Notification do
   def notifications_for(_proj, %Actions.SimulationStep{}, _result), do: []
   def notifications_for(_proj, %Actions.SimulationTerminate{}, _result), do: []
 
-  def notifications_for(_action, _result), do: []
+  def notifications_for(_proj, _action, _result), do: []
+
+  defp document_modified(doc_id), do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
 end
