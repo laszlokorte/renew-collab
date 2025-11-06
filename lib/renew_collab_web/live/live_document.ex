@@ -27,7 +27,7 @@ defmodule RenewCollabWeb.LiveDocument do
              document_id: document_id
            }
            |> Fetcher.fetch_as(account) do
-      Phoenix.PubSub.subscribe(RenewCollab.PubSub, "document:#{document_id}")
+      Phoenix.PubSub.subscribe(RenewCollab.PubSub, "pub-document:#{document_id}")
 
       socket =
         socket

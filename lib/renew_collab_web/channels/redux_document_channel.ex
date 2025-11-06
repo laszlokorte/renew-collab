@@ -17,7 +17,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
         {:error, %{reason: "not found"}}
 
       doc ->
-        Phoenix.PubSub.subscribe(RenewCollab.PubSub, "document:#{document_id}")
+        Phoenix.PubSub.subscribe(RenewCollab.PubSub, "pub-document:#{document_id}")
 
         account_id = socket.assigns.current_account.id
         username = socket.assigns.current_account.username

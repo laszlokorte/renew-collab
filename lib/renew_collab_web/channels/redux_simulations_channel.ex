@@ -18,6 +18,8 @@ defmodule RenewCollabWeb.ReduxSimulationsChannel do
         {:error, %{reason: "not found"}}
 
       sims ->
+        Phoenix.PubSub.subscribe(RenewCollab.PubSub, "pub-project-simulations:#{project_id}")
+
         {:ok,
          RenewCollabWeb.SimulationJSON.index_content(%{
            project_id: project_id,
@@ -25,6 +27,31 @@ defmodule RenewCollabWeb.ReduxSimulationsChannel do
            runnings:
              RenewCollabSim.Server.ScopedSimulationServer.running_ids(project_id) |> MapSet.new()
          }), %{project_id: project_id, account: socket.assigns.current_account}}
+    end
+  end
+
+  @impl true
+  def handle_message(
+        :simulations_changed,
+        %{project_id: project_id},
+        %{project_id: project_id, account: account}
+      ) do
+    %Views.ProjectSimulationsList{
+      project_id: project_id
+    }
+    |> Fetcher.fetch_as(account)
+    |> case do
+      nil ->
+        {:error, %{reason: "not found"}}
+
+      sims ->
+        {:noreply,
+         RenewCollabWeb.SimulationJSON.index_content(%{
+           project_id: project_id,
+           simulations: sims,
+           runnings:
+             RenewCollabSim.Server.ScopedSimulationServer.running_ids(project_id) |> MapSet.new()
+         })}
     end
   end
 

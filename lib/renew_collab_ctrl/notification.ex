@@ -20,7 +20,8 @@ defmodule RenewCollabCtrl.Notification do
       ),
       do: [document_modified(doc_id)]
 
-  def notifications_for(_proj, %Actions.DocumentCreateInProject{}, _result), do: []
+  def notifications_for(_proj, %Actions.DocumentCreateInProject{project_id: proj_id}, _result),
+    do: [{"pub-project-documents:#{proj_id}", :documents_changed}]
 
   def notifications_for(_proj, %Actions.DocumentEditCreateLayer{document_id: doc_id}, _result),
     do: [document_modified(doc_id)]
@@ -35,7 +36,8 @@ defmodule RenewCollabCtrl.Notification do
   def notifications_for(_proj, %Actions.DocumentEditImportFile{document_id: doc_id}, _result),
     do: [document_modified(doc_id)]
 
-  def notifications_for(_proj, %Actions.DocumentDeleteAsUser{}, _result), do: []
+  def notifications_for(proj, %Actions.DocumentDeleteAsUser{document_id: doc_id}, _result),
+    do: [document_modified(doc_id), project_documents_modified(proj)]
 
   def notifications_for(
         _proj,
@@ -208,61 +210,62 @@ defmodule RenewCollabCtrl.Notification do
   def notifications_for(_proj, %Actions.DocumentSnapshotsPrune{document_id: doc_id}, _result),
     do: [document_modified(doc_id)]
 
-  def notifications_for(_proj, %Actions.DocumentDuplicateInProject{project_id: proj_id}, _result),
-    do: []
+  def notifications_for(proj, %Actions.DocumentDuplicateInProject{project_id: proj_id}, _result),
+    do: [project_documents_modified(proj)]
 
   def notifications_for(_proj, %Actions.DocumentMoveIntoProject{project_id: proj_id}, _result),
     do: []
 
-  def notifications_for(_proj, %Actions.DocumentUpdateMeta{document_id: doc_id}, _result), do: []
+  def notifications_for(proj, %Actions.DocumentUpdateMeta{document_id: doc_id}, _result),
+    do: [document_modified(doc_id), project_documents_modified(proj)]
 
   def notifications_for(_proj, %Actions.GlobalPrimitivesCreateDefinition{}, _result),
-    do: [{"global_primitives", :changed}]
+    do: [{"pub-global_primitives", :changed}]
 
   def notifications_for(_proj, %Actions.GlobalPrimitivesCreateGroup{}, _result),
-    do: [{"global_primitives", :changed}]
+    do: [{"pub-global_primitives", :changed}]
 
   def notifications_for(_proj, %Actions.GlobalPrimitivesDeleteDefinition{}, _result),
-    do: [{"global_primitives", :changed}]
+    do: [{"pub-global_primitives", :changed}]
 
   def notifications_for(_proj, %Actions.GlobalPrimitivesDeleteGroup{}, _result),
-    do: [{"global_primitives", :changed}]
+    do: [{"pub-global_primitives", :changed}]
 
   def notifications_for(_proj, %Actions.GlobalSocketSchemaCreateSocket{}, _result),
-    do: [{"global_socket_schemas", :changed}]
+    do: [{"pub-global_socket_schemas", :changed}]
 
   def notifications_for(_proj, %Actions.GlobalSocketSchemaCreate{}, _result),
-    do: [{"global_socket_schemas", :changed}]
+    do: [{"pub-global_socket_schemas", :changed}]
 
   def notifications_for(_proj, %Actions.GlobalSocketSchemaDeleteSocket{}, _result),
-    do: [{"global_socket_schemas", :changed}]
+    do: [{"pub-global_socket_schemas", :changed}]
 
   def notifications_for(_proj, %Actions.GlobalSocketSchemaDelete{}, _result),
-    do: [{"global_socket_schemas", :changed}]
+    do: [{"pub-global_socket_schemas", :changed}]
 
   def notifications_for(_proj, %Actions.GlobalSocketSchemaUpdate{}, _result),
-    do: [{"global_socket_schemas", :changed}]
+    do: [{"pub-global_socket_schemas", :changed}]
 
   def notifications_for(_proj, %Actions.GlobalSyntaxAddAutoTargetEntry{}, _result),
-    do: [{"global_syntax", :changed}]
+    do: [{"pub-global_syntax", :changed}]
 
   def notifications_for(_proj, %Actions.GlobalSyntaxAddWhitelistEntry{}, _result),
-    do: [{"global_syntax", :changed}]
+    do: [{"pub-global_syntax", :changed}]
 
   def notifications_for(_proj, %Actions.GlobalSyntaxCreate{}, _result),
-    do: [{"global_syntax", :changed}]
+    do: [{"pub-global_syntax", :changed}]
 
   def notifications_for(_proj, %Actions.GlobalSyntaxDeleteAutoTargetEntry{}, _result),
-    do: [{"global_syntax", :changed}]
+    do: [{"pub-global_syntax", :changed}]
 
   def notifications_for(_proj, %Actions.GlobalSyntaxDeleteWhitelistEntry{}, _result),
-    do: [{"global_syntax", :changed}]
+    do: [{"pub-global_syntax", :changed}]
 
   def notifications_for(_proj, %Actions.GlobalSyntaxDelete{}, _result),
-    do: [{"global_syntax", :changed}]
+    do: [{"pub-global_syntax", :changed}]
 
   def notifications_for(_proj, %Actions.GlobalSyntaxMakeDefault{}, _result),
-    do: [{"global_syntax", :changed}]
+    do: [{"pub-global_syntax", :changed}]
 
   def notifications_for(_proj, %Actions.ProjectAcceptInvitation{project_id: proj_id}, _result),
     do: []
@@ -291,12 +294,18 @@ defmodule RenewCollabCtrl.Notification do
       do: []
 
   def notifications_for(_proj, %Actions.ProjectCreateAsAdmin{}, _result), do: []
-  def notifications_for(_proj, %Actions.ProjectCreateAsUser{account_id: acc_id}, _result), do: []
-  def notifications_for(_proj, %Actions.ProjectDelete{project_id: proj_id}, _result), do: []
-  def notifications_for(_proj, %Actions.ProjectDuplicateAsAdmin{}, _result), do: []
 
-  def notifications_for(_proj, %Actions.ProjectDuplicateAsUser{project_id: project_id}, _result),
-    do: []
+  def notifications_for(_proj, %Actions.ProjectCreateAsUser{account_id: acc_id}, _result),
+    do: [{"pub-my-projects:#{acc_id}", :projects_changed}]
+
+  def notifications_for(proj, %Actions.ProjectDelete{project_id: proj_id}, _result),
+    do: project_modified(proj)
+
+  def notifications_for(proj, %Actions.ProjectDuplicateAsAdmin{}, _result),
+    do: project_modified(proj)
+
+  def notifications_for(proj, %Actions.ProjectDuplicateAsUser{project_id: project_id}, _result),
+    do: project_modified(proj)
 
   def notifications_for(_proj, %Actions.ProjectInviteMember{project_id: proj_id}, _result), do: []
   def notifications_for(_proj, %Actions.ProjectMediaCreateSvg{}, _result), do: []
@@ -330,7 +339,8 @@ defmodule RenewCollabCtrl.Notification do
       ),
       do: []
 
-  def notifications_for(_proj, %Actions.ProjectRename{project_id: proj_id}, _result), do: []
+  def notifications_for(proj, %Actions.ProjectRename{project_id: proj_id}, _result),
+    do: project_modified(proj)
 
   def notifications_for(_proj, %Actions.ProjectRevokeInvitation{project_id: proj_id}, _result),
     do: []
@@ -360,21 +370,21 @@ defmodule RenewCollabCtrl.Notification do
       do: []
 
   def notifications_for(
-        _proj,
+        proj,
         %Actions.SimulationCreateFromShadowNetSystemInProject{project_id: proj_id},
         _result
       ),
-      do: []
+      do: [project_simulations_modified(proj)]
 
-  def notifications_for(_proj, %Actions.SimulationDeleteAsUser{simulation_id: sim_id}, _result),
-    do: []
+  def notifications_for(proj, %Actions.SimulationDeleteAsUser{simulation_id: sim_id}, _result),
+    do: [project_simulations_modified(proj)]
 
   def notifications_for(
-        _proj,
+        proj,
         %Actions.SimulationDuplicateInProject{project_id: proj_id},
         _result
       ),
-      do: []
+      do: [project_simulations_modified(proj)]
 
   def notifications_for(_proj, %Actions.SimulationInitialize{simulation_id: sim_id}, _result),
     do: []
@@ -397,5 +407,20 @@ defmodule RenewCollabCtrl.Notification do
 
   def notifications_for(_proj, _action, _result), do: []
 
-  defp document_modified(doc_id), do: [{"document:#{doc_id}", {:document_modified, doc_id}}]
+  defp document_modified(doc_id), do: {"pub-document:#{doc_id}", {:document_modified, doc_id}}
+
+  defp project_documents_modified(proj) do
+    {"pub-project-documents:#{proj.id}", :documents_changed}
+  end
+
+  defp project_simulations_modified(proj) do
+    {"pub-project-simulations:#{proj.id}", :simulations_changed}
+  end
+
+  defp project_modified(proj) do
+    for %{account_id: acc_id} <-
+          proj.members do
+      {"pub-my-projects:#{acc_id}", :projects_changed}
+    end
+  end
 end

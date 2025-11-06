@@ -13,6 +13,8 @@ defmodule RenewCollabWeb.ReduxProjectsChannel do
     username = socket.assigns.current_account.username
     connection_id = socket.assigns.connection_id
 
+    Phoenix.PubSub.subscribe(RenewCollab.PubSub, "pub-my-projects:#{account_id}")
+
     Presence.track(socket, account_id, %{
       online_at: inspect(System.system_time(:second)),
       username: username,
@@ -36,7 +38,7 @@ defmodule RenewCollabWeb.ReduxProjectsChannel do
   end
 
   @impl true
-  def handle_message(:any, _state, %{:account => account}) do
+  def handle_message(:projects_changed, _state, %{account: account}) do
     {:noreply, load_state(account)}
   end
 

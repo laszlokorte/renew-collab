@@ -8,10 +8,12 @@ defmodule RenewCollabWeb.ReduxDocumentsChannel do
   alias RenewCollabCtrl.Fetcher
 
   @impl true
-  def init("project-documents:" <> <<project_id::binary-size(36)>>, _params, socket) do
+  def init("project-documents:" <> project_id, _params, socket) do
     account_id = socket.assigns.current_account.id
     username = socket.assigns.current_account.username
     connection_id = socket.assigns.connection_id
+
+    Phoenix.PubSub.subscribe(RenewCollab.PubSub, "pub-project-documents:#{project_id}")
 
     Presence.track(socket, account_id, %{
       online_at: inspect(System.system_time(:second)),
@@ -36,7 +38,7 @@ defmodule RenewCollabWeb.ReduxDocumentsChannel do
   end
 
   @impl true
-  def handle_message(:any, _state, %{:project_id => project_id, :account => account}) do
+  def handle_message(:documents_changed, _state, %{:project_id => project_id, :account => account}) do
     {:noreply, load_state(account, project_id)}
   end
 

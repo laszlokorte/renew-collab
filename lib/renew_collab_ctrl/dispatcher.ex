@@ -7,7 +7,7 @@ defmodule RenewCollabCtrl.Dispatcher do
 
   def perform_as(action, account) do
     if WriteAccess.can(account, action) do
-      project_before =
+      {:ok, project_before} =
         associated_project(action)
 
       Action.do_perform(action)
@@ -79,6 +79,6 @@ defmodule RenewCollabCtrl.Dispatcher do
   end
 
   defp associated_project(_) do
-    nil
+    {:ok, nil}
   end
 end
