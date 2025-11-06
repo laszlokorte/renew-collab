@@ -7,6 +7,9 @@ defmodule RenewCollabCtrl.Dispatcher do
 
   def perform_as(action, account) do
     if WriteAccess.can(account, action) do
+      project_before =
+        associated_project(action)
+
       Action.do_perform(action)
       |> case do
         {:error, :not_implemented} ->
@@ -29,11 +32,11 @@ defmodule RenewCollabCtrl.Dispatcher do
       end
       |> case do
         res = :ok ->
-          notify(nil, action, :ok)
+          notify(project_before, action, :ok)
           res
 
         res = {:ok, result} ->
-          notify(nil, action, result)
+          notify(project_before, action, result)
           res
 
         res ->
@@ -53,5 +56,29 @@ defmodule RenewCollabCtrl.Dispatcher do
 
   defp evict_cache(tags) do
     CacheServer.delete_tags(tags)
+  end
+
+  defp associated_project(%{project_id: project_id}) do
+    RenewCollabProj.Queries.ProjectWithMembers.new(%{project_id: project_id})
+    |> RenewCollabProj.ProjectFetcher.fetch()
+  end
+
+  defp associated_project(%{document_id: document_id}) do
+    RenewCollabProj.Queries.ProjectWithMembers.new(%{document_id: document_id})
+    |> RenewCollabProj.ProjectFetcher.fetch()
+  end
+
+  defp associated_project(%{simulation_id: simulation_id}) do
+    RenewCollabProj.Queries.ProjectWithMembers.new(%{simulation_id: simulation_id})
+    |> RenewCollabProj.ProjectFetcher.fetch()
+  end
+
+  defp associated_project(%{shadow_net_system_id: shadow_net_system_id}) do
+    RenewCollabProj.Queries.ProjectWithMembers.new(%{shadow_net_system_id: shadow_net_system_id})
+    |> RenewCollabProj.ProjectFetcher.fetch()
+  end
+
+  defp associated_project(_) do
+    nil
   end
 end
