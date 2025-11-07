@@ -7,44 +7,30 @@ defmodule RenewCollabWeb.LiveDocuments do
   alias RenewCollabCtrl.Actions
   alias RenewCollabCtrl.Dispatcher
 
+  use RenewCollabCtrl.Helper,
+    project: {Views.MyProject, [:account_id, :project_id], :project_changed},
+    documents: {Views.ProjectDocumentsList, [:project_id], :documents_changed},
+    projects: {Views.MyProjectsList, [:account_id], :projects_changed}
+
+  def load_param(:account_id, socket), do: socket.assigns.current_account.id
+  def load_param(:project_id, socket), do: socket.assigns.project_id
+
   def mount(%{"project_id" => project_id}, _session, socket) do
-    account = socket.assigns.current_account
-
-    %Views.MyProject{
-      account_id: account.id,
-      project_id: project_id
-    }
-    |> Fetcher.fetch_as(account)
-    |> case do
-      nil ->
-        {:ok, socket |> put_flash(:error, "Project not found") |> redirect(to: ~p"/projects")}
-
-      project ->
-        socket =
-          socket
-          |> assign(load_data(project, account))
-          |> allow_upload(:import_file, accept: ~w(.rnw .aip), max_entries: 10)
-
-        {:ok, socket}
-    end
-  end
-
-  def load_data(project, account) do
-    %{
-      project: project,
-      documents:
-        %Views.ProjectDocumentsList{
-          project_id: project.id
-        }
-        |> Fetcher.fetch_as(account),
-      projects:
-        %Views.MyProjectsList{
-          account_id: account.id
-        }
-        |> Fetcher.fetch_as(account),
+    socket
+    |> assign(:project_id, project_id)
+    |> allow_upload(:import_file, accept: ~w(.rnw .aip), max_entries: 10)
+    |> assign(
       create_form: to_form(%{}),
       import_form: to_form(%{})
-    }
+    )
+    |> load_data(true)
+    |> case do
+      {:error, socket} ->
+        {:ok, socket |> put_flash(:error, "Project not found") |> redirect(to: ~p"/projects")}
+
+      ok ->
+        ok
+    end
   end
 
   defp error_to_string(:too_large), do: "The selected file is too large."
@@ -420,11 +406,5 @@ defmodule RenewCollabWeb.LiveDocuments do
       {:error, _} ->
         {:noreply, socket |> put_flash(:error, "Failed to create simulation")}
     end
-  end
-
-  def handle_info(:any, socket) do
-    {:noreply,
-     socket
-     |> assign(load_data(socket.assigns.project, socket.assigns.current_account))}
   end
 end

@@ -430,7 +430,7 @@ defmodule RenewCollabCtrl.Notification do
       do: [project_simulations_modified(proj.id)]
 
   def notifications_for(proj, %Actions.SimulationDeleteAsUser{simulation_id: sim_id}, _result),
-    do: [simulation_modified(sim_id) | project_simulations_modified(proj.id)]
+    do: [simulation_modified(sim_id), project_simulations_modified(proj.id)]
 
   def notifications_for(proj, %Actions.SimulationDuplicateInProject{}, _result),
     do: [project_simulations_modified(proj.id)]

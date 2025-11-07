@@ -6,62 +6,50 @@ defmodule RenewCollabWeb.LiveSimulations do
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Fetcher
 
-  def mount(%{"project_id" => project_id}, _session, socket) do
-    account = socket.assigns.current_account
+  use RenewCollabCtrl.Helper,
+    project: {Views.MyProject, [:account_id, :project_id], :project_changed},
+    documents: {Views.ProjectDocumentsList, [:project_id], :documents_changed},
+    simulations: {Views.ProjectSimulationsList, [:project_id], :simulations_changed}
 
-    %Views.MyProject{
-      account_id: account.id,
-      project_id: project_id
-    }
-    |> Fetcher.fetch_as(account)
+  def load_param(:account_id, socket), do: socket.assigns.current_account.id
+  def load_param(:project_id, socket), do: socket.assigns.project_id
+
+  def mount(%{"project_id" => project_id}, _session, socket) do
+    socket
+    |> assign(:project_id, project_id)
+    |> assign(
+      :sim_form,
+      to_form(%{"documents" => [], "formalism" => nil, "main_net" => nil})
+    )
+    |> assign(
+      running:
+        RenewCollabSim.Server.ScopedSimulationServer.running_ids(project_id)
+        |> MapSet.new()
+    )
+    |> load_data(true)
     |> case do
-      nil ->
+      {:error, socket} ->
         {:ok, socket |> put_flash(:error, "Project not found") |> redirect(to: ~p"/projects")}
 
-      project ->
-        RenewCollabWeb.Endpoint.subscribe("projects/#{project.id}/simulations")
-
-        socket =
-          socket
-          |> assign(
-            :sim_form,
-            to_form(%{"documents" => [], "formalism" => nil, "main_net" => nil})
-          )
-          |> assign(load_data(project, account))
-
-        {:ok, socket}
+      ok ->
+        Phoenix.PubSub.subscribe(RenewCollab.PubSub, "projects/#{project_id}/simulations")
+        ok
     end
   end
 
-  def handle_info({:simulation_change, _, _}, socket) do
-    {:noreply,
-     socket
-     |> assign(load_data(socket.assigns.project, socket.assigns.current_account))}
-  end
-
-  def handle_info(:any, socket) do
-    {:noreply,
-     socket
-     |> assign(load_data(socket.assigns.project, socket.assigns.current_account))}
-  end
-
-  def load_data(project, account) do
-    %{
-      project: project,
-      documents:
-        %Views.ProjectDocumentsList{
-          project_id: project.id
-        }
-        |> Fetcher.fetch_as(account),
-      simulations:
-        %Views.ProjectSimulationsList{
-          project_id: project.id
-        }
-        |> Fetcher.fetch_as(account),
+  def handle_info(
+        {:simulation_change, _sim_id, _change},
+        socket = %{assigns: %{project_id: project_id, current_account: account}}
+      ) do
+    socket
+    |> assign(
       running:
-        RenewCollabSim.Server.ScopedSimulationServer.running_ids(project.id)
-        |> MapSet.new()
-    }
+        RenewCollabSim.Server.ScopedSimulationServer.running_ids(project_id)
+        |> MapSet.new(),
+      simulations:
+        %Views.ProjectSimulationsList{project_id: project_id} |> Fetcher.fetch_as(account)
+    )
+    |> then(&{:noreply, &1})
   end
 
   def render(assigns) do

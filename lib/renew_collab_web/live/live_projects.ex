@@ -10,14 +10,13 @@ defmodule RenewCollabWeb.LiveProjects do
     projects: {Views.MyProjectsList, [:account_id], :projects_changed},
     invitations: {Views.MyProjectInvitations, [:account_id], :invitations_changed}
 
+  def load_param(:account_id, socket), do: socket.assigns.current_account.id
+
   def mount(_params, _session, socket) do
     socket
     |> assign(create_form: to_form(%{}))
     |> load_data(true)
-    |> then(&{:ok, &1})
   end
-
-  def load_param(:account_id, socket), do: socket.assigns.current_account.id
 
   def render(assigns) do
     ~H"""

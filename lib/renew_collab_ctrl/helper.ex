@@ -17,26 +17,39 @@ defmodule RenewCollabCtrl.Helper do
       def load_data(socket, initial) do
         alias RenewCollabCtrl.Fetcher
 
-        for {key, {view, params, _event}} <- unquote(data_sources), reduce: socket do
-          sock ->
+        for {key, {view, params, _event}} <- unquote(data_sources), reduce: {:ok, socket} do
+          {:error, sock} ->
+            {:error, sock}
+
+          {:ok, sock} ->
             query =
               params
               |> Enum.map(&{&1, load_param(&1, socket)})
               |> Map.new()
               |> Map.put(:__struct__, view)
 
-            data =
-              if initial do
-                query |> Fetcher.fetch_and_subscribe(socket.assigns.current_account)
-              else
-                query |> Fetcher.fetch_as(socket.assigns.current_account)
-              end
+            if initial do
+              query |> Fetcher.fetch_and_subscribe(socket.assigns.current_account)
+            else
+              query |> Fetcher.fetch_as(socket.assigns.current_account)
+            end
+            |> case do
+              nil ->
+                {:error,
+                 sock
+                 |> assign(
+                   key,
+                   nil
+                 )}
 
-            sock
-            |> assign(
-              key,
-              data
-            )
+              data ->
+                {:ok,
+                 sock
+                 |> assign(
+                   key,
+                   data
+                 )}
+            end
         end
       end
     end

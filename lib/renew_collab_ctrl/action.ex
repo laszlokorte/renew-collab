@@ -1268,7 +1268,29 @@ defmodule RenewCollabCtrl.Action do
         project_id: project_id,
         simulation_id: simulation_id
       }) do
-    {:error, :not_implemented}
+    RenewCollabSim.Queries.Simulation.new(%{simulation_id: simulation_id, detailed: true})
+    |> RenewCollabSim.SimulationFetcher.fetch()
+    |> case do
+      {:ok, %{} = original_sim} ->
+        RenewCollabSim.Commands.CreateSimulation.new(%{
+          shadow_net_system_id: original_sim.shadow_net_system_id,
+          document_ids: []
+        })
+        |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
+        |> case do
+          {:ok, %{simulation: %{id: sim_id} = simulation}} ->
+            RenewCollabProj.Commands.AssignProjectSimulation.new(%{
+              project_id: project_id,
+              simulation_id: sim_id
+            })
+            |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+
+            {:ok, simulation}
+
+          e ->
+            {:error, e}
+        end
+    end
   end
 
   def do_perform(%Actions.ShadowNetSystemRename{sns_id: sns_id, new_name: new_name}) do
@@ -1280,7 +1302,7 @@ defmodule RenewCollabCtrl.Action do
   end
 
   def do_perform(%Actions.SimulationDeleteAsUser{simulation_id: simulation_id}) do
-    {:ok, %{id: project_id}} =
+    {:ok, %{project_id: project_id}} =
       %RenewCollabProj.Queries.SimulationsProject{simulation_id: simulation_id}
       |> RenewCollabProj.ProjectFetcher.fetch()
 

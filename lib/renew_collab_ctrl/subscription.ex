@@ -9,7 +9,10 @@ defmodule RenewCollabCtrl.Subscription do
     do: "pub-my-invitations:#{account_id}"
 
   def channel_for(%Views.ProjectMembersList{}), do: nil
-  def channel_for(%Views.ProjectDocumentsList{}), do: nil
+
+  def channel_for(%Views.ProjectDocumentsList{project_id: proj_id}),
+    do: "pub-project-documents:#{proj_id}"
+
   def channel_for(%Views.DocumentWithContent{}), do: nil
   def channel_for(%Views.DocumentVersionsList{}), do: nil
   def channel_for(%Views.DocumentVersionState{}), do: nil
@@ -30,7 +33,9 @@ defmodule RenewCollabCtrl.Subscription do
   def channel_for(%Views.GlobalProjects{}), do: nil
   def channel_for(%Views.MyProject{account_id: account_id}), do: nil
 
-  def channel_for(%Views.ProjectSimulationsList{}), do: nil
+  def channel_for(%Views.ProjectSimulationsList{project_id: proj_id}),
+    do: "pub-project-simulations:#{proj_id}"
+
   def channel_for(%Views.ProjectShadowNetSystemsList{}), do: nil
   def channel_for(%Views.ShadowNetSystem{}), do: nil
   def channel_for(%Views.SimulationWithState{}), do: nil
