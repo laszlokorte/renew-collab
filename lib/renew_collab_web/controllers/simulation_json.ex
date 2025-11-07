@@ -153,7 +153,11 @@ defmodule RenewCollabWeb.SimulationJSON do
       "href" => url(~p"/api/shadow_net_system/#{sns.id}"),
       "content" => %{
         "main_net_name" => sns.main_net_name,
-        "nets" => Enum.map(sns.nets, &%{"id" => &1.id, "name" => &1.name})
+        "nets" =>
+          Enum.map(
+            sns.nets,
+            &%{"id" => &1.id, "name" => &1.name, "thumbnail" => net_thumbnail(&1)}
+          )
       }
     }
   end
@@ -165,7 +169,15 @@ defmodule RenewCollabWeb.SimulationJSON do
       "content" => %{
         "main_net_name" => sns.main_net_name,
         "nets" =>
-          Enum.map(sns.nets, &%{"id" => &1.id, "name" => &1.name, "document" => net_document(&1)})
+          Enum.map(
+            sns.nets,
+            &%{
+              "id" => &1.id,
+              "name" => &1.name,
+              "document" => net_document(&1),
+              "thumbnail" => net_thumbnail(&1)
+            }
+          )
       }
     }
   end
@@ -175,6 +187,17 @@ defmodule RenewCollabWeb.SimulationJSON do
       {:ok, j = %{}} -> j
       _ -> nil
     end
+  end
+
+  defp net_thumbnail(%{document_json: json}) when is_binary(json) do
+    %{
+      viewbox: %{
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 50
+      }
+    }
   end
 
   defp net_document(%{document_json: nil}), do: nil

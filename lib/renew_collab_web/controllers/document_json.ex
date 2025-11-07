@@ -45,6 +45,12 @@ defmodule RenewCollabWeb.DocumentJSON do
       syntax: syntax_data(document.syntax_id),
       viewbox: viewbox_data(RenewCollab.ViewBox.calculate(document)),
       snapshot: snapshot_data(document),
+      thumbnail_layer:
+        document.thumbnail
+        |> case do
+          nil -> nil
+          %{layer_id: layer_id} -> layer_id
+        end,
       layers:
         case document.layers do
           %Ecto.Association.NotLoaded{} -> %{}

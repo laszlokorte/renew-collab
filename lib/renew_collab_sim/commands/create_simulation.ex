@@ -1,5 +1,4 @@
 defmodule RenewCollabSim.Commands.CreateSimulation do
-  alias RenewCollab.Simulation.SimulationLink
   alias RenewCollabSim.Entities.Simulation
 
   defstruct [:shadow_net_system_id]

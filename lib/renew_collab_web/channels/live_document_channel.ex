@@ -934,6 +934,23 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
     :ack
   end
 
+  @impl true
+  def handle_event(
+        "set_thumbnail",
+        %{"layer_id" => layer_id},
+        %{},
+        %{:document_id => document_id, :account => account},
+        _socket
+      ) do
+    %Actions.DocumentEditSetThumbnail{
+      document_id: document_id,
+      layer_id: layer_id
+    }
+    |> Dispatcher.perform_as(account)
+
+    :ack
+  end
+
   defp make_color(account_id) do
     hue =
       <<i <- account_id |> then(&:crypto.hash(:md5, &1))>> |> for(do: i) |> Enum.sum() |> rem(360)
