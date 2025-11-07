@@ -34,11 +34,14 @@ defmodule RenewCollabCtrl.View do
     |> RenewCollab.DocumentFetcher.fetch()
   end
 
-  def do_fetch(_account, %Views.DocumentWithContent{
-        document_id: document_id,
-        root_layer_id: root_layer_id
-      }) do
-    %{document_id: document_id, root_layer_id: root_layer_id}
+  def do_fetch(
+        _account,
+        %Views.DocumentWithContent{
+          document_id: document_id
+        } = doc
+      ) do
+    doc
+    # TODO
     |> RenewCollab.Queries.DocumentWithElements.new()
     |> RenewCollab.DocumentFetcher.fetch()
     |> case do
@@ -176,6 +179,18 @@ defmodule RenewCollabCtrl.View do
   def do_fetch(_account, %Views.GlobalSymbolsList{}) do
     RenewCollab.Queries.ListSymbols.new()
     |> RenewCollab.DocumentFetcher.fetch()
+  end
+
+  def do_fetch(_account, %Views.GlobalSymbolsMap{}) do
+    RenewCollab.Queries.ListSymbols.new()
+    |> RenewCollab.DocumentFetcher.fetch()
+    |> case do
+      {:ok, symbols} ->
+        symbols
+        |> Enum.map(&{&1.id, &1})
+        |> Map.new()
+        |> then(&{:ok, &1})
+    end
   end
 
   def do_fetch(_account, %Views.GlobalSymbol{symbol_id: id}) do

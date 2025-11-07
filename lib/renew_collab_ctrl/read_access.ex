@@ -13,6 +13,7 @@ defmodule RenewCollabCtrl.ReadAccess do
   def can(_account, %Views.GlobalSocketSchema{}), do: true
   def can(_account, %Views.GlobalSocketById{}), do: true
   def can(_account, %Views.GlobalSymbolsList{}), do: true
+  def can(_account, %Views.GlobalSymbolsMap{}), do: true
   def can(_account, %Views.GlobalSymbol{}), do: true
   def can(_account, %Views.GlobalSyntaxList{}), do: true
   def can(_account, %Views.GlobalPrimitives{}), do: true

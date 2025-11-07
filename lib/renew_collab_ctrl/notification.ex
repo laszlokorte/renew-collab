@@ -486,17 +486,22 @@ defmodule RenewCollabCtrl.Notification do
   defp own_projects_modified(acc_id), do: {"pub-my-projects:#{acc_id}", :projects_changed}
 
   defp project_modified(proj) do
-    for %{account_id: acc_id} <-
-          proj.members do
-      {"pub-my-projects:#{acc_id}", :projects_changed}
-    end
+    [
+      {"pub-project:#{proj.id}", :project_changed},
+      for %{account_id: acc_id} <-
+            proj.members do
+        {"pub-my-projects:#{acc_id}", :projects_changed}
+      end
+    ]
   end
 
   defp syntax_changed(), do: {"pub-global_syntax", :changed}
 
-  defp invitations_changed(_proj, account_id),
+  defp invitations_changed(proj, account_id),
     do: [
-      {"pub-my-invitations:#{account_id}", :invitations_changed}
+      {"pub-my-invitations:#{account_id}", :invitations_changed},
+      {"pub-project:#{proj.id}", :invitations_changed}
+      | project_modified(proj)
     ]
 
   defp global_primitive_changed(), do: {"pub-global_primitives", :changed}

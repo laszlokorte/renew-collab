@@ -17,12 +17,15 @@ defmodule RenewCollabProj.Commands.RevokeInvitation do
         inviation_or_account_id: {:invitation, invitation_id}
       }) do
     Ecto.Multi.new()
-    |> Ecto.Multi.delete_all(
-      :delete_invitaion,
+    |> Ecto.Multi.one(
+      :invitation,
       from(a in ProjectInvitation,
         where: a.project_id == ^project_id and a.id == ^invitation_id
-      ),
-      []
+      )
+    )
+    |> Ecto.Multi.delete(
+      :delete_invitaion,
+      fn %{invitation: inv} -> inv end
     )
   end
 
@@ -31,12 +34,15 @@ defmodule RenewCollabProj.Commands.RevokeInvitation do
         inviation_or_account_id: {:account, account_id}
       }) do
     Ecto.Multi.new()
-    |> Ecto.Multi.delete_all(
-      :delete_invitaion,
+    |> Ecto.Multi.one(
+      :invitation,
       from(a in ProjectInvitation,
         where: a.project_id == ^project_id and a.account_id == ^account_id
-      ),
-      []
+      )
+    )
+    |> Ecto.Multi.delete(
+      :delete_invitaion,
+      fn %{invitation: inv} -> inv end
     )
   end
 end

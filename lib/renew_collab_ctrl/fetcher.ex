@@ -28,9 +28,7 @@ defmodule RenewCollabCtrl.Fetcher do
     end
   end
 
-  def fetch_and_subscribe(view, account) do
-    result = fetch_as(view, account)
-
+  def subscribe(view) do
     Subscription.channel_for(view)
     |> case do
       channel when is_binary(channel) ->
@@ -39,6 +37,12 @@ defmodule RenewCollabCtrl.Fetcher do
       nil ->
         nil
     end
+  end
+
+  def fetch_and_subscribe(view, account) do
+    result = fetch_as(view, account)
+
+    subscribe(view)
 
     result
   end

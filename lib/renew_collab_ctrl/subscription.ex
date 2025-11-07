@@ -13,15 +13,16 @@ defmodule RenewCollabCtrl.Subscription do
   def channel_for(%Views.ProjectDocumentsList{project_id: proj_id}),
     do: "pub-project-documents:#{proj_id}"
 
-  def channel_for(%Views.DocumentWithContent{}), do: nil
-  def channel_for(%Views.DocumentVersionsList{}), do: nil
-  def channel_for(%Views.DocumentVersionState{}), do: nil
+  def channel_for(%Views.DocumentWithContent{document_id: doc_id}), do: "pub-document:#{doc_id}"
+  def channel_for(%Views.DocumentVersionsList{document_id: doc_id}), do: "pub-document:#{doc_id}"
+  def channel_for(%Views.DocumentVersionState{document_id: doc_id}), do: "pub-document:#{doc_id}"
   def channel_for(%Views.DocumentStripped{}), do: nil
   def channel_for(%Views.DocumentSimulationLinks{}), do: nil
   def channel_for(%Views.GlobalSocketSchemasList{}), do: nil
   def channel_for(%Views.GlobalSocketSchema{}), do: nil
   def channel_for(%Views.GlobalSocketById{}), do: nil
   def channel_for(%Views.GlobalSymbolsList{}), do: nil
+  def channel_for(%Views.GlobalSymbolsMap{}), do: nil
   def channel_for(%Views.GlobalSymbol{}), do: nil
   def channel_for(%Views.GlobalSyntaxList{}), do: nil
   def channel_for(%Views.GlobalPrimitives{}), do: nil
@@ -52,7 +53,7 @@ defmodule RenewCollabCtrl.Subscription do
   def channel_for(%Views.GlobalProjectAllAssignments{}), do: nil
   def channel_for(%Views.SimulationWithLogEntries{}), do: nil
   def channel_for(%Views.SimulationNetInstance{}), do: nil
-  def channel_for(%Views.ProjectInvitations{}), do: nil
+  def channel_for(%Views.ProjectInvitations{project_id: proj_id}), do: "pub-project:#{proj_id}"
   def channel_for(%Views.MediaData{}), do: nil
   def channel_for(_view), do: nil
 end

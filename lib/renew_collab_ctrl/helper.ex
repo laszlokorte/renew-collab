@@ -17,65 +17,149 @@ defmodule RenewCollabCtrl.Helper do
       def load_data(socket, initial) do
         alias RenewCollabCtrl.Fetcher
 
-        for {key, {view, params, _event}} <- unquote(data_sources), reduce: {:ok, socket} do
+        sync_loaded =
+          for {key, {view, params, _event}} <- unquote(data_sources), reduce: {:ok, socket} do
+            {:error, sock} ->
+              {:error, sock}
+
+            {:ok, sock} ->
+              query =
+                params
+                |> Enum.map(&{&1, load_param(&1, sock)})
+                |> Map.new()
+                |> Map.put(:__struct__, view)
+
+              if initial do
+                query |> Fetcher.fetch_and_subscribe(socket.assigns.current_account)
+              else
+                query |> Fetcher.fetch_as(socket.assigns.current_account)
+              end
+              |> case do
+                nil ->
+                  {:error,
+                   sock
+                   |> assign(
+                     key,
+                     nil
+                   )}
+
+                data ->
+                  {:ok,
+                   sock
+                   |> assign(
+                     key,
+                     data
+                   )}
+              end
+          end
+
+        for {key, {:async, view, params, _event}} <- unquote(data_sources),
+            reduce: sync_loaded do
           {:error, sock} ->
             {:error, sock}
 
           {:ok, sock} ->
+            account = socket.assigns.current_account
+
             query =
               params
               |> Enum.map(&{&1, load_param(&1, sock)})
               |> Map.new()
               |> Map.put(:__struct__, view)
 
-            if initial do
-              query |> Fetcher.fetch_and_subscribe(socket.assigns.current_account)
-            else
-              query |> Fetcher.fetch_as(socket.assigns.current_account)
-            end
-            |> case do
-              nil ->
-                {:error,
-                 sock
-                 |> assign(
-                   key,
-                   nil
-                 )}
+            Fetcher.subscribe(query)
 
-              data ->
-                {:ok,
-                 sock
-                 |> assign(
-                   key,
-                   data
-                 )}
-            end
+            {:ok,
+             sock
+             |> assign_async(
+               key,
+               fn ->
+                 query
+                 |> Fetcher.fetch_as(account)
+                 |> case do
+                   res -> {:ok, %{key => res}}
+                 end
+               end
+             )}
         end
       end
     end
   end
 
   defmacro register_listener(data_sources) do
-    quote bind_quoted: [data_sources: data_sources] do
-      for {key, {view, params, event}} <- data_sources do
-        def handle_info({unquote(event), _}, sock), do: handle_info(unquote(event), sock)
+    quote do
+      for {event, sources} <-
+            unquote(data_sources)
+            |> Enum.group_by(fn
+              {key, {view, params, event}} -> event
+              {key, {:async, view, params, event}} -> event
+            end) do
+        def handle_info({event, _}, sock), do: handle_info(event, sock)
 
-        def handle_info(unquote(event), sock) do
+        def handle_info(event, socket) do
           alias RenewCollabCtrl.Fetcher
 
-          data =
-            unquote(params)
-            |> Enum.map(&{&1, load_param(&1, sock)})
-            |> Map.new()
-            |> Map.put(:__struct__, unquote(view))
-            |> Fetcher.fetch_as(sock.assigns.current_account)
+          sync_loaded =
+            for {key, {view, params, ^event}} <- unquote(data_sources), reduce: {:ok, socket} do
+              {:error, sock} ->
+                {:error, sock}
 
-          sock
-          |> assign(
-            unquote(key),
-            data
-          )
-          |> then(&{:noreply, &1})
+              {:ok, sock} ->
+                params
+                |> Enum.map(&{&1, load_param(&1, sock)})
+                |> Map.new()
+                |> Map.put(:__struct__, view)
+                |> Fetcher.fetch_as(socket.assigns.current_account)
+                |> case do
+                  nil ->
+                    {:error,
+                     sock
+                     |> assign(
+                       key,
+                       nil
+                     )}
+
+                  data ->
+                    {:ok,
+                     sock
+                     |> assign(
+                       key,
+                       data
+                     )}
+                end
+            end
+
+          for {key, {:async, view, params, ^event}} <- unquote(data_sources),
+              reduce: sync_loaded do
+            {:error, sock} ->
+              {:error, sock}
+
+            {:ok, sock} ->
+              account = sock.assigns.current_account
+
+              query =
+                params
+                |> Enum.map(&{&1, load_param(&1, sock)})
+                |> Map.new()
+                |> Map.put(:__struct__, view)
+
+              {:ok,
+               sock
+               |> assign_async(
+                 key,
+                 fn ->
+                   query
+                   |> Fetcher.fetch_as(account)
+                   |> case do
+                     res -> {:ok, %{key => res}}
+                   end
+                 end
+               )}
+          end
+          |> case do
+            {:ok, socket} -> {:noreply, socket}
+            o -> o
+          end
         end
       end
     end

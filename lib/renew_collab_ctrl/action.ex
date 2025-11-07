@@ -743,6 +743,17 @@ defmodule RenewCollabCtrl.Action do
     :ok
   end
 
+  def do_perform(%Actions.DocumentEditCreateSnapshot{
+        document_id: document_id
+      }) do
+    RenewCollab.Commands.CreateSnapshot.new(%{
+      document_id: document_id
+    })
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
+
+    :ok
+  end
+
   def do_perform(%Actions.DocumentEditSnapshotCreateLabel{
         document_id: document_id,
         snapshot_id: snapshot_id,
@@ -837,6 +848,9 @@ defmodule RenewCollabCtrl.Action do
       invitation_id: invitation_id
     })
     |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+    |> case do
+      {:ok, %{invitation: invitation}} -> {:ok, invitation}
+    end
   end
 
   def do_perform(%Actions.ProjectRejectInvitation{

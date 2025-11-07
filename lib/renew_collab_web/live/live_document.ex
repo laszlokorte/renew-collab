@@ -13,6 +13,23 @@ defmodule RenewCollabWeb.LiveDocument do
   alias RenewCollab.Renew
   alias RenewCollab.Syntax
 
+  use RenewCollabCtrl.Helper,
+    document: {Views.DocumentWithContent, [:document_id], :document_modified},
+    undo_redo: {:async, Views.DocumentVersionState, [:document_id], :document_modified},
+    other_documents: {:async, Views.ProjectDocumentsList, [:project_id], :documents_modified},
+    snapshots: {:async, Views.DocumentVersionsList, [:document_id], :document_modified},
+    socket_schemas: {:async, Views.GlobalSocketSchemasList, [], :socket_schema_changed},
+    symbols: {:async, Views.GlobalSymbolsMap, [], :symbols_changed},
+    hierachy_missing: {:async, Views.DocumentHierarchyMissings, [:document_id], :_},
+    hierachy_invalid: {:async, Views.DocumentHierarchyInvalids, [:document_id], :_},
+    simulation_links:
+      {:async, Views.DocumentSimulationLinks, [:document_id], :simulations_changed}
+
+  def load_param(:account_id, socket), do: socket.assigns.current_account.id
+  def load_param(:project_id, socket), do: socket.assigns.document.project_assignment.project_id
+  def load_param(:document_id, socket), do: socket.assigns.document_id
+  def load_param(:account, socket), do: socket.assigns.account
+
   @renew_grammar Renewex.Grammar.new(11)
 
   def renew_grammar do
@@ -20,71 +37,16 @@ defmodule RenewCollabWeb.LiveDocument do
   end
 
   def mount(%{"id" => document_id}, _session, socket) do
-    account = socket.assigns.current_account
-
-    with document when not is_nil(document) <-
-           %Views.DocumentWithContent{
-             document_id: document_id
-           }
-           |> Fetcher.fetch_as(account) do
-      Phoenix.PubSub.subscribe(RenewCollab.PubSub, "pub-document:#{document_id}")
-
-      socket =
-        socket
-        |> assign(:auto_adjust_viewbox, false)
-        |> assign(:document, document)
+    socket
+    |> assign(:document_id, document_id)
+    |> load_data(true)
+    |> case do
+      {:ok, %{assigns: %{document: document}} = sock} ->
+        sock
         |> assign(import_form: to_form(%{}))
         |> allow_upload(:import_file, accept: ~w(.rnw), max_entries: 1)
+        |> assign(:auto_adjust_viewbox, false)
         |> assign(:syntax_types, Syntax.find_all())
-        |> assign_async(
-          [
-            :symbols,
-            :socket_schemas,
-            :undo_redo,
-            :other_documents,
-            :snapshots,
-            :hierachy_missing,
-            :hierachy_invalid,
-            :simulation_links
-          ],
-          fn ->
-            {:ok,
-             %{
-               undo_redo:
-                 %Views.DocumentVersionState{
-                   document_id: document_id
-                 }
-                 |> Fetcher.fetch_as(account),
-               other_documents:
-                 %Views.ProjectDocumentsList{
-                   project_id: document.project_assignment.project_id
-                 }
-                 |> Fetcher.fetch_as(account),
-               snapshots:
-                 %Views.DocumentVersionsList{
-                   document_id: document_id
-                 }
-                 |> Fetcher.fetch_as(account),
-               socket_schemas:
-                 %Views.GlobalSocketSchemasList{}
-                 |> Fetcher.fetch_as(account),
-               symbols:
-                 %Views.GlobalSymbolsList{}
-                 |> Fetcher.fetch_as(account)
-                 |> Enum.map(fn s -> {s.id, s} end)
-                 |> Map.new(),
-               hierachy_missing:
-                 %Views.DocumentHierarchyMissings{document_id: document_id}
-                 |> Fetcher.fetch_as(account),
-               hierachy_invalid:
-                 %Views.DocumentHierarchyInvalids{document_id: document_id}
-                 |> Fetcher.fetch_as(account),
-               simulation_links:
-                 %Views.DocumentSimulationLinks{document_id: document_id}
-                 |> Fetcher.fetch_as(account)
-             }}
-          end
-        )
         |> assign(:selection, nil)
         |> assign(:show_hierarchy, false)
         |> assign(:show_selected, false)
@@ -94,11 +56,7 @@ defmodule RenewCollabWeb.LiveDocument do
         |> assign(:show_meta, false)
         |> assign(:show_grid, false)
         |> assign(:viewbox, viewbox(document))
-
-      {:ok, socket}
-    else
-      _ ->
-        {:ok, socket |> put_flash(:error, "Document not found") |> redirect(to: ~p"/projects")}
+        |> then(&{:ok, &1})
     end
   end
 
@@ -1944,110 +1902,6 @@ defmodule RenewCollabWeb.LiveDocument do
 
       {:error, _} ->
         {:noreply, socket |> put_flash(:error, "Failed to create simulation")}
-    end
-  end
-
-  def handle_info({:document_modified, document_id}, socket) do
-    account = socket.assigns.current_account
-
-    if document_id == socket.assigns.document.id do
-      %Views.DocumentWithContent{
-        document_id: document_id
-      }
-      |> Fetcher.fetch_as(socket.assigns.current_account)
-      |> case do
-        nil ->
-          {:norely, socket}
-
-        doc ->
-          {:noreply,
-           socket
-           |> assign_async(
-             [:undo_redo],
-             fn ->
-               {:ok,
-                %{
-                  undo_redo:
-                    %Views.DocumentVersionState{
-                      document_id: document_id
-                    }
-                    |> Fetcher.fetch_as(account)
-                }}
-             end
-           )
-           |> assign_async(
-             [:snapshots],
-             fn ->
-               {:ok,
-                %{
-                  snapshots:
-                    %Views.DocumentVersionsList{
-                      document_id: document_id
-                    }
-                    |> Fetcher.fetch_as(account)
-                }}
-             end
-           )
-           |> assign(:document, doc)
-           |> then(fn socket ->
-             if socket.assigns.auto_adjust_viewbox do
-               socket |> assign(:viewbox, viewbox(doc)) |> assign(:auto_adjust_viewbox, false)
-             else
-               socket
-             end
-           end)}
-      end
-    end
-  end
-
-  def handle_info({:document_simulated, document_id}, socket) do
-    if document_id == socket.assigns.document.id do
-      {:noreply,
-       socket
-       |> assign_async(
-         [:simulation_links],
-         fn ->
-           {:ok,
-            %{
-              simulation_links: Renew.list_simulation_links(document_id)
-            }}
-         end
-       )}
-    end
-  end
-
-  def handle_info({:versions_changed, document_id}, socket) do
-    account = socket.assigns.current_account
-
-    if document_id == socket.assigns.document.id do
-      {:noreply,
-       socket
-       |> assign_async(
-         [:undo_redo],
-         fn ->
-           {:ok,
-            %{
-              undo_redo:
-                %Views.DocumentVersionState{
-                  document_id: document_id
-                }
-                |> Fetcher.fetch_as(account)
-            }}
-         end
-       )
-       |> assign_async(
-         [:snapshots],
-         fn ->
-           {:ok,
-            %{
-              snapshots:
-                %Views.DocumentVersionsList{
-                  document_id: document_id
-                }
-                |> Fetcher.fetch_as(account)
-            }}
-         end
-       )}
     end
   end
 

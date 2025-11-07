@@ -12,38 +12,25 @@ defmodule RenewCollabWeb.LiveProjectSettings do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
-  def mount(%{"project_id" => project_id}, _session, socket) do
-    account = socket.assigns.current_account
+  use RenewCollabCtrl.Helper,
+    project: {Views.MyProject, [:account_id, :project_id], :project_changed},
+    members: {Views.ProjectMembersList, [:project_id], :members_changed},
+    invitations: {Views.ProjectInvitations, [:project_id], :invitations_changed}
 
-    %Views.MyProject{
-      account_id: account.id,
-      project_id: project_id
-    }
-    |> Fetcher.fetch_as(account)
+  def load_param(:account_id, socket), do: socket.assigns.current_account.id
+  def load_param(:project_id, socket), do: socket.assigns.project_id
+
+  def mount(%{"project_id" => project_id}, _session, socket) do
+    socket
+    |> assign(create_form: to_form(%{}))
+    |> assign(:project_id, project_id)
+    |> load_data(true)
     |> case do
-      nil ->
+      {:error, socket} ->
         {:ok, socket |> put_flash(:error, "Project not found") |> redirect(to: ~p"/projects")}
 
-      proj ->
-        socket =
-          socket
-          |> assign(:project, proj)
-          |> assign(
-            :members,
-            %Views.ProjectMembersList{
-              project_id: project_id
-            }
-            |> Fetcher.fetch_as(account)
-          )
-          |> assign(
-            :invitations,
-            %Views.ProjectInvitations{
-              project_id: project_id
-            }
-            |> Fetcher.fetch_as(account)
-          )
-
-        {:ok, socket}
+      ok ->
+        ok
     end
   end
 
@@ -193,10 +180,6 @@ defmodule RenewCollabWeb.LiveProjectSettings do
     """
   end
 
-  def handle_info(:any, socket) do
-    socket |> reload()
-  end
-
   def handle_event("invite_member", %{"account_email" => ""}, socket) do
     {:noreply, socket}
   end
@@ -210,10 +193,10 @@ defmodule RenewCollabWeb.LiveProjectSettings do
     |> Dispatcher.perform_as(socket.assigns.current_account)
     |> case do
       {:ok, _} ->
-        reload(socket |> put_flash(:info, "Member added to project"))
+        socket |> put_flash(:info, "Member added to project") |> then(&{:noreply, &1})
 
       {:error, _} ->
-        reload(socket |> put_flash(:error, "Adding member failed"))
+        socket |> put_flash(:error, "Adding member failed") |> then(&{:noreply, &1})
     end
   end
 
@@ -225,10 +208,10 @@ defmodule RenewCollabWeb.LiveProjectSettings do
     |> Dispatcher.perform_as(socket.assigns.current_account)
     |> case do
       {:ok, _} ->
-        reload(socket |> put_flash(:info, "Member removed"))
+        socket |> put_flash(:info, "Member removed") |> then(&{:noreply, &1})
 
       {:error, _} ->
-        reload(socket |> put_flash(:error, "Removing member failed"))
+        socket |> put_flash(:error, "Removing member failed") |> then(&{:noreply, &1})
     end
   end
 
@@ -240,10 +223,10 @@ defmodule RenewCollabWeb.LiveProjectSettings do
     |> Dispatcher.perform_as(socket.assigns.current_account)
     |> case do
       {:ok, _} ->
-        reload(socket |> put_flash(:info, "Inviation revoked"))
+        socket |> put_flash(:info, "Inviation revoked") |> then(&{:noreply, &1})
 
       {:error, _} ->
-        reload(socket |> put_flash(:error, "Revoking inviation failed"))
+        socket |> put_flash(:error, "Revoking inviation failed") |> then(&{:noreply, &1})
     end
   end
 
@@ -252,10 +235,10 @@ defmodule RenewCollabWeb.LiveProjectSettings do
     |> Dispatcher.perform_as(socket.assigns.current_account)
     |> case do
       {:ok, _} ->
-        socket |> put_flash(:info, "Project name changed") |> reload
+        socket |> put_flash(:info, "Project name changed") |> then(&{:noreply, &1})
 
       _ ->
-        socket |> put_flash(:error, "Project rename failed") |> reload
+        socket |> put_flash(:error, "Project rename failed") |> then(&{:noreply, &1})
     end
   end
 
@@ -284,32 +267,5 @@ defmodule RenewCollabWeb.LiveProjectSettings do
       _ ->
         {:noreply, socket |> put_flash(:error, "Deleting project failed")}
     end
-  end
-
-  def reload(socket) do
-    {:noreply,
-     socket
-     |> assign(
-       :invitations,
-       %Views.ProjectInvitations{
-         project_id: socket.assigns.project.id
-       }
-       |> Fetcher.fetch_as(socket.assigns.current_account.id)
-     )
-     |> assign(
-       :members,
-       %Views.ProjectMembersList{
-         project_id: socket.assigns.project.id
-       }
-       |> Fetcher.fetch_as(socket.assigns.current_account.id)
-     )
-     |> assign(
-       :project,
-       %Views.MyProject{
-         account_id: socket.assigns.current_account.id,
-         project_id: socket.assigns.project.id
-       }
-       |> Fetcher.fetch_as(socket.assigns.current_account)
-     )}
   end
 end
