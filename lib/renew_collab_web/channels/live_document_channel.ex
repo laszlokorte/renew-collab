@@ -1,4 +1,4 @@
-defmodule RenewCollabWeb.ReduxDocumentChannel do
+defmodule RenewCollabWeb.LiveDocumentChannel do
   use RenewCollabWeb.StateChannel, web_module: RenewCollabWeb
 
   alias RenewCollabCtrl.Actions
@@ -8,7 +8,7 @@ defmodule RenewCollabWeb.ReduxDocumentChannel do
   alias RenewCollabCtrl.Views
 
   @impl true
-  def init("redux_document:" <> document_id, _params, socket) do
+  def init("live:document:" <> document_id, _params, socket) do
     case %Views.DocumentWithContent{
            document_id: document_id
          }

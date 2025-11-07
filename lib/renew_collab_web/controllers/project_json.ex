@@ -114,10 +114,16 @@ defmodule RenewCollabWeb.ProjectJSON do
   def show_content(%Project{} = project) do
     %{
       name: project.name,
+      invitations: %{
+        items:
+          for i <- project.invitations do
+            %{id: i.id, email: i.email, role: i.role}
+          end
+      },
       members: %{
         items:
           for m <- project.members do
-            %{id: m.id, email: "foo"}
+            %{id: m.id, email: "foo", role: m.role}
           end
       }
     }

@@ -11,6 +11,7 @@ defmodule RenewCollabProj.Entities.Project do
     has_many :simulations, RenewCollabProj.Entities.ProjectSimulation
     has_many :shadow_net_systems, RenewCollabProj.Entities.ProjectShadowNetSystem
     has_many :members, RenewCollabProj.Entities.ProjectMember
+    has_many :invitations, RenewCollabProj.Entities.ProjectInvitation
     has_many :ownerships, RenewCollabProj.Entities.ProjectMember, where: [role: :owner]
 
     timestamps(type: :utc_datetime)

@@ -1,17 +1,18 @@
-defmodule RenewCollabWeb.ReduxSocket do
+defmodule RenewCollabWeb.LiveSocket do
   use Phoenix.Socket
 
-  channel "redux_document:*", RenewCollabWeb.ReduxDocumentChannel
-  channel "project-documents:*", RenewCollabWeb.ReduxDocumentsChannel
+  channel "live:document:*", RenewCollabWeb.LiveDocumentChannel
+  channel "project-documents:*", RenewCollabWeb.LiveDocumentsChannel
 
-  channel "redux_simulation:*", RenewCollabWeb.ReduxSimulationChannel
-  channel "project-simulations:*", RenewCollabWeb.ReduxSimulationsChannel
-  channel "my-projects", RenewCollabWeb.ReduxProjectsChannel
-  channel "project:*", RenewCollabWeb.ReduxProjectChannel
+  channel "live:simulation:*", RenewCollabWeb.LiveSimulationChannel
+  channel "project-simulations:*", RenewCollabWeb.LiveSimulationsChannel
+  channel "my-projects", RenewCollabWeb.LiveProjectsChannel
+  channel "my-invitations", RenewCollabWeb.LiveInvitationsChannel
+  channel "project:*", RenewCollabWeb.LiveProjectChannel
 
-  channel "redux_net_instance:*", RenewCollabWeb.ReduxSimulationNetInstanceChannel
-  channel "redux_simulation_links:*", RenewCollabWeb.ReduxSimulationLinksChannel
-  channel "redux_simulation_log:*", RenewCollabWeb.ReduxSimulationLogChannel
+  channel "live:net_instance:*", RenewCollabWeb.LiveSimulationNetInstanceChannel
+  channel "live:simulation_links:*", RenewCollabWeb.LiveSimulationLinksChannel
+  channel "live:simulation_log:*", RenewCollabWeb.LiveSimulationLogChannel
 
   @impl true
   def connect(%{"token" => token}, socket, _connect_info) do

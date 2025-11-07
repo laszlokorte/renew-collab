@@ -10,9 +10,6 @@ defmodule RenewCollabWeb.LiveDocument do
 
   import RenewCollabWeb.RenewComponents
 
-  alias RenewCollab.Renew
-  alias RenewCollab.Syntax
-
   use RenewCollabCtrl.Helper,
     document: {Views.DocumentWithContent, [:document_id], :document_modified},
     undo_redo: {:async, Views.DocumentVersionState, [:document_id], :document_modified},
@@ -20,6 +17,7 @@ defmodule RenewCollabWeb.LiveDocument do
     snapshots: {:async, Views.DocumentVersionsList, [:document_id], :document_modified},
     socket_schemas: {:async, Views.GlobalSocketSchemasMap, [], :socket_schema_changed},
     symbols: {:async, Views.GlobalSymbolsMap, [], :symbols_changed},
+    syntax_types: {Views.GlobalSyntaxList, [], :syntax_changed},
     hierachy_missing: {:async, Views.DocumentHierarchyMissings, [:document_id], :never},
     hierachy_invalid: {:async, Views.DocumentHierarchyInvalids, [:document_id], :never},
     simulation_links:
@@ -46,7 +44,6 @@ defmodule RenewCollabWeb.LiveDocument do
         |> assign(import_form: to_form(%{}))
         |> allow_upload(:import_file, accept: ~w(.rnw), max_entries: 1)
         |> assign(:auto_adjust_viewbox, false)
-        |> assign(:syntax_types, Syntax.find_all())
         |> assign(:selection, nil)
         |> assign(:show_hierarchy, false)
         |> assign(:show_selected, false)

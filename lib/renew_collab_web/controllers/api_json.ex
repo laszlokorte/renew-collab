@@ -16,6 +16,10 @@ defmodule RenewCollabWeb.ApiJSON do
           method: "GET",
           href: url(~p"/api/projects")
         },
+        invitations: %{
+          method: "GET",
+          href: url(~p"/api/invitations")
+        },
         project: %{
           method: "GET",
           href: url(~p"/api/projects/:id")
@@ -39,7 +43,7 @@ defmodule RenewCollabWeb.ApiJSON do
         live_socket: %{
           method: "GET",
           href:
-            static_url(RenewCollabWeb.Endpoint, "/redux")
+            static_url(RenewCollabWeb.Endpoint, "/live")
             |> String.replace_leading("http", "ws")
         }
       }

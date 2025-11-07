@@ -1,10 +1,10 @@
-defmodule RenewCollabWeb.ReduxSimulationLinksChannel do
+defmodule RenewCollabWeb.LiveSimulationLinksChannel do
   use RenewCollabWeb.StateChannel, web_module: RenewCollabWeb
 
   alias RenewCollab.Renew
 
   @impl true
-  def init("redux_simulation_links:" <> document_id, _params, _socket) do
+  def init("live:simulation_links:" <> document_id, _params, _socket) do
     {:ok,
      RenewCollabWeb.SimulationLinksJSON.index_content(%{
        links: Renew.list_simulation_links(document_id)

@@ -1,4 +1,4 @@
-defmodule RenewCollabWeb.ReduxSimulationsChannel do
+defmodule RenewCollabWeb.LiveSimulationsChannel do
   alias RenewCollabCtrl.Fetcher
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Dispatcher

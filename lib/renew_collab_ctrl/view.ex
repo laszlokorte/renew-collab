@@ -37,7 +37,7 @@ defmodule RenewCollabCtrl.View do
   def do_fetch(
         _account,
         %Views.DocumentWithContent{
-          document_id: document_id
+          document_id: _document_id
         } = doc
       ) do
     doc

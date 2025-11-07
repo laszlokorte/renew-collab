@@ -1,10 +1,10 @@
-defmodule RenewCollabWeb.ReduxSimulationLogChannel do
+defmodule RenewCollabWeb.LiveSimulationLogChannel do
   alias RenewCollabCtrl.Fetcher
   alias RenewCollabCtrl.Views
   use RenewCollabWeb.StateChannel, web_module: RenewCollabWeb
 
   @impl true
-  def init("redux_simulation_log:" <> simulation_id, _params, socket) do
+  def init("live:simulation_log:" <> simulation_id, _params, socket) do
     %Views.SimulationWithLogEntries{
       simulation_id: simulation_id
     }

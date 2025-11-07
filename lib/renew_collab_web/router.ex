@@ -108,6 +108,10 @@ defmodule RenewCollabWeb.Router do
       post "/:project_id/import", ProjectDocumentController, :import
     end
 
+    scope "/invitations" do
+      get "/", InvitationController, :index
+    end
+
     post "/projects/:project_id/media/svg", MediaController, :create
     get "/media/svg/:id", MediaController, :show
 

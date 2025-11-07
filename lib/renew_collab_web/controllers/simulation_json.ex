@@ -5,7 +5,7 @@ defmodule RenewCollabWeb.SimulationJSON do
   def index(%{project_id: project_id, simulations: simulations, runnings: runnings}) do
     %{
       href: url(~p"/api/projects/#{project_id}/simulations"),
-      topic: "redux_simulations",
+      topic: "live:simulations",
       content:
         index_content(%{project_id: project_id, simulations: simulations, runnings: runnings}),
       links: %{
@@ -41,7 +41,7 @@ defmodule RenewCollabWeb.SimulationJSON do
     %{
       # id: simulation.id,
       href: url(~p"/api/simulations/#{simulation}"),
-      topic: "redux_simulation:#{simulation.id}",
+      topic: "live:simulation:#{simulation.id}",
       id: simulation.id,
       links: %{
         project:
@@ -125,7 +125,7 @@ defmodule RenewCollabWeb.SimulationJSON do
         url(
           ~p"/api/simulations/#{net_instance.simulation_id}/instance/#{net_instance.shadow_net.name}/#{net_instance.integer_id}"
         ),
-      topic: "redux_net_instance:#{net_instance.id}",
+      topic: "live:net_instance:#{net_instance.id}",
       id: net_instance.id,
       label: net_instance.label,
       links: %{
@@ -235,7 +235,7 @@ defmodule RenewCollabWeb.SimulationJSON do
   def log(%{simulation_id: simulation_id, log_entries: log_entries}) do
     %{
       href: url(~p"/api/simulations/#{simulation_id}"),
-      topic: "redux_simulation_log:#{simulation_id}",
+      topic: "live:simulation_log:#{simulation_id}",
       content: show_log_content(log_entries)
     }
   end

@@ -1,10 +1,10 @@
-defmodule RenewCollabWeb.ReduxSimulationNetInstanceChannel do
+defmodule RenewCollabWeb.LiveSimulationNetInstanceChannel do
   alias RenewCollabCtrl.Fetcher
   alias RenewCollabCtrl.Views
   use RenewCollabWeb.StateChannel, web_module: RenewCollabWeb
 
   @impl true
-  def init("redux_net_instance:" <> net_instance_id, _params, socket) do
+  def init("live:net_instance:" <> net_instance_id, _params, socket) do
     %Views.SimulationNetInstance{net_instance_id: net_instance_id}
     |> Fetcher.fetch_as(socket.assigns.current_account)
     |> case do

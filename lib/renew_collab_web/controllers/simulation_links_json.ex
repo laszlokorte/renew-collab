@@ -3,7 +3,7 @@ defmodule RenewCollabWeb.SimulationLinksJSON do
 
   def index(%{document_id: document_id, links: simulations}) do
     %{
-      topic: "redux_simulation_links:#{document_id}",
+      topic: "live:simulation_links:#{document_id}",
       content: index_content(%{links: simulations})
     }
   end
