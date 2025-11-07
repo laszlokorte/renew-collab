@@ -6,10 +6,6 @@ defmodule RenewCollab.Init do
   alias RenewCollab.Primitives.PredefinedPrimitiveGroup
   import Ecto.Query, warn: false
 
-  def foo() do
-    IO.puts("Fooo")
-  end
-
   def reset(repo \\ RenewCollab.Repo) do
     try do
       Ecto.Multi.new()
@@ -41,7 +37,9 @@ defmodule RenewCollab.Init do
       )
       |> repo.transact()
     rescue
-      e -> dbg(e)
+      # IO.inspect(e)
+      _e ->
+        nil
     end
 
     try do
@@ -74,7 +72,9 @@ defmodule RenewCollab.Init do
       )
       |> repo.transact()
     rescue
-      e -> dbg(e)
+      # IO.inspect(e)
+      _e ->
+        nil
     end
 
     for transient_doc = %{content: %{id: pre_id}} <- RenewCollab.Blueprints.all() do

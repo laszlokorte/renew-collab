@@ -14,8 +14,8 @@ defmodule RenewCollabWeb.ProjectJSON do
     }
   end
 
-  def show(%{project: project}) do
-    detail_data(project)
+  def show(%{project: project, members: members}) do
+    detail_data(%{project: project, members: members})
   end
 
   def export(%{project: project}) do
@@ -83,7 +83,7 @@ defmodule RenewCollabWeb.ProjectJSON do
     }
   end
 
-  defp detail_data(%Project{} = project) do
+  defp detail_data(%{project: project, members: members}) do
     %{
       # id: document.id,
       href: url(~p"/api/projects/#{project}"),
@@ -107,11 +107,11 @@ defmodule RenewCollabWeb.ProjectJSON do
           href: url(~p"/api/projects/#{project.id}/export")
         }
       },
-      content: show_content(project)
+      content: show_content(%{project: project, members: members})
     }
   end
 
-  def show_content(%Project{} = project) do
+  def show_content(%{project: project, members: members}) do
     %{
       name: project.name,
       invitations: %{
@@ -122,8 +122,8 @@ defmodule RenewCollabWeb.ProjectJSON do
       },
       members: %{
         items:
-          for m <- project.members do
-            %{id: m.id, email: "foo", role: m.role}
+          for m <- members do
+            %{id: m.id, email: m.account.email, role: m.role}
           end
       }
     }

@@ -9,7 +9,8 @@ defmodule RenewCollab.Commands.InsertTransientDocument do
 
   defstruct [:converted_document, :target_document_id, :position, :target]
 
-  # TODO: clarify difference between ConvertedDocument and TransientDocument or merge them both into one concept
+  # TODO: clarify difference between ConvertedDocument and TransientDocument
+  #  or merge them both into one concept
 
   def new(%{
         target_document_id: target_document_id,

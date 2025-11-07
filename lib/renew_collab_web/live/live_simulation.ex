@@ -44,7 +44,7 @@ defmodule RenewCollabWeb.LiveSimulation do
 
   def handle_info(
         {:simulation_change, simulation_id, _},
-        socket = %{assigns: %{simulation_id: simulation_id, current_account: account}}
+        %{assigns: %{simulation_id: simulation_id, current_account: account}} = socket
       ) do
     {:noreply,
      socket

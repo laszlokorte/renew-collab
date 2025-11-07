@@ -1,13 +1,7 @@
 defmodule RenewCollabWeb.InvitationController do
-  use RenewCollabWeb, :controller
-
-  alias RenewCollab.ViewBox
-  alias RenewCollab.Document.Document
-  alias RenewCollab.Import.DocumentImport
-  alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Fetcher
-  alias RenewCollabCtrl.Actions
-  alias RenewCollabCtrl.Dispatcher
+  alias RenewCollabCtrl.Views
+  use RenewCollabWeb, :controller
 
   action_fallback(RenewCollabWeb.FallbackController)
 

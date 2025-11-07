@@ -16,11 +16,12 @@ defmodule RenewCollabWeb.LiveSocket do
 
   @impl true
   def connect(%{"token" => token}, socket, _connect_info) do
-    with {:ok, %{account: %{id: account_id, email: email}}} <- RenewCollabWeb.Token.verify(token) do
-      {:ok, assign(socket, :current_account, %{id: account_id, username: email})}
-    else
-      error ->
-        dbg(error)
+    RenewCollabWeb.Token.verify(token)
+    |> case do
+      {:ok, %{account: %{id: account_id, email: email}}} ->
+        {:ok, assign(socket, :current_account, %{id: account_id, username: email})}
+
+      _error ->
         {:error, "Invalid Token"}
     end
   end

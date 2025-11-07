@@ -15,11 +15,20 @@ defmodule RenewCollabWeb.LiveProjectChannel do
   end
 
   defp load_state(project_id, current_account) do
-    %Views.MyProject{
-      project_id: project_id,
-      account_id: current_account.id
-    }
-    |> Fetcher.fetch_as(current_account)
+    project =
+      %Views.MyProject{
+        account_id: current_account.id,
+        project_id: project_id
+      }
+      |> Fetcher.fetch_as(current_account)
+
+    members =
+      %Views.ProjectMembersList{
+        project_id: project_id
+      }
+      |> Fetcher.fetch_as(current_account)
+
+    %{project: project, members: members}
     |> RenewCollabWeb.ProjectJSON.show_content()
   end
 

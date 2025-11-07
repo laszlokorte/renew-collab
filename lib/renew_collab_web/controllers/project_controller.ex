@@ -45,7 +45,13 @@ defmodule RenewCollabWeb.ProjectController do
       }
       |> Fetcher.fetch_as(account)
 
-    render(conn, :show, project: project)
+    members =
+      %Views.ProjectMembersList{
+        project_id: project_id
+      }
+      |> Fetcher.fetch_as(account)
+
+    render(conn, :show, project: project, members: members)
   end
 
   def members(conn, %{"id" => project_id}) do

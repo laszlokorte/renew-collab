@@ -25,13 +25,14 @@ defmodule RenewCollabWeb.LoginController do
       {:ok, %{email: email, password: password}} ->
         nil
 
-        with %RenewCollabAuth.Entities.Account{} = account <-
-               RenewCollabAuth.Auth.get_account_by_email_and_password(
-                 email,
-                 password
-               ) do
-          {:ok, account}
-        else
+        RenewCollabAuth.Auth.get_account_by_email_and_password(
+          email,
+          password
+        )
+        |> case do
+          %RenewCollabAuth.Entities.Account{} = account ->
+            {:ok, account}
+
           _ ->
             login
             |> Ecto.Changeset.add_error(:password, "Invalid Login")

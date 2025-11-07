@@ -1,10 +1,4 @@
 defmodule RenewCollabWeb.InvitationJSON do
-  alias RenewCollab.ViewBox
-  alias RenewCollab.Document.Document
-  alias RenewCollab.Hierarchy.Layer
-  alias RenewCollab.Connection.Waypoint
-  alias RenewCollab.Versioning.Snapshot
-
   use RenewCollabWeb, :verified_routes
 
   def index(%{invitations: invitations}) do

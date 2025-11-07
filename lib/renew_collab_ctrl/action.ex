@@ -1179,8 +1179,7 @@ defmodule RenewCollabCtrl.Action do
     |> RenewCollabProj.ProjectCommander.run_project_command_sync()
 
     RenewCollabSim.Commands.CreateSimulation.new(%{
-      shadow_net_system_id: sns_id,
-      document_ids: actual_document_ids
+      shadow_net_system_id: sns_id
     })
     |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
     |> case do
@@ -1190,6 +1189,14 @@ defmodule RenewCollabCtrl.Action do
           simulation_id: sim_id
         })
         |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+
+        RenewCollab.Commands.LinkDocumenstToSimulation.new(%{
+          simulation_id: sim_id,
+          document_ids:
+            nets
+            |> Enum.map(fn {_, _, _, {doc_id, snapshot_id}} -> {doc_id, snapshot_id} end)
+        })
+        |> RenewCollab.DocumentCommander.run_document_command_sync()
 
         {:ok, simulation}
 
@@ -1271,15 +1278,15 @@ defmodule RenewCollabCtrl.Action do
   end
 
   def do_perform(%Actions.ShadowNetSystemDuplicateInProject{
-        project_id: project_id,
-        shadow_net_system_id: sns_id
+        project_id: _project_id,
+        shadow_net_system_id: _sns_id
       }) do
     {:error, :not_implemented}
   end
 
   def do_perform(%Actions.ShadowNetSystemImportIntoProject{
-        project_id: project_id,
-        sns_binary: sns_binary
+        project_id: _project_id,
+        sns_binary: _sns_binary
       }) do
     {:error, :not_implemented}
   end

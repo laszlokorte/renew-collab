@@ -10,10 +10,13 @@ defmodule RenewCollabWeb.ShadowNetController do
 
   def download(conn, %{"id" => shadow_net_system_id}) do
     content_type =
-      with %{query_params: %{"text" => _}} <- conn do
-        "text/plain"
-      else
-        _ -> "application/binary"
+      conn
+      |> case do
+        %{query_params: %{"text" => _}} ->
+          "text/plain"
+
+        _ ->
+          "application/binary"
       end
 
     %Views.ShadowNetSystem{shadow_net_system_id: shadow_net_system_id}

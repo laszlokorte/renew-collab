@@ -635,10 +635,13 @@ defmodule RenewCollab.DocumentFixtures do
         {:insert_blueprint, i},
         fn rep, %{} ->
           id =
-            with %{content: %{id: id}} <- transient_doc do
-              id
-            else
-              _ -> nil
+            transient_doc
+            |> case do
+              %{content: %{id: id}} ->
+                id
+
+              _ ->
+                nil
             end
 
           RenewCollab.Commands.CreateDocument.new(%{doc: transient_doc})

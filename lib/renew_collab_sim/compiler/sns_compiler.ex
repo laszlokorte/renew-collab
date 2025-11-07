@@ -29,14 +29,14 @@ defmodule RenewCollabSim.Compiler.SnsCompiler do
           end
 
         conf = Application.fetch_env!(:renew_collab, RenewCollabSim.Commands)
-        renewSetFormalism = Keyword.get(conf, :set_formalism)
-        renewExport = Keyword.get(conf, :export)
-        renewShadowNetSystem = Keyword.get(conf, :sns)
+        renew_set_formalism = Keyword.get(conf, :set_formalism)
+        renew_export = Keyword.get(conf, :export)
+        renew_shadow_net_system = Keyword.get(conf, :sns)
 
         script_content =
           [
-            "#{renewSetFormalism} #{compiler}",
-            "#{renewExport} #{renewShadowNetSystem} -a #{Enum.map_join(paths, " ", &"\"#{&1}\"")} -o \"#{output_path}\""
+            "#{renew_set_formalism} #{compiler}",
+            "#{renew_export} #{renew_shadow_net_system} -a #{Enum.map_join(paths, " ", &"\"#{&1}\"")} -o \"#{output_path}\""
           ]
           |> Enum.join("\n")
 

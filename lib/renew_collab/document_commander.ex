@@ -35,11 +35,15 @@ defmodule RenewCollab.DocumentCommander do
     auto_snapshot = apply(module, :auto_snapshot, [command])
 
     apply(module, :multi, [command])
-    |> Ecto.Multi.merge(fn %{document_id: document_id} ->
-      if(auto_snapshot and snapshot,
-        do: Versioning.snapshot_multi(document_id),
-        else: Ecto.Multi.new()
-      )
+    |> Ecto.Multi.merge(fn
+      %{document_id: document_id} ->
+        if(auto_snapshot and snapshot,
+          do: Versioning.snapshot_multi(document_id),
+          else: Ecto.Multi.new()
+        )
+
+      _ ->
+        Ecto.Multi.new()
     end)
     |> run_document_transaction()
   end

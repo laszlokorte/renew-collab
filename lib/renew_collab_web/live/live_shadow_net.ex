@@ -50,7 +50,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
 
   def handle_info(
         {:simulation_change, _sim_id, _change},
-        socket = %{assigns: %{project_id: project_id, current_account: account}}
+        %{assigns: %{project_id: project_id, current_account: account}} = socket
       ) do
     socket
     |> assign(

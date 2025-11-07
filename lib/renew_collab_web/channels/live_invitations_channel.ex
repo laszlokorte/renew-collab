@@ -9,8 +9,6 @@ defmodule RenewCollabWeb.LiveInvitationsChannel do
   @impl true
   def init("my-invitations", _params, socket) do
     account_id = socket.assigns.current_account.id
-    username = socket.assigns.current_account.username
-    connection_id = socket.assigns.connection_id
 
     Phoenix.PubSub.subscribe(RenewCollab.PubSub, "pub-my-invitations:#{account_id}")
 
@@ -68,12 +66,5 @@ defmodule RenewCollabWeb.LiveInvitationsChannel do
     |> Dispatcher.perform_as(account)
 
     :ack
-  end
-
-  defp make_color(account_id) do
-    hue =
-      <<i <- account_id |> then(&:crypto.hash(:md5, &1))>> |> for(do: i) |> Enum.sum() |> rem(360)
-
-    "hsl(#{hue}, 70%, 40%)"
   end
 end

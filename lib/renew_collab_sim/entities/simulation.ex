@@ -19,6 +19,8 @@ defmodule RenewCollabSim.Entities.Simulation do
     has_one :project_assignment, RenewCollabProj.Entities.ProjectSimulation
     has_one :project, through: [:project_assignment, :project]
 
+    has_many :document_links, RenewCollab.Simulation.SimulationLink
+
     timestamps(type: :utc_datetime)
   end
 

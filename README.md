@@ -17,7 +17,7 @@ docker build -t renew_collab:latest .
 
 ### Run Container
 
-```sh 
+```sh
 docker run \
 -e PHX_HOST="localhost" \
 -e PORT="8080" \
@@ -32,8 +32,8 @@ docker run \
 `RENEW_ADMIN_EMAIL` and `RENEW_ADMIN_PASSWORD` are the credentials to log into the Web Application.
 Additional accounts can be created there.
 
-`PORT` is the TCP port the webserver listens on for incoming connections. This port must be exposed by via `-p`. 
-`PORT_EXTERNAL` is the port that is used for generating URLs. This may differ from `PORT` if the application is running behind a proxy. In the example above `-p 9000:8080` is used to map the port 9000 from the host machine to the port 8080 of the container. Thus the webserver listens on port 8080 but to access the application from the host machines network `http://localhost:9000` must be used. 
+`PORT` is the TCP port the webserver listens on for incoming connections. This port must be exposed by via `-p`.
+`PORT_EXTERNAL` is the port that is used for generating URLs. This may differ from `PORT` if the application is running behind a proxy. In the example above `-p 9000:8080` is used to map the port 9000 from the host machine to the port 8080 of the container. Thus the webserver listens on port 8080 but to access the application from the host machines network `http://localhost:9000` must be used.
 
 `mix phx.gen.secret` above is used to generate a random squence of at least 64 bytes. You can generate such a random seed for `SECRET_KEY_BASE` by others means, eg if you do not have mix and phoenix installed when running the container. `SECRET_KEY_BASE` is used for encrypting and signing cookies.
 
@@ -66,23 +66,23 @@ git clone url-to-this-repository
 ```sh
 # Inside this project directory
 mix deps.get
-``` 
+```
 
-### Compile dependencies 
+### Compile dependencies
 
 This step is needed if the GLIBC version on your machine differs from the one used in the precompiled SQlite adapter.
 
 ```sh
 # Inside this project directory
 mix deps.compile
-``` 
+```
 
 ### Compile Project
 
 ```sh
 # Inside this project directory
 mix compile
-``` 
+```
 
 ### Create Database and run migrations
 
@@ -149,6 +149,14 @@ To check the code formatting before every git commit, setup the git `pre-commit`
 cp priv/dev/git-hooks/pre-commit .git/hooks/pre-commit
 ```
 
+### Elixir Code Linting
+
+To check for common code style issues or code smells you may run `mix credo`:
+
+```sh
+mix credo --all
+```
+
 ## Database Schema
 
 By SQLite is used as database. Once the `mix ecto.migrate` command has been run (see above) the database file `renew_collab_dev.db` is created inside this projects root folder. The database schema is defined and maintained via migration scripts inside [priv/repo/migrations](./priv/repo/migrations) file.
@@ -173,13 +181,13 @@ In the example below MySQL is used to store user accounts, PostgreSQL is used to
 docker build \
 --build-arg RENEW_ACCOUNT_DB_TYPE=mysql \
 --build-arg RENEW_DOCS_DB_TYPE=postgresql \
---build-arg RENEW_SIM_DB_TYPE=sqlite 
+--build-arg RENEW_SIM_DB_TYPE=sqlite
 -t renew_collab_mixed_db:latest .
 ```
 
 The *kind* of databases must be determined at compile time (when building the Docker image). But the exact databases to be used are configured at run time (when container is started).
 
-```sh 
+```sh
 docker run\
 -e PHX_HOST="localhost"\
 -e PORT="8080"\

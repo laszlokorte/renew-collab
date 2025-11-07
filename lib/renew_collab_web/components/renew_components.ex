@@ -134,11 +134,11 @@ defmodule RenewCollabWeb.RenewComponents do
   end
 
   defp of_type(nil, _), do: true
-  defp of_type(:box, layer), do: not is_nil(layer.box) or is_group(layer)
-  defp of_type(:text, layer), do: not is_nil(layer.text) or is_group(layer)
-  defp of_type(:edge, layer), do: not is_nil(layer.edge) or is_group(layer)
+  defp of_type(:box, layer), do: not is_nil(layer.box) or group?(layer)
+  defp of_type(:text, layer), do: not is_nil(layer.text) or group?(layer)
+  defp of_type(:edge, layer), do: not is_nil(layer.edge) or group?(layer)
 
-  defp is_group(layer), do: is_nil(layer.box) and is_nil(layer.text) and is_nil(layer.edge)
+  defp group?(layer), do: is_nil(layer.box) and is_nil(layer.text) and is_nil(layer.edge)
 
   @doc """
   Renders flash notices.
