@@ -1,21 +1,16 @@
 defmodule RenewCollabWeb.LiveIcons do
+  alias RenewCollabCtrl.Views
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
-  alias RenewCollabCtrl.Views
-  alias RenewCollabCtrl.Fetcher
+  use RenewCollabCtrl.Helper,
+    icons: {Views.GlobalSymbolsList, [], :symbols_changed}
+
+  def load_param(:account, socket), do: socket.assigns.account
 
   def mount(_params, _session, socket) do
-    {:ok, load_data(socket)}
-  end
-
-  defp load_data(socket) do
     socket
-    |> assign(
-      :icons,
-      %Views.GlobalSymbolsList{}
-      |> Fetcher.fetch_as(socket.assigns.current_account)
-    )
+    |> load_data(true)
   end
 
   def render(assigns) do

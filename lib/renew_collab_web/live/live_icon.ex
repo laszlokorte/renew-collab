@@ -4,22 +4,16 @@ defmodule RenewCollabWeb.LiveIcon do
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Fetcher
 
+  use RenewCollabCtrl.Helper,
+    icon: {Views.GlobalSymbol, [:symbol_id], :symbols_changed}
+
+  def load_param(:symbol_id, socket), do: socket.assigns.symbol_id
+  def load_param(:account, socket), do: socket.assigns.account
+
   def mount(%{"id" => symbol_id}, _session, socket) do
-    socket = assign(socket, :symbol_id, symbol_id)
-
-    {:ok, load_data(socket)}
-  end
-
-  defp load_data(socket) do
-    %Views.GlobalSymbol{symbol_id: socket.assigns.symbol_id}
-    |> Fetcher.fetch_as(socket.assigns.current_account)
-    |> case do
-      nil ->
-        socket |> put_flash(:error, "Icon not found") |> redirect(to: ~p"/icons")
-
-      icon ->
-        socket |> assign(:icon, icon)
-    end
+    socket
+    |> assign(:symbol_id, symbol_id)
+    |> load_data(true)
   end
 
   def render(assigns) do

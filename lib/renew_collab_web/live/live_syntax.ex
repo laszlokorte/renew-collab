@@ -13,43 +13,17 @@ defmodule RenewCollabWeb.LiveSyntax do
 
   def semantic_tags(), do: @semantic_tags
 
+  use RenewCollabCtrl.Helper,
+    syntax_types: {Views.GlobalSyntaxList, [], :syntax_changed},
+    symbols: {:async, Views.GlobalSymbolsMap, [], :symbols_changed},
+    sockets: {:async, Views.GlobalSocketById, [], :sockets_changed}
+
+  def load_param(:account, socket), do: socket.assigns.account
+
   def mount(_params, _session, socket) do
-    {:ok, load_data(socket)}
-  end
-
-  def handle_info({_, _syntax_id}, socket) do
-    {:noreply, load_data(socket)}
-  end
-
-  defp load_data(socket) do
-    current_account = socket.assigns.current_account
-
     socket
-    |> assign(
-      :syntax_types,
-      %Views.GlobalSyntaxList{}
-      |> Fetcher.fetch_as(current_account)
-    )
     |> assign(:create_form, to_form(%{"name" => nil}, as: :create_syntax))
-    |> assign_async(
-      [
-        :symbols,
-        :sockets
-      ],
-      fn ->
-        {:ok,
-         %{
-           sockets:
-             %Views.GlobalSocketById{}
-             |> Fetcher.fetch_as(current_account),
-           symbols:
-             %Views.GlobalSymbolsList{}
-             |> Fetcher.fetch_as(current_account)
-             |> Enum.map(fn s -> {s.id, s} end)
-             |> Map.new()
-         }}
-      end
-    )
+    |> load_data(true)
   end
 
   def render(assigns) do

@@ -17,6 +17,7 @@ defmodule RenewCollabCtrl.CacheConfig do
   def key_for_view(_account, %Views.GlobalSocketById{}), do: nil
   def key_for_view(_account, %Views.GlobalSocketIdsByName{}), do: nil
   def key_for_view(_account, %Views.GlobalSocketSchemasList{}), do: nil
+  def key_for_view(_account, %Views.GlobalSocketSchemasMap{}), do: nil
   def key_for_view(_account, %Views.GlobalSocketSchemasNames{}), do: nil
   def key_for_view(_account, %Views.GlobalSymbolsList{}), do: nil
   def key_for_view(_account, %Views.GlobalSymbolsNames{}), do: nil
@@ -45,6 +46,7 @@ defmodule RenewCollabCtrl.CacheConfig do
   def tags_for_view(_account, %Views.GlobalSocketById{}), do: []
   def tags_for_view(_account, %Views.GlobalSocketIdsByName{}), do: []
   def tags_for_view(_account, %Views.GlobalSocketSchemasList{}), do: []
+  def tags_for_view(_account, %Views.GlobalSocketSchemasMap{}), do: []
   def tags_for_view(_account, %Views.GlobalSocketSchemasNames{}), do: []
   def tags_for_view(_account, %Views.GlobalSymbolsList{}), do: []
   def tags_for_view(_account, %Views.GlobalSymbolsNames{}), do: []
@@ -73,6 +75,7 @@ defmodule RenewCollabCtrl.CacheConfig do
   def ttl_for_view(%Views.GlobalSocketById{}), do: :infinity
   def ttl_for_view(%Views.GlobalSocketIdsByName{}), do: :infinity
   def ttl_for_view(%Views.GlobalSocketSchemasList{}), do: :infinity
+  def ttl_for_view(%Views.GlobalSocketSchemasMap{}), do: :infinity
   def ttl_for_view(%Views.GlobalSocketSchemasNames{}), do: :infinity
   def ttl_for_view(%Views.GlobalSymbolsList{}), do: :infinity
   def ttl_for_view(%Views.GlobalSymbolsNames{}), do: :infinity

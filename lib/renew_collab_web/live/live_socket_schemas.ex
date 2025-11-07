@@ -6,18 +6,15 @@ defmodule RenewCollabWeb.LiveSocketSchemas do
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Fetcher
 
-  def mount(_params, _session, socket) do
-    {:ok, load_data(socket)}
-  end
+  use RenewCollabCtrl.Helper,
+    socket_schemas: {Views.GlobalSocketSchemasList, [], :socket_schema_changed}
 
-  defp load_data(socket) do
+  def load_param(:account, socket), do: socket.assigns.account
+
+  def mount(_params, _session, socket) do
     socket
-    |> assign(
-      :socket_schemas,
-      %Views.GlobalSocketSchemasList{}
-      |> Fetcher.fetch_as(socket.assigns.current_account)
-      |> Map.values()
-    )
+    |> assign(:create_form, to_form(%{"name" => nil}, as: :create_group))
+    |> load_data(true)
   end
 
   def render(assigns) do
@@ -198,7 +195,7 @@ defmodule RenewCollabWeb.LiveSocketSchemas do
     |> Dispatcher.perform_as(socket.assigns.current_account)
     |> case do
       {:ok, _} ->
-        {:noreply, load_data(socket) |> put_flash(:info, "Socket Schema created")}
+        {:noreply, socket |> put_flash(:info, "Socket Schema created")}
 
       _ ->
         {:noreply, socket |> put_flash(:error, "Error creating Socket Schema")}
@@ -210,7 +207,7 @@ defmodule RenewCollabWeb.LiveSocketSchemas do
     |> Dispatcher.perform_as(socket.assigns.current_account)
     |> case do
       {:ok, _} ->
-        {:noreply, load_data(socket) |> put_flash(:info, "Socket Schema deleted")}
+        {:noreply, socket |> put_flash(:info, "Socket Schema deleted")}
 
       _ ->
         {:noreply, socket |> put_flash(:error, "Error deleting Socket Schema")}

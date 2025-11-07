@@ -12,33 +12,19 @@ defmodule RenewCollabWeb.LiveSocketSchema do
   def dims(), do: @dims
   def funcs(), do: @funcs
 
+  use RenewCollabCtrl.Helper,
+    socket_schema: {Views.GlobalSocketSchema, [:socket_schema_id], :socket_schema_changed},
+    icons: {Views.GlobalSymbolsList, [], :symbols_changed}
+
+  def load_param(:account, socket), do: socket.assigns.account
+  def load_param(:socket_schema_id, socket), do: socket.assigns.socket_schema_id
+
   def mount(%{"id" => socket_schema_id}, _session, socket) do
-    socket =
-      socket
-      |> assign(:socket_schema_id, socket_schema_id)
-      |> assign(
-        :icons,
-        %Views.GlobalSymbolsList{}
-        |> Fetcher.fetch_as(socket.assigns.current_account)
-      )
-      |> assign(:icon, nil)
-      |> assign(:preview, %RenewCollab.Connection.Socket{})
-
-    {:ok, load_data(socket)}
-  end
-
-  defp load_data(socket) do
-    %Views.GlobalSocketSchema{socket_schema_id: socket.assigns.socket_schema_id}
-    |> Fetcher.fetch_as(socket.assigns.current_account)
-    |> case do
-      nil ->
-        socket
-        |> put_flash(:error, "Socket Schema not found")
-        |> redirect(to: ~p"/socket_schemas")
-
-      schema ->
-        socket |> assign(:schema, schema)
-    end
+    socket
+    |> assign(:socket_schema_id, socket_schema_id)
+    |> assign(:icon, nil)
+    |> assign(:preview, %RenewCollab.Connection.Socket{})
+    |> load_data(true)
   end
 
   def render(assigns) do
@@ -61,7 +47,7 @@ defmodule RenewCollabWeb.LiveSocketSchema do
         <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
           <img class="icon" src="/assets/icon-socket.svg" />
           <span>
-            Socket Schema: {@schema.name}
+            Socket Schema: {@socket_schema.name}
           </span>
         </h2>
       </div>
@@ -84,7 +70,7 @@ defmodule RenewCollabWeb.LiveSocketSchema do
               <% end %>
 
               <g fill="#ddd">
-                <%= case @schema.stencil do %>
+                <%= case @socket_schema.stencil do %>
                   <% :ellipse -> %>
                     <ellipse
                       stroke-width="3"
@@ -124,7 +110,7 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                     />
                 <% end %>
               </g>
-              <%= for s <- @schema.sockets do %>
+              <%= for s <- @socket_schema.sockets do %>
                 <g pointer-events="all" fill="transparent">
                   <circle
                     cx={
@@ -241,9 +227,11 @@ defmodule RenewCollabWeb.LiveSocketSchema do
             <form id="stencil_form" phx-change="change_stencil">
               <p>
                 <select name="stencil">
-                  <option selected={@schema.stencil == nil} value="">None</option>
-                  <option selected={@schema.stencil == :ellipse} value="ellipse">Ellipse</option>
-                  <option selected={@schema.stencil == :rect} value="rect">Rect</option>
+                  <option selected={@socket_schema.stencil == nil} value="">None</option>
+                  <option selected={@socket_schema.stencil == :ellipse} value="ellipse">
+                    Ellipse
+                  </option>
+                  <option selected={@socket_schema.stencil == :rect} value="rect">Rect</option>
                 </select>
               </p>
             </form>
@@ -282,7 +270,7 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                 </tr>
               </thead>
               <tbody>
-                <%= for s <- @schema.sockets do %>
+                <%= for s <- @socket_schema.sockets do %>
                   <tr>
                     <td>{s.name}</td>
 
@@ -415,7 +403,7 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                   </td>
                   <td>
                     <form id="create_form" phx-submit="create_socket" phx-change="preview_socket">
-                      <input type="hidden" name="socket_schema_id" value={@schema.id} />
+                      <input type="hidden" name="socket_schema_id" value={@socket_schema.id} />
                       <button type="submit">Create</button>
                     </form>
                   </td>
@@ -425,7 +413,7 @@ defmodule RenewCollabWeb.LiveSocketSchema do
 
             <details>
               <summary>Export</summary>
-              <textarea style="width: 50%; min-height: 12em;" readonly>{inspect(@schema, pretty: true)}</textarea>
+              <textarea style="width: 50%; min-height: 12em;" readonly>{inspect(@socket_schema, pretty: true)}</textarea>
             </details>
           </div>
         </div>
@@ -442,7 +430,7 @@ defmodule RenewCollabWeb.LiveSocketSchema do
     |> Dispatcher.perform_as(socket.assigns.current_account)
     |> case do
       {:ok, _} ->
-        {:noreply, load_data(socket) |> put_flash(:info, "Socket Schema updated")}
+        {:noreply, socket |> put_flash(:info, "Socket Schema updated")}
 
       _ ->
         {:noreply, socket |> put_flash(:error, "Error changing Socket Schema")}
@@ -454,7 +442,7 @@ defmodule RenewCollabWeb.LiveSocketSchema do
     |> Dispatcher.perform_as(socket.assigns.current_account)
     |> case do
       {:ok, _} ->
-        {:noreply, load_data(socket) |> put_flash(:info, "Socket deleted")}
+        {:noreply, socket |> put_flash(:info, "Socket deleted")}
 
       _ ->
         {:noreply, socket |> put_flash(:error, "Error deleting Socket")}
@@ -485,9 +473,9 @@ defmodule RenewCollabWeb.LiveSocketSchema do
     %Actions.GlobalSocketSchemaCreateSocket{attributes: attrs}
     |> Dispatcher.perform_as(socket.assigns.current_account)
     |> case do
-      {:ok, _} ->
+      :ok ->
         {:noreply,
-         load_data(socket)
+         socket
          |> assign(:preview, %RenewCollab.Connection.Socket{})
          |> put_flash(:info, "Socket created")}
 

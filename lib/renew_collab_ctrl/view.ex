@@ -168,6 +168,18 @@ defmodule RenewCollabCtrl.View do
     |> RenewCollab.DocumentFetcher.fetch()
   end
 
+  def do_fetch(_account, %Views.GlobalSocketSchemasMap{}) do
+    RenewCollab.Queries.SocketSchemasList.new()
+    |> RenewCollab.DocumentFetcher.fetch()
+    |> case do
+      {:ok, sockets} ->
+        sockets
+        |> Enum.map(&{&1.id, &1})
+        |> Map.new()
+        |> then(&{:ok, &1})
+    end
+  end
+
   def do_fetch(_account, %Views.GlobalSocketSchema{socket_schema_id: id}) do
     {:ok, RenewCollab.Sockets.find_socket_schema(id)}
   end

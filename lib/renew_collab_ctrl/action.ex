@@ -1461,6 +1461,8 @@ defmodule RenewCollabCtrl.Action do
 
   def do_perform(%Actions.GlobalSocketSchemaCreateSocket{attributes: attrs}) do
     Sockets.create_socket(attrs)
+
+    :ok
   end
 
   def do_perform(%Actions.GlobalSocketSchemaCreate{attributes: attrs}) do
@@ -1480,26 +1482,32 @@ defmodule RenewCollabCtrl.Action do
 
   def do_perform(%Actions.GlobalSyntaxCreate{attributes: attrs}) do
     Syntax.create(attrs)
+    :ok
   end
 
   def do_perform(%Actions.GlobalSyntaxDelete{syntax_id: syntax_id}) do
     Syntax.delete(syntax_id)
+    :ok
   end
 
   def do_perform(%Actions.GlobalSyntaxDeleteWhitelistEntry{whitelist_id: whitelist_list_id}) do
     Syntax.delete_whitelist(whitelist_list_id)
+    :ok
   end
 
   def do_perform(%Actions.GlobalSyntaxDeleteAutoTargetEntry{auto_target_id: auto_target_id}) do
     Syntax.delete_autonode(auto_target_id)
+    :ok
   end
 
   def do_perform(%Actions.GlobalSyntaxMakeDefault{syntax_id: syntax_id}) do
     Syntax.make_default(syntax_id)
+    :ok
   end
 
   def do_perform(%Actions.GlobalSyntaxAddWhitelistEntry{attributes: attrs}) do
     Syntax.add_whitelist(attrs)
+    :ok
   end
 
   def do_perform(%Actions.ProjectMediaCreateSvg{project_id: project_id, svg: svg}) do

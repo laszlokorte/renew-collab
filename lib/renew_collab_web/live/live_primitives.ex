@@ -7,43 +7,17 @@ defmodule RenewCollabWeb.LivePrimitives do
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Fetcher
 
+  use RenewCollabCtrl.Helper,
+    primitive_groups: {Views.GlobalPrimitives, [], :primitives_changed},
+    sockets: {:async, Views.GlobalSocketById, [], :sockets_changed},
+    symbols: {:async, Views.GlobalSymbolsMap, [], :symbols_changed}
+
+  def load_param(:account, socket), do: socket.assigns.account
+
   def mount(_params, _session, socket) do
-    {:ok, load_data(socket)}
-  end
-
-  def handle_info({_, _}, socket) do
-    {:noreply, load_data(socket)}
-  end
-
-  defp load_data(socket) do
-    current_account = socket.assigns.current_account
-
     socket
-    |> assign(
-      :primitive_groups,
-      %Views.GlobalPrimitives{}
-      |> Fetcher.fetch_as(current_account)
-    )
     |> assign(:create_form, to_form(%{"name" => nil}, as: :create_group))
-    |> assign_async(
-      [
-        :symbols,
-        :sockets
-      ],
-      fn ->
-        {:ok,
-         %{
-           sockets:
-             %Views.GlobalSocketById{}
-             |> Fetcher.fetch_as(current_account),
-           symbols:
-             %Views.GlobalSymbolsList{}
-             |> Fetcher.fetch_as(current_account)
-             |> Enum.map(fn s -> {s.id, s} end)
-             |> Map.new()
-         }}
-      end
-    )
+    |> load_data(true)
   end
 
   def render(assigns) do

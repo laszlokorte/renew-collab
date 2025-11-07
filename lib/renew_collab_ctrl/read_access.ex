@@ -10,6 +10,7 @@ defmodule RenewCollabCtrl.ReadAccess do
   def can(_account, %Views.DocumentStripped{}), do: true
   def can(_account, %Views.DocumentSimulationLinks{}), do: true
   def can(_account, %Views.GlobalSocketSchemasList{}), do: true
+  def can(_account, %Views.GlobalSocketSchemasMap{}), do: true
   def can(_account, %Views.GlobalSocketSchema{}), do: true
   def can(_account, %Views.GlobalSocketById{}), do: true
   def can(_account, %Views.GlobalSymbolsList{}), do: true

@@ -18,14 +18,15 @@ defmodule RenewCollabCtrl.Subscription do
   def channel_for(%Views.DocumentVersionState{document_id: doc_id}), do: "pub-document:#{doc_id}"
   def channel_for(%Views.DocumentStripped{}), do: nil
   def channel_for(%Views.DocumentSimulationLinks{}), do: nil
-  def channel_for(%Views.GlobalSocketSchemasList{}), do: nil
-  def channel_for(%Views.GlobalSocketSchema{}), do: nil
-  def channel_for(%Views.GlobalSocketById{}), do: nil
+  def channel_for(%Views.GlobalSocketSchemasList{}), do: "pub-global_socket_schemas"
+  def channel_for(%Views.GlobalSocketSchemasMap{}), do: "pub-global_socket_schemas"
+  def channel_for(%Views.GlobalSocketSchema{}), do: "pub-global_socket_schemas"
+  def channel_for(%Views.GlobalSocketById{}), do: "pub-global_socket_schemas"
   def channel_for(%Views.GlobalSymbolsList{}), do: nil
   def channel_for(%Views.GlobalSymbolsMap{}), do: nil
   def channel_for(%Views.GlobalSymbol{}), do: nil
-  def channel_for(%Views.GlobalSyntaxList{}), do: nil
-  def channel_for(%Views.GlobalPrimitives{}), do: nil
+  def channel_for(%Views.GlobalSyntaxList{}), do: "pub-global_syntax"
+  def channel_for(%Views.GlobalPrimitives{}), do: "pub-global_primitives"
   def channel_for(%Views.DocumentHierarchyMissings{}), do: nil
   def channel_for(%Views.DocumentHierarchyInvalids{}), do: nil
   def channel_for(%Views.SystemHealthReport{}), do: nil
