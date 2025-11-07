@@ -26,7 +26,6 @@ defmodule RenewCollabWeb.LiveShadowNet do
       :sim_form,
       to_form(%{"documents" => [], "formalism" => nil, "main_net" => nil})
     )
-    |> assign(:shadow_net_system_id, shadow_net_system_id)
     |> load_data(true)
     |> case do
       {:error, socket} ->

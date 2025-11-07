@@ -7,72 +7,56 @@ defmodule RenewCollabWeb.LiveSimulation do
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Fetcher
 
+  use RenewCollabCtrl.Helper,
+    simulation: {Views.SimulationWithState, [:simulation_id], :simulation_change}
+
+  def load_param(:simulation_id, socket), do: socket.assigns.simulation_id
+  def load_param(:account_id, socket), do: socket.assigns.current_account.id
+
+  def load_param(:project_id, socket),
+    do: socket.assigns.simulation.project_assignment.project_id
+
   def mount(%{"id" => simulation_id}, _session, socket) do
-    %Views.SimulationWithState{
-      simulation_id: simulation_id
-    }
-    |> Fetcher.fetch_as(socket.assigns.current_account)
+    socket
+    |> assign(:simulation_id, simulation_id)
+    |> load_data(true)
     |> case do
-      nil ->
-        {:ok, socket |> put_flash(:error, "Simulation not found") |> redirect(to: ~p"/projects")}
+      {:error, socket} ->
+        {:ok, socket |> put_flash(:error, "Project not found") |> redirect(to: ~p"/projects")}
 
-      sim ->
-        socket =
-          socket
-          |> assign(:rename_form, to_form(%{"name" => sim.label}))
-          |> assign(:show_transitions, false)
-          |> assign(load_data(sim, socket.assigns.current_account))
+      {:ok, socket = %{assigns: %{simulation: sim}}} ->
+        project_id = load_param(:project_id, socket)
+        Phoenix.PubSub.subscribe(RenewCollab.PubSub, "simulation:#{sim.id}")
 
-        RenewCollabWeb.Endpoint.subscribe("simulation:#{simulation_id}")
-
-        {:ok, socket}
-    end
-  end
-
-  def load_data(simulation, _account) do
-    %{
-      simulation: simulation,
-      is_active:
-        RenewCollabSim.Server.ScopedSimulationServer.exists(
-          simulation.project_assignment.project_id,
-          simulation.id
+        socket
+        |> assign(:rename_form, to_form(%{"name" => sim.label}))
+        |> assign(:show_transitions, false)
+        |> assign(
+          is_active:
+            RenewCollabSim.Server.ScopedSimulationServer.exists(
+              project_id,
+              sim.id
+            )
         )
-    }
+        |> then(&{:ok, &1})
+    end
   end
 
-  def handle_info({:simulation_change, sim_id, _}, socket) do
-    current_account = socket.assigns.current_account
-
-    if sim_id == socket.assigns.simulation.id do
-      %Views.SimulationWithState{
-        simulation_id: sim_id
-      }
-      |> Fetcher.fetch_as(current_account)
-      |> case do
-        nil ->
-          {:noreply,
-           socket
-           |> put_flash(:error, "Simulation not found")
-           |> redirect(to: ~p"/shadow_net/#{socket.assigns.simulation.shadow_net_system_id}")}
-
-        sim ->
-          {:noreply,
-           socket
-           |> assign(
-             :simulation,
-             sim
-           )
-           |> assign(
-             :is_active,
-             RenewCollabSim.Server.ScopedSimulationServer.exists(
-               sim.project_assignment.project_id,
-               sim_id
-             )
-           )}
-      end
-    else
-      {:noreply, socket}
-    end
+  def handle_info(
+        {:simulation_change, simulation_id, _},
+        socket = %{assigns: %{simulation_id: simulation_id, current_account: account}}
+      ) do
+    {:noreply,
+     socket
+     |> assign(
+       simulation:
+         %Views.SimulationWithState{simulation_id: simulation_id} |> Fetcher.fetch_as(account),
+       is_active:
+         RenewCollabSim.Server.ScopedSimulationServer.exists(
+           socket.assigns.simulation.project_assignment.project_id,
+           socket.assigns.simulation.id
+         )
+     )}
   end
 
   def handle_info(:state, socket) do

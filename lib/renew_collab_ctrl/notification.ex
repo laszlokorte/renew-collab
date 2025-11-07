@@ -453,7 +453,7 @@ defmodule RenewCollabCtrl.Notification do
     do: [simulation_modified(sim_id)]
 
   def notifications_for(proj, %Actions.SimulationRename{simulation_id: sim_id}, _result),
-    do: [simulation_modified(sim_id) | project_simulations_modified(proj.id)]
+    do: [simulation_modified(sim_id), project_simulations_modified(proj.id)]
 
   def notifications_for(_proj, %Actions.SimulationPause{}, _result), do: []
   def notifications_for(_proj, %Actions.SimulationPlay{}, _result), do: []
@@ -487,15 +487,15 @@ defmodule RenewCollabCtrl.Notification do
 
   defp project_modified(proj) do
     [
-      {"pub-project:#{proj.id}", :project_changed},
-      for %{account_id: acc_id} <-
-            proj.members do
-        {"pub-my-projects:#{acc_id}", :projects_changed}
-      end
+      {"pub-project:#{proj.id}", :project_changed}
+      | for %{account_id: acc_id} <-
+              proj.members do
+          {"pub-my-projects:#{acc_id}", :projects_changed}
+        end
     ]
   end
 
-  defp syntax_changed(), do: {"pub-global_syntax", :changed}
+  defp syntax_changed(), do: {"pub-global_syntax", :syntax_changed}
 
   defp invitations_changed(proj, account_id),
     do: [
@@ -504,6 +504,6 @@ defmodule RenewCollabCtrl.Notification do
       | project_modified(proj)
     ]
 
-  defp global_primitive_changed(), do: {"pub-global_primitives", :changed}
-  defp global_socket_schema_changed(), do: {"pub-global_socket_schemas", :changed}
+  defp global_primitive_changed(), do: {"pub-global_primitives", :primitives_changed}
+  defp global_socket_schema_changed(), do: {"pub-global_socket_schemas", :socket_schema_changed}
 end

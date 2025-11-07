@@ -43,7 +43,7 @@ defmodule RenewCollabCtrl.Subscription do
   def channel_for(%Views.ShadowNetSystem{shadow_net_system_id: sns_id}),
     do: "pub-shadow-net-system:#{sns_id}"
 
-  def channel_for(%Views.SimulationWithState{}), do: nil
+  def channel_for(%Views.SimulationWithState{simulation_id: sim_id}), do: "simulation:#{sim_id}"
   def channel_for(%Views.ShadowNetSystemSimulations{}), do: nil
 
   def channel_for(%Views.GlobalProject{}), do: nil

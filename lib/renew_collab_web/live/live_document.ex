@@ -20,8 +20,8 @@ defmodule RenewCollabWeb.LiveDocument do
     snapshots: {:async, Views.DocumentVersionsList, [:document_id], :document_modified},
     socket_schemas: {:async, Views.GlobalSocketSchemasList, [], :socket_schema_changed},
     symbols: {:async, Views.GlobalSymbolsMap, [], :symbols_changed},
-    hierachy_missing: {:async, Views.DocumentHierarchyMissings, [:document_id], :_},
-    hierachy_invalid: {:async, Views.DocumentHierarchyInvalids, [:document_id], :_},
+    hierachy_missing: {:async, Views.DocumentHierarchyMissings, [:document_id], :never},
+    hierachy_invalid: {:async, Views.DocumentHierarchyInvalids, [:document_id], :never},
     simulation_links:
       {:async, Views.DocumentSimulationLinks, [:document_id], :simulations_changed}
 
