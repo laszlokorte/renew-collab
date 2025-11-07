@@ -823,6 +823,9 @@ defmodule RenewCollabCtrl.Action do
       account_id: existing_account_id
     })
     |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+    |> case do
+      {:ok, %{insert_inviatation: invitation}} -> {:ok, invitation}
+    end
   end
 
   def do_perform(%Actions.ProjectRevokeInvitation{
@@ -856,6 +859,9 @@ defmodule RenewCollabCtrl.Action do
       invitation_id: invitation_id
     })
     |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+    |> case do
+      {:ok, %{add_member: membership}} -> {:ok, membership}
+    end
   end
 
   def do_perform(%Actions.ProjectAddSimulationAsAdmin{
@@ -1231,7 +1237,7 @@ defmodule RenewCollabCtrl.Action do
     {:ok, sns}
   end
 
-  def do_perform(%Actions.ShadowNetSystemDeleteAsUser{sns_id: shadow_net_system_id}) do
+  def do_perform(%Actions.ShadowNetSystemDeleteAsUser{shadow_net_system_id: shadow_net_system_id}) do
     {:ok, %{id: project_id}} =
       %RenewCollabProj.Queries.ShadowNetsProject{shadow_net_system_id: shadow_net_system_id}
       |> RenewCollabProj.ProjectFetcher.fetch()
@@ -1293,7 +1299,7 @@ defmodule RenewCollabCtrl.Action do
     end
   end
 
-  def do_perform(%Actions.ShadowNetSystemRename{sns_id: sns_id, new_name: new_name}) do
+  def do_perform(%Actions.ShadowNetSystemRename{shadow_net_system_id: sns_id, new_name: new_name}) do
     RenewCollabSim.Commands.RenameShadowNetSystem.new(%{
       shadow_net_system_id: sns_id,
       new_name: new_name

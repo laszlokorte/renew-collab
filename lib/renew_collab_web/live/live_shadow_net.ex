@@ -7,95 +7,64 @@ defmodule RenewCollabWeb.LiveShadowNet do
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Fetcher
 
+  use RenewCollabCtrl.Helper,
+    shadow_net_system:
+      {Views.ShadowNetSystem, [:shadow_net_system_id], :shadow_net_system_modified},
+    documents: {Views.ProjectDocumentsList, [:project_id], :documents_changed},
+    simulations: {Views.ShadowNetSystemSimulations, [:shadow_net_system_id], :simulations_changed}
+
+  def load_param(:shadow_net_system_id, socket), do: socket.assigns.shadow_net_system_id
+  def load_param(:account_id, socket), do: socket.assigns.current_account.id
+
+  def load_param(:project_id, socket),
+    do: socket.assigns.shadow_net_system.project_assignment.project_id
+
   def mount(%{"id" => shadow_net_system_id}, _session, socket) do
-    %Views.ShadowNetSystem{
-      shadow_net_system_id: shadow_net_system_id
-    }
-    |> Fetcher.fetch_as(socket.assigns.current_account)
+    socket
+    |> assign(:shadow_net_system_id, shadow_net_system_id)
+    |> assign(
+      :sim_form,
+      to_form(%{"documents" => [], "formalism" => nil, "main_net" => nil})
+    )
+    |> assign(:shadow_net_system_id, shadow_net_system_id)
+    |> load_data(true)
     |> case do
-      nil ->
-        {:ok,
-         socket |> put_flash(:error, "Shadow Net System not found") |> redirect(to: ~p"/projects")}
+      {:error, socket} ->
+        {:ok, socket |> put_flash(:error, "Project not found") |> redirect(to: ~p"/projects")}
 
-      sns ->
-        socket =
-          socket
-          |> assign(:shadow_net_system_id, shadow_net_system_id)
-          |> assign(:rename_form, to_form(%{"name" => sns.label}))
-          |> assign(
-            :running,
-            RenewCollabSim.Server.ScopedSimulationServer.running_ids(
-              sns.project_assignment.project_id
-            )
+      {:ok, socket} ->
+        project_id = load_param(:project_id, socket)
+        Phoenix.PubSub.subscribe(RenewCollab.PubSub, "projects/#{project_id}/simulations")
+        Phoenix.PubSub.subscribe(RenewCollab.PubSub, "pub-project-simulations:#{project_id}")
+
+        socket
+        |> assign(:rename_form, to_form(%{"name" => socket.assigns.shadow_net_system.label}))
+        |> assign(
+          project_id: project_id,
+          running:
+            RenewCollabSim.Server.ScopedSimulationServer.running_ids(project_id)
             |> MapSet.new()
-          )
-          |> assign(
-            :project_id,
-            sns.project_assignment.project_id
-          )
-          |> assign(
-            :shadow_net_system,
-            sns
-          )
-          |> assign(
-            :documents,
-            %Views.ProjectDocumentsList{
-              project_id: sns.project_assignment.project_id
-            }
-            |> Fetcher.fetch_as(socket.assigns.current_account)
-          )
-
-        {:ok, socket}
+        )
+        |> then(&{:ok, &1})
     end
   end
 
-  def reload(socket) do
+  def handle_info(
+        {:simulation_change, _sim_id, _change},
+        socket = %{assigns: %{project_id: project_id, current_account: account}}
+      ) do
     socket
     |> assign(
-      :shadow_net_system,
-      %Views.ShadowNetSystem{
-        shadow_net_system_id: socket.assigns.shadow_net_system.id
-      }
-      |> Fetcher.fetch_as(socket.assigns.current_account)
+      running:
+        RenewCollabSim.Server.ScopedSimulationServer.running_ids(project_id)
+        |> MapSet.new(),
+      simulations:
+        %Views.ShadowNetSystemSimulations{
+          shadow_net_system_id: load_param(:shadow_net_system_id, socket)
+        }
+        |> Fetcher.fetch_as(account)
     )
-  end
-
-  def handle_info(:any, socket) do
-    {:noreply,
-     socket
-     |> assign(
-       :shadow_net_system,
-       %Views.ShadowNetSystem{
-         shadow_net_system_id: socket.assigns.shadow_net_system.id
-       }
-       |> Fetcher.fetch_as(socket.assigns.current_account)
-     )
-     |> assign(
-       :running,
-       RenewCollabSim.Server.ScopedSimulationServer.running_ids(
-         socket.assigns.shadow_net_system.project_assignment.project_id
-       )
-       |> MapSet.new()
-     )}
-  end
-
-  def handle_info({:simulation_change, _, _}, socket) do
-    {:noreply,
-     socket
-     |> assign(
-       :shadow_net_system,
-       %Views.ShadowNetSystem{
-         shadow_net_system_id: socket.assigns.shadow_net_system.id
-       }
-       |> Fetcher.fetch_as(socket.assigns.current_account)
-     )
-     |> assign(
-       :running,
-       RenewCollabSim.Server.ScopedSimulationServer.running_ids(
-         socket.assigns.shadow_net_system.project_assignment.project_id
-       )
-       |> MapSet.new()
-     )}
+    |> then(&{:noreply, &1})
   end
 
   def render(assigns) do
@@ -264,7 +233,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
           </thead>
 
           <tbody>
-            <%= if Enum.empty?(@shadow_net_system.simulations) do %>
+            <%= if Enum.empty?(@simulations) do %>
               <tr>
                 <td colspan="9">
                   <div style="padding: 2em; border: 3px dashed #aaa; text-align: center; font-style: italic;">
@@ -283,7 +252,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
                 </td>
               </tr>
             <% else %>
-              <%= for {sim,si} <- @shadow_net_system.simulations |> Enum.with_index do %>
+              <%= for {sim,si} <- @simulations |> Enum.with_index do %>
                 <tr {if(rem(si, 2) == 0, do: [style: "background-color:#f5f5f5;"], else: [])}>
                   <td>
                     <div style="display: flex; align-items: center; gap: 1ex; justify-content: start;">
@@ -399,7 +368,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
   def handle_event("duplicate", %{"simulation_id" => simulation_id}, socket) do
     %Actions.SimulationDuplicateInProject{
       simulation_id: simulation_id,
-      project_id: socket.assigns.project.id
+      project_id: load_param(:project_id, socket)
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
@@ -412,19 +381,19 @@ defmodule RenewCollabWeb.LiveShadowNet do
 
   def handle_event("rename", %{"name" => new_name}, socket) do
     %Actions.ShadowNetSystemRename{
-      sns_id: socket.assigns.shadow_net_system_id,
+      shadow_net_system_id: socket.assigns.shadow_net_system_id,
       new_name: new_name
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
-    {:noreply, socket |> reload() |> put_flash(:info, "Shadow net System renamed")}
+    {:noreply, socket |> put_flash(:info, "Shadow net System renamed")}
   end
 
   def handle_event("delete", %{"id" => simulation_id}, socket) do
     %Actions.SimulationDeleteAsUser{simulation_id: simulation_id}
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
-    {:noreply, socket |> reload() |> put_flash(:info, "Simulation deleted")}
+    {:noreply, socket |> put_flash(:info, "Simulation deleted")}
   end
 
   def handle_event("setup", %{"id" => simulation_id}, socket) do
@@ -508,7 +477,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
-    {:noreply, socket |> reload()}
+    {:noreply, socket}
   end
 
   def handle_event(
@@ -523,7 +492,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
-    {:noreply, socket |> reload()}
+    {:noreply, socket}
   end
 
   def handle_event(
@@ -538,12 +507,12 @@ defmodule RenewCollabWeb.LiveShadowNet do
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
-    {:noreply, socket |> reload()}
+    {:noreply, socket}
   end
 
   def handle_event("new-simulation", %{}, socket) do
     %Actions.SimulationCreateFromShadowNetSystemInProject{
-      project_id: socket.assigns.project_id,
+      project_id: load_param(:project_id, socket),
       shadow_net_system_id: socket.assigns.shadow_net_system.id
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)

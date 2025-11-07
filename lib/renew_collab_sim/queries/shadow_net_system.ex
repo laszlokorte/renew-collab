@@ -14,10 +14,9 @@ defmodule RenewCollabSim.Queries.ShadowNetSystem do
       :result,
       from(s in ShadowNetSystem,
         left_join: nets in assoc(s, :nets),
-        left_join: sims in assoc(s, :simulations),
         where: s.id == ^id,
-        order_by: [desc: s.inserted_at, asc: sims.inserted_at],
-        preload: [nets: nets, simulations: sims]
+        order_by: [desc: s.inserted_at],
+        preload: [nets: nets]
       )
     )
   end

@@ -40,6 +40,7 @@ defmodule RenewCollabCtrl.ReadAccess do
   def can(_account, %Views.ProjectInvitations{}), do: true
   def can(_account, %Views.MyProjectInvitations{}), do: true
   def can(_account, %Views.MediaData{}), do: true
+  def can(_account, %Views.ShadowNetSystemSimulations{}), do: true
 
   def can(_account, _view), do: false
 end

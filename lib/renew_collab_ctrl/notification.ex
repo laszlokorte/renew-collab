@@ -274,10 +274,11 @@ defmodule RenewCollabCtrl.Notification do
         %Actions.ProjectAcceptInvitation{},
         %ProjectMember{account_id: acc_id}
       ),
-      do: [
-        invitations_changed(proj, acc_id),
-        own_projects_modified(acc_id) | project_modified(proj)
-      ]
+      do:
+        [
+          own_projects_modified(acc_id) | project_modified(proj)
+        ]
+        |> Enum.concat(invitations_changed(proj, acc_id))
 
   def notifications_for(
         proj,
@@ -346,7 +347,7 @@ defmodule RenewCollabCtrl.Notification do
         %Actions.ProjectRemoveDocumentAsAdmin{document_id: doc_id},
         _result
       ),
-      do: [document_modified(doc_id) | project_documents_modified(proj)]
+      do: [document_modified(doc_id), project_documents_modified(proj)]
 
   def notifications_for(proj, %Actions.ProjectRemoveMemberAsAdmin{}, _result),
     do: project_modified(proj)
@@ -398,8 +399,12 @@ defmodule RenewCollabCtrl.Notification do
   def notifications_for(proj, %Actions.ShadowNetSystemImportFromSnsFileInProject{}, _result),
     do: [project_shadow_net_systems_modified(proj.id)]
 
-  def notifications_for(proj, %Actions.ShadowNetSystemRename{sns_id: sns_id}, _result),
-    do: [shadow_net_system_modified(sns_id), project_shadow_net_systems_modified(proj.id)]
+  def notifications_for(
+        proj,
+        %Actions.ShadowNetSystemRename{shadow_net_system_id: sns_id},
+        _result
+      ),
+      do: [shadow_net_system_modified(sns_id), project_shadow_net_systems_modified(proj.id)]
 
   def notifications_for(
         proj,
@@ -424,10 +429,10 @@ defmodule RenewCollabCtrl.Notification do
 
   def notifications_for(
         proj,
-        %Actions.SimulationCreateFromShadowNetSystemInProject{},
+        %Actions.SimulationCreateFromShadowNetSystemInProject{shadow_net_system_id: sns_id},
         _result
       ),
-      do: [project_simulations_modified(proj.id)]
+      do: [project_simulations_modified(proj.id), shadow_net_system_modified(sns_id)]
 
   def notifications_for(proj, %Actions.SimulationDeleteAsUser{simulation_id: sim_id}, _result),
     do: [simulation_modified(sim_id), project_simulations_modified(proj.id)]

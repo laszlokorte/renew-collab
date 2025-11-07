@@ -24,7 +24,7 @@ defmodule RenewCollabCtrl.Helper do
           {:ok, sock} ->
             query =
               params
-              |> Enum.map(&{&1, load_param(&1, socket)})
+              |> Enum.map(&{&1, load_param(&1, sock)})
               |> Map.new()
               |> Map.put(:__struct__, view)
 
@@ -58,6 +58,8 @@ defmodule RenewCollabCtrl.Helper do
   defmacro register_listener(data_sources) do
     quote bind_quoted: [data_sources: data_sources] do
       for {key, {view, params, event}} <- data_sources do
+        def handle_info({unquote(event), _}, sock), do: handle_info(unquote(event), sock)
+
         def handle_info(unquote(event), sock) do
           alias RenewCollabCtrl.Fetcher
 

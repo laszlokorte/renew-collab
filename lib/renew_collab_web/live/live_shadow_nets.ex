@@ -8,57 +8,43 @@ defmodule RenewCollabWeb.LiveShadowNets do
   alias RenewCollabCtrl.Fetcher
   @file_count_limit 10
 
+  use RenewCollabCtrl.Helper,
+    project: {Views.MyProject, [:account_id, :project_id], :project_changed},
+    shadow_net_systems:
+      {Views.ProjectShadowNetSystemsList, [:project_id], :shadow_net_systems_changed}
+
+  def load_param(:account_id, socket), do: socket.assigns.current_account.id
+  def load_param(:project_id, socket), do: socket.assigns.project_id
+
   def file_count_limit, do: @file_count_limit
 
   def mount(%{"project_id" => project_id}, _session, socket) do
-    account = socket.assigns.current_account
-
-    %Views.MyProject{
-      account_id: account.id,
-      project_id: project_id
-    }
-    |> Fetcher.fetch_as(account)
+    socket
+    |> assign(:project_id, project_id)
+    |> assign(:is_admin, is_admin(socket))
+    |> assign(
+      import_rnw_form:
+        to_form(%{
+          "main_net" => nil,
+          "formalism" => RenewCollabSim.Compiler.SnsCompiler.default_formalism()
+        })
+    )
+    |> assign(import_sns_form: to_form(%{"main_net" => nil}))
+    |> allow_upload(:import_rnw_file, accept: ~w(.rnw), max_entries: @file_count_limit)
+    |> allow_upload(:import_sns_file, accept: ~w(.sns), max_entries: 1)
+    |> assign(
+      running:
+        RenewCollabSim.Server.ScopedSimulationServer.running_ids(project_id)
+        |> MapSet.new()
+    )
+    |> load_data(true)
     |> case do
-      nil ->
+      {:error, socket} ->
         {:ok, socket |> put_flash(:error, "Project not found") |> redirect(to: ~p"/projects")}
 
-      proj ->
-        socket =
-          socket
-          |> assign(:is_admin, is_admin(socket))
-          |> assign(:project, proj)
-          |> assign(
-            :shadow_net_systems,
-            %Views.ProjectShadowNetSystemsList{
-              project_id: project_id
-            }
-            |> Fetcher.fetch_as(account)
-          )
-          |> assign(
-            import_rnw_form:
-              to_form(%{
-                "main_net" => nil,
-                "formalism" => RenewCollabSim.Compiler.SnsCompiler.default_formalism()
-              })
-          )
-          |> assign(import_sns_form: to_form(%{"main_net" => nil}))
-          |> allow_upload(:import_rnw_file, accept: ~w(.rnw), max_entries: @file_count_limit)
-          |> allow_upload(:import_sns_file, accept: ~w(.sns), max_entries: 1)
-
-        {:ok, socket}
+      ok ->
+        ok
     end
-  end
-
-  def handle_info(:any, socket) do
-    {:noreply,
-     socket
-     |> assign(
-       :shadow_net_systems,
-       %Views.ProjectShadowNetSystemsList{
-         project_id: socket.assigns.project.id
-       }
-       |> Fetcher.fetch_as(socket.assigns.current_account)
-     )}
   end
 
   defp error_to_string(:too_large), do: "The selected file is too large."
@@ -481,7 +467,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
   end
 
   def handle_event("delete", %{"id" => sns_id}, socket) do
-    %Actions.ShadowNetSystemDeleteAsUser{sns_id: sns_id}
+    %Actions.ShadowNetSystemDeleteAsUser{shadow_net_system_id: sns_id}
     |> Dispatcher.perform_as(socket.assigns.current_account)
     |> case do
       :ok ->

@@ -310,8 +310,9 @@ defmodule RenewCollabCtrl.View do
     end
   end
 
-  def do_fetch(_account, %Views.ShadowNetSystemSimulations{}) do
-    {:error, :not_implemented}
+  def do_fetch(_account, %Views.ShadowNetSystemSimulations{shadow_net_system_id: sns_id}) do
+    RenewCollabSim.Queries.ShadowNetSystemsSimulations.new(%{shadow_net_system_id: sns_id})
+    |> RenewCollabSim.SimulationFetcher.fetch()
   end
 
   def do_fetch(_account, %Views.SimulationWithState{simulation_id: simulation_id}) do
