@@ -1,3 +1,3 @@
 defmodule RenewCollabCtrl.Actions.ProjectRejectInvitation do
-  defstruct [:project_id, :invitation_id]
+  defstruct [:project_id, :account_id]
 end

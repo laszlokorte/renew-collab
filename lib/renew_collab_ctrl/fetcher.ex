@@ -1,4 +1,5 @@
 defmodule RenewCollabCtrl.Fetcher do
+  alias RenewCollabCtrl.Subscription
   alias RenewCollabCtrl.View
   alias RenewCollabCtrl.CacheConfig
   alias RenewCollabCtrl.CacheServer
@@ -25,6 +26,21 @@ defmodule RenewCollabCtrl.Fetcher do
       raise "Access denied: #{inspect(view)}"
       :access_denied
     end
+  end
+
+  def fetch_and_subscribe(view, account) do
+    result = fetch_as(view, account)
+
+    Subscription.channel_for(view)
+    |> case do
+      channel when is_binary(channel) ->
+        Phoenix.PubSub.subscribe(RenewCollab.PubSub, channel)
+
+      nil ->
+        nil
+    end
+
+    result
   end
 
   def cached_or_do(key, fun, tags, lifetime \\ :infinity)

@@ -134,7 +134,6 @@ defmodule RenewCollabCtrl.CacheConfig do
   def tags_for_action(%Actions.DocumentSnapshotsPrune{}, _result), do: []
   def tags_for_action(%Actions.ProjectAddDocumentAsAdmin{}, _result), do: []
   def tags_for_action(%Actions.ProjectAddMemberAsAdmin{}, _result), do: []
-  def tags_for_action(%Actions.ProjectAddMemberAsUser{}, _result), do: []
   def tags_for_action(%Actions.ProjectAddSimulationAsAdmin{}, _result), do: []
   def tags_for_action(%Actions.ProjectAddShadowNetSystemAsAdmin{}, _result), do: []
   def tags_for_action(%Actions.ProjectCreateAsAdmin{}, _result), do: []

@@ -1,4 +1,6 @@
 defmodule RenewCollabCtrl.Notification do
+  alias RenewCollabProj.Entities.ProjectInvitation
+  alias RenewCollabProj.Entities.ProjectMember
   alias RenewCollabCtrl.Actions
 
   def notifications_for(proj, action, result)
@@ -21,7 +23,7 @@ defmodule RenewCollabCtrl.Notification do
       do: [document_modified(doc_id)]
 
   def notifications_for(_proj, %Actions.DocumentCreateInProject{project_id: proj_id}, _result),
-    do: [{"pub-project-documents:#{proj_id}", :documents_changed}]
+    do: [project_documents_modified(proj_id)]
 
   def notifications_for(_proj, %Actions.DocumentEditCreateLayer{document_id: doc_id}, _result),
     do: [document_modified(doc_id)]
@@ -37,7 +39,7 @@ defmodule RenewCollabCtrl.Notification do
     do: [document_modified(doc_id)]
 
   def notifications_for(proj, %Actions.DocumentDeleteAsUser{document_id: doc_id}, _result),
-    do: [document_modified(doc_id), project_documents_modified(proj)]
+    do: [document_modified(doc_id), project_documents_modified(proj.id)]
 
   def notifications_for(
         _proj,
@@ -210,197 +212,246 @@ defmodule RenewCollabCtrl.Notification do
   def notifications_for(_proj, %Actions.DocumentSnapshotsPrune{document_id: doc_id}, _result),
     do: [document_modified(doc_id)]
 
-  def notifications_for(proj, %Actions.DocumentDuplicateInProject{project_id: proj_id}, _result),
-    do: [project_documents_modified(proj)]
+  def notifications_for(_proj, %Actions.DocumentDuplicateInProject{project_id: proj_id}, _result),
+    do: [project_documents_modified(proj_id)]
 
-  def notifications_for(_proj, %Actions.DocumentMoveIntoProject{project_id: proj_id}, _result),
-    do: []
+  def notifications_for(proj, %Actions.DocumentMoveIntoProject{}, _result),
+    do: [project_documents_modified(proj) | project_modified(proj)]
 
   def notifications_for(proj, %Actions.DocumentUpdateMeta{document_id: doc_id}, _result),
-    do: [document_modified(doc_id), project_documents_modified(proj)]
+    do: [document_modified(doc_id), project_documents_modified(proj.id)]
 
   def notifications_for(_proj, %Actions.GlobalPrimitivesCreateDefinition{}, _result),
-    do: [{"pub-global_primitives", :changed}]
+    do: [global_primitive_changed()]
 
   def notifications_for(_proj, %Actions.GlobalPrimitivesCreateGroup{}, _result),
-    do: [{"pub-global_primitives", :changed}]
+    do: [global_primitive_changed()]
 
   def notifications_for(_proj, %Actions.GlobalPrimitivesDeleteDefinition{}, _result),
-    do: [{"pub-global_primitives", :changed}]
+    do: [global_primitive_changed()]
 
   def notifications_for(_proj, %Actions.GlobalPrimitivesDeleteGroup{}, _result),
-    do: [{"pub-global_primitives", :changed}]
+    do: [global_primitive_changed()]
 
   def notifications_for(_proj, %Actions.GlobalSocketSchemaCreateSocket{}, _result),
-    do: [{"pub-global_socket_schemas", :changed}]
+    do: [global_socket_schema_changed()]
 
   def notifications_for(_proj, %Actions.GlobalSocketSchemaCreate{}, _result),
-    do: [{"pub-global_socket_schemas", :changed}]
+    do: [global_socket_schema_changed()]
 
   def notifications_for(_proj, %Actions.GlobalSocketSchemaDeleteSocket{}, _result),
-    do: [{"pub-global_socket_schemas", :changed}]
+    do: [global_socket_schema_changed()]
 
   def notifications_for(_proj, %Actions.GlobalSocketSchemaDelete{}, _result),
-    do: [{"pub-global_socket_schemas", :changed}]
+    do: [global_socket_schema_changed()]
 
   def notifications_for(_proj, %Actions.GlobalSocketSchemaUpdate{}, _result),
-    do: [{"pub-global_socket_schemas", :changed}]
+    do: [global_socket_schema_changed()]
 
   def notifications_for(_proj, %Actions.GlobalSyntaxAddAutoTargetEntry{}, _result),
-    do: [{"pub-global_syntax", :changed}]
+    do: [syntax_changed()]
 
   def notifications_for(_proj, %Actions.GlobalSyntaxAddWhitelistEntry{}, _result),
-    do: [{"pub-global_syntax", :changed}]
+    do: [syntax_changed()]
 
   def notifications_for(_proj, %Actions.GlobalSyntaxCreate{}, _result),
-    do: [{"pub-global_syntax", :changed}]
+    do: [syntax_changed()]
 
   def notifications_for(_proj, %Actions.GlobalSyntaxDeleteAutoTargetEntry{}, _result),
-    do: [{"pub-global_syntax", :changed}]
+    do: [syntax_changed()]
 
   def notifications_for(_proj, %Actions.GlobalSyntaxDeleteWhitelistEntry{}, _result),
-    do: [{"pub-global_syntax", :changed}]
+    do: [syntax_changed()]
 
   def notifications_for(_proj, %Actions.GlobalSyntaxDelete{}, _result),
-    do: [{"pub-global_syntax", :changed}]
+    do: [syntax_changed()]
 
   def notifications_for(_proj, %Actions.GlobalSyntaxMakeDefault{}, _result),
-    do: [{"pub-global_syntax", :changed}]
-
-  def notifications_for(_proj, %Actions.ProjectAcceptInvitation{project_id: proj_id}, _result),
-    do: []
-
-  def notifications_for(_proj, %Actions.ProjectAddDocumentAsAdmin{project_id: proj_id}, _result),
-    do: []
-
-  def notifications_for(_proj, %Actions.ProjectAddMemberAsAdmin{project_id: proj_id}, _result),
-    do: []
-
-  def notifications_for(_proj, %Actions.ProjectAddMemberAsUser{project_id: proj_id}, _result),
-    do: []
+    do: [syntax_changed()]
 
   def notifications_for(
-        _proj,
-        %Actions.ProjectAddShadowNetSystemAsAdmin{project_id: proj_id},
-        _result
+        proj,
+        %Actions.ProjectAcceptInvitation{},
+        %ProjectMember{account_id: acc_id}
       ),
-      do: []
+      do: [
+        invitations_changed(proj, acc_id),
+        own_projects_modified(acc_id) | project_modified(proj)
+      ]
 
   def notifications_for(
-        _proj,
-        %Actions.ProjectAddSimulationAsAdmin{project_id: proj_id},
+        proj,
+        %Actions.ProjectAddDocumentAsAdmin{},
+        _res
+      ),
+      do: project_documents_modified(proj)
+
+  def notifications_for(
+        proj,
+        %Actions.ProjectAddMemberAsAdmin{account_id: acc_id},
+        _re
+      ),
+      do: [own_projects_modified(acc_id) | project_modified(proj)]
+
+  def notifications_for(
+        proj,
+        %Actions.ProjectAddShadowNetSystemAsAdmin{},
         _result
       ),
-      do: []
+      do: [project_shadow_net_systems_modified(proj.id)]
 
-  def notifications_for(_proj, %Actions.ProjectCreateAsAdmin{}, _result), do: []
+  def notifications_for(
+        proj,
+        %Actions.ProjectAddSimulationAsAdmin{},
+        _result
+      ),
+      do: [project_simulations_modified(proj.id)]
+
+  def notifications_for(_proj, %Actions.ProjectCreateAsAdmin{}, _result),
+    do: [{"pub-global-projects", :projects_changed}]
 
   def notifications_for(_proj, %Actions.ProjectCreateAsUser{account_id: acc_id}, _result),
-    do: [{"pub-my-projects:#{acc_id}", :projects_changed}]
+    do: [own_projects_modified(acc_id)]
 
-  def notifications_for(proj, %Actions.ProjectDelete{project_id: proj_id}, _result),
+  def notifications_for(proj, %Actions.ProjectDelete{}, _result),
     do: project_modified(proj)
 
   def notifications_for(proj, %Actions.ProjectDuplicateAsAdmin{}, _result),
     do: project_modified(proj)
 
-  def notifications_for(proj, %Actions.ProjectDuplicateAsUser{project_id: project_id}, _result),
-    do: project_modified(proj)
-
-  def notifications_for(_proj, %Actions.ProjectInviteMember{project_id: proj_id}, _result), do: []
-  def notifications_for(_proj, %Actions.ProjectMediaCreateSvg{}, _result), do: []
-  def notifications_for(_proj, %Actions.ProjectMemberWithdraw{}), do: []
-  def notifications_for(_proj, %Actions.ProjectRejectInvitation{}, _result), do: []
-
   def notifications_for(
-        _proj,
-        %Actions.ProjectRemoveDocumentAsAdmin{project_id: proj_id},
+        proj,
+        %Actions.ProjectDuplicateAsUser{account_id: acc_id},
         _result
       ),
-      do: []
-
-  def notifications_for(_proj, %Actions.ProjectRemoveMemberAsAdmin{project_id: proj_id}, _result),
-    do: []
-
-  def notifications_for(_proj, %Actions.ProjectRemoveMemberAsUser{project_id: proj_id}, _result),
-    do: []
-
-  def notifications_for(
-        _proj,
-        %Actions.ProjectRemoveShadowNetSystemAsAdmin{project_id: proj_id},
-        _result
-      ),
-      do: []
-
-  def notifications_for(
-        _proj,
-        %Actions.ProjectRemoveSimulationAsAdmin{project_id: proj_id},
-        _result
-      ),
-      do: []
-
-  def notifications_for(proj, %Actions.ProjectRename{project_id: proj_id}, _result),
-    do: project_modified(proj)
-
-  def notifications_for(_proj, %Actions.ProjectRevokeInvitation{project_id: proj_id}, _result),
-    do: []
-
-  def notifications_for(
-        _proj,
-        %Actions.ShadowNetSystemCreateFromRnwInProject{project_id: proj_id},
-        _result
-      ),
-      do: []
-
-  def notifications_for(_proj, %Actions.ShadowNetSystemDeleteAsUser{}, _result), do: []
-  def notifications_for(_proj, %Actions.ShadowNetSystemDuplicateInProject{}, _result), do: []
-
-  def notifications_for(_proj, %Actions.ShadowNetSystemImportFromSnsFileInProject{}, _result),
-    do: []
-
-  def notifications_for(_proj, %Actions.ShadowNetSystemRename{}, _result), do: []
-  def notifications_for(_proj, %Actions.ShadowNetSystemSetMainNet{}, _result), do: []
-  def notifications_for(_proj, %Actions.ShadowNetSystemSetNetDocument{}, _result), do: []
-
-  def notifications_for(
-        _proj,
-        %Actions.SimulationCreateFromDocumentsInProject{project_id: proj_id},
-        _result
-      ),
-      do: []
+      do: [own_projects_modified(acc_id) | project_modified(proj)]
 
   def notifications_for(
         proj,
-        %Actions.SimulationCreateFromShadowNetSystemInProject{project_id: proj_id},
+        %Actions.ProjectInviteMember{},
+        %ProjectInvitation{account_id: acc_id}
+      ),
+      do: invitations_changed(proj, acc_id)
+
+  def notifications_for(_proj, %Actions.ProjectMediaCreateSvg{}, _result), do: []
+
+  def notifications_for(proj, %Actions.ProjectMemberWithdraw{account_id: acc_id}, _result),
+    do: [own_projects_modified(acc_id) | project_modified(proj)]
+
+  def notifications_for(proj, %Actions.ProjectRejectInvitation{account_id: acc_id}, _result),
+    do: invitations_changed(proj, acc_id)
+
+  def notifications_for(
+        proj,
+        %Actions.ProjectRemoveDocumentAsAdmin{document_id: doc_id},
         _result
       ),
-      do: [project_simulations_modified(proj)]
+      do: [document_modified(doc_id) | project_documents_modified(proj)]
+
+  def notifications_for(proj, %Actions.ProjectRemoveMemberAsAdmin{}, _result),
+    do: project_modified(proj)
+
+  def notifications_for(proj, %Actions.ProjectRemoveMemberAsUser{}, _result),
+    do: project_modified(proj)
+
+  def notifications_for(
+        proj,
+        %Actions.ProjectRemoveShadowNetSystemAsAdmin{},
+        _result
+      ),
+      do: project_shadow_net_systems_modified(proj.id)
+
+  def notifications_for(
+        proj,
+        %Actions.ProjectRemoveSimulationAsAdmin{simulation_id: sim_id},
+        _result
+      ),
+      do: [simulation_modified(sim_id) | project_simulations_modified(proj.id)]
+
+  def notifications_for(proj, %Actions.ProjectRename{}, _result),
+    do: project_modified(proj)
+
+  def notifications_for(
+        proj,
+        %Actions.ProjectRevokeInvitation{},
+        %ProjectInvitation{account_id: account_id}
+      ),
+      do: invitations_changed(proj, account_id)
+
+  def notifications_for(
+        proj,
+        %Actions.ShadowNetSystemCreateFromRnwInProject{},
+        _result
+      ),
+      do: [project_shadow_net_systems_modified(proj.id)]
+
+  def notifications_for(proj, %Actions.ShadowNetSystemDeleteAsUser{}, _result),
+    do: [project_shadow_net_systems_modified(proj.id)]
+
+  def notifications_for(
+        _proj,
+        %Actions.ShadowNetSystemDuplicateInProject{project_id: proj_id},
+        _result
+      ),
+      do: [project_shadow_net_systems_modified(proj_id)]
+
+  def notifications_for(proj, %Actions.ShadowNetSystemImportFromSnsFileInProject{}, _result),
+    do: [project_shadow_net_systems_modified(proj.id)]
+
+  def notifications_for(proj, %Actions.ShadowNetSystemRename{sns_id: sns_id}, _result),
+    do: [shadow_net_system_modified(sns_id), project_shadow_net_systems_modified(proj.id)]
+
+  def notifications_for(
+        proj,
+        %Actions.ShadowNetSystemSetMainNet{shadow_net_system_id: sns_id},
+        _result
+      ),
+      do: [shadow_net_system_modified(sns_id), project_shadow_net_systems_modified(proj.id)]
+
+  def notifications_for(
+        proj,
+        %Actions.ShadowNetSystemSetNetDocument{shadow_net_system_id: sns_id},
+        _result
+      ),
+      do: [shadow_net_system_modified(sns_id), project_shadow_net_systems_modified(proj.id)]
+
+  def notifications_for(
+        proj,
+        %Actions.SimulationCreateFromDocumentsInProject{},
+        _result
+      ),
+      do: [project_simulations_modified(proj.id)]
+
+  def notifications_for(
+        proj,
+        %Actions.SimulationCreateFromShadowNetSystemInProject{},
+        _result
+      ),
+      do: [project_simulations_modified(proj.id)]
 
   def notifications_for(proj, %Actions.SimulationDeleteAsUser{simulation_id: sim_id}, _result),
-    do: [project_simulations_modified(proj)]
+    do: [simulation_modified(sim_id) | project_simulations_modified(proj.id)]
 
-  def notifications_for(
-        proj,
-        %Actions.SimulationDuplicateInProject{project_id: proj_id},
-        _result
-      ),
-      do: [project_simulations_modified(proj)]
+  def notifications_for(proj, %Actions.SimulationDuplicateInProject{}, _result),
+    do: [project_simulations_modified(proj.id)]
 
   def notifications_for(_proj, %Actions.SimulationInitialize{simulation_id: sim_id}, _result),
-    do: []
+    do: [simulation_modified(sim_id)]
 
   def notifications_for(_proj, %Actions.SimulationInstancesClear{simulation_id: sim_id}, _result),
-    do: []
+    do: [simulation_modified(sim_id)]
 
   def notifications_for(_proj, %Actions.SimulationLogClear{simulation_id: sim_id}, _result),
-    do: []
+    do: [simulation_modified(sim_id)]
 
   def notifications_for(_proj, %Actions.SimulationLogDebug{simulation_id: sim_id}, _result),
-    do: []
+    do: [simulation_modified(sim_id)]
+
+  def notifications_for(proj, %Actions.SimulationRename{simulation_id: sim_id}, _result),
+    do: [simulation_modified(sim_id) | project_simulations_modified(proj.id)]
 
   def notifications_for(_proj, %Actions.SimulationPause{}, _result), do: []
   def notifications_for(_proj, %Actions.SimulationPlay{}, _result), do: []
-  def notifications_for(_proj, %Actions.SimulationRename{simulation_id: sim_id}, _result), do: []
   def notifications_for(_proj, %Actions.SimulationReset{}, _result), do: []
   def notifications_for(_proj, %Actions.SimulationStep{}, _result), do: []
   def notifications_for(_proj, %Actions.SimulationTerminate{}, _result), do: []
@@ -409,13 +460,25 @@ defmodule RenewCollabCtrl.Notification do
 
   defp document_modified(doc_id), do: {"pub-document:#{doc_id}", {:document_modified, doc_id}}
 
-  defp project_documents_modified(proj) do
-    {"pub-project-documents:#{proj.id}", :documents_changed}
+  defp simulation_modified(sim_id),
+    do: {"pub-simulation:#{sim_id}", {:simulation_modified, sim_id}}
+
+  defp shadow_net_system_modified(sns_id),
+    do: {"pub-shadow-net-system:#{sns_id}", {:shadow_net_system_modified, sns_id}}
+
+  defp project_documents_modified(proj_id) do
+    {"pub-project-documents:#{proj_id}", :documents_changed}
   end
 
-  defp project_simulations_modified(proj) do
-    {"pub-project-simulations:#{proj.id}", :simulations_changed}
+  defp project_simulations_modified(proj_id) do
+    {"pub-project-simulations:#{proj_id}", :simulations_changed}
   end
+
+  defp project_shadow_net_systems_modified(proj_id) do
+    {"pub-project-shadow-net-systems:#{proj_id}", :shadow_net_systems_changed}
+  end
+
+  defp own_projects_modified(acc_id), do: {"pub-my-projects:#{acc_id}", :projects_changed}
 
   defp project_modified(proj) do
     for %{account_id: acc_id} <-
@@ -423,4 +486,14 @@ defmodule RenewCollabCtrl.Notification do
       {"pub-my-projects:#{acc_id}", :projects_changed}
     end
   end
+
+  defp syntax_changed(), do: {"pub-global_syntax", :changed}
+
+  defp invitations_changed(_proj, account_id),
+    do: [
+      {"pub-my-invitations:#{account_id}", :invitations_changed}
+    ]
+
+  defp global_primitive_changed(), do: {"pub-global_primitives", :changed}
+  defp global_socket_schema_changed(), do: {"pub-global_socket_schemas", :changed}
 end

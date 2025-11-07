@@ -6,26 +6,18 @@ defmodule RenewCollabWeb.LiveProjects do
   use RenewCollabWeb, :live_view
   use RenewCollabWeb, :verified_routes
 
-  alias RenewCollabCtrl.Fetcher
+  use RenewCollabCtrl.Helper,
+    projects: {Views.MyProjectsList, [:account_id], :projects_changed},
+    invitations: {Views.MyProjectInvitations, [:account_id], :invitations_changed}
 
   def mount(_params, _session, socket) do
-    socket =
-      socket |> assign(load_data(socket.assigns.current_account))
-
-    {:ok, socket}
+    socket
+    |> assign(create_form: to_form(%{}))
+    |> load_data(true)
+    |> then(&{:ok, &1})
   end
 
-  def load_data(account) do
-    %{
-      projects: %Views.MyProjectsList{account_id: account.id} |> Fetcher.fetch_as(account),
-      invitations:
-        %Views.MyProjectInvitations{account_id: account.id} |> Fetcher.fetch_as(account),
-      create_form:
-        to_form(%{
-          "name" => ""
-        })
-    }
-  end
+  def load_param(:account_id, socket), do: socket.assigns.current_account.id
 
   def render(assigns) do
     ~H"""
@@ -101,7 +93,7 @@ defmodule RenewCollabWeb.LiveProjects do
                     <button
                       type="button"
                       phx-click="reject_invitation"
-                      phx-value-invitation_id={inv.id}
+                      phx-value-account_id={inv.account_id}
                       phx-value-project_id={inv.project_id}
                       style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
                     >
@@ -255,12 +247,12 @@ defmodule RenewCollabWeb.LiveProjects do
         socket
         |> put_flash(:info, "Project created")
         |> assign(create_form: to_form(%{}))
-        |> reload()
+        |> then(&{:noreply, &1})
 
       _ ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Project creation failed")}
+        socket
+        |> put_flash(:info, "Project creation failed")
+        |> then(&{:noreply, &1})
     end
   end
 
@@ -278,17 +270,13 @@ defmodule RenewCollabWeb.LiveProjects do
         socket
         |> put_flash(:info, "Project deleted")
         |> assign(create_form: to_form(%{}))
-        |> reload()
+        |> then(&{:noreply, &1})
 
       _ ->
         {:noreply,
          socket
          |> put_flash(:info, "Project deletion failed")}
     end
-
-    socket
-    |> put_flash(:info, "Project deleted")
-    |> reload()
   end
 
   def handle_event(
@@ -305,22 +293,22 @@ defmodule RenewCollabWeb.LiveProjects do
       {:ok, _} ->
         socket
         |> put_flash(:info, "Invitation accepted")
-        |> reload()
+        |> then(&{:noreply, &1})
 
       _ ->
         socket
         |> put_flash(:info, "Accepting invitation failed")
-        |> reload()
+        |> then(&{:noreply, &1})
     end
   end
 
   def handle_event(
         "reject_invitation",
-        %{"project_id" => project_id, "invitation_id" => invitation_id},
+        %{"project_id" => project_id, "account_id" => account_id},
         socket
       ) do
     %Actions.ProjectRejectInvitation{
-      invitation_id: invitation_id,
+      account_id: account_id,
       project_id: project_id
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
@@ -328,12 +316,12 @@ defmodule RenewCollabWeb.LiveProjects do
       {:ok, _} ->
         socket
         |> put_flash(:info, "Invitation rejected")
-        |> reload()
+        |> then(&{:noreply, &1})
 
       _ ->
         socket
         |> put_flash(:info, "Rejecting invitation failed")
-        |> reload()
+        |> then(&{:noreply, &1})
     end
   end
 
@@ -347,20 +335,12 @@ defmodule RenewCollabWeb.LiveProjects do
       {:ok, _} ->
         socket
         |> put_flash(:info, "Project duplicated")
-        |> reload()
+        |> then(&{:noreply, &1})
 
       _ ->
         socket
         |> put_flash(:info, "Project duplication failed")
-        |> reload()
+        |> then(&{:noreply, &1})
     end
-  end
-
-  def handle_info(:any, socket) do
-    socket |> reload()
-  end
-
-  def reload(socket) do
-    {:noreply, socket |> assign(load_data(socket.assigns.current_account))}
   end
 end

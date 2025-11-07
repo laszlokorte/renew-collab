@@ -804,27 +804,6 @@ defmodule RenewCollabCtrl.Action do
     |> RenewCollabProj.ProjectCommander.run_project_command_sync()
   end
 
-  def do_perform(%Actions.ProjectAddMemberAsUser{
-        project_id: project_id,
-        email: email,
-        role: role
-      }) do
-    RenewCollabAuth.Queries.AccountByEmail.new(%{email: email})
-    |> RenewCollabAuth.AuthFetcher.fetch()
-    |> case do
-      {:ok, %{id: account_id}} ->
-        RenewCollabProj.Commands.AssignProjectMember.new(%{
-          project_id: project_id,
-          account_id: account_id,
-          role: role
-        })
-        |> RenewCollabProj.ProjectCommander.run_project_command_sync()
-
-      _ ->
-        {:error, nil}
-    end
-  end
-
   def do_perform(%Actions.ProjectInviteMember{project_id: project_id, email: email, role: role}) do
     existing_account_id =
       RenewCollabAuth.Queries.AccountByEmail.new(%{email: email})
@@ -859,11 +838,11 @@ defmodule RenewCollabCtrl.Action do
 
   def do_perform(%Actions.ProjectRejectInvitation{
         project_id: project_id,
-        invitation_id: invitation_id
+        account_id: account_id
       }) do
     RenewCollabProj.Commands.RevokeInvitation.new(%{
       project_id: project_id,
-      invitation_id: invitation_id
+      account_id: account_id
     })
     |> RenewCollabProj.ProjectCommander.run_project_command_sync()
   end

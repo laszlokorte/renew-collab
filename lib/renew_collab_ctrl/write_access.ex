@@ -122,7 +122,6 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(_account, %Actions.ProjectAddShadowNetSystemAsAdmin{}), do: true
   def can(_account, %Actions.ProjectRemoveShadowNetSystemAsAdmin{}), do: true
   def can(_account, %Actions.ProjectRemoveMemberAsUser{}), do: true
-  def can(_account, %Actions.ProjectAddMemberAsUser{}), do: true
   def can(_account, %Actions.ProjectInviteMember{}), do: true
   def can(_account, %Actions.ProjectRevokeInvitation{}), do: true
   def can(_account, %Actions.ProjectRejectInvitation{}), do: true
