@@ -1166,7 +1166,8 @@ defmodule RenewCollabCtrl.Action do
           |> Enum.map(fn {name, _, json, _} ->
             %{
               "name" => name,
-              "document_json" => json
+              "document_json" => json,
+              "thumbnail_json" => json
             }
           end)
       })

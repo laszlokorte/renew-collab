@@ -7,6 +7,7 @@ defmodule RenewCollabSim.Entities.ShadowNet do
   schema "shadow_net" do
     field :name, :string
     field :document_json, :binary
+    field :thumbnail_json, :binary
     belongs_to :shadow_net_system, RenewCollabSim.Entities.ShadowNetSystem
 
     timestamps(type: :utc_datetime)
@@ -15,7 +16,9 @@ defmodule RenewCollabSim.Entities.ShadowNet do
   @doc false
   def changeset(shadow_net, attrs) do
     shadow_net
-    |> cast(attrs, [:name, :document_json])
+    |> cast(attrs, [:name])
+    |> cast(attrs, [:document_json], empty_values: ["", nil])
+    |> cast(attrs, [:thumbnail_json], empty_values: ["", nil])
     |> validate_required([:name])
   end
 

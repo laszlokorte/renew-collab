@@ -133,6 +133,9 @@ defmodule RenewCollabWeb.LiveShadowNet do
                 <ul style="list-style: none; margin: 0; padding: 0;">
                   <%= for net <- @shadow_net_system.nets do %>
                     <li>
+                      <%= if net.thumbnail_json do %>
+                        has thumbnail
+                      <% end %>
                       <%= if net.document_json do %>
                         <details>
                           <summary>

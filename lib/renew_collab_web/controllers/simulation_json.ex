@@ -156,7 +156,7 @@ defmodule RenewCollabWeb.SimulationJSON do
         "nets" =>
           Enum.map(
             sns.nets,
-            &%{"id" => &1.id, "name" => &1.name, "thumbnail" => net_thumbnail(&1)}
+            &%{"id" => &1.id, "name" => &1.name}
           )
       }
     }
@@ -189,18 +189,16 @@ defmodule RenewCollabWeb.SimulationJSON do
     end
   end
 
-  defp net_thumbnail(%{document_json: json}) when is_binary(json) do
-    %{
-      viewbox: %{
-        x: 0,
-        y: 0,
-        width: 100,
-        height: 50
-      }
-    }
+  defp net_document(%{document_json: nil}), do: nil
+
+  defp net_thumbnail(%{thumbnail_json: json}) when is_binary(json) do
+    case Jason.decode(json) do
+      {:ok, j = %{}} -> j
+      _ -> nil
+    end
   end
 
-  defp net_document(%{document_json: nil}), do: nil
+  defp net_thumbnail(%{thumbnail_json: nil}), do: nil
 
   defp show_token(net_token) do
     %{place_id: net_token.place_id, id: net_token.id, value: net_token.value}
