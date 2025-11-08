@@ -1,4 +1,5 @@
 defmodule RenewCollabProj.Queries.CheckAccess do
+  alias RenewCollabProj.Entities.ProjectInvitation
   alias RenewCollabProj.Entities.ProjectMember
   import Ecto.Query
   defstruct [:account_id, :entity, :roles]
@@ -47,6 +48,24 @@ defmodule RenewCollabProj.Queries.CheckAccess do
               m.account_id == ^account_id and s.shadow_net_system_id == ^sns_id and
                 m.role in ^roles,
             select: not is_nil(m.account_id),
+            limit: 1
+          )
+
+        {:media, media_id} ->
+          from(m in ProjectMember,
+            join: p in assoc(m, :project),
+            join: med in assoc(p, :medias),
+            where:
+              m.account_id == ^account_id and med.media_id == ^media_id and
+                m.role in ^roles,
+            select: not is_nil(m.account_id),
+            limit: 1
+          )
+
+        {:invitation, inv_id} ->
+          from(inv in ProjectInvitation,
+            where: inv.account_id == ^account_id and inv.id == ^inv_id,
+            select: not is_nil(inv.id),
             limit: 1
           )
       end

@@ -1,5 +1,5 @@
 defmodule RenewCollabCtrl.WriteAccess do
-  alias RenewCollabAuth.Entities.Account
+  alias RenewCollabCtrl.ReadAccess
   alias RenewCollabCtrl.Actions
   def can(account, action)
 
@@ -185,7 +185,9 @@ defmodule RenewCollabCtrl.WriteAccess do
         source_document_id: src_doc_id,
         target_document_id: tgt_document_id
       }),
-      do: can_write(account_id, :document, tgt_document_id)
+      do:
+        can_write(account_id, :document, tgt_document_id) and
+          ReadAccess.can_read(account_id, :document, src_doc_id)
 
   def can(%{id: account_id}, %Actions.SimulationRename{simulation_id: sim_id}),
     do: can_write(account_id, :simulation, sim_id)
@@ -193,47 +195,49 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(%{id: account_id}, %Actions.DocumentEditReorderLayerRelative{document_id: doc_id}),
     do: can_write(account_id, :document, doc_id)
 
-  def can(%{id: account_id, is_admin: true}, %Actions.GlobalPrimitivesCreateGroup{}),
+  def can(%{is_admin: true}, %Actions.GlobalPrimitivesCreateGroup{}),
     do: true
 
-  def can(%{id: account_id, is_admin: true}, %Actions.GlobalPrimitivesDeleteGroup{}),
+  def can(%{is_admin: true}, %Actions.GlobalPrimitivesDeleteGroup{}),
     do: true
 
-  def can(%{id: account_id, is_admin: true}, %Actions.GlobalPrimitivesDeleteDefinition{}),
+  def can(%{is_admin: true}, %Actions.GlobalPrimitivesDeleteDefinition{}),
     do: true
 
-  def can(%{id: account_id, is_admin: true}, %Actions.GlobalPrimitivesCreateDefinition{}),
+  def can(%{is_admin: true}, %Actions.GlobalPrimitivesCreateDefinition{}),
     do: true
 
-  def can(%{id: account_id, is_admin: true}, %Actions.GlobalSocketSchemaDeleteSocket{}),
+  def can(%{is_admin: true}, %Actions.GlobalSocketSchemaDeleteSocket{}),
     do: true
 
-  def can(%{id: account_id, is_admin: true}, %Actions.GlobalSocketSchemaCreateSocket{}),
+  def can(%{is_admin: true}, %Actions.GlobalSocketSchemaCreateSocket{}),
     do: true
 
-  def can(%{id: account_id, is_admin: true}, %Actions.GlobalSocketSchemaCreate{}), do: true
-  def can(%{id: account_id, is_admin: true}, %Actions.GlobalSocketSchemaDelete{}), do: true
-  def can(%{id: account_id, is_admin: true}, %Actions.GlobalSocketSchemaUpdate{}), do: true
+  def can(%{is_admin: true}, %Actions.GlobalSocketSchemaCreate{}), do: true
+  def can(%{is_admin: true}, %Actions.GlobalSocketSchemaDelete{}), do: true
+  def can(%{is_admin: true}, %Actions.GlobalSocketSchemaUpdate{}), do: true
 
-  def can(%{id: account_id, is_admin: true}, %Actions.GlobalSyntaxCreate{}), do: true
-  def can(%{id: account_id, is_admin: true}, %Actions.GlobalSyntaxDelete{}), do: true
+  def can(%{is_admin: true}, %Actions.GlobalSyntaxCreate{}), do: true
+  def can(%{is_admin: true}, %Actions.GlobalSyntaxDelete{}), do: true
 
-  def can(%{id: account_id, is_admin: true}, %Actions.GlobalSyntaxDeleteWhitelistEntry{}),
+  def can(%{is_admin: true}, %Actions.GlobalSyntaxDeleteWhitelistEntry{}),
     do: true
 
-  def can(%{id: account_id, is_admin: true}, %Actions.GlobalSyntaxDeleteAutoTargetEntry{}),
+  def can(%{is_admin: true}, %Actions.GlobalSyntaxDeleteAutoTargetEntry{}),
     do: true
 
-  def can(%{id: account_id, is_admin: true}, %Actions.GlobalSyntaxMakeDefault{}), do: true
+  def can(%{is_admin: true}, %Actions.GlobalSyntaxMakeDefault{}), do: true
 
-  def can(%{id: account_id, is_admin: true}, %Actions.GlobalSyntaxAddWhitelistEntry{}),
+  def can(%{is_admin: true}, %Actions.GlobalSyntaxAddWhitelistEntry{}),
     do: true
 
-  def can(%{id: account_id, is_admin: true}, %Actions.GlobalSyntaxAddAutoTargetEntry{}),
+  def can(%{is_admin: true}, %Actions.GlobalSyntaxAddAutoTargetEntry{}),
     do: true
 
   def can(%{id: account_id}, %Actions.ProjectCreateAsUser{account_id: account_id}), do: true
-  def can(%{id: account_id}, %Actions.ProjectRename{}), do: true
+
+  def can(%{id: account_id}, %Actions.ProjectRename{project_id: proj_id}),
+    do: can_write(account_id, :project, proj_id)
 
   def can(%{id: account_id}, %Actions.DocumentDuplicateInProject{project_id: proj_id}),
     do: can_write(account_id, :project, proj_id)
@@ -251,7 +255,7 @@ defmodule RenewCollabCtrl.WriteAccess do
     do: can_write(account_id, :project, proj_id)
 
   def can(%{id: account_id}, %Actions.ProjectAcceptInvitation{invitation_id: inv_id}),
-    do: true
+    do: can_write(account_id, :invitation, inv_id)
 
   def can(%{id: account_id}, %Actions.ProjectMemberWithdraw{account_id: account_id}), do: true
   def can(_, %Actions.ProjectMemberWithdraw{}), do: false
@@ -263,10 +267,10 @@ defmodule RenewCollabCtrl.WriteAccess do
     do: can_write(account_id, :simulation, sim_id)
 
   def can(%{id: account_id}, %Actions.SimulationInitialize{simulation_id: sim_id}),
-    do: true
+    do: can_write(account_id, :simulation, sim_id)
 
   def can(%{id: account_id}, %Actions.SimulationInstancesClear{simulation_id: sim_id}),
-    do: true
+    do: can_write(account_id, :simulation, sim_id)
 
   def can(%{id: account_id}, %Actions.SimulationLogClear{simulation_id: sim_id}),
     do: can_write(account_id, :simulation, sim_id)
@@ -287,12 +291,14 @@ defmodule RenewCollabCtrl.WriteAccess do
         shadow_net_system_id: sns_id,
         document_id: doc_id
       }),
-      do: true
+      do:
+        can_write(account_id, :shadow_net_system, sns_id) and
+          ReadAccess.can_read(account_id, :document, doc_id)
 
   def can(%{id: account_id}, %Actions.ShadowNetSystemSetMainNet{
         shadow_net_system_id: sns_id
       }),
-      do: true
+      do: can_write(account_id, :shadow_net_system, sns_id)
 
   def can(%{id: account_id}, %Actions.ProjectMediaCreateSvg{project_id: proj_id}),
     do: can_write(account_id, :project, proj_id)
@@ -301,53 +307,58 @@ defmodule RenewCollabCtrl.WriteAccess do
         document_id: doc_id,
         project_id: proj_id
       }),
-      do: can_write(account_id, :project, proj_id)
+      do:
+        can_write(account_id, :project, proj_id) and
+          ReadAccess.can_read(account_id, :document, doc_id)
 
-  def can(%{id: account_id, is_admin: true}, %Actions.ProjectCreateAsAdmin{}), do: true
+  def can(%{is_admin: true}, %Actions.ProjectCreateAsAdmin{}), do: true
 
-  def can(%{id: account_id, is_admin: true}, %Actions.ProjectAddDocumentAsAdmin{}),
+  def can(%{is_admin: true}, %Actions.ProjectAddDocumentAsAdmin{}),
     do: true
 
-  def can(%{id: account_id, is_admin: true}, %Actions.ProjectRemoveDocumentAsAdmin{}),
+  def can(%{is_admin: true}, %Actions.ProjectRemoveDocumentAsAdmin{}),
     do: true
 
-  def can(%{id: account_id, is_admin: true}, %Actions.ProjectAddSimulationAsAdmin{}),
+  def can(%{is_admin: true}, %Actions.ProjectAddSimulationAsAdmin{}),
     do: true
 
-  def can(%{id: account_id, is_admin: true}, %Actions.ProjectRemoveSimulationAsAdmin{}),
+  def can(%{is_admin: true}, %Actions.ProjectRemoveSimulationAsAdmin{}),
     do: true
 
-  def can(%{id: account_id, is_admin: true}, %Actions.ProjectAddShadowNetSystemAsAdmin{}),
+  def can(%{is_admin: true}, %Actions.ProjectAddShadowNetSystemAsAdmin{}),
     do: true
 
   def can(
-        %{id: account_id, is_admin: true},
+        %{is_admin: true},
         %Actions.ProjectRemoveShadowNetSystemAsAdmin{}
       ),
       do: true
 
-  def can(%{id: account_id, is_admin: true}, %Actions.ProjectDuplicateAsAdmin{}), do: true
-  def can(%{id: account_id, is_admin: true}, %Actions.ProjectAddMemberAsAdmin{}), do: true
+  def can(%{is_admin: true}, %Actions.ProjectDuplicateAsAdmin{}), do: true
+  def can(%{is_admin: true}, %Actions.ProjectAddMemberAsAdmin{}), do: true
 
-  def can(%{id: account_id, is_admin: true}, %Actions.ProjectRemoveMemberAsAdmin{}),
+  def can(%{is_admin: true}, %Actions.ProjectRemoveMemberAsAdmin{}),
     do: true
 
-  def can(%{id: account_id}, _action), do: false
+  def can(_account, _action), do: false
 
-  defp can_write(account_id, :project, proj_id),
+  def can_write(account_id, :project, proj_id),
     do: check_access(account_id, {:project, proj_id}, [:editor, :owner])
 
-  defp can_write(account_id, :simulation, sim_id),
+  def can_write(account_id, :simulation, sim_id),
     do: check_access(account_id, {:simulation, sim_id}, [:editor, :owner])
 
-  defp can_write(account_id, :shadow_net_system, sns_id),
+  def can_write(account_id, :shadow_net_system, sns_id),
     do: check_access(account_id, {:shadow_net_system, sns_id}, [:editor, :owner])
 
-  defp can_write(account_id, :document, doc_id),
+  def can_write(account_id, :document, doc_id),
     do: check_access(account_id, {:document, doc_id}, [:editor, :owner])
 
-  defp can_write(account_id, :media, media_id),
+  def can_write(account_id, :media, media_id),
     do: check_access(account_id, {:media, media_id}, [:editor, :owner])
+
+  def can_write(account_id, :invitation, inv_id),
+    do: check_access(account_id, {:invitation, inv_id}, [:reader, :editor, :owner])
 
   defp check_access(account_id, entity, roles) do
     RenewCollabProj.Queries.CheckAccess.new(%{

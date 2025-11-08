@@ -1,5 +1,4 @@
 defmodule RenewCollabCtrl.ReadAccess do
-  alias RenewCollabAuth.Entities.Account
   alias RenewCollabCtrl.Views
   def can(_, _)
 
@@ -38,7 +37,7 @@ defmodule RenewCollabCtrl.ReadAccess do
     do: can_read(account_id, :document, doc_id)
 
   def can(%{id: account_id}, %Views.DocumentHierarchyInvalids{document_id: doc_id}),
-    do: true
+    do: can_read(account_id, :document, doc_id)
 
   def can(%{id: account_id}, %Views.DocumentLayerRelative{document_id: doc_id}),
     do: can_read(account_id, :document, doc_id)
@@ -90,23 +89,31 @@ defmodule RenewCollabCtrl.ReadAccess do
   def can(%{id: _acc_id, is_admin: true}, %Views.GlobalProjects{}), do: true
   def can(_account, _view), do: false
 
-  defp can_read(account_id, :project, proj_id),
+  def can_read(account_id, :project, proj_id),
     do: check_access(account_id, {:project, proj_id}, [:reader, :editor, :owner])
 
-  defp can_read(account_id, :simulation, sim_id),
+  def can_read(account_id, :simulation, sim_id),
     do: check_access(account_id, {:simulation, sim_id}, [:reader, :editor, :owner])
 
-  defp can_read(account_id, :shadow_net_system, sns_id),
+  def can_read(account_id, :shadow_net_system, sns_id),
     do: check_access(account_id, {:shadow_net_system, sns_id}, [:reader, :editor, :owner])
 
-  defp can_read(account_id, :document, doc_id),
+  def can_read(account_id, :document, doc_id),
     do: check_access(account_id, {:document, doc_id}, [:reader, :editor, :owner])
 
-  defp can_read(account_id, :media, media_id),
+  def can_read(account_id, :media, media_id),
     do: check_access(account_id, {:media, media_id}, [:reader, :editor, :owner])
 
-  defp can_read(_account_id, :net_instance, net_instance_id),
-    do: true
+  def can_read(account_id, :net_instance, net_instance_id) do
+    RenewCollabSim.Queries.SimulationNetInstanceSimple.new(%{
+      net_instance_id: net_instance_id
+    })
+    |> RenewCollabSim.SimulationFetcher.fetch()
+    |> case do
+      {:ok, %{simulation_id: sim_id}} -> can_read(account_id, :simulation, sim_id)
+      _ -> false
+    end
+  end
 
   defp check_access(account_id, entity, roles) do
     RenewCollabProj.Queries.CheckAccess.new(%{
