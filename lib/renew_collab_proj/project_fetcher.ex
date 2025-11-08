@@ -6,6 +6,7 @@ defmodule RenewCollabProj.ProjectFetcher do
     |> Repo.transact()
     |> case do
       {:ok, %{result: result}} -> {:ok, result}
+      o -> o
     end
   end
 end

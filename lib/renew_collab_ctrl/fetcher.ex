@@ -23,6 +23,7 @@ defmodule RenewCollabCtrl.Fetcher do
         CacheConfig.ttl_for_view(view)
       )
     else
+      dbg(account)
       raise "Access denied: #{inspect(view)}"
       :access_denied
     end

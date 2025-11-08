@@ -14,7 +14,7 @@ defmodule RenewCollabWeb.LiveProjectSettings do
 
   use RenewCollabCtrl.Helper,
     project: {Views.MyProject, [:account_id, :project_id], :project_changed},
-    members: {Views.ProjectMembersList, [:project_id], :members_changed},
+    members: {Views.ProjectMembersList, [:project_id], :project_changed},
     invitations: {Views.ProjectInvitations, [:project_id], :invitations_changed}
 
   def load_param(:account_id, socket), do: socket.assigns.current_account.id
