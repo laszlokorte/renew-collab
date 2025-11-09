@@ -466,7 +466,7 @@ defmodule RenewCollabCtrl.Notification do
   defp document_modified(doc_id), do: {"pub-document:#{doc_id}", {:document_modified, doc_id}}
 
   defp simulation_modified(sim_id),
-    do: {"pub-simulation:#{sim_id}", {:simulation_modified, sim_id}}
+    do: {"simulation:#{sim_id}", {:simulation_change, sim_id}}
 
   defp shadow_net_system_modified(sns_id),
     do: {"pub-shadow-net-system:#{sns_id}", {:shadow_net_system_modified, sns_id}}

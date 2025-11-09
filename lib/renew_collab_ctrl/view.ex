@@ -304,6 +304,22 @@ defmodule RenewCollabCtrl.View do
     |> RenewCollabSim.SimulationFetcher.fetch()
   end
 
+  def do_fetch(_account, %Views.ProjectRunningSimulationIds{project_id: project_id}) do
+    RenewCollabSim.Server.ScopedSimulationServer.running_ids(project_id)
+    |> MapSet.new()
+    |> then(&{:ok, &1})
+  end
+
+  def do_fetch(_account, %Views.SimulationIsActive{project_id: proj_id, simulation_id: sim_id}) do
+    RenewCollabSim.Server.ScopedSimulationServer.exists(proj_id, sim_id)
+    |> then(&{:ok, &1})
+  end
+
+  def do_fetch(_account, %Views.SimulationIsPlaying{project_id: proj_id, simulation_id: sim_id}) do
+    RenewCollabSim.Server.ScopedSimulationServer.is_playing(proj_id, sim_id)
+    |> then(&{:ok, &1})
+  end
+
   def do_fetch(_account, %Views.ProjectSimulationsList{project_id: project_id}) do
     RenewCollabProj.Queries.ProjectDetails.new(%{project_id: project_id})
     |> RenewCollabProj.ProjectFetcher.fetch()

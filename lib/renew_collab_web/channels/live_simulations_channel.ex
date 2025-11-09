@@ -9,10 +9,12 @@ defmodule RenewCollabWeb.LiveSimulationsChannel do
   def init("project-simulations:" <> project_id, _params, socket) do
     Phoenix.PubSub.subscribe(RenewCollab.PubSub, "projects/#{project_id}/simulations")
 
+    account = socket.assigns.current_account
+
     %Views.ProjectSimulationsList{
       project_id: project_id
     }
-    |> Fetcher.fetch_as(socket.assigns.current_account)
+    |> Fetcher.fetch_as(account)
     |> case do
       nil ->
         {:error, %{reason: "not found"}}
@@ -25,7 +27,10 @@ defmodule RenewCollabWeb.LiveSimulationsChannel do
            project_id: project_id,
            simulations: sims,
            runnings:
-             RenewCollabSim.Server.ScopedSimulationServer.running_ids(project_id) |> MapSet.new()
+             %Views.ProjectRunningSimulationIds{
+               project_id: project_id
+             }
+             |> Fetcher.fetch_as(account)
          }), %{project_id: project_id, account: socket.assigns.current_account}}
     end
   end
@@ -50,14 +55,17 @@ defmodule RenewCollabWeb.LiveSimulationsChannel do
            project_id: project_id,
            simulations: sims,
            runnings:
-             RenewCollabSim.Server.ScopedSimulationServer.running_ids(project_id) |> MapSet.new()
+             %Views.ProjectRunningSimulationIds{
+               project_id: project_id
+             }
+             |> Fetcher.fetch_as(account)
          })}
     end
   end
 
   @impl true
   def handle_message(
-        {:simulation_change, _simulation_id, _},
+        {:simulation_change, _},
         %{project_id: project_id},
         %{project_id: project_id, account: account}
       ) do
@@ -75,7 +83,10 @@ defmodule RenewCollabWeb.LiveSimulationsChannel do
            project_id: project_id,
            simulations: sims,
            runnings:
-             RenewCollabSim.Server.ScopedSimulationServer.running_ids(project_id) |> MapSet.new()
+             %Views.ProjectRunningSimulationIds{
+               project_id: project_id
+             }
+             |> Fetcher.fetch_as(account)
          })}
     end
   end

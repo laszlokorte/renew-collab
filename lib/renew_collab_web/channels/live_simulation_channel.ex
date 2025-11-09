@@ -35,14 +35,16 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
         {:ok,
          RenewCollabWeb.SimulationJSON.show_content(
            sim,
-           RenewCollabSim.Server.ScopedSimulationServer.exists(
-             sim.project_assignment.project_id,
-             simulation_id
-           ),
-           RenewCollabSim.Server.ScopedSimulationServer.is_playing(
-             sim.project_assignment.project_id,
-             simulation_id
-           )
+           %Views.SimulationIsActive{
+             project_id: sim.project_assignment.project_id,
+             simulation_id: simulation_id
+           }
+           |> Fetcher.fetch_as(socket.assigns.current_account),
+           %Views.SimulationIsPlaying{
+             project_id: sim.project_assignment.project_id,
+             simulation_id: simulation_id
+           }
+           |> Fetcher.fetch_as(socket.assigns.current_account)
          ),
          %{
            project_id: sim.project_assignment.project_id,
@@ -54,7 +56,7 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
 
   @impl true
   def handle_message(
-        {:simulation_change, simulation_id, {_event, is_playing}},
+        {:simulation_change, {simulation_id, {_event, is_playing}}},
         _state,
         %{project_id: project_id, simulation_id: simulation_id, account: account}
       ) do
@@ -68,7 +70,11 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
         {:noreply,
          RenewCollabWeb.SimulationJSON.show_content(
            sim,
-           RenewCollabSim.Server.ScopedSimulationServer.exists(project_id, simulation_id),
+           %Views.SimulationIsActive{
+             project_id: project_id,
+             simulation_id: simulation_id
+           }
+           |> Fetcher.fetch_as(account),
            is_playing
          )}
     end
@@ -76,7 +82,7 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
 
   @impl true
   def handle_message(
-        {:simulation_change, simulation_id, _event},
+        {:simulation_change, {simulation_id, _event}},
         _state,
         %{project_id: project_id, simulation_id: simulation_id, account: account}
       ) do
@@ -90,7 +96,11 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
         {:noreply,
          RenewCollabWeb.SimulationJSON.show_content(
            sim,
-           RenewCollabSim.Server.ScopedSimulationServer.exists(project_id, simulation_id),
+           %Views.SimulationIsActive{
+             project_id: project_id,
+             simulation_id: simulation_id
+           }
+           |> Fetcher.fetch_as(account),
            false
          )}
     end

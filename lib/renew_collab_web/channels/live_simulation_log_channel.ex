@@ -25,7 +25,7 @@ defmodule RenewCollabWeb.LiveSimulationLogChannel do
 
   @impl true
   def handle_message(
-        {:simulation_change, simulation_id, _event},
+        {:simulation_change, {simulation_id, _event}},
         _state,
         %{simulation_id: simulation_id, account: account}
       ) do

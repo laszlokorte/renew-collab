@@ -32,11 +32,6 @@ defmodule RenewCollabWeb.LiveShadowNets do
     |> assign(import_sns_form: to_form(%{"main_net" => nil}))
     |> allow_upload(:import_rnw_file, accept: ~w(.rnw), max_entries: @file_count_limit)
     |> allow_upload(:import_sns_file, accept: ~w(.sns), max_entries: 1)
-    |> assign(
-      running:
-        RenewCollabSim.Server.ScopedSimulationServer.running_ids(project_id)
-        |> MapSet.new()
-    )
     |> load_data(true)
     |> case do
       {:error, socket} ->

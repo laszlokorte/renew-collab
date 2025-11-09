@@ -3,7 +3,6 @@ defmodule RenewCollabWeb.ProjectSimulationController do
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Dispatcher
   alias RenewCollabCtrl.Actions
-  alias RenewCollabSim.Server.ScopedSimulationServer
   alias RenewCollabSim.Entities.Simulation
   use RenewCollabWeb, :controller
 
@@ -17,7 +16,11 @@ defmodule RenewCollabWeb.ProjectSimulationController do
           project_id: project_id
         }
         |> Fetcher.fetch_as(conn.assigns.current_account),
-      runnings: ScopedSimulationServer.running_ids(project_id) |> MapSet.new()
+      runnings:
+        %Views.ProjectRunningSimulationIds{
+          project_id: project_id
+        }
+        |> Fetcher.fetch_as(conn.assigns.current_account)
     )
   end
 

@@ -51,6 +51,15 @@ defmodule RenewCollabCtrl.ReadAccess do
   def can(%{id: account_id}, %Views.ProjectShadowNetSystemsList{project_id: proj_id}),
     do: can_read(account_id, :project, proj_id)
 
+  def can(%{id: account_id}, %Views.ProjectRunningSimulationIds{project_id: proj_id}),
+    do: can_read(account_id, :project, proj_id)
+
+  def can(%{id: account_id}, %Views.SimulationIsActive{project_id: proj_id}),
+    do: can_read(account_id, :project, proj_id)
+
+  def can(%{id: account_id}, %Views.SimulationIsPlaying{project_id: proj_id}),
+    do: can_read(account_id, :project, proj_id)
+
   def can(%{id: account_id}, %Views.ShadowNetSystem{shadow_net_system_id: sns_id}),
     do: can_read(account_id, :shadow_net_system, sns_id)
 

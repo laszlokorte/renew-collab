@@ -21,7 +21,7 @@ defmodule RenewCollabWeb.LiveSimulationNetInstanceChannel do
 
   @impl true
   def handle_message(
-        {:simulation_change, _simulation_id, _details},
+        {:simulation_change, {_simulation_id, _details}},
         _state,
         %{net_instance_id: net_instance_id, account: account}
       ) do

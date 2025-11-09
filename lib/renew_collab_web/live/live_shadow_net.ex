@@ -11,7 +11,9 @@ defmodule RenewCollabWeb.LiveShadowNet do
     shadow_net_system:
       {Views.ShadowNetSystem, [:shadow_net_system_id], :shadow_net_system_modified},
     documents: {Views.ProjectDocumentsList, [:project_id], :documents_changed},
-    simulations: {Views.ShadowNetSystemSimulations, [:shadow_net_system_id], :simulations_changed}
+    simulations:
+      {Views.ShadowNetSystemSimulations, [:shadow_net_system_id], :simulations_changed},
+    running: {Views.ProjectRunningSimulationIds, [:project_id], :simulation_change}
 
   def load_param(:shadow_net_system_id, socket), do: socket.assigns.shadow_net_system_id
   def load_param(:account_id, socket), do: socket.assigns.current_account.id
@@ -33,30 +35,20 @@ defmodule RenewCollabWeb.LiveShadowNet do
 
       {:ok, socket} ->
         project_id = load_param(:project_id, socket)
-        Phoenix.PubSub.subscribe(RenewCollab.PubSub, "projects/#{project_id}/simulations")
         Phoenix.PubSub.subscribe(RenewCollab.PubSub, "pub-project-simulations:#{project_id}")
 
         socket
         |> assign(:rename_form, to_form(%{"name" => socket.assigns.shadow_net_system.label}))
-        |> assign(
-          project_id: project_id,
-          running:
-            RenewCollabSim.Server.ScopedSimulationServer.running_ids(project_id)
-            |> MapSet.new()
-        )
         |> then(&{:ok, &1})
     end
   end
 
   def handle_info(
-        {:simulation_change, _sim_id, _change},
-        %{assigns: %{project_id: project_id, current_account: account}} = socket
+        {:simulation_change, {_sim_id, _change}},
+        %{assigns: %{current_account: account}} = socket
       ) do
     socket
     |> assign(
-      running:
-        RenewCollabSim.Server.ScopedSimulationServer.running_ids(project_id)
-        |> MapSet.new(),
       simulations:
         %Views.ShadowNetSystemSimulations{
           shadow_net_system_id: load_param(:shadow_net_system_id, socket)

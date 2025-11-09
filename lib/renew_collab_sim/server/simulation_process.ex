@@ -60,7 +60,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
         Phoenix.PubSub.broadcast(
           RenewCollab.PubSub,
           channel,
-          {:simulation_change, sim_id, {event, playing}}
+          {:simulation_change, {sim_id, {event, playing}}}
         )
       end
 

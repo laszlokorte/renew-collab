@@ -68,10 +68,11 @@ defmodule RenewCollabWeb.SimulationController do
         render(conn, :show,
           simulation: sim,
           running:
-            RenewCollabSim.Server.ScopedSimulationServer.exists(
-              sim.project_assignment.project_id,
-              simulation_id
-            )
+            %Views.SimulationIsActive{
+              project_id: sim.project_assignment.project_id,
+              simulation_id: simulation_id
+            }
+            |> Fetcher.fetch_as(conn.assigns.current_account)
         )
     end
   end

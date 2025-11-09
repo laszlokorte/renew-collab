@@ -71,7 +71,7 @@ defmodule RenewCollabSim.Server.SimulationServer do
   @impl true
   def handle_cast(
         {:setup, simulation_id},
-        %{project_id: project_id, processes: procs, pubsub_channels: pubsub_channels} = state
+        %{processes: procs, pubsub_channels: pubsub_channels} = state
       ) do
     if Map.has_key?(procs, simulation_id) do
       {:noreply, state}
@@ -80,7 +80,7 @@ defmodule RenewCollabSim.Server.SimulationServer do
              RenewCollabSim.Server.SimulationProcess.start_monitor(simulation_id, [
                "simulation:#{simulation_id}" | pubsub_channels
              ]) do
-        broadcast_state_change(state, project_id, simulation_id)
+        broadcast_state_change(state, simulation_id)
 
         {:noreply,
          %{
@@ -137,14 +137,14 @@ defmodule RenewCollabSim.Server.SimulationServer do
   def handle_call(
         {:setup, simulation_id},
         _from,
-        %{project_id: project_id, processes: procs, pubsub_channels: pubsub_channels} = state
+        %{processes: procs, pubsub_channels: pubsub_channels} = state
       ) do
     if Map.has_key?(procs, simulation_id) do
       {:noreply, state}
     else
       with {:ok, pid} <-
              RenewCollabSim.Server.SimulationProcess.start_monitor(simulation_id, pubsub_channels) do
-        broadcast_state_change(state, project_id, simulation_id)
+        broadcast_state_change(state, simulation_id)
 
         {:reply, :ok,
          %{
@@ -201,9 +201,9 @@ defmodule RenewCollabSim.Server.SimulationServer do
   @impl true
   def handle_info(
         {:broadcast_shutdown, simulation_id},
-        %{project_id: project_id, processes: procs} = state
+        %{processes: procs} = state
       ) do
-    broadcast_state_change(state, project_id, simulation_id)
+    broadcast_state_change(state, simulation_id)
 
     if Enum.empty?(procs), do: {:stop, :normal, state}, else: {:noreply, state}
   end
@@ -238,25 +238,21 @@ defmodule RenewCollabSim.Server.SimulationServer do
     state
   end
 
-  defp cleanup(_reason, %{project_id: project_id, processes: procs} = state) do
+  defp cleanup(_reason, %{processes: procs} = state) do
     for {simulation_id, %{sim_process: pid}} <- procs do
       RenewCollabSim.Server.SimulationProcess.stop(pid)
 
-      broadcast_state_change(state, project_id, simulation_id)
+      broadcast_state_change(state, simulation_id)
     end
   end
 
-  defp broadcast_state_change(_state, project_id, simulation_id) do
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "simulation:#{simulation_id}",
-      {:simulation_change, simulation_id, :state}
-    )
-
-    Phoenix.PubSub.broadcast(
-      RenewCollab.PubSub,
-      "projects/#{project_id}/simulations",
-      {:simulation_change, simulation_id, :state}
-    )
+  defp broadcast_state_change(%{pubsub_channels: channels}, simulation_id) do
+    for channel <- ["simulation:#{simulation_id}" | channels] do
+      Phoenix.PubSub.broadcast(
+        RenewCollab.PubSub,
+        channel,
+        {:simulation_change, {simulation_id, :state}}
+      )
+    end
   end
 end

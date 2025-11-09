@@ -9,7 +9,9 @@ defmodule RenewCollabWeb.LiveSimulations do
   use RenewCollabCtrl.Helper,
     project: {Views.MyProject, [:account_id, :project_id], :project_changed},
     documents: {Views.ProjectDocumentsList, [:project_id], :documents_changed},
-    simulations: {Views.ProjectSimulationsList, [:project_id], :simulations_changed}
+    simulations: {Views.ProjectSimulationsList, [:project_id], :simulations_changed},
+    simulations: {Views.ProjectSimulationsList, [:project_id], :simulation_change},
+    running: {Views.ProjectRunningSimulationIds, [:project_id], :simulation_change}
 
   def load_param(:account_id, socket), do: socket.assigns.current_account.id
   def load_param(:project_id, socket), do: socket.assigns.project_id
@@ -20,11 +22,6 @@ defmodule RenewCollabWeb.LiveSimulations do
     |> assign(
       :sim_form,
       to_form(%{"documents" => [], "formalism" => nil, "main_net" => nil})
-    )
-    |> assign(
-      running:
-        RenewCollabSim.Server.ScopedSimulationServer.running_ids(project_id)
-        |> MapSet.new()
     )
     |> load_data(true)
     |> case do
@@ -38,14 +35,11 @@ defmodule RenewCollabWeb.LiveSimulations do
   end
 
   def handle_info(
-        {:simulation_change, _sim_id, _change},
+        {:simulation_change, {_sim_id, _change}},
         %{assigns: %{project_id: project_id, current_account: account}} = socket
       ) do
     socket
     |> assign(
-      running:
-        RenewCollabSim.Server.ScopedSimulationServer.running_ids(project_id)
-        |> MapSet.new(),
       simulations:
         %Views.ProjectSimulationsList{project_id: project_id} |> Fetcher.fetch_as(account)
     )
