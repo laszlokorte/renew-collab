@@ -13,6 +13,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
     documents: {Views.ProjectDocumentsList, [:project_id], :documents_changed},
     simulations:
       {Views.ShadowNetSystemSimulations, [:shadow_net_system_id], :simulations_changed},
+    simulations: {Views.ShadowNetSystemSimulations, [:shadow_net_system_id], :simulation_change},
     running: {Views.ProjectRunningSimulationIds, [:project_id], :simulation_change}
 
   def load_param(:shadow_net_system_id, socket), do: socket.assigns.shadow_net_system_id
@@ -334,7 +335,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
                         phx-disable-with="Starting..."
                         style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
                       >
-                        Setup
+                        Initialize
                       </button>
                     </td>
                   <% end %>

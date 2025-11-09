@@ -8,7 +8,7 @@ defmodule RenewCollabWeb.LiveSimulation do
   alias RenewCollabCtrl.Fetcher
 
   use RenewCollabCtrl.Helper,
-    simulation: {Views.SimulationWithState, [:simulation_id], :simulation_change},
+    simulation: {Views.SimulationWithState, [:simulation_id], :simulation_ch},
     is_active: {Views.SimulationIsActive, [:project_id, :simulation_id], :simulation_change}
 
   def load_param(:simulation_id, socket), do: socket.assigns.simulation_id

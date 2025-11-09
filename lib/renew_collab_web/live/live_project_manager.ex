@@ -1,5 +1,4 @@
 defmodule RenewCollabWeb.LiveProjectManager do
-  alias RenewCollabCtrl.WriteAccess
   alias RenewCollabCtrl.Fetcher
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Dispatcher
@@ -74,21 +73,19 @@ defmodule RenewCollabWeb.LiveProjectManager do
         </dl>
       </div>
       <div style="padding: 1em">
-        <%= if WriteAccess.can(@current_account, %Actions.ProjectRename{project_id: @project.id}) do %>
-          <div style="border: 1px solid #ddd; margin: 1em 0; padding: 1em">
-            <h3 style="margin-top: 0;border-bottom: 1px solid #aaa;">Rename Project</h3>
+        <div style="border: 1px solid #ddd; margin: 1em 0; padding: 1em">
+          <h3 style="margin-top: 0;border-bottom: 1px solid #aaa;">Rename Project</h3>
 
-            <form method="post" phx-submit="rename" accept-charset="utf-8">
-              <input type="text" name="name" value={@project.name} />
-              <button
-                type="submit"
-                style="cursor: pointer; padding: 1ex; border: none; background: #3aa; color: #fff"
-              >
-                Rename
-              </button>
-            </form>
-          </div>
-        <% end %>
+          <form method="post" phx-submit="rename" accept-charset="utf-8">
+            <input type="text" name="name" value={@project.name} />
+            <button
+              type="submit"
+              style="cursor: pointer; padding: 1ex; border: none; background: #3aa; color: #fff"
+            >
+              Rename
+            </button>
+          </form>
+        </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(40em, 1fr)); gap: 1em;">
           <div style="border: 1px solid #ddd; padding: 1em">
             <h3 style="margin-top: 0;border-bottom: 1px solid #aaa;">Members</h3>
@@ -96,16 +93,14 @@ defmodule RenewCollabWeb.LiveProjectManager do
               <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px">
                 <%= for m <- @project.members do %>
                   <li>
-                    <%= if WriteAccess.can(@current_account, %Actions.ProjectRemoveMemberAsAdmin{project_id: @project.id, account_id: m.account_id}) do %>
-                      <button
-                        type="button"
-                        phx-click="remove_member"
-                        style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
-                        phx-value-id={m.account_id}
-                      >
-                        Remove
-                      </button>
-                    <% end %>
+                    <button
+                      type="button"
+                      phx-click="remove_member"
+                      style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
+                      phx-value-id={m.account_id}
+                    >
+                      Remove
+                    </button>
                     <img class="icon" src="/assets/icon-user.svg" style="vertical-align: middle" />
                     <%= case  m.account do %>
                       <% %{id: account_id, email: account_email} -> %>
@@ -133,34 +128,32 @@ defmodule RenewCollabWeb.LiveProjectManager do
               <p>None</p>
             <% end %>
 
-            <%= if WriteAccess.can(@current_account, %Actions.ProjectAddMemberAsAdmin{project_id: @project.id}) do %>
-              <form method="post" phx-submit="add_member" accept-charset="utf-8">
-                <select name="account_id">
-                  <option value="">---</option>
-                  <%= for a <- @accounts do %>
-                    <option
-                      value={a.id}
-                      disabled={Enum.any?(@project.members, &(&1.account_id == a.id))}
-                    >
-                      {a.email}
-                    </option>
-                  <% end %>
-                </select>
-                <select name="role">
-                  <%= for r <- RenewCollabProj.Projects.member_roles(@current_account, @project) do %>
-                    <option value={r}>
-                      {r}
-                    </option>
-                  <% end %>
-                </select>
-                <button
-                  type="submit"
-                  style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
-                >
-                  Invite
-                </button>
-              </form>
-            <% end %>
+            <form method="post" phx-submit="add_member" accept-charset="utf-8">
+              <select name="account_id">
+                <option value="">---</option>
+                <%= for a <- @accounts do %>
+                  <option
+                    value={a.id}
+                    disabled={Enum.any?(@project.members, &(&1.account_id == a.id))}
+                  >
+                    {a.email}
+                  </option>
+                <% end %>
+              </select>
+              <select name="role">
+                <%= for r <- RenewCollabProj.Projects.member_roles(@current_account, @project) do %>
+                  <option value={r}>
+                    {r}
+                  </option>
+                <% end %>
+              </select>
+              <button
+                type="submit"
+                style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+              >
+                Invite
+              </button>
+            </form>
           </div>
           <div style="border: 1px solid #ddd; padding: 1em">
             <h3 style="margin-top: 0;border-bottom: 1px solid #aaa;">Documents</h3>
@@ -341,20 +334,18 @@ defmodule RenewCollabWeb.LiveProjectManager do
             </form>
           </div>
         </div>
-        <%= if WriteAccess.can(@current_account, %Actions.ProjectDelete{project_id: @project.id}) do %>
-          <div style="border: 1px solid #ddd; margin: 1em 0; padding: 1em">
-            <h3 style="margin-top: 0;border-bottom: 1px solid #aaa;">Delete Project</h3>
+        <div style="border: 1px solid #ddd; margin: 1em 0; padding: 1em">
+          <h3 style="margin-top: 0;border-bottom: 1px solid #aaa;">Delete Project</h3>
 
-            <form method="post" phx-submit="delete" phx-value-id={@project.id} accept-charset="utf-8">
-              <button
-                type="submit"
-                style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
-              >
-                Delete
-              </button>
-            </form>
-          </div>
-        <% end %>
+          <form method="post" phx-submit="delete" phx-value-id={@project.id} accept-charset="utf-8">
+            <button
+              type="submit"
+              style="white-space: nowrap; cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
+            >
+              Delete
+            </button>
+          </form>
+        </div>
       </div>
     </div>
     """

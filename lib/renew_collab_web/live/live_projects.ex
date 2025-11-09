@@ -1,6 +1,5 @@
 defmodule RenewCollabWeb.LiveProjects do
   alias RenewCollabCtrl.Dispatcher
-  alias RenewCollabCtrl.WriteAccess
   alias RenewCollabCtrl.Actions
   alias RenewCollabCtrl.Views
   use RenewCollabWeb, :live_view
@@ -201,29 +200,25 @@ defmodule RenewCollabWeb.LiveProjects do
                     </a>
                   </td>
                   <td width="50">
-                    <%= if WriteAccess.can(@current_account, %Actions.ProjectDuplicateAsUser{project_id: project.id}) do %>
-                      <button
-                        type="button"
-                        phx-click="duplicate_project"
-                        phx-value-id={project.id}
-                        style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
-                      >
-                        Duplicate
-                      </button>
-                    <% end %>
+                    <button
+                      type="button"
+                      phx-click="duplicate_project"
+                      phx-value-id={project.id}
+                      style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
+                    >
+                      Duplicate
+                    </button>
                   </td>
 
                   <td width="50">
-                    <%= if WriteAccess.can(@current_account, %Actions.ProjectDelete{project_id: project.id}) do %>
-                      <button
-                        type="button"
-                        phx-click="delete_project"
-                        phx-value-id={project.id}
-                        style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
-                      >
-                        Delete
-                      </button>
-                    <% end %>
+                    <button
+                      type="button"
+                      phx-click="delete_project"
+                      phx-value-id={project.id}
+                      style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               <% end %>

@@ -214,6 +214,8 @@ defmodule RenewCollabWeb.Router do
       live "/primitives", LivePrimitives
       live "/manage/projects", LiveProjectsManager
       live "/manage/project/:project_id", LiveProjectManager
+      live "/manage/documents", LiveDocumentsManager
+      live "/manage/simulations", LiveSimulationsManager
     end
   end
 

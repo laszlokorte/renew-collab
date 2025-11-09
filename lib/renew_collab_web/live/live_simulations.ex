@@ -225,7 +225,7 @@ defmodule RenewCollabWeb.LiveSimulations do
                         phx-disable-with="Starting..."
                         style="cursor: pointer; padding: 1ex; border: none; background: #3a3; color: #fff"
                       >
-                        Setup
+                        Initialize
                       </button>
                     </td>
                   <% end %>
