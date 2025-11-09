@@ -34,18 +34,6 @@ defmodule RenewCollabWeb.LiveSimulations do
     end
   end
 
-  def handle_info(
-        {:simulation_change, {_sim_id, _change}},
-        %{assigns: %{project_id: project_id, current_account: account}} = socket
-      ) do
-    socket
-    |> assign(
-      simulations:
-        %Views.ProjectSimulationsList{project_id: project_id} |> Fetcher.fetch_as(account)
-    )
-    |> then(&{:noreply, &1})
-  end
-
   def render(assigns) do
     ~H"""
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">

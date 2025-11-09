@@ -44,21 +44,6 @@ defmodule RenewCollabWeb.LiveShadowNet do
     end
   end
 
-  def handle_info(
-        {:simulation_change, {_sim_id, _change}},
-        %{assigns: %{current_account: account}} = socket
-      ) do
-    socket
-    |> assign(
-      simulations:
-        %Views.ShadowNetSystemSimulations{
-          shadow_net_system_id: load_param(:shadow_net_system_id, socket)
-        }
-        |> Fetcher.fetch_as(account)
-    )
-    |> then(&{:noreply, &1})
-  end
-
   def render(assigns) do
     ~H"""
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">

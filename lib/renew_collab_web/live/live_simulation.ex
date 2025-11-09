@@ -26,7 +26,6 @@ defmodule RenewCollabWeb.LiveSimulation do
         {:ok, socket |> put_flash(:error, "Project not found") |> redirect(to: ~p"/projects")}
 
       {:ok, socket = %{assigns: %{simulation: sim}}} ->
-        project_id = load_param(:project_id, socket)
         Phoenix.PubSub.subscribe(RenewCollab.PubSub, "simulation:#{sim.id}")
 
         socket
