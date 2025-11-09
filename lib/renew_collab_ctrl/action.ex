@@ -1135,25 +1135,40 @@ defmodule RenewCollabCtrl.Action do
             |> RenewCollab.Queries.DocumentWithElements.new()
             |> RenewCollab.DocumentFetcher.fetch()
 
-          {:ok, rnw} = RenewCollab.Export.DocumentExport.export(document, synthetic: true)
-          {:ok, json} = RenewCollabWeb.DocumentJSON.show_content(document) |> Jason.encode()
+          {:ok, document_thumbnail} =
+            %{document_id: doc_id, root_layer_id: :thumbnail}
+            |> RenewCollab.Queries.DocumentWithElements.new()
+            |> RenewCollab.DocumentFetcher.fetch()
 
-          {RenewCollabSim.Compiler.SnsCompiler.normalize_net_name(document.name), rnw, json,
-           {document.id, document.current_snaptshot.id}}
+          {:ok, rnw} = RenewCollab.Export.DocumentExport.export(document, synthetic: true)
+
+          {:ok, document_json} =
+            RenewCollabWeb.DocumentJSON.show_content(document) |> Jason.encode()
+
+          {:ok, thumbnail_json} =
+            RenewCollabWeb.DocumentJSON.show_content(document_thumbnail, 0) |> Jason.encode()
+
+          %{
+            net_name: RenewCollabSim.Compiler.SnsCompiler.normalize_net_name(document.name),
+            rnw: rnw,
+            document_json: document_json,
+            thumbnail_json: thumbnail_json,
+            snapshot_id: {document.id, document.current_snaptshot.id}
+          }
         end)
       rescue
         e ->
           {:error, {:export_error, e}}
       end
 
-    [{default_main_name, _, _, _} | _] = nets
+    [%{net_name: default_main_name} | _] = nets
     main_name = main_net_name || default_main_name
 
     {:ok, content} =
       RenewCollabSim.Compiler.SnsCompiler.compile(
         formalism,
         nets
-        |> Enum.map(fn {name, rnw, _, _} -> {name, rnw} end)
+        |> Enum.map(fn %{net_name: name, rnw: rnw} -> {name, rnw} end)
       )
 
     {:ok, %{shadow_net_system: %{id: sns_id}}} =
@@ -1163,11 +1178,15 @@ defmodule RenewCollabCtrl.Action do
         main_net_name: main_name,
         nets:
           nets
-          |> Enum.map(fn {name, _, json, _} ->
+          |> Enum.map(fn %{
+                           net_name: net_name,
+                           document_json: document_json,
+                           thumbnail_json: thumbnail_json
+                         } ->
             %{
-              "name" => name,
-              "document_json" => json,
-              "thumbnail_json" => json
+              "name" => net_name,
+              "document_json" => document_json,
+              "thumbnail_json" => thumbnail_json
             }
           end)
       })
@@ -1195,7 +1214,7 @@ defmodule RenewCollabCtrl.Action do
           simulation_id: sim_id,
           document_ids:
             nets
-            |> Enum.map(fn {_, _, _, {doc_id, snapshot_id}} -> {doc_id, snapshot_id} end)
+            |> Enum.map(fn %{snapshot_id: snap_id} -> snap_id end)
         })
         |> RenewCollab.DocumentCommander.run_document_command_sync()
 

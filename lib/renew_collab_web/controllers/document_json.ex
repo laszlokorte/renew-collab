@@ -38,12 +38,12 @@ defmodule RenewCollabWeb.DocumentJSON do
     }
   end
 
-  def show_content(%Document{} = document) do
+  def show_content(%Document{} = document, padding \\ 100) do
     %{
       name: document.name,
       kind: document.kind,
       syntax: syntax_data(document.syntax_id),
-      viewbox: viewbox_data(RenewCollab.ViewBox.calculate(document)),
+      viewbox: viewbox_data(RenewCollab.ViewBox.calculate(document, padding)),
       snapshot: snapshot_data(document),
       thumbnail_layer:
         document.thumbnail
