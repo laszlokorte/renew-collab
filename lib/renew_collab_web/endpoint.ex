@@ -18,7 +18,7 @@ defmodule RenewCollabWeb.Endpoint do
     longpoll: [connect_info: [session: @session_options]]
 
   socket "/redux", RenewCollabWeb.LiveSocket,
-    websocket: [check_origin: true],
+    websocket: [check_origin: false],
     longpoll: false
 
   # Serve at "/" the static files from "priv/static" directory.
