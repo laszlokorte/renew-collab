@@ -35,7 +35,7 @@ defmodule RenewCollabWeb.LiveSocketSchemas do
       <div style="padding: 1em">
         / Socket Schemas
         <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
-          <img class="icon" src="/assets/icon-socket.svg" />
+          <img class="icon" src="/images/icon-socket.svg" />
           <span>
             Socket Schemas
           </span>

@@ -56,7 +56,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
         <.link navigate={~p"/manage/projects"}>Projects Management</.link>
         / Project
         <h2 style="margin: 0; display: flex; align-items: center; gap: 1ex;">
-          <img class="icon" src="/assets/icon-project.svg" /> Project: {@project.name}
+          <img class="icon" src="/images/icon-project.svg" /> Project: {@project.name}
         </h2>
       </div>
 
@@ -101,7 +101,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
                     >
                       Remove
                     </button>
-                    <img class="icon" src="/assets/icon-user.svg" style="vertical-align: middle" />
+                    <img class="icon" src="/images/icon-user.svg" style="vertical-align: middle" />
                     <%= case  m.account do %>
                       <% %{id: account_id, email: account_email} -> %>
                         <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
@@ -170,7 +170,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
                       Remove
                     </button>
 
-                    <img class="icon" src="/assets/icon-document.svg" style="vertical-align: middle" />
+                    <img class="icon" src="/images/icon-document.svg" style="vertical-align: middle" />
                     <img
                       class="icon"
                       src={"/documents/#{d.document_id}/thumbnail"}
@@ -241,7 +241,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
                     >
                       Remove
                     </button>
-                    <img class="icon" src="/assets/icon-network.svg" style="vertical-align: middle" />
+                    <img class="icon" src="/images/icon-network.svg" style="vertical-align: middle" />
                     <%= case s.shadow_net_system do %>
                       <% %{id: sns_id, label: sns_label} -> %>
                         <small>{sns_label || "Untitled"} ({sns_id})</small>
@@ -295,7 +295,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
 
                     <img
                       class="icon"
-                      src="/assets/icon-simulation.svg"
+                      src="/images/icon-simulation.svg"
                       style="vertical-align: middle"
                     />
                     <%= case s.simulation do %>

@@ -28,7 +28,7 @@ defmodule RenewCollabWeb.LivePrimitives do
         /
         Predefined Primitives
         <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
-          <img class="icon" src="/assets/icon-lego.svg" />
+          <img class="icon" src="/images/icon-lego.svg" />
           <span>
             Primitives
           </span>

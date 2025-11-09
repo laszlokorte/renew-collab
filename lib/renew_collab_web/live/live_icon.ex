@@ -37,7 +37,7 @@ defmodule RenewCollabWeb.LiveIcon do
           Icons
         </.link>
         <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
-          <img class="icon" src="/assets/icon-symbol.svg" />
+          <img class="icon" src="/images/icon-symbol.svg" />
           <span>
             Icon: {@icon.name}
           </span>

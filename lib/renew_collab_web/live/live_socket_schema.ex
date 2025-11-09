@@ -45,7 +45,7 @@ defmodule RenewCollabWeb.LiveSocketSchema do
           Socket Schemas
         </.link>
         <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
-          <img class="icon" src="/assets/icon-socket.svg" />
+          <img class="icon" src="/images/icon-socket.svg" />
           <span>
             Socket Schema: {@socket_schema.name}
           </span>

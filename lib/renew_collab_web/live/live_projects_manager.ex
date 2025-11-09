@@ -28,7 +28,7 @@ defmodule RenewCollabWeb.LiveProjectsManager do
       <div style="padding: 1em">
         Projects Management
         <h2 style="margin: 0; display: flex; align-items: center; gap: 1ex;">
-          <img class="icon" src="/assets/icon-project.svg" /> Manage Projects
+          <img class="icon" src="/images/icon-project.svg" /> Manage Projects
         </h2>
       </div>
       <div style="padding: 1em 1em 0; display: flex; align-items: start; gap: 1em">
@@ -97,33 +97,33 @@ defmodule RenewCollabWeb.LiveProjectsManager do
                       style="color: #078; display: flex; gap: 1ex;"
                       navigate={~p"/manage/project/#{project.id}"}
                     >
-                      <img class="icon" src="/assets/icon-project.svg" />
+                      <img class="icon" src="/images/icon-project.svg" />
                       {project.name}
                     </.link>
                   </td>
 
                   <td width="50">
                     <div style=" display: flex; gap: 1ex; align-items: center;">
-                      <img class="icon" src="/assets/icon-document.svg" />
+                      <img class="icon" src="/images/icon-document.svg" />
                       {project.documents |> Enum.count()}
                     </div>
                   </td>
                   <td width="50">
                     <div style=" display: flex; gap: 1ex; align-items: center;">
-                      <img class="icon" src="/assets/icon-network.svg" />
+                      <img class="icon" src="/images/icon-network.svg" />
                       {project.shadow_net_systems |> Enum.count()}
                     </div>
                   </td>
                   <td width="50">
                     <div style=" display: flex; gap: 1ex; align-items: center;">
-                      <img class="icon" src="/assets/icon-simulation.svg" />
+                      <img class="icon" src="/images/icon-simulation.svg" />
                       {project.simulations |> Enum.count()}
                     </div>
                   </td>
 
                   <td width="50">
                     <div style=" display: flex; gap: 1ex; align-items: center;">
-                      <img class="icon" src="/assets/icon-user.svg" />
+                      <img class="icon" src="/images/icon-user.svg" />
                       {project.ownerships |> Enum.count()} / {project.members |> Enum.count()}
                     </div>
                   </td>

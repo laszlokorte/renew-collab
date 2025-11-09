@@ -49,7 +49,7 @@ defmodule RenewCollabWeb.LiveProjectSettings do
         </.link>
         / Settings
         <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
-          <img class="icon" src="/assets/icon-gear.svg" />
+          <img class="icon" src="/images/icon-gear.svg" />
           <span>
             Settings (Name: {@project.name}) <br /><small>{@project.id}</small>
           </span>

@@ -26,7 +26,7 @@ defmodule RenewCollabWeb.LiveSimulationsManager do
       <div style="padding: 1em">
         Simulation Management
         <h2 style="margin: 0; display: flex; align-items: center; gap: 1ex;">
-          <img class="icon" src="/assets/icon-simulation.svg" /> Manage Simulations
+          <img class="icon" src="/images/icon-simulation.svg" /> Manage Simulations
         </h2>
       </div>
       <div style="padding: 1em">
@@ -61,7 +61,7 @@ defmodule RenewCollabWeb.LiveSimulationsManager do
                       style="color: #078; display: flex; gap: 1ex;"
                       navigate={~p"/simulation/#{simulation.id}"}
                     >
-                      <img class="icon" src="/assets/icon-simulation.svg" />
+                      <img class="icon" src="/images/icon-simulation.svg" />
                       {simulation.label || simulation.id}
                     </.link>
                   </td>

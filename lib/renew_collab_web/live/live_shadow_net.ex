@@ -67,7 +67,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
         <% end %>
         / Simulations
         <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
-          <img class="icon" src="/assets/icon-network.svg" />
+          <img class="icon" src="/images/icon-network.svg" />
           <span>
             Shadow Net System {@shadow_net_system.label || "Untitled"}<br />
             (<small><code>{@shadow_net_system.id}</code></small>)
@@ -236,7 +236,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
                 <tr {if(rem(si, 2) == 0, do: [style: "background-color:#f5f5f5;"], else: [])}>
                   <td>
                     <div style="display: flex; align-items: center; gap: 1ex; justify-content: start;">
-                      <img class="icon" src="/assets/icon-simulation.svg" />
+                      <img class="icon" src="/images/icon-simulation.svg" />
                       <span>
                         <%= if sim.label do %>
                           <.link navigate={~p"/simulation/#{sim.id}"}>

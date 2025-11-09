@@ -50,7 +50,7 @@ defmodule RenewCollabWeb.LiveSimulations do
         </.link>
         / Simulations
         <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
-          <img class="icon" src="/assets/icon-simulation.svg" /> Simulations
+          <img class="icon" src="/images/icon-simulation.svg" /> Simulations
         </h2>
       </div>
 
@@ -133,7 +133,7 @@ defmodule RenewCollabWeb.LiveSimulations do
                 <tr {if(rem(si, 2) == 0, do: [style: "background-color:#f5f5f5;"], else: [])}>
                   <td>
                     <div style="color: #078; display: flex; align-items: center; gap: 1ex; justify-content: start;">
-                      <img class="icon" src="/assets/icon-simulation.svg" />
+                      <img class="icon" src="/images/icon-simulation.svg" />
                       <span>
                         <.link navigate={~p"/simulation/#{sim.id}"}>
                           {sim.label || sim.id}

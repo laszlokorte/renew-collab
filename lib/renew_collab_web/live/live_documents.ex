@@ -54,7 +54,7 @@ defmodule RenewCollabWeb.LiveDocuments do
         </.link>
         / Documents
         <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
-          <img class="icon" src="/assets/icon-document.svg" /> Documents
+          <img class="icon" src="/images/icon-document.svg" /> Documents
         </h2>
       </div>
 
@@ -184,7 +184,7 @@ defmodule RenewCollabWeb.LiveDocuments do
                       style="color: #078; display: flex; align-items: center; gap: 1ex; justify-content: start;"
                       navigate={~p"/document/#{document.id}"}
                     >
-                      <img class="icon" src="/assets/icon-document.svg" />
+                      <img class="icon" src="/images/icon-document.svg" />
                       <img class="icon" src={"/documents/#{document.id}/thumbnail"} />
                       {document.name}
                     </.link>

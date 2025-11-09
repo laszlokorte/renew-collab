@@ -25,7 +25,7 @@ defmodule RenewCollabWeb.LiveProjects do
       <div style="padding: 1em">
         Projects
         <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
-          <img class="icon" src="/assets/icon-project.svg" /> Projects
+          <img class="icon" src="/images/icon-project.svg" /> Projects
         </h2>
       </div>
       <div style="padding:  0 1em ; display: flex; align-items: start; gap: 1em">
@@ -142,7 +142,7 @@ defmodule RenewCollabWeb.LiveProjects do
                       style="color: #078;display: flex; align-items: center; gap: 1ex; justify-content: start;"
                       navigate={~p"/project/#{project.id}/documents"}
                     >
-                      <img class="icon" src="/assets/icon-project.svg" />
+                      <img class="icon" src="/images/icon-project.svg" />
                       {project.name}
                     </.link>
                   </td>
@@ -152,7 +152,7 @@ defmodule RenewCollabWeb.LiveProjects do
                       style="color: #078; display: flex; align-items: center; gap: 1ex; justify-content: center;"
                       navigate={~p"/project/#{project.id}/documents"}
                     >
-                      <img class="icon" src="/assets/icon-document.svg" />
+                      <img class="icon" src="/images/icon-document.svg" />
                       {project.documents |> Enum.count()}
                     </.link>
                   </td>
@@ -161,7 +161,7 @@ defmodule RenewCollabWeb.LiveProjects do
                       style="color: #078; display: flex; align-items: center; gap: 1ex; justify-content: center;"
                       navigate={~p"/project/#{project.id}/shadow_nets"}
                     >
-                      <img class="icon" src="/assets/icon-network.svg" />
+                      <img class="icon" src="/images/icon-network.svg" />
                       {project.shadow_net_systems |> Enum.count()}
                     </.link>
                   </td>
@@ -170,7 +170,7 @@ defmodule RenewCollabWeb.LiveProjects do
                       style="color: #078; display: flex; align-items: center; gap: 1ex; justify-content: center;"
                       navigate={~p"/project/#{project.id}/simulations"}
                     >
-                      <img class="icon" src="/assets/icon-simulation.svg" />
+                      <img class="icon" src="/images/icon-simulation.svg" />
                       {project.simulations |> Enum.count()}
                     </.link>
                   </td>
@@ -180,7 +180,7 @@ defmodule RenewCollabWeb.LiveProjects do
                       style="color: #078; display: flex; align-items: center; gap: 1ex; justify-content: center;"
                       navigate={~p"/project/#{project.id}/settings"}
                     >
-                      <img class="icon" src="/assets/icon-gear.svg" />
+                      <img class="icon" src="/images/icon-gear.svg" />
                       {project.ownerships |> Enum.count()} / {project.members |> Enum.count()}
                     </.link>
                   </td>

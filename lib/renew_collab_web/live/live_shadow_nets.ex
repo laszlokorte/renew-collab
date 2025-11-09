@@ -59,7 +59,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
         </.link>
         / Shadow Net Systems
         <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
-          <img class="icon" src="/assets/icon-network.svg" /> Shadow Net Systems
+          <img class="icon" src="/images/icon-network.svg" /> Shadow Net Systems
         </h2>
       </div>
       <div style="padding: 0 1em; display: flex; align-items: start; gap: 1em">
@@ -252,7 +252,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
                 <tr {if(rem(si, 2) == 0, do: [style: "background-color:#f5f5f5;"], else: [])}>
                   <td width="100%">
                     <div style="color: #078; display: flex; align-items: center; gap: 1ex; justify-content: start;">
-                      <img class="icon" src="/assets/icon-network.svg" />
+                      <img class="icon" src="/images/icon-network.svg" />
                       <span>
                         <.link navigate={~p"/shadow_net/#{sns.id}"}>
                           {sns.label || sns.id}
@@ -282,7 +282,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
 
                   <td style="white-space: nowrap;">
                     <div style="display: flex; align-items: center; gap: 1ex; justify-content: start;">
-                      <img class="icon" src="/assets/icon-simulation.svg" />
+                      <img class="icon" src="/images/icon-simulation.svg" />
                       {sns.simulation_count}
                     </div>
                   </td>

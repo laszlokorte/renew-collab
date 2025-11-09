@@ -26,7 +26,7 @@ defmodule RenewCollabWeb.LiveDocumentsManager do
       <div style="padding: 1em">
         Documents Management
         <h2 style="margin: 0; display: flex; align-items: center; gap: 1ex;">
-          <img class="icon" src="/assets/icon-document.svg" /> Manage Documents
+          <img class="icon" src="/images/icon-document.svg" /> Manage Documents
         </h2>
       </div>
 
@@ -62,7 +62,7 @@ defmodule RenewCollabWeb.LiveDocumentsManager do
                       style="color: #078; display: flex; gap: 1ex;"
                       navigate={~p"/document/#{document.id}"}
                     >
-                      <img class="icon" src="/assets/icon-document.svg" />
+                      <img class="icon" src="/images/icon-document.svg" />
                       {document.name}
                     </.link>
                   </td>

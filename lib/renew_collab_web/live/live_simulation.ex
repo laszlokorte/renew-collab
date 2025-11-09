@@ -62,7 +62,7 @@ defmodule RenewCollabWeb.LiveSimulation do
         </.link>
         / Simulation
         <h2 style="margin: 0; display: flex; gap: 1ex; align-items: start;">
-          <img class="icon" src="/assets/icon-simulation.svg" />
+          <img class="icon" src="/images/icon-simulation.svg" />
           <span>
             Simulation {@simulation.label || "Untitled"}<br />
             (<small><code>{@simulation.id}</code></small>)
