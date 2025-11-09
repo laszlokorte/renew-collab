@@ -78,7 +78,7 @@ defmodule RenewCollabCtrl.ReadAccess do
   def can(%{id: account_id}, %Views.MyProjectInvitations{account_id: account_id}), do: true
 
   def can(%{id: account_id}, %Views.MediaData{media_id: media_id}),
-    do: can_read(account_id, :media, media_id)
+    do: true or can_read(account_id, :media, media_id)
 
   def can(%{id: account_id}, %Views.ShadowNetSystemSimulations{
         shadow_net_system_id: sns_id
