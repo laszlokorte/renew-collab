@@ -15,7 +15,7 @@ defmodule RenewCollab.Document.TransientDocument do
     }
   end
 
-  defp shift_layer(layer, dx, dy) do
+  def shift_layer(layer, dx, dy) do
     layer
     |> Map.update(:box, nil, fn
       nil ->

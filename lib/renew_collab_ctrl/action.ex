@@ -294,13 +294,15 @@ defmodule RenewCollabCtrl.Action do
   def do_perform(%Actions.DocumentEditImportFile{
         document_id: document_id,
         file_name: file_name,
-        file_content: file_content
+        file_content: file_content,
+        x: x,
+        y: y
       }) do
     with {:ok, imported} <- RenewCollab.Import.DocumentImport.import(file_name, file_content) do
       %RenewCollab.Commands.InsertTransientDocument{
         target_document_id: document_id,
         converted_document: imported,
-        position: {0, 0}
+        position: {x, y}
       }
       |> RenewCollab.DocumentCommander.run_document_command_sync()
 

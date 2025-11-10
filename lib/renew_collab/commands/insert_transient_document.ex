@@ -43,10 +43,10 @@ defmodule RenewCollab.Commands.InsertTransientDocument do
   def multi(%__MODULE__{
         target_document_id: target_document_id,
         converted_document: converted_document,
-        position: {_dx, _dy}
+        position: {dx, dy}
       }) do
     Ecto.Multi.new()
-    |> Ecto.Multi.put(:stripped_document, converted_document)
+    |> Ecto.Multi.put(:stripped_document, converted_document |> Converted.shift_positions(dx, dy))
     |> Ecto.Multi.put(:document_id, target_document_id)
     |> Ecto.Multi.run(:now, fn _, %{} ->
       {:ok, DateTime.utc_now() |> DateTime.truncate(:second)}

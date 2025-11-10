@@ -875,14 +875,13 @@ defmodule RenewCollabWeb.LiveDocument do
       consume_uploaded_entries(socket, :import_file, fn %{path: path}, %{client_name: filename} ->
         {:ok, content} = File.read(path)
 
-        with {:ok, converted = %RenewCollab.Import.Converted{}} <-
-               %Actions.DocumentEditImportFile{
-                 document_id: socket.assigns.document.id,
-                 file_name: filename,
-                 file_content: content
-               } do
-          {:ok, converted}
-        end
+        %Actions.DocumentEditImportFile{
+          document_id: socket.assigns.document.id,
+          file_name: filename,
+          x: 0,
+          y: 0,
+          file_content: content
+        }
       end)
 
     command

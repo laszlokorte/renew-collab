@@ -951,6 +951,26 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
     :ack
   end
 
+  @impl true
+  def handle_event(
+        "insert_file",
+        %{"content" => content, "file_name" => file_name, "x" => x, "y" => y},
+        %{},
+        %{:document_id => document_id, :account => account},
+        _socket
+      ) do
+    %Actions.DocumentEditImportFile{
+      document_id: document_id,
+      file_name: file_name,
+      file_content: content,
+      x: x,
+      y: y
+    }
+    |> Dispatcher.perform_as(account)
+
+    :ack
+  end
+
   defp make_color(account_id) do
     hue =
       <<i <- account_id |> then(&:crypto.hash(:md5, &1))>> |> for(do: i) |> Enum.sum() |> rem(360)
