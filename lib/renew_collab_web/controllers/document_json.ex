@@ -14,15 +14,6 @@ defmodule RenewCollabWeb.DocumentJSON do
     detail_data(document)
   end
 
-  @doc """
-  Renders a single document.
-  """
-  def import(%{imported: documents}) do
-    %{
-      items: for(document <- documents, do: list_data(document))
-    }
-  end
-
   defp list_data(%Document{} = document) do
     %{
       # id: document.id,

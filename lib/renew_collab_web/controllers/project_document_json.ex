@@ -15,6 +15,10 @@ defmodule RenewCollabWeb.ProjectDocumentJSON do
           method: "GET",
           id: project_id,
           href: url(~p"/api/projects/#{project_id}")
+        },
+        import: %{
+          method: "POST",
+          href: url(~p"/api/projects/#{project_id}/documents/import")
         }
       }
     }
@@ -38,6 +42,12 @@ defmodule RenewCollabWeb.ProjectDocumentJSON do
           href: url(~p"/api/documents/#{document.id}/export")
         }
       }
+    }
+  end
+
+  def import_documents(%{imported: documents}) do
+    %{
+      items: for(document <- documents, do: list_data(document))
     }
   end
 end

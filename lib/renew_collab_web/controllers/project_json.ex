@@ -105,6 +105,10 @@ defmodule RenewCollabWeb.ProjectJSON do
         export: %{
           method: "GET",
           href: url(~p"/api/projects/#{project.id}/export")
+        },
+        import_documents: %{
+          method: "POST",
+          href: url(~p"/api/projects/#{project.id}/documents/import")
         }
       },
       content: show_content(%{project: project, members: members})

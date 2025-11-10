@@ -251,8 +251,8 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(%{id: account_id}, %Actions.ProjectRevokeInvitation{project_id: proj_id}),
     do: can_write(account_id, :project, proj_id)
 
-  def can(%{id: account_id}, %Actions.ProjectRejectInvitation{project_id: proj_id}),
-    do: can_write(account_id, :project, proj_id)
+  def can(%{id: account_id}, %Actions.ProjectRejectInvitation{account_id: account_id}),
+    do: true
 
   def can(%{id: account_id}, %Actions.ProjectAcceptInvitation{invitation_id: inv_id}),
     do: can_write(account_id, :invitation, inv_id)

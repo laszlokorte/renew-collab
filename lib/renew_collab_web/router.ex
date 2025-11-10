@@ -105,7 +105,7 @@ defmodule RenewCollabWeb.Router do
 
       get "/:project_id/blueprints", BlueprintController, :index
 
-      post "/:project_id/import", ProjectDocumentController, :import
+      post "/:project_id/documents/import", ProjectDocumentController, :import_documents
     end
 
     scope "/invitations" do

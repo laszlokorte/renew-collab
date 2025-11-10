@@ -176,46 +176,4 @@ defmodule RenewCollabWeb.DocumentController do
         |> text(Kernel.inspect(Map.from_struct(document), pretty: true, limit: :infinity))
     end
   end
-
-  def import(conn, %{
-        "files" => files
-      }) do
-    for %Plug.Upload{
-          path: path,
-          content_type: _content_type,
-          filename: filename
-        } <- files,
-        reduce: [] do
-      :error ->
-        :error
-
-      imported_documents ->
-        with {:ok, content} <- File.read(path),
-             {:ok, imported = %RenewCollab.Import.Converted{}} <-
-               DocumentImport.import(filename, content),
-             {:ok, %Document{} = document} <-
-               %Actions.DocumentCreateInProject{
-                 project_id: conn.assigns.project.id,
-                 document_data: imported
-               }
-               |> Dispatcher.perform_as(conn.assigns.current_account) do
-          [document | imported_documents]
-        else
-          _ ->
-            :error
-        end
-    end
-    |> case do
-      :error ->
-        conn
-        |> put_status(:bad_request)
-        |> Phoenix.Controller.json(%{message: "Not a valid renew file"})
-        |> halt()
-
-      imported ->
-        conn
-        |> put_status(:created)
-        |> render(:import, imported: imported)
-    end
-  end
 end
