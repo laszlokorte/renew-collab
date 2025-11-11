@@ -150,9 +150,11 @@ defmodule RenewCollab.Import.DocumentImport do
                   attrs ->
                     %{
                       "opacity" => Map.get(attrs, "Opacity", 1),
-                      "background_color" => convert_color(Map.get(attrs, "FillColor", "#70DB93")),
-                      "border_color" => convert_color(Map.get(attrs, "FrameColor", "black")),
-                      "border_width" => convert_border_width(Map.get(attrs, "LineWidth", 1)),
+                      "background_color" =>
+                        convert_color(Map.get(attrs, "FillColor", "transparent")),
+                      "border_color" =>
+                        convert_color(Map.get(attrs, "FrameColor", "transparent")),
+                      "border_width" => convert_border_width(Map.get(attrs, "LineWidth", 0)),
                       "border_dash_array" => convert_line_style(Map.get(attrs, "LineStyle"))
                     }
                 end

@@ -241,7 +241,12 @@ defmodule RenewCollab.Export.DocumentExport do
           }
         ])
 
-      Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "CH.ifa.draw.figures.PolyLineFigure") ->
+      Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "CH.ifa.draw.contrib.PolygonFigure") or
+          Hierarchy.is_subtype_of(
+            grammar,
+            layer.semantic_tag,
+            "CH.ifa.draw.figures.PolyLineFigure"
+          ) ->
         {storables, source_arrow_ref} =
           layer.edge.style
           |> case do
@@ -729,11 +734,16 @@ defmodule RenewCollab.Export.DocumentExport do
         attributes: [
           {"FrameColor", "Color",
            color_to_rgba(
-             style(edge, :stroke_color),
+             style_or_default(edge, :stroke_color),
              style_or_default(layer, :opacity)
            )},
           {"LineWidth", "Int", round(style_or_default(edge, :stroke_width))},
-          {"LineStyle", "String", style_or_default(edge, :stroke_dash_array)}
+          {"LineStyle", "String", style_or_default(edge, :stroke_dash_array)},
+          {"FillColor", "Color",
+           color_to_rgba(
+             style_or_default(layer, :background_color),
+             style_or_default(layer, :opacity)
+           )}
         ]
       }
     }
@@ -921,6 +931,8 @@ defmodule RenewCollab.Export.DocumentExport do
   defp default_style(:border_color), do: "black"
   defp default_style(:border_dash_array), do: ""
   defp default_style(:stroke_dash_array), do: ""
+  defp default_style(:stroke_width), do: 1
+  defp default_style(:stroke_color), do: "black"
 
   defp default_style(_style_key), do: nil
 
