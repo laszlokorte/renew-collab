@@ -7,7 +7,7 @@ defmodule RenewCollabWeb.MediaController do
 
   def show(conn, %{"id" => id}) do
     %Views.MediaData{media_id: id}
-    |> Fetcher.fetch_as(conn.assigns.current_account)
+    |> Fetcher.fetch_as(nil)
     |> case do
       nil -> conn |> put_status(:not_found) |> json(%{"message" => "not found"}) |> halt()
       svg -> conn |> put_resp_content_type("image/svg+xml") |> text(svg.xml)

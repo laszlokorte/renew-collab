@@ -14,21 +14,6 @@ defmodule RenewCollabWeb.DocumentJSON do
     detail_data(document)
   end
 
-  defp list_data(%Document{} = document) do
-    %{
-      # id: document.id,
-      href: url(~p"/api/documents/#{document}"),
-      name: document.name,
-      kind: document.kind,
-      id: document.id,
-      links: %{
-        export: %{
-          href: url(~p"/api/documents/#{document.id}/export")
-        }
-      }
-    }
-  end
-
   def show_content(%Document{} = document, padding \\ 100) do
     %{
       name: document.name,

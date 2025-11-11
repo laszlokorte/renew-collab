@@ -56,6 +56,15 @@ defmodule RenewCollabWeb.Router do
   end
 
   scope "/api", RenewCollabWeb do
+    # TODO: currently uploaded svg are not auth protected.
+    # this is to allow them to be embeded via simple URL as <img> tag into documents
+    # the API auth is based on Auth-Header (not cookies) but the header can not be set for simple
+    # <img src=""> requests.
+    # We could append auth tokens via ?query=param
+    get "/media/svg/:id", MediaController, :show
+  end
+
+  scope "/api", RenewCollabWeb do
     if Application.compile_env(:renew_collab, :dev_routes) do
       pipe_through :debug_protected_api
     else
@@ -113,7 +122,6 @@ defmodule RenewCollabWeb.Router do
     end
 
     post "/projects/:project_id/media/svg", MediaController, :create
-    get "/media/svg/:id", MediaController, :show
 
     scope "/simulations" do
       get "/:id", SimulationController, :show
