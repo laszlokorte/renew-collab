@@ -715,57 +715,74 @@ defmodule RenewCollab.Export.DocumentExport do
              style_or_default(layer, :border_color),
              style_or_default(layer, :opacity)
            )},
-          {"LineWidth", "Int", round(style_or_default(layer, :border_width))}
+          {"LineWidth", "Int", round(style_or_default(layer, :border_width))},
+          {"LineStyle", "String", style_or_default(layer, :border_dash_array)}
         ]
       }
     }
   end
 
-  defp export_attributes(:edge, _layer) do
+  defp export_attributes(:edge, %{edge: edge} = layer) do
     %Renewex.Storable{
       class_name: "CH.ifa.draw.figures.FigureAttributes",
       fields: %{
-        attributes: [{"Test", "Color", {:rgba, 100, 100, 200, 50}}]
+        attributes: [
+          {"FrameColor", "Color",
+           color_to_rgba(
+             style(edge, :stroke_color),
+             style_or_default(layer, :opacity)
+           )},
+          {"LineWidth", "Int", round(style_or_default(edge, :stroke_width))},
+          {"LineStyle", "String", style_or_default(edge, :stroke_dash_array)}
+        ]
       }
     }
   end
 
   defp export_attributes(:text, layer) do
     with layer_style <- layer.style,
-         text_style <- layer.text.style,
-         true <- not is_nil(layer_style),
-         true <- not is_nil(text_style) do
+         text_style <- layer.text.style do
       %Renewex.Storable{
         class_name: "CH.ifa.draw.figures.FigureAttributes",
         fields: %{
-          attributes: [
-            {"TextAlignment", "Int",
-             case style_or_default(layer.text, :alignment) do
-               :left -> 0
-               :center -> 1
-               :right -> 2
-             end},
-            {"TextColor", "Color",
-             color_to_rgba(
-               style_or_default(layer.text, :text_color),
-               style_or_default(layer, :opacity)
-             )},
-            {"FillColor", "Color",
-             color_to_rgba(
-               style_or_default(layer, :background_color),
-               style_or_default(layer, :opacity)
-             )},
-            {"FrameColor", "Color",
-             color_to_rgba(
-               style_or_default(layer, :border_color),
-               style_or_default(layer, :opacity)
-             )},
-            {"LineWidth", "Int", round(style_or_default(layer, :border_width))}
-          ]
+          attributes:
+            if(is_nil(text_style),
+              do: [],
+              else: [
+                {"TextAlignment", "Int",
+                 case style_or_default(layer.text, :alignment) do
+                   :left -> 0
+                   :center -> 1
+                   :right -> 2
+                 end},
+                {"TextColor", "Color",
+                 color_to_rgba(
+                   style_or_default(layer.text, :text_color),
+                   style_or_default(layer, :opacity)
+                 )}
+              ]
+            )
+            |> Enum.concat(
+              if(is_nil(layer_style),
+                do: [],
+                else: [
+                  {"FillColor", "Color",
+                   color_to_rgba(
+                     style(layer, :background_color),
+                     style_or_default(layer, :opacity)
+                   )},
+                  {"FrameColor", "Color",
+                   color_to_rgba(
+                     style(layer, :border_color),
+                     style_or_default(layer, :opacity)
+                   )},
+                  {"LineWidth", "Int", round(style_or_default(layer, :border_width))},
+                  {"LineStyle", "String", style_or_default(layer, :border_dash_array)}
+                ]
+              )
+            )
         }
       }
-    else
-      _ -> nil
     end
   end
 
@@ -874,6 +891,18 @@ defmodule RenewCollab.Export.DocumentExport do
     end
   end
 
+  defp style(%{:style => nil}, _style_key) do
+    nil
+  end
+
+  defp style(%{:style => style}, style_key) do
+    with %{^style_key => value} <- style do
+      value
+    else
+      _ -> nil
+    end
+  end
+
   defp style_or_default(%{:style => nil}, style_key) do
     default_style(style_key)
   end
@@ -889,6 +918,10 @@ defmodule RenewCollab.Export.DocumentExport do
   defp default_style(:background_color), do: "#70DB93"
   defp default_style(:opacity), do: 1.0
   defp default_style(:border_width), do: 1
+  defp default_style(:border_color), do: "black"
+  defp default_style(:border_dash_array), do: ""
+  defp default_style(:stroke_dash_array), do: ""
+
   defp default_style(_style_key), do: nil
 
   defp create_ref(storables, nil), do: {storables, nil}

@@ -139,7 +139,16 @@ defmodule RenewCollabWeb.DocumentController do
         |> halt()
 
       document ->
-        {:ok, output} = RenewCollab.Export.DocumentExport.export(document, synthetic: true)
+        {:ok, output} =
+          RenewCollab.Export.DocumentExport.export(document,
+            synthetic:
+              params
+              |> Map.get("synthetic")
+              |> case do
+                "1" -> true
+                _ -> false
+              end
+          )
 
         conn
         |> put_resp_header(
