@@ -170,7 +170,19 @@ defmodule RenewCollabWeb.StateChannel do
 
             {:reply, :ok, socket}
 
+          {:reply, val, new_state, socket} ->
+            {:noreply, socket} =
+              maybe_handle_reply({:noreply, new_state}, socket)
+
+            {:reply, {:ok, val}, socket}
+
           {:reply, val, socket} ->
+            {:noreply, socket} =
+              maybe_handle_reply({:noreply, Map.get(assigns, state_key())}, socket)
+
+            {:reply, {:ok, val}, socket}
+
+          {:reply, val} ->
             {:noreply, socket} =
               maybe_handle_reply({:noreply, Map.get(assigns, state_key())}, socket)
 

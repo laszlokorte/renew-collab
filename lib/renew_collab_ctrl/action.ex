@@ -383,8 +383,6 @@ defmodule RenewCollabCtrl.Action do
       new_position: new_position
     })
     |> RenewCollab.DocumentCommander.run_document_command_sync()
-
-    :ok
   end
 
   def do_perform(%Actions.DocumentEditLayerEdgeStyle{
