@@ -29,6 +29,9 @@ defmodule RenewCollabCtrl.Dispatcher do
 
         res = {:error, _e} ->
           res
+
+        :error ->
+          :error
       end
       |> case do
         res = :ok ->

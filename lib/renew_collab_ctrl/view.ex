@@ -444,4 +444,9 @@ defmodule RenewCollabCtrl.View do
     })
     |> RenewCollabSim.SimulationFetcher.fetch()
   end
+
+  def do_fetch(_account, %Views.MyRegistration{registration_id: registration_id}) do
+    RenewCollabAuth.Queries.RegisrationById.new(%{registration_id: registration_id})
+    |> RenewCollabAuth.AuthFetcher.fetch()
+  end
 end

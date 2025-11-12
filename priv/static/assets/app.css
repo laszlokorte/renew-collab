@@ -81,3 +81,8 @@ body {
   height: 1.5em;
   vertical-align: center;
 }
+input[readonly] {
+  background-color: #eee;
+  border: 1px solid #aaa;
+  outline: none;
+}

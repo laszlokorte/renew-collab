@@ -80,6 +80,9 @@ defmodule RenewCollabCtrl.ReadAccess do
   def can(%{id: account_id}, %Views.MediaData{media_id: media_id}),
     do: can_read(account_id, :media, media_id)
 
+  def can(_, %Views.MyRegistration{}),
+    do: true
+
   # TODO add auth protection for reading media
   # currently we want to embed media objects via <img src="">
   # but then the browser does not send any auth headers (we do not used cookies)

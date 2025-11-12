@@ -19,9 +19,9 @@ defmodule RenewCollabWeb.AccountsController do
   end
 
   def create(conn, %{
-        "account" => %{"email" => email, "password" => password, "is_admin" => is_admin}
+        "account" => account
       }) do
-    %Actions.AccountCreateAsAdmin{email: email, password: password, is_admin: is_admin}
+    %Actions.AccountCreateAsAdmin{account: account}
     |> Dispatcher.perform_as(conn.assigns.current_account)
     |> case do
       {:ok, _} ->

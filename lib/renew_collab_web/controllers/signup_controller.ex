@@ -1,8 +1,10 @@
 defmodule RenewCollabWeb.SignupController do
   use RenewCollabWeb, :controller
 
+  alias RenewCollabCtrl.Fetcher
+  alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Dispatcher
-  alias RenewCollabCtrl.Actions.RegistrationCreateAsUser
+  alias RenewCollabCtrl.Actions
   alias RenewCollabAuth.Entities.Registration
 
   action_fallback RenewCollabWeb.FallbackController
@@ -19,12 +21,12 @@ defmodule RenewCollabWeb.SignupController do
   end
 
   def create(conn, %{"registration" => registration}) do
-    %RegistrationCreateAsUser{email: Map.get(registration, "email")}
+    %Actions.RegistrationCreateAsUser{email: Map.get(registration, "email")}
     |> Dispatcher.perform_as(nil)
     |> case do
       {:ok, reg} ->
         conn
-        |> put_flash(:info, "Signup almost complete")
+        |> put_flash(:info, "Signup in progress")
         |> redirect(to: ~p"/signup/#{reg.id}")
 
       {:error, changeset} ->
@@ -33,55 +35,109 @@ defmodule RenewCollabWeb.SignupController do
           changeset: changeset
         })
     end
-
-    #  |> render(:new, %{
-    #    changeset:
-    #      RenewCollabAuth.Entities.Account.changeset(
-    #        %RenewCollabAuth.Entities.Account{},
-    #        %{}
-    #      )
-    #  })
   end
 
   def set_password(conn, %{
         "registration_id" => registration_id,
         "confirmation_code" => confirmation_code,
-        "account" => %{
-          "password" => password,
-          "password_repeat" => password_repeat
-        }
+        "account" => account
       }) do
-    registration = %Registration{id: registration_id}
+    %Views.MyRegistration{registration_id: registration_id}
+    |> Fetcher.fetch_as(nil)
+    |> case do
+      nil ->
+        conn
+        |> put_flash(:error, "not found")
+        |> redirect(to: ~p"/signup")
 
-    conn
-    |> put_flash(:info, "Signup complete")
-    |> redirect(to: ~p"/login")
+      %Registration{} = reg ->
+        if verify(confirmation_code, reg) do
+          %Actions.RegistrationConfirmAsUser{
+            registration_id: registration_id,
+            account: account
+          }
+          |> Dispatcher.perform_as(nil)
+          |> case do
+            :ok ->
+              conn
+              |> put_flash(:info, "Signup successful")
+              |> redirect(to: ~p"/login")
+
+            {:error, changeset} ->
+              conn
+              |> render(:confirm, %{
+                registration: reg,
+                code: confirmation_code,
+                changeset: changeset
+              })
+          end
+        else
+          conn
+          |> put_flash(:error, "Invalid Confirmation code")
+          |> redirect(to: ~p"/signup/#{reg.id}")
+        end
+    end
   end
 
   def confirm(conn, %{
         "registration_id" => registration_id,
         "confirmation_code" => confirmation_code
       }) do
-    registration = %Registration{id: registration_id}
+    %Views.MyRegistration{registration_id: registration_id}
+    |> Fetcher.fetch_as(nil)
+    |> case do
+      nil ->
+        conn
+        |> put_flash(:error, "not found")
+        |> redirect(to: ~p"/signup")
 
-    conn
-    |> render(:confirm, %{
-      registration: registration,
-      code: confirmation_code,
-      changeset:
-        RenewCollabAuth.Entities.Account.changeset(
-          %RenewCollabAuth.Entities.Account{},
-          %{}
-        )
-    })
+      %Registration{} = reg ->
+        if verify(confirmation_code, reg) do
+          conn
+          |> render(:confirm, %{
+            registration: reg,
+            code: confirmation_code,
+            changeset:
+              RenewCollabAuth.Entities.Account.changeset(
+                %RenewCollabAuth.Entities.Account{email: reg.email},
+                %{}
+              )
+          })
+        else
+          conn
+          |> put_flash(:error, "Invalid Confirmation code")
+          |> redirect(to: ~p"/signup/#{reg.id}")
+        end
+    end
   end
 
   def waiting(conn, %{"registration_id" => registration_id}) do
-    registration = %Registration{id: registration_id}
+    %Views.MyRegistration{registration_id: registration_id}
+    |> Fetcher.fetch_as(nil)
+    |> case do
+      nil ->
+        conn
+        |> put_flash(:error, "not found")
+        |> redirect(to: ~p"/signup")
 
-    conn
-    |> render(:waiting, %{
-      registration: registration
-    })
+      %Registration{} = reg ->
+        conn
+        |> render(:waiting, %{
+          registration: reg,
+          token: sign_token(reg)
+        })
+    end
+  end
+
+  defp sign_token(%Registration{} = reg) do
+    RenewCollabWeb.Token.sign(%{registration_id: reg.id})
+  end
+
+  defp verify(token, %Registration{id: reg_id}) do
+    RenewCollabWeb.Token.verify(token)
+    |> case do
+      {:ok, %{registration_id: ^reg_id}} -> :ok
+      _ -> false
+    end
   end
 end

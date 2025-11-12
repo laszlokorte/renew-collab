@@ -1,4 +1,5 @@
 defmodule RenewCollabCtrl.Action do
+  alias RenewCollabAuth.Entities.Registration
   alias RenewCollab.Media
   alias RenewCollab.Syntax
   alias RenewCollab.Sockets
@@ -1599,7 +1600,32 @@ defmodule RenewCollabCtrl.Action do
     |> RenewCollabAuth.AuthCommander.run_auth_command_sync()
     |> case do
       {:ok, %{registration: reg}} -> {:ok, reg}
-      {:error, :registration, changeset} -> {:error, changeset}
+      {:error, :registration, changeset, _} -> {:error, changeset}
+    end
+  end
+
+  def do_perform(%Actions.RegistrationConfirmAsUser{
+        registration_id: registration_id,
+        account: account
+      }) do
+    RenewCollabAuth.Queries.RegisrationById.new(%{registration_id: registration_id})
+    |> RenewCollabAuth.AuthFetcher.fetch()
+    |> case do
+      {:ok, %Registration{email: email}} ->
+        RenewCollabAuth.Commands.CreateAccountFromRegistration.new(%{
+          registration_id: registration_id,
+          email: email,
+          account: account
+        })
+        |> RenewCollabAuth.AuthCommander.run_auth_command_sync()
+        |> case do
+          {:ok, %{account: %RenewCollabAuth.Entities.Account{}}} -> :ok
+          {:error, :account, changeset, _} -> {:error, changeset}
+          _ -> :error
+        end
+
+      _ ->
+        :error
     end
   end
 end

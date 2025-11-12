@@ -7,6 +7,7 @@ defmodule RenewCollabAuth.Entities.Account do
   schema "account" do
     field :password, :string, redact: true
     field :new_password, :string, virtual: true, redact: true
+    field :new_password_confirmation, :string, virtual: true, redact: true
     field :email, :string
     field :is_admin, :boolean, default: false
 
@@ -17,8 +18,21 @@ defmodule RenewCollabAuth.Entities.Account do
   def changeset(account, attrs) do
     account
     |> cast(attrs, [:email, :new_password, :is_admin])
+    |> validate_confirmation(:new_password, message: "does not match password!")
     |> validate_required([:email, :new_password])
+    |> validate_format(:email, ~r/@/)
     |> unique_constraint(:email)
+    |> maybe_hash_password()
+  end
+
+  @doc false
+  def registration_changeset(account, attrs) do
+    account
+    |> cast(attrs, [:new_password, :new_password_confirmation])
+    |> validate_confirmation(:new_password, message: "does not match password!")
+    |> validate_required([:email, :new_password, :new_password_confirmation])
+    |> validate_format(:email, ~r/@/)
+    |> unique_constraint(:email, message: "An account with this E-mail address already exists.")
     |> maybe_hash_password()
   end
 

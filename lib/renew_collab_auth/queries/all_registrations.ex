@@ -10,6 +10,6 @@ defmodule RenewCollabAuth.Queries.AllRegistrations do
 
   def multi(%__MODULE__{}) do
     Ecto.Multi.new()
-    |> Ecto.Multi.all(:result, from(a in Registration))
+    |> Ecto.Multi.all(:result, from(r in Registration))
   end
 end
