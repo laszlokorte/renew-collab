@@ -223,6 +223,29 @@ if config_env() == :prod do
          |> Enum.map(&String.trim/1)
          |> Enum.filter(&(&1 != ""))
 
+  Regex.compile(System.get_env("RENEW_EMAIL_WHITELIST") || ".")
+  |> case do
+    {:ok, pattern} ->
+      config :renew_collab, RenewCollabAuth, email_pattern: pattern
+  end
+
+  with mail_host <- System.get_env("RENEW_MAILER_SMTP_HOST"),
+       mailer_user <- System.get_env("RENEW_MAILER_SMTP_USER"),
+       mailer_password <- System.get_env("RENEW_MAILER_SMTP_PASSWORD") do
+    config :renew_collab, RenewCollabAuth.Mailer,
+      local: false,
+      adapter: Swoosh.Adapters.SMTP,
+      relay: mail_host,
+      username: mailer_user,
+      password: mailer_password,
+      port: String.to_integer(System.get_env("RENEW_MAILER_SMTP_PORT") || "587"),
+      ssl: false,
+      tls: :always,
+      tls_options: :tls_certificate_check.options(mail_host) ++ [versions: [:"tlsv1.3"]],
+      auth: :always,
+      retries: String.to_integer(System.get_env("RENEW_MAILER_SMTP_RETRIES") || "3")
+  end
+
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key

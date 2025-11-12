@@ -5,7 +5,7 @@ defmodule RenewCollabAuth.Email.Sender do
   def confirm(%Registration{} = reg, confirm_url) do
     new()
     |> to(reg.email)
-    |> from({"Petristation", "signup@petristation.net"})
+    |> from({"Petristation", "petristation@mail.petristation.net"})
     |> subject("Petristation: Confirm your E-mail address")
     |> render_body(:confirm, %{reg: reg, confirm_url: confirm_url})
   end

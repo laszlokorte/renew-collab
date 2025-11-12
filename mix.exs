@@ -66,6 +66,7 @@ defmodule RenewCollab.MixProject do
         {:renewex_converter, "~> 0.5.0"},
         {:swoosh, "~> 1.19"},
         {:gen_smtp, "~> 1.0"},
+        {:tls_certificate_check, "~> 1.30"},
         {:phoenix_swoosh, "~> 1.2.1"},
         {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
         {:credo, "~> 1.7", only: [:dev, :test], runtime: false}

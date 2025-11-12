@@ -122,3 +122,5 @@ config :phoenix, :stacktrace_depth, 20
 config :phoenix, :plug_init_mode, :runtime
 
 config :renew_collab, RenewCollabAuth.Mailer, adapter: Swoosh.Adapters.Local
+
+config :renew_collab, RenewCollabAuth, email_pattern: ~r/@/

@@ -10,11 +10,13 @@ defmodule RenewCollabWeb.SignupController do
   action_fallback RenewCollabWeb.FallbackController
 
   def new(conn, _params) do
+    reg = %RenewCollabAuth.Entities.Registration{}
+
     conn
     |> render(:new, %{
       changeset:
         RenewCollabAuth.Entities.Registration.changeset(
-          %RenewCollabAuth.Entities.Registration{},
+          reg,
           %{}
         )
     })

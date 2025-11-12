@@ -12,13 +12,15 @@ defmodule RenewCollabAuth.Entities.Registration do
 
   @doc false
   def changeset(registration, attrs) do
+    conf = Application.fetch_env!(:renew_collab, RenewCollabAuth)
+
     registration
     |> cast(attrs, [:email])
     |> validate_format(:email, ~r/@/, message: "Must be a valid E-mail address")
     # TODO: make configurable
     |> validate_format(
       :email,
-      ~r/@(((studium\.|informatik\.)?uni-hamburg\.de)|laszlokorte\.de)$/,
+      Keyword.get(conf, :email_pattern),
       message: "Currently only selected E-mail adresses are for registration"
     )
     |> validate_required([:email])
