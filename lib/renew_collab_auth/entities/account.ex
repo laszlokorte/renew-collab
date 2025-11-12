@@ -6,6 +6,7 @@ defmodule RenewCollabAuth.Entities.Account do
   @foreign_key_type :binary_id
   schema "account" do
     field :password, :string, redact: true
+    field :old_password, :string, redact: true, virtual: true
     field :new_password, :string, virtual: true, redact: true
     field :new_password_confirmation, :string, virtual: true, redact: true
     field :email, :string
@@ -17,11 +18,30 @@ defmodule RenewCollabAuth.Entities.Account do
   @doc false
   def changeset(account, attrs) do
     account
-    |> cast(attrs, [:email, :new_password, :is_admin])
+    |> cast(attrs, [:email, :new_password, :is_admin, :new_password_confirmation])
+    |> validate_required([:email, :new_password, :new_password_confirmation])
     |> validate_confirmation(:new_password, message: "does not match password!")
-    |> validate_required([:email, :new_password])
     |> validate_format(:email, ~r/@/)
     |> unique_constraint(:email)
+    |> maybe_hash_password()
+  end
+
+  @doc false
+  def update_changeset(account, attrs) do
+    account
+    |> cast(attrs, [:email, :new_password, :is_admin, :new_password_confirmation])
+    |> validate_confirmation(:new_password, message: "does not match password!")
+    |> validate_format(:email, ~r/@/)
+    |> unique_constraint(:email)
+    |> maybe_hash_password()
+  end
+
+  @doc false
+  def safe_update_changeset(account, attrs) do
+    account
+    |> cast(attrs, [:new_password, :new_password_confirmation])
+    |> validate_required([:new_password, :new_password_confirmation])
+    |> validate_confirmation(:new_password, message: "does not match password!")
     |> maybe_hash_password()
   end
 

@@ -130,10 +130,6 @@ defmodule RenewCollabCtrl.View do
     |> RenewCollabAuth.AuthFetcher.fetch()
   end
 
-  def do_fetch(_account, %Views.GlobalDocumentCount{}) do
-    {:error, :not_implemented}
-  end
-
   def do_fetch(_account, %Views.GlobalDocumentsList{}) do
     RenewCollab.Queries.DocumentList.new(%{document_ids: :all})
     |> RenewCollab.DocumentFetcher.fetch()
@@ -159,10 +155,6 @@ defmodule RenewCollabCtrl.View do
     |> RenewCollab.DocumentFetcher.fetch()
   end
 
-  def do_fetch(_account, %Views.GlobalSocketIdsByName{}) do
-    {:error, :not_implemented}
-  end
-
   def do_fetch(_account, %Views.GlobalSocketSchemasList{}) do
     RenewCollab.Queries.SocketSchemasList.new()
     |> RenewCollab.DocumentFetcher.fetch()
@@ -182,10 +174,6 @@ defmodule RenewCollabCtrl.View do
 
   def do_fetch(_account, %Views.GlobalSocketSchema{socket_schema_id: id}) do
     {:ok, RenewCollab.Sockets.find_socket_schema(id)}
-  end
-
-  def do_fetch(_account, %Views.GlobalSocketSchemasNames{}) do
-    {:error, :not_implemented}
   end
 
   def do_fetch(_account, %Views.GlobalSymbolsList{}) do
@@ -210,16 +198,8 @@ defmodule RenewCollabCtrl.View do
     |> then(&{:ok, &1})
   end
 
-  def do_fetch(_account, %Views.GlobalSymbolsNames{}) do
-    {:error, :not_implemented}
-  end
-
   def do_fetch(_account, %Views.GlobalSyntaxList{}) do
     {:ok, RenewCollab.Syntax.find_all()}
-  end
-
-  def do_fetch(_account, %Views.MyAccount{}) do
-    {:error, :not_implemented}
   end
 
   def do_fetch(_account, %Views.MyProjectsList{account_id: account_id}) do

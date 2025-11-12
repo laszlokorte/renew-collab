@@ -9,20 +9,15 @@ defmodule RenewCollabCtrl.CacheConfig do
   def key_for_view(_account, %Views.DocumentVersionsList{}), do: nil
   def key_for_view(_account, %Views.DocumentWithContent{}), do: nil
   def key_for_view(_account, %Views.GlobalAccounts{}), do: nil
-  def key_for_view(_account, %Views.GlobalDocumentCount{}), do: nil
   def key_for_view(_account, %Views.GlobalDocumentsList{}), do: nil
   def key_for_view(_account, %Views.GlobalPrimitives{}), do: nil
   def key_for_view(_account, %Views.GlobalShadowNetSystemsList{}), do: nil
   def key_for_view(_account, %Views.GlobalSimulationsList{}), do: nil
   def key_for_view(_account, %Views.GlobalSocketById{}), do: nil
-  def key_for_view(_account, %Views.GlobalSocketIdsByName{}), do: nil
   def key_for_view(_account, %Views.GlobalSocketSchemasList{}), do: nil
   def key_for_view(_account, %Views.GlobalSocketSchemasMap{}), do: nil
-  def key_for_view(_account, %Views.GlobalSocketSchemasNames{}), do: nil
   def key_for_view(_account, %Views.GlobalSymbolsList{}), do: nil
-  def key_for_view(_account, %Views.GlobalSymbolsNames{}), do: nil
   def key_for_view(_account, %Views.GlobalSyntaxList{}), do: nil
-  def key_for_view(_account, %Views.MyAccount{}), do: nil
   def key_for_view(_account, %Views.MyProjectsList{}), do: nil
   def key_for_view(_account, %Views.ProjectDocumentsList{}), do: nil
   def key_for_view(_account, %Views.ProjectShadowNetSystemsList{}), do: nil
@@ -38,20 +33,15 @@ defmodule RenewCollabCtrl.CacheConfig do
   def tags_for_view(_account, %Views.DocumentVersionsList{}), do: []
   def tags_for_view(_account, %Views.DocumentWithContent{}), do: []
   def tags_for_view(_account, %Views.GlobalAccounts{}), do: []
-  def tags_for_view(_account, %Views.GlobalDocumentCount{}), do: []
   def tags_for_view(_account, %Views.GlobalDocumentsList{}), do: []
   def tags_for_view(_account, %Views.GlobalPrimitives{}), do: []
   def tags_for_view(_account, %Views.GlobalShadowNetSystemsList{}), do: []
   def tags_for_view(_account, %Views.GlobalSimulationsList{}), do: []
   def tags_for_view(_account, %Views.GlobalSocketById{}), do: []
-  def tags_for_view(_account, %Views.GlobalSocketIdsByName{}), do: []
   def tags_for_view(_account, %Views.GlobalSocketSchemasList{}), do: []
   def tags_for_view(_account, %Views.GlobalSocketSchemasMap{}), do: []
-  def tags_for_view(_account, %Views.GlobalSocketSchemasNames{}), do: []
   def tags_for_view(_account, %Views.GlobalSymbolsList{}), do: []
-  def tags_for_view(_account, %Views.GlobalSymbolsNames{}), do: []
   def tags_for_view(_account, %Views.GlobalSyntaxList{}), do: []
-  def tags_for_view(_account, %Views.MyAccount{}), do: []
   def tags_for_view(_account, %Views.MyProjectsList{}), do: []
   def tags_for_view(_account, %Views.ProjectDocumentsList{}), do: []
   def tags_for_view(_account, %Views.ProjectShadowNetSystemsList{}), do: []
@@ -67,20 +57,15 @@ defmodule RenewCollabCtrl.CacheConfig do
   def ttl_for_view(%Views.DocumentVersionsList{}), do: :infinity
   def ttl_for_view(%Views.DocumentWithContent{}), do: :infinity
   def ttl_for_view(%Views.GlobalAccounts{}), do: :infinity
-  def ttl_for_view(%Views.GlobalDocumentCount{}), do: :infinity
   def ttl_for_view(%Views.GlobalDocumentsList{}), do: :infinity
   def ttl_for_view(%Views.GlobalPrimitives{}), do: :infinity
   def ttl_for_view(%Views.GlobalShadowNetSystemsList{}), do: :infinity
   def ttl_for_view(%Views.GlobalSimulationsList{}), do: :infinity
   def ttl_for_view(%Views.GlobalSocketById{}), do: :infinity
-  def ttl_for_view(%Views.GlobalSocketIdsByName{}), do: :infinity
   def ttl_for_view(%Views.GlobalSocketSchemasList{}), do: :infinity
   def ttl_for_view(%Views.GlobalSocketSchemasMap{}), do: :infinity
-  def ttl_for_view(%Views.GlobalSocketSchemasNames{}), do: :infinity
   def ttl_for_view(%Views.GlobalSymbolsList{}), do: :infinity
-  def ttl_for_view(%Views.GlobalSymbolsNames{}), do: :infinity
   def ttl_for_view(%Views.GlobalSyntaxList{}), do: :infinity
-  def ttl_for_view(%Views.MyAccount{}), do: :infinity
   def ttl_for_view(%Views.MyProjectsList{}), do: :infinity
   def ttl_for_view(%Views.ProjectDocumentsList{}), do: :infinity
   def ttl_for_view(%Views.ProjectShadowNetSystemsList{}), do: :infinity
@@ -89,10 +74,9 @@ defmodule RenewCollabCtrl.CacheConfig do
   def ttl_for_view(%Views.SimulationWithState{}), do: :infinity
   def ttl_for_view(_), do: nil
 
-  def tags_for_action(%Actions.AccountChangePasswordAsAdmin{}, _result), do: []
+  def tags_for_action(%Actions.AccountSetAdmin{}, _result), do: []
   def tags_for_action(%Actions.AccountChangePasswordAsUser{}, _result), do: []
   def tags_for_action(%Actions.AccountCreateAsAdmin{}, _result), do: []
-  def tags_for_action(%Actions.AccountCreateAsUser{}, _result), do: []
   def tags_for_action(%Actions.AccountDeleteAsAdmin{}, _result), do: []
   def tags_for_action(%Actions.AccountDeleteAsUser{}, _result), do: []
   def tags_for_action(%Actions.DocumentCreateInProject{}, _result), do: []
@@ -152,7 +136,6 @@ defmodule RenewCollabCtrl.CacheConfig do
   def tags_for_action(%Actions.ShadowNetSystemCreateFromRnwInProject{}, _result), do: []
   def tags_for_action(%Actions.ShadowNetSystemDeleteAsUser{}, _result), do: []
   def tags_for_action(%Actions.ShadowNetSystemDuplicateInProject{}, _result), do: []
-  def tags_for_action(%Actions.ShadowNetSystemImportIntoProject{}, _result), do: []
   def tags_for_action(%Actions.ShadowNetSystemRename{}, _result), do: []
   def tags_for_action(%Actions.SimulationDeleteAsUser{}, _result), do: []
   def tags_for_action(%Actions.SimulationInitialize{}, _result), do: []

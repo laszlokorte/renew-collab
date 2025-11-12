@@ -28,7 +28,31 @@
         <td>{a.email}</td>
 
         <td>****</td>
-        <td>{if(a.is_admin, do: "yes", else: "no")}</td>
+        <td>
+          <%= if a.is_admin do %>
+            ✅
+            <%= if @conn.assigns[:current_account].id != a.id do %>
+              <.link
+                href={~p"/accounts/#{a}/admin?admin=false"}
+                method="post"
+                data-confirm="Are you sure?"
+              >
+                Revoke Admin
+              </.link>
+            <% end %>
+          <% else %>
+            ❌
+            <%= if @conn.assigns[:current_account].id != a.id do %>
+              <.link
+                href={~p"/accounts/#{a}/admin?admin=true"}
+                method="post"
+                data-confirm="Are you sure?"
+              >
+                Make Admin
+              </.link>
+            <% end %>
+          <% end %>
+        </td>
 
         <td>
           <%= if @conn.assigns[:current_account].id != a.id do %>

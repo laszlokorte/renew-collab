@@ -21,5 +21,12 @@
   <p>
     Deleting your account will delete all projects you are the owner of, including all their containing documents and simulations.
   </p>
-  <.delete_form action={~p"/account/me/delete"} />
+  <.link
+    href={~p"/account/me"}
+    method="delete"
+    data-confirm="Are you sure?"
+    style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
+  >
+    Delete my account
+  </.link>
 </div>

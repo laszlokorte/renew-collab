@@ -14,7 +14,6 @@ defmodule RenewCollabCtrl.Fetcher do
         fn ->
           View.do_fetch(account, view)
           |> case do
-            {:error, :not_implemented} -> raise "View not implemented: #{inspect(view)}"
             {:ok, value} -> value
             {:error, e} -> raise "Fetch error: #{inspect(e)}"
           end
@@ -23,8 +22,7 @@ defmodule RenewCollabCtrl.Fetcher do
         CacheConfig.ttl_for_view(view)
       )
     else
-      raise "Access denied: #{inspect(view)}"
-      :access_denied
+      {:error, :access}
     end
   end
 

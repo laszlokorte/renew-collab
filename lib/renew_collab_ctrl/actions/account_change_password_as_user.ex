@@ -1,3 +1,3 @@
 defmodule RenewCollabCtrl.Actions.AccountChangePasswordAsUser do
-  defstruct [:account_id, :new_password]
+  defstruct [:account_id, :change]
 end

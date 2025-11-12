@@ -10,28 +10,51 @@ defmodule RenewCollabCtrl.Action do
   alias RenewCollab.Document.TransientDocument
   alias RenewCollabCtrl.Actions
 
-  def do_perform(%Actions.AccountChangePasswordAsAdmin{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.AccountSetAdmin{account_id: account_id, admin: admin}) do
+    RenewCollabAuth.Commands.UpdateAccount.new(%{
+      account_id: account_id,
+      attributes: %{is_admin: admin}
+    })
+    |> RenewCollabAuth.AuthCommander.run_auth_command_sync()
   end
 
-  def do_perform(%Actions.AccountChangePasswordAsUser{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.AccountChangePasswordAsUser{account_id: account_id, change: change}) do
+    RenewCollabAuth.Commands.UpdateOwnAccount.new(%{
+      account_id: account_id,
+      attributes: change
+    })
+    |> RenewCollabAuth.AuthCommander.run_auth_command_sync()
+    |> case do
+      {:ok, %{account: account}} -> {:ok, account}
+      {:error, :account, changeset, _} -> {:error, changeset}
+    end
   end
 
-  def do_perform(%Actions.AccountCreateAsAdmin{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.AccountCreateAsAdmin{account: account}) do
+    RenewCollabAuth.Commands.CreateAccount.new(%{account: account})
+    |> RenewCollabAuth.AuthCommander.run_auth_command_sync()
+    |> case do
+      {:ok, %{account: account}} -> {:ok, account}
+      {:error, :account, changeset, _} -> {:error, changeset}
+    end
   end
 
-  def do_perform(%Actions.AccountCreateAsUser{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.AccountDeleteAsAdmin{account_id: account_id}) do
+    RenewCollabAuth.Commands.DeleteAccount.new(%{account_id: account_id})
+    |> RenewCollabAuth.AuthCommander.run_auth_command_sync()
+    |> case do
+      {:ok, %{delete_account: _}} -> :ok
+      {:error, :account, _changeset, _} -> :error
+    end
   end
 
-  def do_perform(%Actions.AccountDeleteAsAdmin{}) do
-    {:error, :not_implemented}
-  end
-
-  def do_perform(%Actions.AccountDeleteAsUser{}) do
-    {:error, :not_implemented}
+  def do_perform(%Actions.AccountDeleteAsUser{account_id: account_id}) do
+    RenewCollabAuth.Commands.DeleteAccount.new(%{account_id: account_id})
+    |> RenewCollabAuth.AuthCommander.run_auth_command_sync()
+    |> case do
+      {:ok, %{delete_account: _}} -> :ok
+      {:error, :account, _changeset, _} -> :error
+    end
   end
 
   def do_perform(%Actions.DocumentCreateInProject{
@@ -1301,13 +1324,6 @@ defmodule RenewCollabCtrl.Action do
   def do_perform(%Actions.ShadowNetSystemDuplicateInProject{
         project_id: _project_id,
         shadow_net_system_id: _sns_id
-      }) do
-    {:error, :not_implemented}
-  end
-
-  def do_perform(%Actions.ShadowNetSystemImportIntoProject{
-        project_id: _project_id,
-        sns_binary: _sns_binary
       }) do
     {:error, :not_implemented}
   end

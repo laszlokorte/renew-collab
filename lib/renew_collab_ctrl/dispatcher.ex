@@ -12,9 +12,6 @@ defmodule RenewCollabCtrl.Dispatcher do
 
       Action.do_perform(action)
       |> case do
-        {:error, :not_implemented} ->
-          raise "Command not implemented: #{inspect(action)}"
-
         res = :ok ->
           CacheConfig.tags_for_action(action, :ok)
           |> evict_cache()
@@ -46,8 +43,7 @@ defmodule RenewCollabCtrl.Dispatcher do
           res
       end
     else
-      raise "Access denied: #{inspect(action)}"
-      :access_denied
+      {:error, :access}
     end
   end
 

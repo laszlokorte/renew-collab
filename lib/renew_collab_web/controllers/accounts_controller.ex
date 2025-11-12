@@ -49,4 +49,24 @@ defmodule RenewCollabWeb.AccountsController do
         |> redirect(to: ~p"/accounts")
     end
   end
+
+  def admin(conn, %{"id" => id, "admin" => admin}) do
+    %Actions.AccountSetAdmin{account_id: id, admin: bool_param(admin)}
+    |> Dispatcher.perform_as(conn.assigns.current_account)
+    |> case do
+      {:ok, _account} ->
+        conn
+        |> put_flash(:info, "Account updated successfully.")
+        |> redirect(to: ~p"/accounts")
+
+      _ ->
+        conn
+        |> put_flash(:info, "Updating Account failed")
+        |> redirect(to: ~p"/accounts")
+    end
+  end
+
+  defp bool_param("true"), do: true
+  defp bool_param("false"), do: false
+  defp bool_param(_), do: nil
 end

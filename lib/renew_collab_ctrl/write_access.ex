@@ -323,6 +323,15 @@ defmodule RenewCollabCtrl.WriteAccess do
         can_write(account_id, :project, proj_id) and
           ReadAccess.can_read(account_id, :document, doc_id)
 
+  def can(%{id: account_id} = account, %Actions.AccountChangePasswordAsUser{
+        account_id: account_id,
+        change: %{"old_password" => old_password}
+      }),
+      do: RenewCollabAuth.Entities.Account.valid_password?(account, old_password)
+
+  def can(%{id: account_id}, %Actions.AccountDeleteAsUser{account_id: account_id}),
+    do: true
+
   def can(%{is_admin: true}, %Actions.ProjectCreateAsAdmin{}), do: true
 
   def can(%{is_admin: true}, %Actions.ProjectAddDocumentAsAdmin{}),
@@ -350,6 +359,21 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(%{is_admin: true}, %Actions.ProjectAddMemberAsAdmin{}), do: true
 
   def can(%{is_admin: true}, %Actions.ProjectRemoveMemberAsAdmin{}),
+    do: true
+
+  def can(%{is_admin: true, id: account_id}, %Actions.AccountDeleteAsAdmin{account_id: account_id}),
+      do: false
+
+  def can(%{is_admin: true}, %Actions.AccountDeleteAsAdmin{}),
+    do: true
+
+  def can(%{is_admin: true}, %Actions.AccountCreateAsAdmin{}),
+    do: true
+
+  def can(%{is_admin: true, id: account_id}, %Actions.AccountSetAdmin{account_id: account_id}),
+    do: false
+
+  def can(%{is_admin: true}, %Actions.AccountSetAdmin{}),
     do: true
 
   def can(_account, _action), do: false
