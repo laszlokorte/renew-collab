@@ -16,5 +16,6 @@ defmodule RenewCollabProj.Entities.ProjectSimulation do
     sim
     |> cast(attrs, [:simulation_id])
     |> validate_required([:project_id, :simulation_id])
+    |> unique_constraint(:simulation_id)
   end
 end

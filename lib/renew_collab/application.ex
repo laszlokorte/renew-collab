@@ -18,6 +18,7 @@ defmodule RenewCollab.Application do
       {DNSCluster, query: Application.get_env(:renew_collab, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: RenewCollab.PubSub},
       RenewCollabCtrl.CacheServer,
+      {Task.Supervisor, name: RenewCollabAuth.AsyncEmailSupervisor},
       # Start a worker by calling: RenewCollab.Worker.start_link(arg)
       # {RenewCollab.Worker, arg},
       # Start to serve requests, typically the last entry

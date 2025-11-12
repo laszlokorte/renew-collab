@@ -20,6 +20,7 @@ defmodule RenewCollabProj.Entities.ProjectMember do
     member
     |> cast(attrs, [:account_id, :role])
     |> validate_required([:project_id, :account_id, :role])
+    |> unique_constraint([:project_id, :account_id])
   end
 
   @doc false
@@ -27,6 +28,7 @@ defmodule RenewCollabProj.Entities.ProjectMember do
     member
     |> cast(attrs, [:account_id, :role])
     |> validate_required([:account_id, :role])
+    |> unique_constraint([:project_id, :account_id])
 
     # |> dbg
   end

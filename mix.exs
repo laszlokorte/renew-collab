@@ -64,6 +64,9 @@ defmodule RenewCollab.MixProject do
         {:renewex_iconset, "~> 0.2.0"},
         {:renewex_routing, "~> 0.2.0"},
         {:renewex_converter, "~> 0.5.0"},
+        {:swoosh, "~> 1.19"},
+        {:gen_smtp, "~> 1.0"},
+        {:phoenix_swoosh, "~> 1.2.1"},
         {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
         {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
       ]

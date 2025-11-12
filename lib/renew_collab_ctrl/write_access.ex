@@ -19,7 +19,7 @@ defmodule RenewCollabCtrl.WriteAccess do
     do: can_write(account_id, :project, proj_id)
 
   def can(%{id: account_id}, %Actions.ProjectDelete{project_id: proj_id}),
-    do: can_write(account_id, :project, proj_id)
+    do: can_write(account_id, :project, proj_id) and is_owner_of({:account, account_id}, proj_id)
 
   def can(%{id: account_id}, %Actions.DocumentEditLayerTextSizeHint{document_id: doc_id}),
     do: can_write(account_id, :document, doc_id)
@@ -254,14 +254,24 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(%{id: account_id}, %Actions.DocumentDuplicateInProject{project_id: proj_id}),
     do: can_write(account_id, :project, proj_id)
 
-  def can(%{id: account_id}, %Actions.ProjectRemoveMemberAsUser{project_id: proj_id}),
-    do: can_write(account_id, :project, proj_id)
+  def can(%{id: account_id}, %Actions.ProjectRemoveMemberAsUser{
+        project_id: proj_id,
+        member_id: member_id
+      }),
+      do:
+        can_write(account_id, :project, proj_id) and
+          not is_owner_of({:member, member_id}, proj_id) and
+          is_owner_of({:account, account_id}, proj_id)
 
   def can(%{id: account_id}, %Actions.ProjectInviteMember{project_id: proj_id}),
-    do: can_write(account_id, :project, proj_id)
+    do:
+      can_write(account_id, :project, proj_id) and
+        is_owner_of({:account, account_id}, proj_id)
 
   def can(%{id: account_id}, %Actions.ProjectRevokeInvitation{project_id: proj_id}),
-    do: can_write(account_id, :project, proj_id)
+    do:
+      can_write(account_id, :project, proj_id) and
+        is_owner_of({:account, account_id}, proj_id)
 
   def can(%{id: account_id}, %Actions.ProjectRejectInvitation{account_id: account_id}),
     do: true
@@ -269,7 +279,12 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(%{id: account_id}, %Actions.ProjectAcceptInvitation{invitation_id: inv_id}),
     do: can_write(account_id, :invitation, inv_id)
 
-  def can(%{id: account_id}, %Actions.ProjectMemberWithdraw{account_id: account_id}), do: true
+  def can(%{id: account_id}, %Actions.ProjectMemberWithdraw{
+        account_id: account_id,
+        project_id: proj_id
+      }),
+      do: not is_owner_of({:account, account_id}, proj_id)
+
   def can(_, %Actions.ProjectMemberWithdraw{}), do: false
 
   def can(%{id: account_id}, %Actions.SimulationLogDebug{simulation_id: sim_id}),
@@ -401,6 +416,19 @@ defmodule RenewCollabCtrl.WriteAccess do
       account_id: account_id,
       entity: entity,
       roles: roles
+    })
+    |> RenewCollabProj.ProjectFetcher.fetch()
+    |> case do
+      {:ok, nil} -> false
+      {:ok, result} -> result
+      _ -> false
+    end
+  end
+
+  defp is_owner_of(account_or_member, project_id) do
+    RenewCollabProj.Queries.CheckOwnership.new(%{
+      account_or_member: account_or_member,
+      project_id: project_id
     })
     |> RenewCollabProj.ProjectFetcher.fetch()
     |> case do

@@ -8,11 +8,15 @@ defmodule RenewCollabProj.Commands.CreateInvitation do
 
   def multi(%__MODULE__{project_id: project_id, email: email, role: role, account_id: account_id}) do
     Ecto.Multi.new()
-    |> Ecto.Multi.insert(:insert_inviatation, %ProjectInvitation{
-      project_id: project_id,
-      email: email,
-      role: role,
-      account_id: account_id
-    })
+    |> Ecto.Multi.insert(
+      :invitation,
+      %ProjectInvitation{}
+      |> ProjectInvitation.changeset(%{
+        project_id: project_id,
+        email: email,
+        role: role,
+        account_id: account_id
+      })
+    )
   end
 end

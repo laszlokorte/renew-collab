@@ -16,5 +16,6 @@ defmodule RenewCollabProj.Entities.ProjectDocument do
     doc
     |> cast(attrs, [:document_id])
     |> validate_required([:project_id, :document_id])
+    |> unique_constraint([:document_id])
   end
 end

@@ -1,0 +1,5 @@
+Thank you for signing up for Petristation.
+
+Please click the link below to finish your registration:
+
+<%= @confirm_url %>

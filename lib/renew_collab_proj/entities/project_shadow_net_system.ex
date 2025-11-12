@@ -16,5 +16,6 @@ defmodule RenewCollabProj.Entities.ProjectShadowNetSystem do
     sim
     |> cast(attrs, [:shadow_net_system_id])
     |> validate_required([:project_id, :shadow_net_system_id])
+    |> unique_constraint(:shadow_net_system_id)
   end
 end

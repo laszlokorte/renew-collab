@@ -90,4 +90,5 @@ input[readonly] {
     background-color: #eee;
     border: 1px solid #aaa;
     outline: none;
+    user-select: none;
 }

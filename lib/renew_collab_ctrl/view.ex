@@ -249,11 +249,11 @@ defmodule RenewCollabCtrl.View do
         |> Enum.map(fn member ->
           case Map.fetch(accounts_by_id, member.account_id) do
             {:ok, account} ->
-              %{member | account: account} |> Ecto.put_meta(state: :loaded)
+              %{member | account: account}
 
             :error ->
               # leave as-is if the post isn’t in the loaded list
-              member
+              %{member | account: nil}
           end
         end)
         |> then(&{:ok, &1})

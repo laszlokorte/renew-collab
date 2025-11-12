@@ -34,8 +34,17 @@ defmodule RenewCollabCtrl.Action do
     RenewCollabAuth.Commands.CreateAccount.new(%{account: account})
     |> RenewCollabAuth.AuthCommander.run_auth_command_sync()
     |> case do
-      {:ok, %{account: account}} -> {:ok, account}
-      {:error, :account, changeset, _} -> {:error, changeset}
+      {:ok, %{account: account}} ->
+        RenewCollabProj.Commands.AssignInvitationsToNewAccount.new(%{
+          account_id: account.id,
+          email: account.email
+        })
+        |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+
+        {:ok, account}
+
+      {:error, :account, changeset, _} ->
+        {:error, changeset}
     end
   end
 
@@ -860,6 +869,7 @@ defmodule RenewCollabCtrl.Action do
     |> RenewCollabProj.ProjectCommander.run_project_command_sync()
     |> case do
       {:ok, %{insert_inviatation: invitation}} -> {:ok, invitation}
+      {:error, :invitation, changset, _} -> {:error, changset}
     end
   end
 
@@ -1615,8 +1625,11 @@ defmodule RenewCollabCtrl.Action do
     RenewCollabAuth.Commands.CreateRegistration.new(%{email: email})
     |> RenewCollabAuth.AuthCommander.run_auth_command_sync()
     |> case do
-      {:ok, %{registration: reg}} -> {:ok, reg}
-      {:error, :registration, changeset, _} -> {:error, changeset}
+      {:ok, %{registration: reg}} ->
+        {:ok, reg}
+
+      {:error, :registration, changeset, _} ->
+        {:error, changeset}
     end
   end
 
@@ -1635,9 +1648,20 @@ defmodule RenewCollabCtrl.Action do
         })
         |> RenewCollabAuth.AuthCommander.run_auth_command_sync()
         |> case do
-          {:ok, %{account: %RenewCollabAuth.Entities.Account{}}} -> :ok
-          {:error, :account, changeset, _} -> {:error, changeset}
-          _ -> :error
+          {:ok, %{account: %RenewCollabAuth.Entities.Account{} = account}} ->
+            RenewCollabProj.Commands.AssignInvitationsToNewAccount.new(%{
+              account_id: account.id,
+              email: account.email
+            })
+            |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+
+            :ok
+
+          {:error, :account, changeset, _} ->
+            {:error, changeset}
+
+          _ ->
+            :error
         end
 
       _ ->

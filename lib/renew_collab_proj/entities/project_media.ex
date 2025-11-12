@@ -16,5 +16,6 @@ defmodule RenewCollabProj.Entities.ProjectMedia do
     doc
     |> cast(attrs, [:media_id])
     |> validate_required([:project_id, :media_id])
+    |> unique_constraint([:media_id])
   end
 end

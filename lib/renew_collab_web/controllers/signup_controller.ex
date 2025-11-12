@@ -25,6 +25,14 @@ defmodule RenewCollabWeb.SignupController do
     |> Dispatcher.perform_as(nil)
     |> case do
       {:ok, reg} ->
+        Task.Supervisor.start_child(RenewCollabAuth.AsyncEmailSupervisor, fn ->
+          RenewCollabAuth.Email.Sender.confirm(
+            reg,
+            url(~p"/signup/#{reg.id}/#{RenewCollabWeb.Token.sign(%{registration_id: reg.id})}")
+          )
+          |> RenewCollabAuth.Mailer.deliver()
+        end)
+
         conn
         |> put_flash(:info, "Signup in progress")
         |> redirect(to: ~p"/signup/#{reg.id}")
@@ -123,14 +131,9 @@ defmodule RenewCollabWeb.SignupController do
       %Registration{} = reg ->
         conn
         |> render(:waiting, %{
-          registration: reg,
-          token: sign_token(reg)
+          registration: reg
         })
     end
-  end
-
-  defp sign_token(%Registration{} = reg) do
-    RenewCollabWeb.Token.sign(%{registration_id: reg.id})
   end
 
   defp verify(token, %Registration{id: reg_id}) do

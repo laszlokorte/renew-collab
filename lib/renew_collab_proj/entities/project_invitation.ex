@@ -21,7 +21,11 @@ defmodule RenewCollabProj.Entities.ProjectInvitation do
   @doc false
   def changeset(sim, attrs) do
     sim
-    |> cast(attrs, [:invitation_id])
-    |> validate_required([:project_id, :invitation_id])
+    |> cast(attrs, [:project_id, :account_id, :email, :role])
+    |> validate_required([:project_id, :email, :role])
+    |> unique_constraint([:project_id, :email])
+    |> unique_constraint([:project_id, :account_id],
+      name: "project_invitation_project_id_account_id_index"
+    )
   end
 end
