@@ -868,7 +868,7 @@ defmodule RenewCollabCtrl.Action do
     })
     |> RenewCollabProj.ProjectCommander.run_project_command_sync()
     |> case do
-      {:ok, %{insert_inviatation: invitation}} -> {:ok, invitation}
+      {:ok, %{invitation: invitation}} -> {:ok, invitation}
       {:error, :invitation, changset, _} -> {:error, changset}
     end
   end
