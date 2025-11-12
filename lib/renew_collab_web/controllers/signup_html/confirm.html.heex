@@ -10,7 +10,7 @@
   </p>
 </div>
 <div style="display: grid; justify-content: center;" class="rnw-form">
-  <.signup_form changeset={@changeset} action={~p"/signup"} />
+  <.password_form changeset={@changeset} action={~p"/signup/#{@registration.id}/#{@code}"} />
 </div>
 
 <div style="display: grid; justify-content: center; text-align: center; margin: 2em;">

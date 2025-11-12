@@ -1,6 +1,6 @@
 <RenewCollabWeb.RenewComponents.app_header flash={@flash} blank={true} />
 
-<h2 style="text-align: center;">Login</h2>
+<h2 style="text-align: center; margin-top: 3em;">Login</h2>
 
 <%= unless @accounts_initialized  do %>
   <p style="color: #a00; text-align: center;">
@@ -13,5 +13,7 @@
 </div>
 
 <div style="display: grid; justify-content: center; text-align: center; margin: 2em;">
-  <a href={~p"/signup"}>Sign up</a>
+  <p>
+    No account yet? Go <a style="color: #23875d" href={~p"/signup"}>Sign up</a>
+  </p>
 </div>

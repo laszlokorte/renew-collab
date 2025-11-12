@@ -1593,4 +1593,13 @@ defmodule RenewCollabCtrl.Action do
     })
     |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
   end
+
+  def do_perform(%Actions.RegistrationCreateAsUser{email: email}) do
+    RenewCollabAuth.Commands.CreateRegistration.new(%{email: email})
+    |> RenewCollabAuth.AuthCommander.run_auth_command_sync()
+    |> case do
+      {:ok, %{registration: reg}} -> {:ok, reg}
+      {:error, :registration, changeset} -> {:error, changeset}
+    end
+  end
 end

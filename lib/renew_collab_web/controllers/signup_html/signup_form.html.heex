@@ -2,14 +2,7 @@
   <.error :if={@changeset.action}>
     Oops, something went wrong! Please check the errors below.
   </.error>
-  <.input field={f[:email]} type="email" label="Your E-mail" autocomplete="cc-number" />
-  <.input field={f[:new_password]} type="password" label="Password" autocomplete="new-password" />
-  <.input
-    field={f[:confirm_password]}
-    type="password"
-    label="Confirm Password"
-    autocomplete="confirm-password"
-  />
+  <.input field={f[:email]} required type="email" label="Your E-mail" autocomplete="cc-number" />
 
   <:actions>
     <.button>Sign up!</.button>

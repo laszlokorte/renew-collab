@@ -3,6 +3,12 @@ defmodule RenewCollabCtrl.WriteAccess do
   alias RenewCollabCtrl.Actions
   def can(account, action)
 
+  def can(%{id: _}, %Actions.RegistrationCreateAsUser{}),
+    do: false
+
+  def can(_, %Actions.RegistrationCreateAsUser{}),
+    do: true
+
   def can(%{id: account_id}, %Actions.ProjectDuplicateAsUser{project_id: proj_id}),
     do: can_write(account_id, :project, proj_id)
 

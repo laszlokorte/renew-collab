@@ -1,11 +1,25 @@
 <RenewCollabWeb.RenewComponents.app_header flash={@flash} blank={true} logout={true} />
-<div style="text-align: center; margin-top: 1em;">
-  <a href={~p"/"}>Back</a>
-  <h2 style="text-align: center; display: flex; gap: 1ex; align-items: center; justify-content: center;">
-    <img class="icon" src="/images/icon-user.svg" /> My Account
+<div style="padding: 1em">
+  <.link navigate={~p"/"}>
+    Dashboard
+  </.link>
+  / My Account
+  <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
+    <img class="icon" src="/images/icon-user.svg" /> My Account Settings
   </h2>
 </div>
 <div style="text-align: center; margin-top: 1em;">
   <h2>Change Password</h2>
-  <.change_password_form changeset={@changeset} action={~p"/account/me/password"} />
+
+  <div style="display: grid; justify-content: center;" class="rnw-form">
+    <.change_password_form changeset={@changeset} action={~p"/account/me/password"} />
+  </div>
+</div>
+<div style="margin: 1em; text-align: center; margin-top: 1em; border: 3px solid #a00; padding: 1em; background: #fee">
+  <h2 style="margin: 0">Delete My Account</h2>
+
+  <p>
+    Deleting your account will delete all projects you are the owner of, including all their containing documents and simulations.
+  </p>
+  <.delete_form action={~p"/account/me/delete"} />
 </div>

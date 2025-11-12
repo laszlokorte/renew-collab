@@ -19,4 +19,10 @@ defmodule RenewCollabWeb.MyAccountController do
     |> put_flash(:info, "Password changed")
     |> redirect(to: ~p"/account/me")
   end
+
+  def delete(conn, _params) do
+    conn
+    |> put_flash(:info, "Account deleted")
+    |> redirect(to: ~p"/")
+  end
 end
