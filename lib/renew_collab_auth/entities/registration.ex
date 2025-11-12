@@ -16,7 +16,9 @@ defmodule RenewCollabAuth.Entities.Registration do
     |> cast(attrs, [:email])
     |> validate_format(:email, ~r/@/, message: "Must be a valid E-mail address")
     # TODO: make configurable
-    |> validate_format(:email, ~r/(@uni-hamburg\.de|@laszlokorte\.de)$/,
+    |> validate_format(
+      :email,
+      ~r/@(((studium\.|informatik\.)?uni-hamburg\.de)|laszlokorte\.de)$/,
       message: "Currently only selected E-mail adresses are for registration"
     )
     |> validate_required([:email])
