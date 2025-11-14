@@ -3,6 +3,18 @@ defmodule RenewCollabCtrl.WriteAccess do
   alias RenewCollabCtrl.Actions
   def can(account, action)
 
+  def can(%{id: _}, %Actions.AccountRequestPasswordReset{}),
+    do: false
+
+  def can(_, %Actions.AccountRequestPasswordReset{}),
+    do: true
+
+  def can(%{id: _}, %Actions.AccountResetPasswordAsUser{}),
+    do: false
+
+  def can(_, %Actions.AccountResetPasswordAsUser{}),
+    do: true
+
   def can(%{id: _}, %Actions.RegistrationCreateAsUser{}),
     do: false
 

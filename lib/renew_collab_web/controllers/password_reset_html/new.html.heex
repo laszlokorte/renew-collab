@@ -1,0 +1,17 @@
+<RenewCollabWeb.RenewComponents.app_header flash={@flash} blank={true} />
+
+<h2 style="text-align: center; margin-top: 3em;">Request password reset</h2>
+<div style="margin: auto; width: max-content;">
+  <p>
+    To create a new account Enter your E-Mail address.
+  </p>
+</div>
+<div style="display: grid; justify-content: center;" class="rnw-form">
+  <.request_form changeset={@changeset} action={~p"/account/reset"} />
+</div>
+
+<div style="display: grid; justify-content: center; text-align: center; margin: 2em;">
+  <p>
+    <a style="color: #23875d" href={~p"/login"}>Log In</a>
+  </p>
+</div>

@@ -1,2 +1,0 @@
-defmodule RenewCollabWeb.ResetAccountHTML do
-end

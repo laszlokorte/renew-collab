@@ -1621,6 +1621,36 @@ defmodule RenewCollabCtrl.Action do
     |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
   end
 
+  def do_perform(%Actions.AccountRequestPasswordReset{email: email}) do
+    RenewCollabAuth.Commands.CreatePasswordResetRequest.new(%{email: email})
+    |> RenewCollabAuth.AuthCommander.run_auth_command_sync()
+    |> case do
+      {:ok, %{reset_request: reset, account: account}} ->
+        {:ok, reset |> Map.put(:account, account)}
+
+      {:error, :reset_request, changeset, _} ->
+        {:error, changeset}
+    end
+  end
+
+  def do_perform(%Actions.AccountResetPasswordAsUser{reset_id: reset_id, account: account}) do
+    RenewCollabAuth.Commands.ApplyPasswordResetRequest.new(%{
+      reset_id: reset_id,
+      account: account
+    })
+    |> RenewCollabAuth.AuthCommander.run_auth_command_sync()
+    |> case do
+      {:ok, %{reset_request: reset}} ->
+        {:ok, reset}
+
+      {:error, :account, changeset, _} ->
+        {:error, changeset}
+
+      _ ->
+        :error
+    end
+  end
+
   def do_perform(%Actions.RegistrationCreateAsUser{email: email}) do
     RenewCollabAuth.Commands.CreateRegistration.new(%{email: email})
     |> RenewCollabAuth.AuthCommander.run_auth_command_sync()

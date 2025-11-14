@@ -84,7 +84,7 @@ defmodule RenewCollabWeb.SignupController do
         else
           conn
           |> put_flash(:error, "Invalid Confirmation code")
-          |> redirect(to: ~p"/signup/#{reg.id}")
+          |> redirect(to: ~p"/signup")
         end
     end
   end
@@ -141,7 +141,7 @@ defmodule RenewCollabWeb.SignupController do
   defp verify(token, %Registration{id: reg_id}) do
     RenewCollabWeb.Token.verify(token)
     |> case do
-      {:ok, %{registration_id: ^reg_id}} -> :ok
+      {:ok, %{registration_id: ^reg_id}} -> true
       _ -> false
     end
   end

@@ -4,12 +4,11 @@
       Oops, something went wrong! Please check the errors below.
     </span>
   </.error>
-  <.input field={f[:email]} required type="text" label="E-mail" readonly />
   <.input
     field={f[:new_password]}
     required
     type="password"
-    label="Password"
+    label="New Password"
     autocomplete="new-password"
   />
   <.input
@@ -21,6 +20,6 @@
   />
 
   <:actions>
-    <.button>Confirm Sign up!</.button>
+    <.button>Reset password</.button>
   </:actions>
 </.simple_form>

@@ -6,7 +6,7 @@ defmodule RenewCollabAuth.Repo.Migrations.CreateRegistration do
       add :id, :binary_id, primary_key: true, null: false
       add :email, :string, null: false
 
-      timestamps(type: :utc_datetime)
+      timestamps(type: :utc_datetime, updated_at: false)
     end
 
     create unique_index(:registration, [:email])

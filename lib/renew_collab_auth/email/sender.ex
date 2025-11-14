@@ -1,4 +1,5 @@
 defmodule RenewCollabAuth.Email.Sender do
+  alias RenewCollabAuth.Entities.AccountPasswordResetRequest
   alias RenewCollabAuth.Entities.Registration
   use Phoenix.Swoosh, view: RenewCollabAuth.Email.View
 
@@ -8,5 +9,13 @@ defmodule RenewCollabAuth.Email.Sender do
     |> from({"Petristation", "petristation@mail.petristation.net"})
     |> subject("Petristation: Confirm your E-mail address")
     |> render_body(:confirm, %{reg: reg, confirm_url: confirm_url})
+  end
+
+  def reset_password(%AccountPasswordResetRequest{} = reset, confirm_url) do
+    new()
+    |> to(reset.account.email)
+    |> from({"Petristation", "petristation@mail.petristation.net"})
+    |> subject("Petristation: Reset your password")
+    |> render_body(:reset, %{reg: reset, confirm_url: confirm_url})
   end
 end

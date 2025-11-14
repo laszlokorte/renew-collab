@@ -429,4 +429,9 @@ defmodule RenewCollabCtrl.View do
     RenewCollabAuth.Queries.RegisrationById.new(%{registration_id: registration_id})
     |> RenewCollabAuth.AuthFetcher.fetch()
   end
+
+  def do_fetch(_account, %Views.PendingPasswordResetRequest{reset_id: reset_id}) do
+    RenewCollabAuth.Queries.PendingPasswordResetRequest.new(%{reset_id: reset_id})
+    |> RenewCollabAuth.AuthFetcher.fetch()
+  end
 end

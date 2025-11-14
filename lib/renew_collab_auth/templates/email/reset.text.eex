@@ -1,0 +1,3 @@
+Use this link to reset your password:
+
+<%= @confirm_url %>

@@ -146,11 +146,26 @@ defmodule RenewCollabWeb.Router do
 
     get "/login", LoginController, :index
     post "/login", LoginController, :login
+  end
+
+  scope "/", RenewCollabWeb do
+    pipe_through [:browser, :not_authenticated]
     get "/signup", SignupController, :new
     post "/signup", SignupController, :create
     get "/signup/:registration_id", SignupController, :waiting
     get "/signup/:registration_id/:confirmation_code", SignupController, :confirm
     post "/signup/:registration_id/:confirmation_code", SignupController, :set_password
+  end
+
+  scope "/", RenewCollabWeb do
+    pipe_through [:browser, :not_authenticated]
+    get "/account/reset", PasswordResetController, :new
+    post "/account/reset", PasswordResetController, :create
+    get "/account/reset/:reset_id/:confirmation_code", PasswordResetController, :confirm
+
+    post "/account/reset/:reset_id/:confirmation_code",
+         PasswordResetController,
+         :reset_password
   end
 
   scope "/", RenewCollabWeb do

@@ -1,0 +1,15 @@
+<RenewCollabWeb.RenewComponents.app_header flash={@flash} blank={true} />
+
+<h2 style="text-align: center; margin-top: 3em;">Reset your password</h2>
+<div style="margin: auto; width: max-content;">
+  <p>Please choose a new password.</p>
+</div>
+<div style="display: grid; justify-content: center;" class="rnw-form">
+  <.reset_form changeset={@changeset} action={~p"/account/reset/#{@reset.id}/#{@code}"} />
+</div>
+
+<div style="display: grid; justify-content: center; text-align: center; margin: 2em;">
+  <p>
+    Do you already have an account? Go <a style="color: #23875d" href={~p"/login"}>Login</a>
+  </p>
+</div>

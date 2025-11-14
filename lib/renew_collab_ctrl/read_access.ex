@@ -2,6 +2,12 @@ defmodule RenewCollabCtrl.ReadAccess do
   alias RenewCollabCtrl.Views
   def can(_, _)
 
+  def can(%{id: _account_id}, %Views.PendingPasswordResetRequest{}),
+    do: false
+
+  def can(_, %Views.PendingPasswordResetRequest{}),
+    do: true
+
   def can(%{id: account_id}, %Views.ProjectMembersList{project_id: proj_id}),
     do: can_read(account_id, :project, proj_id)
 
