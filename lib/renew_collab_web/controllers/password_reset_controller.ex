@@ -83,7 +83,7 @@ defmodule RenewCollabWeb.PasswordResetController do
 
             {:error, changeset} ->
               conn
-              |> render(:confirm, %{
+              |> render(:reset, %{
                 reset: reset,
                 code: confirmation_code,
                 changeset: changeset

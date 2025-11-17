@@ -244,6 +244,11 @@ if config_env() == :prod do
       tls_options: :tls_certificate_check.options(mail_host) ++ [versions: [:"tlsv1.3"]],
       auth: :always,
       retries: String.to_integer(System.get_env("RENEW_MAILER_SMTP_RETRIES") || "3")
+
+    config :renew_collab, RenewCollabAuth.Email.Sender,
+      sender_name: System.get_env("RENEW_MAILER_SENDER_NAME") || "Petristation",
+      sender_email: System.get_env("RENEW_MAILER_SENDER_EMAIL") || "petristation@local",
+      subject_prefix: System.get_env("RENEW_MAILER_SUBJECT_PREFIX") || "Petristation"
   end
 
   # ## SSL Support

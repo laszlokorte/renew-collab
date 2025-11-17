@@ -1,4 +1,4 @@
-<.simple_form :let={f} for={@changeset} action={@action}>
+<.simple_form :let={f} method="post" for={@changeset} action={@action}>
   <.error :if={@changeset.action}>
     <span style=" color: #a00; ">
       Oops, something went wrong! Please check the errors below.

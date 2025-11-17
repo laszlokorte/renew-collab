@@ -124,3 +124,8 @@ config :phoenix, :plug_init_mode, :runtime
 config :renew_collab, RenewCollabAuth.Mailer, adapter: Swoosh.Adapters.Local
 
 config :renew_collab, RenewCollabAuth, email_pattern: ~r/@/
+
+config :renew_collab, RenewCollabAuth.Email.Sender,
+  sender_name: "Petristation",
+  sender_email: "petristation@local",
+  subject_prefix: "Petristation"

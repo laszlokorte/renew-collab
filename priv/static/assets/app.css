@@ -40,6 +40,9 @@ body {
   padding: 1ex;
   align-self: baseline;
 }
+.form-error {
+  color: #a00;
+}
 .flash:not([hidden]) {
   display: flex;
 }
