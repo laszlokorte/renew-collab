@@ -115,11 +115,11 @@ defmodule RenewCollabWeb.DocumentController do
     |> json(%{message: "ok"})
   end
 
-  def duplicate(conn, %{"id" => document_id}) do
-    %Actions.DocumentDuplicateInProject{document_id: document_id}
+  def duplicate(conn, %{"id" => document_id, "project_id" => project_id}) do
+    %Actions.DocumentDuplicateInProject{document_id: document_id, project_id: project_id}
     |> Dispatcher.perform_as(conn.assigns.current_account)
     |> case do
-      {:ok, %{insert_document: new_document}} ->
+      {:ok, new_document} ->
         conn
         |> put_status(:created)
         |> put_resp_header("location", ~p"/api/documents/#{new_document}")

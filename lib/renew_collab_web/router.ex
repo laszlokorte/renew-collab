@@ -83,7 +83,7 @@ defmodule RenewCollabWeb.Router do
       get "/:id/export", DocumentController, :export
       get "/:id/download.iex", DocumentController, :inspect
       get "/:id/download.json", DocumentController, :show
-      post "/:id/duplicate", DocumentController, :duplicate
+      post "/:id/duplicate/:project_id", DocumentController, :duplicate
       get "/:id/simulations", SimulationLinksController, :index
 
       get "/:id", DocumentController, :show

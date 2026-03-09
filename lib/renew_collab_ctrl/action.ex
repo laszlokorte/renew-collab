@@ -158,7 +158,7 @@ defmodule RenewCollabCtrl.Action do
       }) do
     RenewCollab.Commands.DuplicateDocument.new(%{
       document_id: document_id,
-      keep_name: true
+      keep_name: false
     })
     |> RenewCollab.DocumentCommander.run_document_command_sync(true)
     |> case do
