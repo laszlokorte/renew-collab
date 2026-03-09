@@ -30,7 +30,7 @@ defmodule RenewCollab.Commands.DuplicateDocument do
           doc:
             TransientDocument.update_name(
               transient_doc,
-              &"#{String.trim_trailing(&1, "(Copy)")} (Copy)"
+              &RenewCollabCtrl.Naming.name_for_copy/1
             )
         })
         |> RenewCollab.Commands.CreateDocument.multi()

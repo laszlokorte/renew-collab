@@ -51,8 +51,13 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(%{id: account_id}, %Actions.DocumentEditCreateLayerWithEdge{document_id: doc_id}),
     do: can_write(account_id, :document, doc_id)
 
-  def can(%{id: account_id}, %Actions.DocumentDuplicateInProject{project_id: proj_id}),
-    do: can_write(account_id, :project, proj_id)
+  def can(%{id: account_id}, %Actions.DocumentDuplicateInProject{
+        project_id: proj_id,
+        document_id: doc_id
+      }),
+      do:
+        can_write(account_id, :project, proj_id) and
+          ReadAccess.can_read(account_id, :document, doc_id)
 
   def can(%{id: account_id}, %Actions.SimulationDuplicateInProject{project_id: proj_id}),
     do: can_write(account_id, :project, proj_id)
@@ -261,9 +266,6 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(%{id: account_id}, %Actions.ProjectCreateAsUser{account_id: account_id}), do: true
 
   def can(%{id: account_id}, %Actions.ProjectRename{project_id: proj_id}),
-    do: can_write(account_id, :project, proj_id)
-
-  def can(%{id: account_id}, %Actions.DocumentDuplicateInProject{project_id: proj_id}),
     do: can_write(account_id, :project, proj_id)
 
   def can(%{id: account_id}, %Actions.ProjectRemoveMemberAsUser{

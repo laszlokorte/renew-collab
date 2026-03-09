@@ -145,7 +145,7 @@ defmodule RenewCollabWeb.DocumentJSON do
           method: "get"
         },
         duplicate: %{
-          href: url(~p"/api/documents/#{document.id}/duplicate"),
+          href: url(~p"/api/documents/#{document.id}/duplicate/#{document.project_assignment.project_id}"),
           method: "post"
         },
         linked_simulations: %{
