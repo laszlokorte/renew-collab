@@ -11,6 +11,7 @@ defmodule RenewCollabSim.Script.Runner do
     "Renew Window Management",
     "Renew JHotDraw",
     "Renew Gui",
+    "Renew PropertyManagement",
     # This Renew Formalism Gui Plugin forces the AWT/Swing Gui to open, stopping Renew from closing
     # "Renew Formalism Gui",
     "Renew Logging",
@@ -87,7 +88,7 @@ defmodule RenewCollabSim.Script.Runner do
     xvbf_display = Keyword.get(conf, :sim_xvbf_display)
     interceptor_path = Keyword.get(conf, :sim_interceptor_path)
     log_conf_path = Keyword.get(conf, :sim_log_conf_path)
-    renew_plugins = @renew_plugins |> Enum.join(", ")
+    renew_plugins = (Keyword.get(conf, :sim_renew_plugins) || @renew_plugins) |> Enum.join(", ")
 
     module_path = "#{renew_path}" <> separator <> "#{renew_path}/libs"
 

@@ -175,7 +175,14 @@ if config_env() == :prod do
       System.get_env("SIM_STDIO_WRAPPER") || raise("SIM_STDIO_WRAPPER is missing"),
     sim_log_conf_path: System.get_env("SIM_LOG4J_CONF") || raise("SIM_LOG4J_CONF is missing"),
     sim_xvbf_path: System.get_env("SIM_XVBF") || nil,
-    sim_xvbf_display: System.get_env("SIM_XVBF_DISPLAY") || nil
+    sim_xvbf_display: System.get_env("SIM_XVBF_DISPLAY") || nil,
+    sim_renew_plugins:
+      (with plugins <- System.get_env("SIM_RENEW_PLUGINS") || "",
+            list = [_ | _] <- String.split(plugins, ";", trim: true) do
+         list
+       else
+         _ -> nil
+       end)
 
   config :renew_collab, RenewCollabSim.Commands,
     sim_start: System.get_env("SIM_RENEW_CMD_START") || "startsimulation",

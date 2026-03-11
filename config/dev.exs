@@ -98,7 +98,14 @@ config :renew_collab, RenewCollabSim.Script.Runner,
   sim_renew_path: Path.join([priv_path, "simulation", "renew42"]),
   sim_interceptor_path: Path.join([priv_path, "simulation", "Interceptor.java"]),
   sim_log_conf_path: Path.join([priv_path, "simulation", "log4j.properties"]),
-  sim_xvbf_path: nil
+  sim_xvbf_path: nil,
+  sim_renew_plugins:
+    (with plugins <- System.get_env("SIM_RENEW_PLUGINS") || "",
+          list = [_ | _] <- String.split(plugins, ";", trim: true) do
+       list
+     else
+       _ -> nil
+     end)
 
 config :renew_collab, RenewCollabSim.Commands,
   sim_start: "startsimulation",
