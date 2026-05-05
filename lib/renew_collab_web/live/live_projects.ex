@@ -3,7 +3,6 @@ defmodule RenewCollabWeb.LiveProjects do
   alias RenewCollabCtrl.Actions
   alias RenewCollabCtrl.Views
   use RenewCollabWeb, :live_view
-  use RenewCollabWeb, :verified_routes
 
   use RenewCollabCtrl.Helper,
     projects: {Views.MyProjectsList, [:account_id], :projects_changed},

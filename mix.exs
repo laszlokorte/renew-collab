@@ -16,7 +16,8 @@ defmodule RenewCollab.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      listeners: [Phoenix.CodeReloader]
     ]
   end
 
@@ -39,18 +40,18 @@ defmodule RenewCollab.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.7.14"},
+      {:phoenix, "~> 1.8.0"},
       {:ecto_sql, "~> 3.10"},
       {:ecto_sqlite3, "~> 0.18"}
     ] ++
       db_adapters() ++
       [
         {:phoenix_ecto, "~> 4.5"},
-        {:phoenix_html, "~> 3.2"},
+        {:phoenix_html, "~> 4.3"},
         {:phoenix_view, "~> 2.0"},
         {:phoenix_live_reload, "~> 1.2", only: :dev},
-        {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
-        {:phoenix_live_view, "~> 1.0.0-rc.1", override: true},
+        {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
+        {:phoenix_live_view, "~> 1.1.0", override: true},
         {:phoenix_live_dashboard, "~> 0.8.3"},
         {:telemetry_metrics, "~> 1.0"},
         {:telemetry_poller, "~> 1.0"},
@@ -76,7 +77,10 @@ defmodule RenewCollab.MixProject do
   defp db_adapters do
     for {dep, true} <- [
           {{:myxql, "~> 0.7.0"}, use_mysql()},
-          {{:postgrex, "~> 0.19.3"}, use_postgresql()}
+          {{:postgrex, "~> 0.19.3"}, use_postgresql()},
+          {{:ecto_sqlite3_extras, "~> 1.2.0"}, true},
+          {{:ecto_mysql_extras, "~> 0.3"}, use_mysql()},
+          {{:ecto_psql_extras, "~> 0.6"}, use_postgresql()}
         ] do
       dep
     end

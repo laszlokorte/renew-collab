@@ -27,7 +27,7 @@ defmodule RenewCollabWeb.ThumbnailController do
           |> IO.iodata_to_binary()
         )
 
-      document ->
+      document = %RenewCollab.Document.Document{} ->
         conn
         |> put_resp_content_type("image/svg+xml")
         |> send_resp(

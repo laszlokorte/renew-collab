@@ -14,6 +14,9 @@ defmodule RenewCollabCtrl.ReadAccess do
   def can(%{id: account_id}, %Views.ProjectDocumentsList{project_id: proj_id}),
     do: can_read(account_id, :project, proj_id)
 
+  def can(%{id: _, is_admin: true}, %Views.DocumentWithContent{document_id: _}),
+    do: true
+
   def can(%{id: account_id}, %Views.DocumentWithContent{document_id: doc_id}),
     do: can_read(account_id, :document, doc_id)
 

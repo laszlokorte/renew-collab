@@ -4,7 +4,6 @@ defmodule RenewCollabWeb.LiveDocumentsManager do
   alias RenewCollabCtrl.Fetcher
   alias RenewCollabCtrl.Views
   use RenewCollabWeb, :live_view
-  use RenewCollabWeb, :verified_routes
 
   def mount(_params, _session, socket) do
     socket = socket |> assign(load_data(socket.assigns.current_account))

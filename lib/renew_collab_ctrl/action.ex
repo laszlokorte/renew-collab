@@ -1640,7 +1640,7 @@ defmodule RenewCollabCtrl.Action do
     })
     |> RenewCollabAuth.AuthCommander.run_auth_command_sync()
     |> case do
-      {:ok, %{reset_request: reset}} ->
+      {:ok, %{reset_request: _reset}} ->
         :ok
 
       {:error, :account, changeset, _} ->

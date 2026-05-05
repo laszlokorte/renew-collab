@@ -3,7 +3,6 @@ defmodule RenewCollabWeb.LiveSimulation do
   alias RenewCollabCtrl.Actions
   alias RenewCollabProj.Entities.ProjectSimulation
   use RenewCollabWeb, :live_view
-  use RenewCollabWeb, :verified_routes
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Fetcher
 

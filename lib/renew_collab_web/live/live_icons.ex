@@ -1,7 +1,6 @@
 defmodule RenewCollabWeb.LiveIcons do
   alias RenewCollabCtrl.Views
   use RenewCollabWeb, :live_view
-  use RenewCollabWeb, :verified_routes
 
   use RenewCollabCtrl.Helper,
     icons: {Views.GlobalSymbolsList, [], :symbols_changed}

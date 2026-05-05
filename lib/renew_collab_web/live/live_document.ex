@@ -2,7 +2,6 @@ defmodule RenewCollabWeb.LiveDocument do
   alias RenewCollabCtrl.Dispatcher
   alias RenewCollabProj.Entities.ProjectDocument
   use RenewCollabWeb, :live_view
-  use RenewCollabWeb, :verified_routes
 
   alias RenewCollabCtrl.Fetcher
   alias RenewCollabCtrl.Views

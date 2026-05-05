@@ -1,6 +1,5 @@
 defmodule RenewCollabWeb.LiveIcon do
   use RenewCollabWeb, :live_view
-  use RenewCollabWeb, :verified_routes
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Fetcher
 

@@ -4,7 +4,6 @@ defmodule RenewCollabWeb.LiveProjectManager do
   alias RenewCollabCtrl.Dispatcher
   alias RenewCollabCtrl.Actions
   use RenewCollabWeb, :live_view
-  use RenewCollabWeb, :verified_routes
 
   def mount(%{"project_id" => project_id}, _session, socket) do
     account = socket.assigns.current_account

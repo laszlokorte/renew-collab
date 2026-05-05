@@ -3,7 +3,6 @@ defmodule RenewCollabWeb.LiveShadowNet do
   alias RenewCollabCtrl.Actions
   alias RenewCollabProj.Entities.ProjectShadowNetSystem
   use RenewCollabWeb, :live_view
-  use RenewCollabWeb, :verified_routes
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Fetcher
 
