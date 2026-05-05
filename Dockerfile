@@ -18,7 +18,7 @@ ARG DEBIAN_VERSION=bookworm-20260421-slim
 ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
 ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
 
-ARG JAVA_VERSION="17"
+ARG JAVA_VERSION="21"
 ARG JAVA_BUILDER_IMAGE="eclipse-temurin:${JAVA_VERSION}"
 ARG RENEW_IMAGE="git.informatik.uni-hamburg.de:4567/tgi/paose/renew:modular"
 
@@ -96,7 +96,7 @@ FROM ${RUNNER_IMAGE}
 
 # ARG RENEW_DOWNLOAD_URL="https://www2.informatik.uni-hamburg.de/TGI/renew/4.1/renew4.1base.zip"
 # ARG RENEW_DOWNLOAD_TARGET="/tmp/renew-download.zip"
-ARG JAVA_VERSION="17"
+ARG JAVA_VERSION="21"
 
 ARG DATA_ROOT_PATH="/data"
 ENV DATA_ROOT_PATH=${DATA_ROOT_PATH}
