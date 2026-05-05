@@ -14,34 +14,32 @@ defmodule RenewCollab.Queries.ListSymbols do
   def multi(%__MODULE__{}) do
     Ecto.Multi.new()
     |> Ecto.Multi.all(
-      :result,
+      :shape,
       from(s in Shape,
-        order_by: [asc: :name],
-        left_join: p in assoc(s, :paths),
-        left_join: sgm in assoc(p, :segments),
-        left_join: stp in assoc(sgm, :steps),
-        left_join: h in assoc(stp, :horizontal),
-        left_join: v in assoc(stp, :vertical),
-        left_join: a in assoc(stp, :arc),
-        order_by: [asc: p.sort, asc: sgm.sort, asc: stp.sort],
-        preload: [
-          paths:
-            {p,
-             [
-               segments:
-                 {sgm,
-                  [
-                    steps:
-                      {stp,
-                       [
-                         horizontal: h,
-                         vertical: v,
-                         arc: a
-                       ]}
-                  ]}
-             ]}
-        ]
+        order_by: [asc: :name]
       )
     )
+    |> Ecto.Multi.run(:result, fn repo, %{shape: shape} ->
+      {:ok,
+       repo.preload(
+         shape,
+         [
+           {:paths,
+            [
+              {
+                :segments,
+                [
+                  {:steps,
+                   [
+                     :horizontal,
+                     :vertical,
+                     :arc
+                   ]}
+                ]
+              }
+            ]}
+         ]
+       )}
+    end)
   end
 end

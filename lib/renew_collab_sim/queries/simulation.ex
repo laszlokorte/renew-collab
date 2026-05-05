@@ -18,15 +18,7 @@ defmodule RenewCollabSim.Queries.Simulation do
       :sim,
       from(s in Simulation,
         join: sns in assoc(s, :shadow_net_system),
-        left_join: nets in assoc(sns, :nets),
-        left_join: ins in assoc(s, :net_instances),
-        left_join: net in assoc(ins, :shadow_net),
-        left_join: tokens in assoc(ins, :tokens),
-        where: s.id == ^id,
-        preload: [
-          shadow_net_system: {sns, [nets: nets]},
-          net_instances: {ins, [tokens: tokens, shadow_net: net]}
-        ]
+        where: s.id == ^id
       )
     )
     |> Ecto.Multi.run(:result, fn
@@ -37,9 +29,12 @@ defmodule RenewCollabSim.Queries.Simulation do
         if detailed do
           sim
           |> repo.preload(:log_entries)
-          |> repo.preload(net_instances: :firings)
+          |> repo.preload(net_instances: [:firings, :tokens, :shadow_net])
+          |> repo.preload(shadow_net_system: [:nets])
         else
           sim
+          |> repo.preload(net_instances: [:tokens, :shadow_net])
+          |> repo.preload(shadow_net_system: [:nets])
         end
         |> then(&{:ok, &1})
     end)

@@ -22,34 +22,28 @@ defmodule RenewCollab.Queries.StrippedDocument do
   def multi(%__MODULE__{document_id: document_id, original_ids: original_ids}) do
     Ecto.Multi.new()
     |> Ecto.Multi.one(
-      :original_document,
+      :original_document_flat,
       from(d in Document,
-        where: d.id == ^document_id,
-        left_join: l in assoc(d, :layers),
-        left_join: tb in assoc(d, :thumbnail),
-        left_join: b in assoc(l, :box),
-        left_join: t in assoc(l, :text),
-        left_join: e in assoc(l, :edge),
-        left_join: w in assoc(e, :waypoints),
-        left_join: ls in assoc(l, :style),
-        left_join: ts in assoc(t, :style),
-        left_join: es in assoc(e, :style),
-        left_join: i in assoc(l, :interface),
-        order_by: [asc: l.z_index, asc: w.sort],
-        preload: [
-          thumbnail: tb,
-          layers:
-            {l,
-             [
-               box: b,
-               text: {t, [style: ts]},
-               edge: {e, [style: es, waypoints: w]},
-               style: ls,
-               interface: i
-             ]}
-        ]
+        where: d.id == ^document_id
       )
     )
+    |> Ecto.Multi.run(:original_document, fn repo, %{original_document_flat: doc} ->
+      {:ok,
+       repo.preload(
+         doc,
+         [
+           :thumbnail,
+           {:layers,
+            [
+              {:text, [:style]},
+              {:edge, [:style, :waypoints]},
+              :style,
+              :interface,
+              :box
+            ]}
+         ]
+       )}
+    end)
     |> Ecto.Multi.run(:original_id, fn
       _, %{original_document: %{id: doc_id}} -> {:ok, doc_id}
       _, %{original_document: nil} -> {:error, :not_found}

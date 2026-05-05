@@ -25,7 +25,7 @@ defmodule RenewCollab.Queries.DocumentWithElements do
   def multi(%__MODULE__{document_id: document_id, root_layer_id: root_layer_id}) do
     Ecto.Multi.new()
     |> Ecto.Multi.one(
-      :result,
+      :doc,
       from(d in Document,
         as: :document,
         where: d.id == ^document_id,
@@ -55,45 +55,34 @@ defmodule RenewCollab.Queries.DocumentWithElements do
           end,
         left_join: l in assoc(d, :layers),
         on: l.id == force_parent.descendant_id,
-        left_join: dp in assoc(l, :direct_parent_hood),
-        left_join: b in assoc(l, :box),
-        left_join: ss in assoc(b, :symbol_shape),
-        left_join: t in assoc(l, :text),
-        left_join: e in assoc(l, :edge),
-        left_join: sb in assoc(e, :source_bond),
-        left_join: tb in assoc(e, :target_bond),
-        left_join: w in assoc(e, :waypoints),
-        left_join: ls in assoc(l, :style),
-        left_join: ts in assoc(t, :style),
-        left_join: es in assoc(e, :style),
-        left_join: sh in assoc(t, :size_hint),
-        left_join: i in assoc(l, :interface),
-        left_join: ol in assoc(l, :outgoing_link),
-        left_join: il in assoc(l, :incoming_links),
         left_join: cs in assoc(d, :current_snaptshot),
-        left_join: ps in assoc(cs, :predecessor),
-        # TODO: move this conditon "ns.predecessor_id != ns.id" into :where of the has_many association
-        # of Snapshot, as soon as Ecto supports it.
-        left_join: ns in assoc(cs, :successors),
-        on: ns.predecessor_id != ns.id,
-        order_by: [asc: l.z_index, asc: w.sort],
+        order_by: [asc: l.z_index],
         preload: [
-          current_snaptshot: {cs, [predecessor: ps, successors: ns]},
+          current_snaptshot: cs,
           thumbnail: thumb,
-          layers:
-            {l,
-             [
-               direct_parent_hood: dp,
-               box: {b, [symbol_shape: ss]},
-               text: {t, [style: ts, size_hint: sh]},
-               edge: {e, [style: es, waypoints: w, source_bond: sb, target_bond: tb]},
-               style: ls,
-               interface: i,
-               outgoing_link: ol,
-               incoming_links: il
-             ]}
+          layers: l
         ]
       )
     )
+    |> Ecto.Multi.run(:result, fn repo, %{doc: doc} ->
+      {:ok,
+       repo.preload(
+         doc,
+         [
+           {:current_snaptshot, [:predecessor, :successors]},
+           :thumbnail,
+           layers: [
+             :direct_parent_hood,
+             {:box, [:symbol_shape]},
+             {:text, [:style, :size_hint]},
+             {:edge, [:style, :waypoints, :source_bond, :target_bond]},
+             :style,
+             :interface,
+             :outgoing_link,
+             :incoming_links
+           ]
+         ]
+       )}
+    end)
   end
 end
