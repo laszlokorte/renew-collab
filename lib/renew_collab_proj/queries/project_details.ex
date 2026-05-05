@@ -24,7 +24,8 @@ defmodule RenewCollabProj.Queries.ProjectDetails do
          :ownerships,
          :documents,
          :shadow_net_systems,
-         :simulations
+         :simulations,
+         :invitations
        ])}
     end)
   end
