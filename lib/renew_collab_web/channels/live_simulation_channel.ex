@@ -9,6 +9,8 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
 
   @impl true
   def init("live:simulation:" <> simulation_id, _params, socket) do
+    dbg(socket.assigns.current_account)
+
     %Views.SimulationWithState{simulation_id: simulation_id}
     |> Fetcher.fetch_as(socket.assigns.current_account)
     |> case do
