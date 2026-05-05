@@ -14,12 +14,15 @@ defmodule RenewCollabProj.Queries.CheckAccess do
       :result,
       entity
       |> case do
-        {:project, proj_id} ->
+        {:project, proj_id} when not is_nil(proj_id) ->
           from(m in ProjectMember,
             where: m.account_id == ^account_id and m.project_id == ^proj_id and m.role in ^roles,
             select: not is_nil(m.account_id),
             limit: 1
           )
+
+        {:project, nil} ->
+          from(m in ProjectMember, select: false, limit: 1)
 
         {:document, doc_id} ->
           from(m in ProjectMember,

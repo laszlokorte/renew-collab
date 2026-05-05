@@ -60,20 +60,22 @@ defmodule RenewCollabCtrl.ReadAccess do
   def can(%{id: account_id}, %Views.ProjectShadowNetSystemsList{project_id: proj_id}),
     do: can_read(account_id, :project, proj_id)
 
-  def can(%{id: account_id}, %Views.ProjectRunningSimulationIds{project_id: proj_id}),
-    do: can_read(account_id, :project, proj_id)
+  def can(%{id: account_id, is_admin: admin}, %Views.ProjectRunningSimulationIds{
+        project_id: proj_id
+      }),
+      do: admin || can_read(account_id, :project, proj_id)
 
-  def can(%{id: account_id}, %Views.SimulationIsActive{project_id: proj_id}),
-    do: can_read(account_id, :project, proj_id)
+  def can(%{id: account_id, is_admin: admin}, %Views.SimulationIsActive{project_id: proj_id}),
+    do: admin or can_read(account_id, :project, proj_id)
 
   def can(%{id: account_id}, %Views.SimulationIsPlaying{project_id: proj_id}),
     do: can_read(account_id, :project, proj_id)
 
-  def can(%{id: account_id}, %Views.ShadowNetSystem{shadow_net_system_id: sns_id}),
-    do: can_read(account_id, :shadow_net_system, sns_id)
+  def can(%{id: account_id, is_admin: admin}, %Views.ShadowNetSystem{shadow_net_system_id: sns_id}),
+      do: admin || can_read(account_id, :shadow_net_system, sns_id)
 
-  def can(%{id: account_id}, %Views.SimulationWithState{simulation_id: sim_id}),
-    do: can_read(account_id, :simulation, sim_id)
+  def can(%{id: account_id, is_admin: admin}, %Views.SimulationWithState{simulation_id: sim_id}),
+    do: admin or can_read(account_id, :simulation, sim_id)
 
   def can(%{id: account_id}, %Views.SimulationWithLogEntries{simulation_id: sim_id}),
     do: can_read(account_id, :simulation, sim_id)
@@ -98,10 +100,10 @@ defmodule RenewCollabCtrl.ReadAccess do
   # so we can not auth the user
   def can(_, %Views.MediaData{}), do: true
 
-  def can(%{id: account_id}, %Views.ShadowNetSystemSimulations{
+  def can(%{id: account_id, is_admin: admin}, %Views.ShadowNetSystemSimulations{
         shadow_net_system_id: sns_id
       }),
-      do: can_read(account_id, :shadow_net_system, sns_id)
+      do: admin || can_read(account_id, :shadow_net_system, sns_id)
 
   def can(%{id: _acc_id, is_admin: true}, %Views.GlobalProject{}), do: true
   def can(%{id: _acc_id, is_admin: true}, %Views.GlobalDocumentsList{}), do: true

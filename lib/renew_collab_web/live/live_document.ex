@@ -64,7 +64,7 @@ defmodule RenewCollabWeb.LiveDocument do
       <div style="grid-area: head">
         <RenewCollabWeb.RenewComponents.app_header
           flash={@flash}
-          project_id={@document.project_assignment.project_id}
+          project_id={@document.project_assignment && @document.project_assignment.project_id}
           tab={:documents}
         />
       </div>

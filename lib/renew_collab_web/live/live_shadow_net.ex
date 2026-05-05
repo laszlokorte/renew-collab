@@ -18,8 +18,13 @@ defmodule RenewCollabWeb.LiveShadowNet do
   def load_param(:shadow_net_system_id, socket), do: socket.assigns.shadow_net_system_id
   def load_param(:account_id, socket), do: socket.assigns.current_account.id
 
-  def load_param(:project_id, socket),
-    do: socket.assigns.shadow_net_system.project_assignment.project_id
+  def load_param(:project_id, %{
+        assigns: %{shadow_net_system: %{project_assignment: %{project_id: id}}}
+      }),
+      do: id
+
+  def load_param(:project_id, _),
+    do: nil
 
   def mount(%{"id" => shadow_net_system_id}, _session, socket) do
     socket
@@ -49,7 +54,9 @@ defmodule RenewCollabWeb.LiveShadowNet do
       <RenewCollabWeb.RenewComponents.app_header
         flash={@flash}
         tab={:sns}
-        project_id={@shadow_net_system.project_assignment.project_id}
+        project_id={
+          @shadow_net_system.project_assignment && @shadow_net_system.project_assignment.project_id
+        }
       />
 
       <div style="padding: 1em">
