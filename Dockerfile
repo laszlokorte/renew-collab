@@ -106,7 +106,7 @@ ENV JAVA_VERSION=${JAVA_VERSION}
 WORKDIR ${SIMULATOR_ROOT_PATH}
 
 RUN apt-get update -y && \
-    apt-get install -y libstdc++6 openssl libncurses5 locales \
+    apt-get install -y libstdc++6 openssl libncurses6 locales \
     ca-certificates openjdk-$JAVA_VERSION-jdk wget xvfb unzip \
     && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
