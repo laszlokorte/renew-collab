@@ -23,63 +23,71 @@ defmodule RenewCollabProj.Queries.ProjectWithMembers do
   def multi(%__MODULE__{id: {:project, project_id}}) do
     Ecto.Multi.new()
     |> Ecto.Multi.one(
-      :result,
+      :projects,
       from(
         p in Project,
-        left_join: m in assoc(p, :members),
-        where: p.id == ^project_id,
-        preload: [
-          members: m
-        ]
+        where: p.id == ^project_id
       )
     )
+    |> Ecto.Multi.run(:result, fn repo, %{projects: projects} ->
+      {:ok,
+       repo.preload(projects, [
+         :members
+       ])}
+    end)
   end
 
   def multi(%__MODULE__{id: {:document, document_id}}) do
     Ecto.Multi.new()
     |> Ecto.Multi.one(
-      :result,
+      :projects,
       from(
         p in Project,
         inner_join: d in assoc(p, :documents),
-        on: d.document_id == ^document_id,
-        left_join: m in assoc(p, :members),
-        preload: [
-          members: m
-        ]
+        on: d.document_id == ^document_id
       )
     )
+    |> Ecto.Multi.run(:result, fn repo, %{projects: projects} ->
+      {:ok,
+       repo.preload(projects, [
+         :members
+       ])}
+    end)
   end
 
   def multi(%__MODULE__{id: {:simulation, simulation_id}}) do
     Ecto.Multi.new()
     |> Ecto.Multi.one(
-      :result,
+      :projects,
       from(
         p in Project,
         inner_join: s in assoc(p, :simulations),
-        on: s.simulation_id == ^simulation_id,
-        left_join: m in assoc(p, :members),
-        preload: [
-          members: m
-        ]
+        on: s.simulation_id == ^simulation_id
       )
     )
+    |> Ecto.Multi.run(:result, fn repo, %{projects: projects} ->
+      {:ok,
+       repo.preload(projects, [
+         :members
+       ])}
+    end)
   end
 
   def multi(%__MODULE__{id: {:shadow_net_system, shadow_net_system_id}}) do
     Ecto.Multi.new()
     |> Ecto.Multi.one(
-      :result,
+      :projects,
       from(
         p in Project,
         inner_join: s in assoc(p, :shadow_net_systems),
-        on: s.shadow_net_system_id == ^shadow_net_system_id,
-        left_join: m in assoc(p, :members),
-        preload: [
-          members: m
-        ]
+        on: s.shadow_net_system_id == ^shadow_net_system_id
       )
     )
+    |> Ecto.Multi.run(:result, fn repo, %{projects: projects} ->
+      {:ok,
+       repo.preload(projects, [
+         :members
+       ])}
+    end)
   end
 end
