@@ -8,6 +8,7 @@ defmodule RenewCollabSim.Entities.ShadowNetSystem do
     field :label, :string, default: nil
     field :compiled, :binary
     field :main_net_name, :string
+    field :simulation_count, :integer, virtual: true
     has_many :nets, RenewCollabSim.Entities.ShadowNet, preload_order: [asc: :id]
     has_many :simulations, RenewCollabSim.Entities.Simulation, preload_order: [desc: :inserted_at]
 

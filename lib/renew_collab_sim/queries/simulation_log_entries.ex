@@ -11,14 +11,18 @@ defmodule RenewCollabSim.Queries.SimulationLogEntries do
   def multi(%__MODULE__{simulation_id: id}) do
     Ecto.Multi.new()
     |> Ecto.Multi.one(
-      :result,
+      :sim,
       from(sim in Simulation,
-        left_join: log in assoc(sim, :log_entries),
         where: sim.id == ^id,
-        order_by: [desc: log.inserted_at],
-        limit: 10,
-        preload: [log_entries: log]
+        limit: 10
       )
     )
+    |> Ecto.Multi.run(:result, fn repo, %{sim: sim} ->
+      {:ok,
+       sim
+       |> repo.preload([
+         :log_entries
+       ])}
+    end)
   end
 end

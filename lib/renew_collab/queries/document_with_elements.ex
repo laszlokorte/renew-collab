@@ -66,23 +66,21 @@ defmodule RenewCollab.Queries.DocumentWithElements do
     )
     |> Ecto.Multi.run(:result, fn repo, %{doc: doc} ->
       {:ok,
-       repo.preload(
-         doc,
-         [
-           {:current_snaptshot, [:predecessor, :successors]},
-           :thumbnail,
-           layers: [
-             :direct_parent_hood,
-             {:box, [:symbol_shape]},
-             {:text, [:style, :size_hint]},
-             {:edge, [:style, :waypoints, :source_bond, :target_bond]},
-             :style,
-             :interface,
-             :outgoing_link,
-             :incoming_links
-           ]
+       doc
+       |> repo.preload([
+         {:current_snaptshot, [:predecessor, :successors]},
+         :thumbnail,
+         layers: [
+           :direct_parent_hood,
+           {:box, [:symbol_shape]},
+           {:text, [:style, :size_hint]},
+           {:edge, [:style, :waypoints, :source_bond, :target_bond]},
+           :style,
+           :interface,
+           :outgoing_link,
+           :incoming_links
          ]
-       )}
+       ])}
     end)
   end
 end

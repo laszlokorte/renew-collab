@@ -14,12 +14,13 @@ defmodule RenewCollab.Queries.SocketSchemasList do
   def multi(%__MODULE__{}) do
     Ecto.Multi.new()
     |> Ecto.Multi.all(
-      :result,
+      :schema,
       from(p in SocketSchema,
-        left_join: s in assoc(p, :sockets),
-        order_by: [asc: p.name],
-        preload: [sockets: s]
+        order_by: [asc: p.name]
       )
     )
+    |> Ecto.Multi.run(:result, fn repo, %{schema: schema} ->
+      {:ok, repo.preload(schema, [:sockets])}
+    end)
   end
 end

@@ -12,13 +12,10 @@ defmodule RenewCollabSim.Queries.ListShadowNetSystems do
   def multi(%__MODULE__{shadow_net_system_ids: :all}) do
     Ecto.Multi.new()
     |> Ecto.Multi.all(
-      :result,
+      :sns,
       from(s in ShadowNetSystem,
         as: :sns,
-        left_join: nets in assoc(s, :nets),
-        left_join: sims in assoc(s, :simulations),
         order_by: [desc: s.inserted_at],
-        preload: [nets: nets],
         select: map(s, ^ShadowNetSystem.__schema__(:fields)),
         select_merge: %{
           simulation_count:
@@ -31,19 +28,23 @@ defmodule RenewCollabSim.Queries.ListShadowNetSystems do
         }
       )
     )
+    |> Ecto.Multi.run(:result, fn repo, %{sns: sns} ->
+      {:ok,
+       struct(ShadowNetSystem, sns)
+       |> repo.preload([
+         :nets
+       ])}
+    end)
   end
 
   def multi(%__MODULE__{shadow_net_system_ids: ids}) do
     Ecto.Multi.new()
     |> Ecto.Multi.all(
-      :result,
+      :sns,
       from(s in ShadowNetSystem,
         as: :sns,
-        left_join: nets in assoc(s, :nets),
-        left_join: sims in assoc(s, :simulations),
         where: s.id in ^ids,
         order_by: [desc: s.inserted_at],
-        preload: [nets: nets],
         select: map(s, ^ShadowNetSystem.__schema__(:fields)),
         select_merge: %{
           simulation_count:
@@ -56,5 +57,13 @@ defmodule RenewCollabSim.Queries.ListShadowNetSystems do
         }
       )
     )
+    |> Ecto.Multi.run(:result, fn repo, %{sns: sns} ->
+      {:ok,
+       sns
+       |> Enum.map(&struct(ShadowNetSystem, &1))
+       |> repo.preload([
+         :nets
+       ])}
+    end)
   end
 end

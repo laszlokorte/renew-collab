@@ -23,14 +23,12 @@ defmodule RenewCollab.Sockets do
   def find_socket_schema(id) do
     import Ecto.Query
 
-    RenewCollab.Repo.one(
-      from(p in RenewCollab.Connection.SocketSchema,
-        left_join: s in assoc(p, :sockets),
-        order_by: [asc: p.name],
-        where: p.id == ^id,
-        preload: [sockets: s]
-      )
+    from(p in RenewCollab.Connection.SocketSchema,
+      order_by: [asc: p.name],
+      where: p.id == ^id
     )
+    |> RenewCollab.Repo.one()
+    |> RenewCollab.Repo.preload([:sockets])
   end
 
   def find_socket(id) do

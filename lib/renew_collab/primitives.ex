@@ -6,10 +6,10 @@ defmodule RenewCollab.Primitives do
 
   def find_all() do
     from(g in PredefinedPrimitiveGroup,
-      left_join: p in assoc(g, :primitives),
-      preload: [primitives: p]
+      left_join: p in assoc(g, :primitives)
     )
     |> Repo.all()
+    |> Repo.preload([:primitives])
   end
 
   def create_group(params) do

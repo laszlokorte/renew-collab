@@ -1,5 +1,6 @@
 defmodule RenewCollabSim.Queries.SimulationNetInstanceById do
   alias RenewCollabSim.Entities.SimulationNetInstance
+  alias RenewCollabSim.Entities.SimulationTransitionFiring
   import Ecto.Query
 
   defstruct [:net_instance_id]
@@ -11,17 +12,24 @@ defmodule RenewCollabSim.Queries.SimulationNetInstanceById do
   def multi(%__MODULE__{net_instance_id: net_instance_id}) do
     Ecto.Multi.new()
     |> Ecto.Multi.one(
-      :result,
+      :instance,
       from(ins in SimulationNetInstance,
         join: sim in assoc(ins, :simulation),
         join: net in assoc(ins, :shadow_net),
-        left_join: tokens in assoc(ins, :tokens),
-        left_join: firings in assoc(ins, :firings),
-        on: firings.timestep == sim.timestep,
         where: ins.id == ^net_instance_id,
-        order_by: [asc: firings.timestep],
-        preload: [tokens: tokens, firings: firings, shadow_net: net]
+        preload: [shadow_net: net]
       )
     )
+    |> Ecto.Multi.run(:result, fn repo, %{instance: instance} ->
+      {:ok,
+       instance
+       |> repo.preload([
+         {:firings,
+          from(f in SimulationTransitionFiring,
+            where: f.timestep == ^instance.simulation.timestep
+          )},
+         :tokens
+       ])}
+    end)
   end
 end
