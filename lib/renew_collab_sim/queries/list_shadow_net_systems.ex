@@ -30,7 +30,8 @@ defmodule RenewCollabSim.Queries.ListShadowNetSystems do
     )
     |> Ecto.Multi.run(:result, fn repo, %{sns: sns} ->
       {:ok,
-       struct(ShadowNetSystem, sns)
+       sns
+       |> Enum.map(&struct(ShadowNetSystem, &1))
        |> repo.preload([
          :nets
        ])}
