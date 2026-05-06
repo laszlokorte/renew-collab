@@ -5,9 +5,7 @@ defmodule RenewCollab.Primitives do
   alias RenewCollab.Repo
 
   def find_all() do
-    from(g in PredefinedPrimitiveGroup,
-      left_join: p in assoc(g, :primitives)
-    )
+    from(g in PredefinedPrimitiveGroup)
     |> Repo.all()
     |> Repo.preload([:primitives])
   end
