@@ -23,7 +23,10 @@ defmodule RenewCollab.Syntax do
     |> Repo.one()
     |> Repo.preload([
       :edge_whitelists,
-      :edge_auto_targets,
+      {:edge_auto_targets,
+       [
+         :target_socket
+       ]},
       :default
     ])
   end
