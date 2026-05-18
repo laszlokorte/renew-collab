@@ -17,7 +17,7 @@ defmodule RenewCollabSim.Queries.SimulationNetInstanceById do
         join: sim in assoc(ins, :simulation),
         join: net in assoc(ins, :shadow_net),
         where: ins.id == ^net_instance_id,
-        preload: [shadow_net: net]
+        preload: [shadow_net: net, simulation: sim]
       )
     )
     |> Ecto.Multi.run(:result, fn repo, %{instance: instance} ->
