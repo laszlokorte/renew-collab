@@ -45,6 +45,7 @@ defmodule RenewCollabAuth.Auth do
     create_account(%{
       "email" => email,
       "new_password" => password,
+      "new_password_confirmation" => password,
       "is_admin" => is_admin
     })
   end
