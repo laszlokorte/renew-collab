@@ -201,6 +201,27 @@ defmodule RenewCollab.Export.DocumentExport do
           }
         ])
 
+      Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "CH.ifa.draw.figures.PieFigure") ->
+        shape_attributes = layer.box.symbol_shape_attributes || %{}
+
+        storables
+        |> Enum.concat([
+          %Renewex.Storable{
+            class_name: layer.semantic_tag,
+            fields: %{
+              _root: true,
+              _gen_id: layer.id,
+              attributes: export_attributes(:box, layer),
+              x: round(-view_box.x + layer.box.position_x),
+              y: round(-view_box.y + layer.box.position_y),
+              w: round(layer.box.width),
+              h: round(layer.box.height),
+              start_angle: Map.get(shape_attributes, "start_angle") || 0.0,
+              end_angle: Map.get(shape_attributes, "end_angle") || 180.0
+            }
+          }
+        ])
+
       Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "CH.ifa.draw.contrib.TriangleFigure") ->
         storables
         |> Enum.concat([
