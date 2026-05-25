@@ -176,6 +176,9 @@ defmodule RenewCollab.Import.DocumentImport do
                       "italic" =>
                         convert_font_style(Map.get(fields, :fCurrentFontStyle, 0), :italic),
                       "text_color" => convert_color(Map.get(attrs, "TextColor", "black")),
+                      # Renew TextFigure bodies preserve empty lines as vertical spacing.
+                      # Keep them visible after import; users can still disable them later.
+                      "blank_lines" => true,
                       "rich" => is_rich_text(parser.grammar, class_name)
                     }
                 end
