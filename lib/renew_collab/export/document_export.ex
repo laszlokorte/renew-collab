@@ -8,6 +8,7 @@ defmodule RenewCollab.Export.DocumentExport do
   def export(%Document{} = document, opts \\ [synthetic: false]) do
     grammar = Grammar.new(11)
     sockets = RenewCollab.Sockets.all_socket_by_id()
+    tip_ids = RenewCollab.Symbols.ids_by_name()
 
     view_box = ViewBox.calculate(document, 20)
 
@@ -26,7 +27,7 @@ defmodule RenewCollab.Export.DocumentExport do
         is_nil(l.direct_parent_hood)
       end)
       |> Enum.reduce([], fn layer, storables ->
-        export_layer(storables, view_box, document, grammar, sockets, layer)
+        export_layer(storables, view_box, document, grammar, sockets, tip_ids, layer)
       end)
 
     refs =
@@ -54,6 +55,10 @@ defmodule RenewCollab.Export.DocumentExport do
   end
 
   def export_layer(prev_storables, view_box, document, grammar, sockets, layer) do
+    export_layer(prev_storables, view_box, document, grammar, sockets, %{}, layer)
+  end
+
+  def export_layer(prev_storables, view_box, document, grammar, sockets, tip_ids, layer) do
     child_storables =
       document.layers
       |> Enum.filter(fn l ->
@@ -63,7 +68,7 @@ defmodule RenewCollab.Export.DocumentExport do
     storables =
       child_storables
       |> Enum.reduce(prev_storables, fn sub_layer, acc_storables ->
-        export_layer(acc_storables, view_box, document, grammar, sockets, sub_layer)
+        export_layer(acc_storables, view_box, document, grammar, sockets, tip_ids, sub_layer)
       end)
 
     cond do
@@ -317,58 +322,24 @@ defmodule RenewCollab.Export.DocumentExport do
             "CH.ifa.draw.figures.PolyLineFigure"
           ) ->
         {storables, source_arrow_ref} =
-          layer.edge.style
-          |> case do
-            nil ->
-              {storables, nil}
-
-            edge_style ->
-              create_ref(
-                storables,
-                case edge_style.source_tip_symbol_shape_id do
-                  nil ->
-                    nil
-
-                  _ ->
-                    %Renewex.Storable{
-                      class_name: "CH.ifa.draw.figures.ArrowTip",
-                      fields: %{
-                        angle: 0.4,
-                        outer_radius: 8.0,
-                        inner_radius: 8.0,
-                        filled: true
-                      }
-                    }
-                end
-              )
-          end
+          create_ref(
+            storables,
+            export_edge_decoration(
+              layer.edge.style && layer.edge.style.source_tip_symbol_shape_id,
+              tip_ids,
+              layer.semantic_tag
+            )
+          )
 
         {storables, target_arrow_ref} =
-          layer.edge.style
-          |> case do
-            nil ->
-              {storables, nil}
-
-            edge_style ->
-              create_ref(
-                storables,
-                case edge_style.target_tip_symbol_shape_id do
-                  nil ->
-                    nil
-
-                  _ ->
-                    %Renewex.Storable{
-                      class_name: "CH.ifa.draw.figures.ArrowTip",
-                      fields: %{
-                        angle: 0.4,
-                        outer_radius: 8.0,
-                        inner_radius: 8.0,
-                        filled: true
-                      }
-                    }
-                end
-              )
-          end
+          create_ref(
+            storables,
+            export_edge_decoration(
+              layer.edge.style && layer.edge.style.target_tip_symbol_shape_id,
+              tip_ids,
+              layer.semantic_tag
+            )
+          )
 
         {storables, start_ref} =
           case layer.edge.source_bond do
@@ -715,6 +686,36 @@ defmodule RenewCollab.Export.DocumentExport do
       true ->
         []
     end
+  end
+
+  defp export_edge_decoration(nil, _tip_ids, _semantic_tag), do: nil
+
+  defp export_edge_decoration(tip_id, tip_ids, semantic_tag) do
+    cond do
+      tip_id == Map.get(tip_ids, "arrow-tip-circle") ->
+        %Renewex.Storable{class_name: "de.renew.gui.CircleDecoration", fields: %{}}
+
+      tip_id == Map.get(tip_ids, "arrow-tip-double") ->
+        %Renewex.Storable{
+          class_name: "de.renew.gui.DoubleArrowTip",
+          fields: export_arrow_tip_fields(semantic_tag != "de.renew.gui.HollowDoubleArcConnection")
+        }
+
+      true ->
+        %Renewex.Storable{
+          class_name: "CH.ifa.draw.figures.ArrowTip",
+          fields: export_arrow_tip_fields(true)
+        }
+    end
+  end
+
+  defp export_arrow_tip_fields(filled) do
+    %{
+      angle: 0.4,
+      outer_radius: 8.0,
+      inner_radius: 8.0,
+      filled: filled
+    }
   end
 
   defp attach_synthetic_labels(orig_refs) do
