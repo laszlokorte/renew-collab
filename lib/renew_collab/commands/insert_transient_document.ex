@@ -108,10 +108,12 @@ defmodule RenewCollab.Commands.InsertTransientDocument do
         |> Enum.map(fn %{
                          source_layer_id: source_layer_id,
                          target_layer_id: target_layer_id
-                       } ->
+                       } = hyperlink ->
           %{
             source_layer_id: source_layer_id,
             target_layer_id: target_layer_id,
+            locator_offset_x: Map.get(hyperlink, :locator_offset_x),
+            locator_offset_y: Map.get(hyperlink, :locator_offset_y),
             inserted_at: now,
             updated_at: now
           }

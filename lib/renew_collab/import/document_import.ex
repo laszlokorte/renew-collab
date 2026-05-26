@@ -360,7 +360,7 @@ defmodule RenewCollab.Import.DocumentImport do
 
       text_annotations =
         for {{%Renewex.Storable{
-                fields: %{fParent: {:ref, text_parent_ref}}
+                fields: %{fParent: {:ref, text_parent_ref}} = text_fields
               }, uuid}, _z_index} <- unique_figs,
             target_id =
               Enum.at(refs_with_ids, text_parent_ref)
@@ -368,7 +368,9 @@ defmodule RenewCollab.Import.DocumentImport do
             not is_nil(target_id) do
           %{
             source_layer_id: uuid,
-            target_layer_id: target_id
+            target_layer_id: target_id,
+            locator_offset_x: import_text_locator_offset(text_fields, refs, :x),
+            locator_offset_y: import_text_locator_offset(text_fields, refs, :y)
           }
         end
 
@@ -477,6 +479,19 @@ defmodule RenewCollab.Import.DocumentImport do
          bonds: bonds,
          thumbnail: icon_id
        }}
+    end
+  end
+
+  defp import_text_locator_offset(fields, refs, axis) do
+    case resolve_ref(refs, Map.get(fields, :fLocator)) do
+      %Renewex.Storable{fields: %{fOffsetX: offset}} when axis == :x ->
+        offset
+
+      %Renewex.Storable{fields: %{fOffsetY: offset}} when axis == :y ->
+        offset
+
+      _ ->
+        nil
     end
   end
 

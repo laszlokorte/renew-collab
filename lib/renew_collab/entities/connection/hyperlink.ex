@@ -7,6 +7,8 @@ defmodule RenewCollab.Connection.Hyperlink do
   schema "hyperlink" do
     belongs_to :source_layer, RenewCollab.Hierarchy.Layer
     belongs_to :target_layer, RenewCollab.Hierarchy.Layer
+    field :locator_offset_x, :integer
+    field :locator_offset_y, :integer
 
     timestamps(type: :utc_datetime)
   end
@@ -14,7 +16,7 @@ defmodule RenewCollab.Connection.Hyperlink do
   @doc false
   def changeset(hyperlink, attrs) do
     hyperlink
-    |> cast(attrs, [:source_layer_id, :target_layer_id])
+    |> cast(attrs, [:source_layer_id, :target_layer_id, :locator_offset_x, :locator_offset_y])
     |> validate_required([:source_layer_id, :target_layer_id])
     |> unique_constraint(:source_layer_id)
   end
@@ -22,7 +24,7 @@ defmodule RenewCollab.Connection.Hyperlink do
   @doc false
   def nested_changeset(hyperlink, attrs) do
     hyperlink
-    |> cast(attrs, [:target_layer_id])
+    |> cast(attrs, [:target_layer_id, :locator_offset_x, :locator_offset_y])
     |> unique_constraint(:source_layer_id)
   end
 
@@ -44,6 +46,8 @@ defmodule RenewCollab.Connection.Hyperlink do
           id: h.id,
           source_layer_id: h.source_layer_id,
           target_layer_id: h.target_layer_id,
+          locator_offset_x: h.locator_offset_x,
+          locator_offset_y: h.locator_offset_y,
           inserted_at: h.inserted_at,
           updated_at: h.updated_at
         }

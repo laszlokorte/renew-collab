@@ -148,7 +148,8 @@ defmodule RenewCollab.Queries.StrippedDocument do
       {:ok,
        original_hyperlinks
        |> Enum.map(fn hyperlink ->
-         Map.new()
+         hyperlink
+         |> Map.take([:locator_offset_x, :locator_offset_y])
          |> Map.put(:source_layer_id, Map.get(new_layer_ids, hyperlink.source_layer_id))
          |> Map.put(:target_layer_id, Map.get(new_layer_ids, hyperlink.target_layer_id))
        end)}

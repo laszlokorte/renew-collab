@@ -498,8 +498,8 @@ defmodule RenewCollab.Export.DocumentExport do
               create_ref(storables, %Renewex.Storable{
                 class_name: "CH.ifa.draw.standard.OffsetLocator",
                 fields: %{
-                  fOffsetY: 0,
-                  fOffsetX: 0,
+                  fOffsetY: text_locator_offset(layer, :y),
+                  fOffsetX: text_locator_offset(layer, :x),
                   fBase: locator_base
                 }
               })
@@ -556,8 +556,8 @@ defmodule RenewCollab.Export.DocumentExport do
               create_ref(storables, %Renewex.Storable{
                 class_name: "CH.ifa.draw.standard.OffsetLocator",
                 fields: %{
-                  fOffsetY: 0,
-                  fOffsetX: 0,
+                  fOffsetY: text_locator_offset(layer, :y),
+                  fOffsetX: text_locator_offset(layer, :x),
                   fBase: locator_base
                 }
               })
@@ -717,6 +717,16 @@ defmodule RenewCollab.Export.DocumentExport do
       filled: filled
     }
   end
+
+  defp text_locator_offset(%{outgoing_link: %{locator_offset_x: offset}}, :x)
+       when is_integer(offset),
+       do: offset
+
+  defp text_locator_offset(%{outgoing_link: %{locator_offset_y: offset}}, :y)
+       when is_integer(offset),
+       do: offset
+
+  defp text_locator_offset(_layer, _axis), do: 0
 
   defp attach_synthetic_labels(orig_refs) do
     for {%Storable{class_name: class_name, fields: %{_gen_id: gen_id}}, index} <-
