@@ -8,6 +8,7 @@ defmodule RenewCollab.Style.LayerStyle do
     field :opacity, :float, default: 1.0
     field :background_color, :string
     field :background_url, :string
+    field :target_location, :string
     field :border_color, :string
     field :border_width, :float
     field :border_dash_array, :string
@@ -23,6 +24,7 @@ defmodule RenewCollab.Style.LayerStyle do
       :opacity,
       :background_color,
       :background_url,
+      :target_location,
       :border_color,
       :border_width,
       :border_dash_array
@@ -50,6 +52,7 @@ defmodule RenewCollab.Style.LayerStyle do
           opacity: s.opacity,
           background_color: s.background_color,
           background_url: s.background_url,
+          target_location: s.target_location,
           border_color: s.border_color,
           border_width: s.border_width,
           border_dash_array: s.border_dash_array,

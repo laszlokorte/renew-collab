@@ -768,7 +768,7 @@ defmodule RenewCollab.Export.DocumentExport do
            )},
           {"LineWidth", "Int", round(style_or_default(layer, :border_width))},
           {"LineStyle", "String", style_or_default(layer, :border_dash_array)}
-        ]
+        ] ++ export_target_location(layer)
       }
     }
   end
@@ -790,7 +790,7 @@ defmodule RenewCollab.Export.DocumentExport do
              style_or_default(layer, :background_color),
              style_or_default(layer, :opacity)
            )}
-        ]
+        ] ++ export_target_location(layer)
       }
     }
   end
@@ -837,10 +837,18 @@ defmodule RenewCollab.Export.DocumentExport do
                 ]
               )
             )
+            |> Enum.concat(export_target_location(layer))
         }
       }
     end
   end
+
+  defp export_target_location(%{style: %{target_location: target_location}})
+       when is_binary(target_location) and target_location != "" do
+    [{"targetLocation", "String", target_location}]
+  end
+
+  defp export_target_location(_layer), do: []
 
   defp color_to_rgba("black", opacity) do
     {:rgba, 0, 0, 0, round(255 * opacity)}

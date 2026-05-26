@@ -99,7 +99,8 @@ defmodule RenewCollab.Import.DocumentImport do
                       "background_color" => convert_color(Map.get(attrs, "FillColor", "#70DB93")),
                       "border_color" => convert_color(Map.get(attrs, "FrameColor", "black")),
                       "border_width" => convert_border_width(Map.get(attrs, "LineWidth", 1)),
-                      "border_dash_array" => convert_line_style(Map.get(attrs, "LineStyle"))
+                      "border_dash_array" => convert_line_style(Map.get(attrs, "LineStyle")),
+                      "target_location" => Map.get(attrs, "targetLocation")
                     }
                 end
 
@@ -155,7 +156,8 @@ defmodule RenewCollab.Import.DocumentImport do
                       "border_color" =>
                         convert_color(Map.get(attrs, "FrameColor", "transparent")),
                       "border_width" => convert_border_width(Map.get(attrs, "LineWidth", 0)),
-                      "border_dash_array" => convert_line_style(Map.get(attrs, "LineStyle"))
+                      "border_dash_array" => convert_line_style(Map.get(attrs, "LineStyle")),
+                      "target_location" => Map.get(attrs, "targetLocation")
                     }
                 end
 
@@ -265,7 +267,8 @@ defmodule RenewCollab.Import.DocumentImport do
                           )
                         ),
                       "border_color" => convert_color(Map.get(attrs, "FrameColor", "black")),
-                      "border_width" => convert_border_width(Map.get(attrs, "LineWidth", 1))
+                      "border_width" => convert_border_width(Map.get(attrs, "LineWidth", 1)),
+                      "target_location" => Map.get(attrs, "targetLocation")
                     }
                 end
 
