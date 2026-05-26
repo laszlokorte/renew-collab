@@ -736,6 +736,12 @@ defmodule RenewCollab.Import.DocumentImport do
       Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.contrib.DiamondFigure") ->
         {"diamond", nil}
 
+      Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.figures.ImageFigure") ->
+        {"rect",
+         %{
+           "image_name" => Map.get(fields, :name)
+         }}
+
       Renewex.Hierarchy.is_subtype_of(grammar, class_name, "de.renew.gui.VirtualPlaceFigure") ->
         {"ellipse-double-in", nil}
 
