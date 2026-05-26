@@ -194,6 +194,8 @@ defmodule RenewCollab.Import.DocumentImport do
                   class_name
                 end
 
+              body = if(is_nil(body), do: "", else: body)
+
               %{
                 "semantic_tag" => class_name,
                 "z_index" => z_index,
@@ -203,8 +205,9 @@ defmodule RenewCollab.Import.DocumentImport do
                 "text" => %{
                   "position_x" => x,
                   "position_y" => y,
-                  "body" => if(is_nil(body), do: "", else: body),
-                  "style" => text_style
+                  "body" => body,
+                  "style" => text_style,
+                  "size_hint" => import_text_size_hint(fields, body, x, y)
                 },
                 "interface" => convert_interface(socket_schema_ids, class_name)
               }
@@ -472,6 +475,23 @@ defmodule RenewCollab.Import.DocumentImport do
          thumbnail: icon_id
        }}
     end
+  end
+
+  defp import_text_size_hint(fields, body, x, y) do
+    {width, height} =
+      RenewCollab.TextMeasure.MeasureServer.measure({
+        convert_font(Map.get(fields, :fCurrentFontName, "sans-serif")),
+        Bitwise.band(Map.get(fields, :fCurrentFontStyle, 0), 3),
+        Map.get(fields, :fCurrentFontSize, 12),
+        String.split(body, "\n")
+      })
+
+    %{
+      "position_x" => x,
+      "position_y" => y,
+      "width" => width * 1.0,
+      "height" => height * 1.0
+    }
   end
 
   defp convert_color(m) when is_binary(m), do: m

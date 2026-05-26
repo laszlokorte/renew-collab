@@ -33,6 +33,24 @@ defmodule RenewCollab.Style.TextSizeHint do
     |> unique_constraint(:text_id)
   end
 
+  @doc false
+  def nested_changeset(text_size_hint, attrs) do
+    text_size_hint
+    |> cast(attrs, [
+      :position_x,
+      :position_y,
+      :width,
+      :height
+    ])
+    |> validate_required([
+      :position_x,
+      :position_y,
+      :width,
+      :height
+    ])
+    |> unique_constraint(:text_id)
+  end
+
   defmodule Snapshotter do
     alias RenewCollab.Style.TextSizeHint
     alias RenewCollab.Hierarchy.Layer

@@ -20,6 +20,7 @@ defmodule RenewCollab.Element.Text do
     element_text
     |> cast(attrs, [:position_x, :position_y, :body])
     |> cast_assoc(:style)
+    |> cast_assoc(:size_hint, with: &RenewCollab.Style.TextSizeHint.nested_changeset/2)
     |> validate_required([:position_x, :position_y])
     |> unique_constraint(:element_id)
   end
