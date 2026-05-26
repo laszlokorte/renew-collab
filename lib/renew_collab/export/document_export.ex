@@ -440,7 +440,7 @@ defmodule RenewCollab.Export.DocumentExport do
                 fCurrentFontName: "SansSerif",
                 fCurrentFontStyle: 0,
                 fCurrentFontSize: 12,
-                fIsReadOnly: 0,
+                fIsReadOnly: false,
                 fParent: nil,
                 fLocator: nil,
                 fType: 0,
@@ -463,7 +463,7 @@ defmodule RenewCollab.Export.DocumentExport do
                 fCurrentFontName: style_or_default(layer.text, :font_family),
                 fCurrentFontStyle: export_font_style(layer.text.style),
                 fCurrentFontSize: round(style_or_default(layer.text, :font_size)),
-                fIsReadOnly: 0,
+                fIsReadOnly: false,
                 fParent: nil,
                 fLocator: nil,
                 fType: 0,
@@ -522,7 +522,7 @@ defmodule RenewCollab.Export.DocumentExport do
                 fCurrentFontName: "SansSerif",
                 fCurrentFontStyle: 0,
                 fCurrentFontSize: 12,
-                fIsReadOnly: 0,
+                fIsReadOnly: false,
                 fParent: parent_ref,
                 fLocator: locator_ref,
                 fType: if(locator_ref, do: 1, else: 0)
@@ -579,7 +579,7 @@ defmodule RenewCollab.Export.DocumentExport do
                 fCurrentFontName: style_or_default(layer.text, :font_family),
                 fCurrentFontStyle: export_font_style(layer.text.style),
                 fCurrentFontSize: round(style_or_default(layer.text, :font_size)),
-                fIsReadOnly: 0,
+                fIsReadOnly: false,
                 fParent: parent_ref,
                 fLocator: locator_ref,
                 fType: if(locator_ref, do: 1, else: 0)
@@ -604,7 +604,7 @@ defmodule RenewCollab.Export.DocumentExport do
                 fCurrentFontName: "SansSerif",
                 fCurrentFontStyle: 0,
                 fCurrentFontSize: 12,
-                fIsReadOnly: 0,
+                fIsReadOnly: false,
                 fParent: nil,
                 fLocator: nil,
                 fType: 0
@@ -626,7 +626,7 @@ defmodule RenewCollab.Export.DocumentExport do
                 fCurrentFontName: style_or_default(layer.text, :font_family),
                 fCurrentFontStyle: export_font_style(layer.text.style),
                 fCurrentFontSize: round(style_or_default(layer.text, :font_size)),
-                fIsReadOnly: 0,
+                fIsReadOnly: false,
                 fParent: nil,
                 fLocator: nil,
                 fType: 0
@@ -774,7 +774,7 @@ defmodule RenewCollab.Export.DocumentExport do
               fCurrentFontName: "monospaced",
               fCurrentFontStyle: 0,
               fCurrentFontSize: 2,
-              fIsReadOnly: 0,
+              fIsReadOnly: false,
               fParent: {:ref, index},
               fLocator: locator_ref,
               fType: 2
