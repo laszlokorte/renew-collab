@@ -934,16 +934,12 @@ defmodule RenewCollab.Export.DocumentExport do
          <<"rgba", args::binary>>,
          opacity
        ) do
-    foo =
-      Regex.run(@rgba_paren, args, capture: :all_but_first)
-
     [r, g, b, a] =
-      foo
+      Regex.run(@rgba_paren, args, capture: :all_but_first)
       |> Enum.map(&Float.parse/1)
       |> Enum.map(&elem(&1, 0))
-      |> Enum.map(&round/1)
 
-    {:rgba, r, g, b, round(250 * a * opacity)}
+    {:rgba, round(r), round(g), round(b), round(255 * a * opacity)}
   end
 
   defp color_to_rgba(
@@ -956,7 +952,7 @@ defmodule RenewCollab.Export.DocumentExport do
       |> Enum.map(&elem(&1, 0))
       |> Enum.map(&round/1)
 
-    {:rgba, r, g, b, round(250 * opacity)}
+    {:rgba, r, g, b, round(255 * opacity)}
   end
 
   defp color_to_rgba("transparent", _opacity) do
