@@ -443,7 +443,7 @@ defmodule RenewCollab.Export.DocumentExport do
                 fIsReadOnly: false,
                 fParent: nil,
                 fLocator: nil,
-                fType: 0,
+                fType: export_text_type(layer, 0),
                 paths: [""]
               }
             }
@@ -466,7 +466,7 @@ defmodule RenewCollab.Export.DocumentExport do
                 fIsReadOnly: false,
                 fParent: nil,
                 fLocator: nil,
-                fType: 0,
+                fType: export_text_type(layer, 0),
                 paths: [""]
               }
             }
@@ -525,7 +525,7 @@ defmodule RenewCollab.Export.DocumentExport do
                 fIsReadOnly: false,
                 fParent: parent_ref,
                 fLocator: locator_ref,
-                fType: if(locator_ref, do: 1, else: 0)
+                fType: export_text_type(layer, if(locator_ref, do: 1, else: 0))
 
                 # CH.ifa.draw.standard.OffsetLocator 0 0
                 #     CH.ifa.draw.standard.RelativeLocator 0.5 0.5   1  NULL
@@ -582,13 +582,15 @@ defmodule RenewCollab.Export.DocumentExport do
                 fIsReadOnly: false,
                 fParent: parent_ref,
                 fLocator: locator_ref,
-                fType: if(locator_ref, do: 1, else: 0)
+                fType: export_text_type(layer, if(locator_ref, do: 1, else: 0))
               }
             }
           ])
         end
 
       Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "CH.ifa.draw.figures.TextFigure") ->
+        {storables, parent_ref, locator_ref} = create_text_locator(storables, layer)
+
         if is_nil(layer.text.style) do
           storables
           |> Enum.concat([
@@ -605,9 +607,9 @@ defmodule RenewCollab.Export.DocumentExport do
                 fCurrentFontStyle: 0,
                 fCurrentFontSize: 12,
                 fIsReadOnly: false,
-                fParent: nil,
-                fLocator: nil,
-                fType: 0
+                fParent: parent_ref,
+                fLocator: locator_ref,
+                fType: export_text_type(layer, 0)
               }
             }
           ])
@@ -627,9 +629,9 @@ defmodule RenewCollab.Export.DocumentExport do
                 fCurrentFontStyle: export_font_style(layer.text.style),
                 fCurrentFontSize: round(style_or_default(layer.text, :font_size)),
                 fIsReadOnly: false,
-                fParent: nil,
-                fLocator: nil,
-                fType: 0
+                fParent: parent_ref,
+                fLocator: locator_ref,
+                fType: export_text_type(layer, 0)
               }
             }
           ])
@@ -717,6 +719,48 @@ defmodule RenewCollab.Export.DocumentExport do
       filled: filled
     }
   end
+
+  defp create_text_locator(storables, layer) do
+    parent_ref =
+      with out when not is_nil(out) <- layer.outgoing_link,
+           target_layer_id when not is_nil(target_layer_id) <- out.target_layer_id do
+        Enum.find_value(Enum.with_index(storables), fn
+          {%{fields: %{_gen_id: ^target_layer_id}}, i} -> {:ref, i}
+          _ -> nil
+        end)
+      end
+
+    if parent_ref do
+      {storables, locator_base} =
+        create_ref(storables, %Renewex.Storable{
+          class_name: "CH.ifa.draw.standard.RelativeLocator",
+          fields: %{
+            fOffsetY: 0.5,
+            fOffsetX: 0.5
+          }
+        })
+
+      {storables, locator_ref} =
+        create_ref(storables, %Renewex.Storable{
+          class_name: "CH.ifa.draw.standard.OffsetLocator",
+          fields: %{
+            fOffsetY: text_locator_offset(layer, :y),
+            fOffsetX: text_locator_offset(layer, :x),
+            fBase: locator_base
+          }
+        })
+
+      {storables, parent_ref, locator_ref}
+    else
+      {storables, nil, nil}
+    end
+  end
+
+  defp export_text_type(%{text: %{renew_type: renew_type}}, _default)
+       when is_integer(renew_type),
+       do: renew_type
+
+  defp export_text_type(_layer, default), do: default
 
   defp text_locator_offset(%{outgoing_link: %{locator_offset_x: offset}}, :x)
        when is_integer(offset),

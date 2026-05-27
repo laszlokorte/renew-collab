@@ -8,6 +8,7 @@ defmodule RenewCollab.Element.Text do
     field :position_x, :float
     field :position_y, :float
     field :body, :string, default: ""
+    field :renew_type, :integer
     belongs_to :layer, RenewCollab.Hierarchy.Layer
     has_one :style, RenewCollab.Style.TextStyle, on_delete: :delete_all
     has_one :size_hint, RenewCollab.Style.TextSizeHint, on_delete: :delete_all
@@ -18,7 +19,7 @@ defmodule RenewCollab.Element.Text do
   @doc false
   def changeset(element_text, attrs) do
     element_text
-    |> cast(attrs, [:position_x, :position_y, :body])
+    |> cast(attrs, [:position_x, :position_y, :body, :renew_type])
     |> cast_assoc(:style)
     |> cast_assoc(:size_hint, with: &RenewCollab.Style.TextSizeHint.nested_changeset/2)
     |> validate_required([:position_x, :position_y])
@@ -53,6 +54,7 @@ defmodule RenewCollab.Element.Text do
           position_x: t.position_x,
           position_y: t.position_y,
           body: t.body,
+          renew_type: t.renew_type,
           inserted_at: t.inserted_at,
           updated_at: t.updated_at
         }

@@ -185,17 +185,6 @@ defmodule RenewCollab.Import.DocumentImport do
                     }
                 end
 
-              class_name =
-                if class_name == "de.renew.gui.CPNTextFigure" do
-                  case Map.get(fields, :fType) do
-                    0 -> "CH.ifa.draw.figures.TextFigure"
-                    2 -> "CH.ifa.draw.figures.TextFigure"
-                    _ -> class_name
-                  end
-                else
-                  class_name
-                end
-
               body = if(is_nil(body), do: "", else: body)
 
               %{
@@ -208,6 +197,7 @@ defmodule RenewCollab.Import.DocumentImport do
                   "position_x" => x,
                   "position_y" => y,
                   "body" => body,
+                  "renew_type" => Map.get(fields, :fType),
                   "style" => text_style,
                   "size_hint" => import_text_size_hint(fields, body, x, y)
                 },
