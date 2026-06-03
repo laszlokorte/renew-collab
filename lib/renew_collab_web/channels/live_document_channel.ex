@@ -28,7 +28,8 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
           username: username,
           connection_id: connection_id,
           color: make_color(account_id),
-          cursor: nil
+          cursor: nil,
+          selection: []
         })
 
         push(socket, "presence_state", Presence.list(socket))
@@ -92,29 +93,14 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
   end
 
   @impl true
-  def handle_event("select", %{}, _state, _scope, socket) do
+  def handle_event("select", selection, _state, _scope, socket) do
     account_id = socket.assigns.current_account.id
 
     Presence.update(
       socket,
       account_id,
       &Map.merge(&1, %{
-        selection: nil
-      })
-    )
-
-    :silent
-  end
-
-  @impl true
-  def handle_event("select", layer_id, _state, _scope, socket) when is_binary(layer_id) do
-    account_id = socket.assigns.current_account.id
-
-    Presence.update(
-      socket,
-      account_id,
-      &Map.merge(&1, %{
-        selection: layer_id
+        selection: normalize_selection(selection)
       })
     )
 
@@ -970,6 +956,15 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
 
     :ack
   end
+
+  defp normalize_selection(selection) when is_list(selection) do
+    selection
+    |> Enum.filter(&is_binary/1)
+    |> Enum.uniq()
+  end
+
+  defp normalize_selection(selection) when is_binary(selection), do: [selection]
+  defp normalize_selection(_selection), do: []
 
   defp make_color(account_id) do
     hue =

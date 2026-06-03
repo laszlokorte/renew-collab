@@ -40,12 +40,15 @@ defmodule RenewCollab.Commands.MoveLayerRelative do
       }) do
     Ecto.Multi.new()
     |> Ecto.Multi.put(:document_id, document_id)
-    |> Ecto.Multi.all(:child_layers, fn %{document_id: document_id} ->
+    |> Ecto.Multi.all(:descendant_layers, fn %{document_id: document_id} ->
       from(p in LayerParenthood,
         where: p.ancestor_id == ^layer_id and p.document_id == ^document_id,
         select: p.descendant_id,
         group_by: p.descendant_id
       )
+    end)
+    |> Ecto.Multi.run(:child_layers, fn _, %{descendant_layers: descendant_layers} ->
+      {:ok, Enum.uniq([layer_id | descendant_layers])}
     end)
     |> Ecto.Multi.all(:connected_edge_layers, fn
       %{child_layers: child_layers} ->
