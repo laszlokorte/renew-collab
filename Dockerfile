@@ -91,7 +91,6 @@ RUN java -jar Interceptor.jar echo
 FROM ${RUNNER_IMAGE}
 
 
-ARG RENEW_DOWNLOAD_URL="https://www2.informatik.uni-hamburg.de/TGI/renew/4.2/renew4.2base.zip"
 ARG RENEW_DOWNLOAD_TARGET="/tmp/renew-download.zip"
 ARG JAVA_VERSION="21"
 
@@ -104,7 +103,7 @@ WORKDIR ${SIMULATOR_ROOT_PATH}
 
 RUN apt-get update -y && \
     apt-get install -y libstdc++6 openssl libncurses6 locales \
-    ca-certificates openjdk-$JAVA_VERSION-jdk wget xvfb unzip \
+    ca-certificates openjdk-$JAVA_VERSION-jdk xvfb unzip \
     && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
 ENV JAVA_HOME=/usr/lib/jvm/jdk-${JAVA_VERSION}/
@@ -114,10 +113,9 @@ RUN java --version
 
 COPY --chmod=0755 --from=java_builder /interceptor/Interceptor.jar "./Interceptor.jar"
 COPY priv/simulation/log4j.properties "./log4j.properties"
+COPY priv/simulation/vendor/renew4.2base.zip /tmp/renew-download.zip
 
 RUN mkdir -p ./renew /tmp/renew-download && \
-    wget --tries=3 --timeout=30 --dns-timeout=10 --connect-timeout=10 --read-timeout=60 \
-      --progress=dot:giga "${RENEW_DOWNLOAD_URL}" -O "${RENEW_DOWNLOAD_TARGET}" && \
     unzip -q "${RENEW_DOWNLOAD_TARGET}" -d /tmp/renew-download && \
     mv /tmp/renew-download/*/* ./renew/ && \
     rm -rf "${RENEW_DOWNLOAD_TARGET}" /tmp/renew-download && \
