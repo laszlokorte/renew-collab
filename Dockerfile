@@ -20,7 +20,6 @@ ARG RUNNER_IMAGE="ubuntu:${UBUNTU_VERSION}"
 
 ARG JAVA_VERSION="21"
 ARG JAVA_BUILDER_IMAGE="eclipse-temurin:${JAVA_VERSION}"
-ARG RENEW_IMAGE="git.informatik.uni-hamburg.de:4567/tgi/paose/renew:modular"
 
 FROM ${BUILDER_IMAGE} AS builder
 
@@ -87,15 +86,13 @@ ADD priv/simulation/manifest.txt manifest.txt
 RUN javac Interceptor.java && jar cmf manifest.txt Interceptor.jar Interceptor.class
 RUN java -jar Interceptor.jar echo
 
-FROM ${RENEW_IMAGE} AS renew_build
-
 # start a new build stage so that the final image will only contain
 # the compiled release and other runtime necessities
 FROM ${RUNNER_IMAGE}
 
 
-# ARG RENEW_DOWNLOAD_URL="https://www2.informatik.uni-hamburg.de/TGI/renew/4.1/renew4.1base.zip"
-# ARG RENEW_DOWNLOAD_TARGET="/tmp/renew-download.zip"
+ARG RENEW_DOWNLOAD_URL="https://www2.informatik.uni-hamburg.de/TGI/renew/4.2/renew4.2base.zip"
+ARG RENEW_DOWNLOAD_TARGET="/tmp/renew-download.zip"
 ARG JAVA_VERSION="21"
 
 ARG DATA_ROOT_PATH="/data"
@@ -118,11 +115,13 @@ RUN java --version
 COPY --chmod=0755 --from=java_builder /interceptor/Interceptor.jar "./Interceptor.jar"
 COPY priv/simulation/log4j.properties "./log4j.properties"
 
-COPY --from=renew_build --chmod=0755 /opt/ART/Renew/dist ./renew
-# RUN mkdir -p ./renew && \
-#     wget ${RENEW_DOWNLOAD_URL} -O ${RENEW_DOWNLOAD_TARGET} && \
-#     unzip ${RENEW_DOWNLOAD_TARGET} -d ./renew && \
-#     rm ${RENEW_DOWNLOAD_TARGET} && chown -R nobody:nogroup .
+RUN mkdir -p ./renew /tmp/renew-download && \
+    wget --tries=3 --timeout=30 --dns-timeout=10 --connect-timeout=10 --read-timeout=60 \
+      --progress=dot:giga "${RENEW_DOWNLOAD_URL}" -O "${RENEW_DOWNLOAD_TARGET}" && \
+    unzip -q "${RENEW_DOWNLOAD_TARGET}" -d /tmp/renew-download && \
+    mv /tmp/renew-download/*/* ./renew/ && \
+    rm -rf "${RENEW_DOWNLOAD_TARGET}" /tmp/renew-download && \
+    chown -R nobody:nogroup ./renew
 
 WORKDIR /text_metrics
 COPY --chmod=0755 priv/text_metrics/TextMeasure.java "./TextMeasure.java"
