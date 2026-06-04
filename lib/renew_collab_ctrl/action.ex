@@ -622,12 +622,14 @@ defmodule RenewCollabCtrl.Action do
   def do_perform(%Actions.DocumentEditMoveLayerRelative{
         document_id: document_id,
         layer_id: layer_id,
+        layer_ids: layer_ids,
         dx: dx,
         dy: dy
       }) do
     RenewCollab.Commands.MoveLayerRelative.new(%{
       document_id: document_id,
       layer_id: layer_id,
+      layer_ids: layer_ids,
       dx: dx,
       dy: dy
     })

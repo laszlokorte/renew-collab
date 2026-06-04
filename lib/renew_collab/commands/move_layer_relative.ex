@@ -11,17 +11,19 @@ defmodule RenewCollab.Commands.MoveLayerRelative do
   alias RenewCollab.Connection.Bond
   alias RenewCollab.Style.TextSizeHint
 
-  defstruct [:document_id, :layer_id, :dx, :dy]
+  defstruct [:document_id, :layer_ids, :dx, :dy]
 
-  def new(%{
-        document_id: document_id,
-        layer_id: layer_id,
-        dx: dx,
-        dy: dy
-      }) do
+  def new(%{document_id: document_id, dx: dx, dy: dy} = attrs) do
+    layer_ids =
+      attrs
+      |> Map.get(:layer_ids, [Map.get(attrs, :layer_id)])
+      |> List.wrap()
+      |> Enum.reject(&is_nil/1)
+      |> Enum.uniq()
+
     %__MODULE__{
       document_id: document_id,
-      layer_id: layer_id,
+      layer_ids: layer_ids,
       dx: dx,
       dy: dy
     }
@@ -34,7 +36,7 @@ defmodule RenewCollab.Commands.MoveLayerRelative do
 
   def multi(%__MODULE__{
         document_id: document_id,
-        layer_id: layer_id,
+        layer_ids: layer_ids,
         dx: dx,
         dy: dy
       }) do
@@ -42,13 +44,13 @@ defmodule RenewCollab.Commands.MoveLayerRelative do
     |> Ecto.Multi.put(:document_id, document_id)
     |> Ecto.Multi.all(:descendant_layers, fn %{document_id: document_id} ->
       from(p in LayerParenthood,
-        where: p.ancestor_id == ^layer_id and p.document_id == ^document_id,
+        where: p.ancestor_id in ^layer_ids and p.document_id == ^document_id,
         select: p.descendant_id,
         group_by: p.descendant_id
       )
     end)
     |> Ecto.Multi.run(:child_layers, fn _, %{descendant_layers: descendant_layers} ->
-      {:ok, Enum.uniq([layer_id | descendant_layers])}
+      {:ok, Enum.uniq(layer_ids ++ descendant_layers)}
     end)
     |> Ecto.Multi.all(:connected_edge_layers, fn
       %{child_layers: child_layers} ->

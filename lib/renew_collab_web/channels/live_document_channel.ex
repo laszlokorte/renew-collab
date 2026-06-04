@@ -822,21 +822,29 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
   def handle_event(
         "move_layer_relative",
         %{
-          "layer_id" => layer_id,
           "dx" => dx,
           "dy" => dy
-        },
+        } = params,
         %{},
         %{:document_id => document_id, :account => account},
         _socket
       ) do
-    %Actions.DocumentEditMoveLayerRelative{
-      document_id: document_id,
-      layer_id: layer_id,
-      dx: dx,
-      dy: dy
-    }
-    |> Dispatcher.perform_as(account)
+    layer_ids =
+      params
+      |> Map.get("layer_ids", [Map.get(params, "layer_id")])
+      |> List.wrap()
+      |> Enum.filter(&is_binary/1)
+      |> Enum.uniq()
+
+    if layer_ids != [] do
+      %Actions.DocumentEditMoveLayerRelative{
+        document_id: document_id,
+        layer_ids: layer_ids,
+        dx: dx,
+        dy: dy
+      }
+      |> Dispatcher.perform_as(account)
+    end
 
     :ack
   end
