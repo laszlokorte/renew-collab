@@ -2,14 +2,22 @@ defmodule RenewCollab.Queries.LayerHierarchyRelative do
   import Ecto.Query, warn: false
   alias RenewCollab.Hierarchy.Layer
 
-  defstruct [:document_id, :layer_id, :relative, :id_only]
+  defstruct [:document_id, :layer_id, :relative, :id_only, :ref_id]
 
-  def new(%{document_id: document_id, layer_id: layer_id, relative: relative, id_only: id_only}) do
+  def new(
+        %{
+          document_id: document_id,
+          layer_id: layer_id,
+          relative: relative,
+          id_only: id_only
+        } = attrs
+      ) do
     %__MODULE__{
       document_id: document_id,
       layer_id: layer_id,
       relative: relative,
-      id_only: id_only
+      id_only: id_only,
+      ref_id: Map.get(attrs, :ref_id)
     }
   end
 
@@ -19,11 +27,14 @@ defmodule RenewCollab.Queries.LayerHierarchyRelative do
         document_id: document_id,
         layer_id: layer_id,
         relative: relative,
-        id_only: id_only
+        id_only: id_only,
+        ref_id: ref_id
       }) do
+    result_key = result_key(ref_id)
+
     Ecto.Multi.new()
     |> Ecto.Multi.one(
-      :result,
+      result_key,
       case relative do
         :parent ->
           from(l in Layer,
@@ -87,4 +98,7 @@ defmodule RenewCollab.Queries.LayerHierarchyRelative do
   def parse_relative("sibling_next"), do: {:sibling, :next}
   def parse_relative("child_first"), do: {:child, :first}
   def parse_relative("child_last"), do: {:child, :last}
+
+  def result_key(nil), do: :result
+  def result_key(ref_id), do: {ref_id, :result}
 end

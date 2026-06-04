@@ -128,18 +128,33 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
   @impl true
   def handle_event(
         "delete_layer",
-        layer_id,
+        params,
         _state,
         %{:document_id => document_id, :account => account},
         _socket
-      )
-      when is_binary(layer_id) do
-    %Actions.DocumentEditDeleteLayer{
-      document_id: document_id,
-      layer_id: layer_id,
-      delete_children: true
-    }
-    |> Dispatcher.perform_as(account)
+      ) do
+    layer_ids =
+      case params do
+        layer_id when is_binary(layer_id) ->
+          [layer_id]
+
+        %{} ->
+          params
+          |> Map.get("layer_ids", [Map.get(params, "layer_id")])
+          |> normalize_selection()
+
+        _ ->
+          []
+      end
+
+    if layer_ids != [] do
+      %Actions.DocumentEditDeleteLayer{
+        document_id: document_id,
+        layer_ids: layer_ids,
+        delete_children: true
+      }
+      |> Dispatcher.perform_as(account)
+    end
 
     :silent
   end
@@ -849,22 +864,28 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
   def handle_event(
         "move_layer",
         %{
-          "layer_id" => layer_id,
           "target_layer_id" => target_layer_id,
           "order" => order,
           "relative" => relative
-        },
+        } = params,
         %{},
         %{:document_id => document_id, :account => account},
         _socket
       ) do
-    %Actions.DocumentEditReorderLayer{
-      document_id: document_id,
-      layer_id: layer_id,
-      target_layer_id: target_layer_id,
-      target: Actions.DocumentEditReorderLayer.parse_hierarchy_position(order, relative)
-    }
-    |> Dispatcher.perform_as(account)
+    layer_ids =
+      params
+      |> Map.get("layer_ids", [Map.get(params, "layer_id")])
+      |> normalize_selection()
+
+    if layer_ids != [] do
+      %Actions.DocumentEditReorderLayer{
+        document_id: document_id,
+        layer_ids: layer_ids,
+        target_layer_id: target_layer_id,
+        target: Actions.DocumentEditReorderLayer.parse_hierarchy_position(order, relative)
+      }
+      |> Dispatcher.perform_as(account)
+    end
 
     :silent
   end
@@ -903,42 +924,62 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
   @impl true
   def handle_event(
         "reorder_relative",
-        %{"id" => layer_id, "target_rel" => target_rel},
+        %{"target_rel" => target_rel} = params,
         %{},
         %{:document_id => document_id, :account => account},
         _socket
       ) do
     {rel, target} = Actions.DocumentEditReorderLayerRelative.parse_direction(target_rel)
 
-    %Actions.DocumentEditReorderLayerRelative{
-      document_id: document_id,
-      layer_id: layer_id,
-      relative_direction: rel,
-      target: target
-    }
-    |> Dispatcher.perform_as(account)
+    layer_ids =
+      params
+      |> Map.get("ids", Map.get(params, "layer_ids", [Map.get(params, "id")]))
+      |> normalize_selection()
 
-    :silent
+    if layer_ids != [] do
+      %Actions.DocumentEditReorderLayerRelative{
+        document_id: document_id,
+        layer_ids: layer_ids,
+        relative_direction: rel,
+        target: target
+      }
+      |> Dispatcher.perform_as(account)
+    end
+
+    {:reply, %{ids: layer_ids}}
   end
 
   @impl true
   def handle_event(
         "fetch_relative",
-        %{"id" => layer_id, "rel" => rel},
+        %{"rel" => rel} = params,
         %{},
         %{:document_id => document_id, :account => account},
         _socket
       ) do
-    rel_id =
-      %Views.DocumentLayerRelative{
-        document_id: document_id,
-        layer_id: layer_id,
-        id_only: true,
-        relative: Views.DocumentLayerRelative.parse_relative(rel)
-      }
-      |> Fetcher.fetch_as(account)
+    layer_ids =
+      params
+      |> Map.get("ids", Map.get(params, "layer_ids", [Map.get(params, "id")]))
+      |> normalize_selection()
 
-    {:reply, %{id: rel_id}}
+    rel_ids =
+      layer_ids
+      |> Enum.map(fn layer_id ->
+        %Views.DocumentLayerRelative{
+          document_id: document_id,
+          layer_id: layer_id,
+          id_only: true,
+          relative: Views.DocumentLayerRelative.parse_relative(rel)
+        }
+        |> Fetcher.fetch_as(account)
+      end)
+      |> Enum.filter(&is_binary/1)
+
+    case params do
+      %{"ids" => _} -> {:reply, %{ids: rel_ids}}
+      %{"layer_ids" => _} -> {:reply, %{ids: rel_ids}}
+      _ -> {:reply, %{id: List.first(rel_ids)}}
+    end
   end
 
   @impl true

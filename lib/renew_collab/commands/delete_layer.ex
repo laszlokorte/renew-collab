@@ -1,20 +1,31 @@
 defmodule RenewCollab.Commands.DeleteLayer do
   import Ecto.Query, warn: false
 
-  defstruct [:document_id, :layer_id, :delete_children]
+  defstruct [:document_id, :layer_id, :layer_ids, :delete_children]
   alias RenewCollab.Connection.Bond
   alias RenewCollab.Connection.Hyperlink
   alias RenewCollab.Hierarchy.Layer
   alias RenewCollab.Hierarchy.LayerParenthood
 
-  def new(%{
-        document_id: document_id,
-        layer_id: layer_id,
-        delete_children: delete_children
-      }) do
+  def new(
+        %{
+          document_id: document_id,
+          delete_children: delete_children
+        } = attrs
+      ) do
+    layer_id = Map.get(attrs, :layer_id)
+
+    layer_ids =
+      attrs
+      |> Map.get(:layer_ids, [layer_id])
+      |> List.wrap()
+      |> Enum.filter(&is_binary/1)
+      |> Enum.uniq()
+
     %__MODULE__{
       document_id: document_id,
       layer_id: layer_id,
+      layer_ids: layer_ids,
       delete_children: delete_children
     }
   end
@@ -24,15 +35,16 @@ defmodule RenewCollab.Commands.DeleteLayer do
 
   def multi(%__MODULE__{
         document_id: document_id,
-        layer_id: layer_id,
+        layer_ids: layer_ids,
         delete_children: delete_children
       }) do
     Ecto.Multi.new()
     |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.put(:layer_ids, layer_ids)
     |> Ecto.Multi.all(:child_layers, fn %{document_id: document_id} ->
       from(p in LayerParenthood,
         where:
-          p.ancestor_id == ^layer_id and p.document_id == ^document_id and
+          p.ancestor_id in ^layer_ids and p.document_id == ^document_id and
             (p.depth == 0 or ^delete_children),
         select: p.descendant_id
       )

@@ -1,5 +1,5 @@
 defmodule RenewCollabCtrl.Actions.DocumentEditReorderLayer do
-  defstruct [:document_id, :layer_id, :target_layer_id, :target]
+  defstruct [:document_id, :layer_id, :layer_ids, :target_layer_id, :target]
 
   def parse_hierarchy_position("above", "inside"), do: {:above, :inside}
   def parse_hierarchy_position("above", "outside"), do: {:above, :outside}
