@@ -1,5 +1,5 @@
 defmodule RenewCollabCtrl.Actions.DocumentEditReorderLayerRelative do
-  defstruct [:document_id, :layer_id, :layer_ids, :relative_direction, :target]
+  defstruct [:document_id, :layer_ids, :relative_direction, :target]
 
   def parse_direction("before_parent"), do: {:parent, {:below, :outside}}
   def parse_direction("after_parent"), do: {:parent, {:above, :outside}}

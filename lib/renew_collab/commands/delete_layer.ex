@@ -1,33 +1,40 @@
 defmodule RenewCollab.Commands.DeleteLayer do
   import Ecto.Query, warn: false
 
-  defstruct [:document_id, :layer_id, :layer_ids, :delete_children]
+  defstruct [:document_id, :layer_ids, :delete_children]
   alias RenewCollab.Connection.Bond
   alias RenewCollab.Connection.Hyperlink
   alias RenewCollab.Hierarchy.Layer
   alias RenewCollab.Hierarchy.LayerParenthood
 
-  def new(
-        %{
-          document_id: document_id,
-          delete_children: delete_children
-        } = attrs
-      ) do
-    layer_id = Map.get(attrs, :layer_id)
+  def new(%{document_id: document_id, layer_id: layer_id, delete_children: delete_children}) do
+    %__MODULE__{
+      document_id: document_id,
+      layer_ids: normalize_layer_ids([layer_id]),
+      delete_children: delete_children
+    }
+  end
 
+  def new(%{
+        document_id: document_id,
+        layer_ids: layer_ids,
+        delete_children: delete_children
+      }) do
+    %__MODULE__{
+      document_id: document_id,
+      layer_ids: normalize_layer_ids(layer_ids),
+      delete_children: delete_children
+    }
+  end
+
+  defp normalize_layer_ids(layer_ids) do
     layer_ids =
-      attrs
-      |> Map.get(:layer_ids, [layer_id])
+      layer_ids
       |> List.wrap()
       |> Enum.filter(&is_binary/1)
       |> Enum.uniq()
 
-    %__MODULE__{
-      document_id: document_id,
-      layer_id: layer_id,
-      layer_ids: layer_ids,
-      delete_children: delete_children
-    }
+    layer_ids
   end
 
   def tags(%__MODULE__{document_id: document_id}), do: [{:document_content, document_id}]

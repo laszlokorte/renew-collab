@@ -283,13 +283,11 @@ defmodule RenewCollabCtrl.Action do
 
   def do_perform(%Actions.DocumentEditDeleteLayer{
         document_id: document_id,
-        layer_id: layer_id,
         layer_ids: layer_ids,
         delete_children: delete_children
       }) do
     RenewCollab.Commands.DeleteLayer.new(%{
       document_id: document_id,
-      layer_id: layer_id,
       layer_ids: layer_ids,
       delete_children: delete_children
     })
@@ -640,14 +638,12 @@ defmodule RenewCollabCtrl.Action do
 
   def do_perform(%Actions.DocumentEditMoveLayerRelative{
         document_id: document_id,
-        layer_id: layer_id,
         layer_ids: layer_ids,
         dx: dx,
         dy: dy
       }) do
     RenewCollab.Commands.MoveLayerRelative.new(%{
       document_id: document_id,
-      layer_id: layer_id,
       layer_ids: layer_ids,
       dx: dx,
       dy: dy
@@ -672,14 +668,13 @@ defmodule RenewCollabCtrl.Action do
 
   def do_perform(%Actions.DocumentEditReorderLayer{
         document_id: document_id,
-        layer_id: layer_id,
         layer_ids: layer_ids,
         target_layer_id: target_layer_id,
         target: target
       }) do
     Commands.ReorderLayers.new(%{
       document_id: document_id,
-      layer_ids: normalize_layer_ids(layer_ids, layer_id),
+      layer_ids: layer_ids,
       target_layer_id: target_layer_id,
       target: target
     })
@@ -690,14 +685,13 @@ defmodule RenewCollabCtrl.Action do
 
   def do_perform(%Actions.DocumentEditReorderLayerRelative{
         document_id: document_id,
-        layer_id: layer_id,
         layer_ids: layer_ids,
         target: target,
         relative_direction: relative_direction
       }) do
     Commands.ReorderLayersRelative.new(%{
       document_id: document_id,
-      layer_ids: normalize_layer_ids(layer_ids, layer_id),
+      layer_ids: layer_ids,
       target: target,
       relative_direction: relative_direction
     })
@@ -1720,15 +1714,5 @@ defmodule RenewCollabCtrl.Action do
       _ ->
         :error
     end
-  end
-
-  defp normalize_layer_ids(layer_ids, fallback_layer_id) do
-    layer_ids
-    |> List.wrap()
-    |> then(fn ids ->
-      if ids == [] and is_binary(fallback_layer_id), do: [fallback_layer_id], else: ids
-    end)
-    |> Enum.filter(&is_binary/1)
-    |> Enum.uniq()
   end
 end

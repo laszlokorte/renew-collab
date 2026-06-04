@@ -1,3 +1,3 @@
 defmodule RenewCollabCtrl.Actions.DocumentEditDeleteLayer do
-  defstruct [:document_id, :layer_id, :layer_ids, :delete_children]
+  defstruct [:document_id, :layer_ids, :delete_children]
 end

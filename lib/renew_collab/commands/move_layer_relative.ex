@@ -13,20 +13,29 @@ defmodule RenewCollab.Commands.MoveLayerRelative do
 
   defstruct [:document_id, :layer_ids, :dx, :dy]
 
-  def new(%{document_id: document_id, dx: dx, dy: dy} = attrs) do
-    layer_ids =
-      attrs
-      |> Map.get(:layer_ids, [Map.get(attrs, :layer_id)])
-      |> List.wrap()
-      |> Enum.reject(&is_nil/1)
-      |> Enum.uniq()
-
+  def new(%{document_id: document_id, layer_id: layer_id, dx: dx, dy: dy}) do
     %__MODULE__{
       document_id: document_id,
-      layer_ids: layer_ids,
+      layer_ids: normalize_layer_ids([layer_id]),
       dx: dx,
       dy: dy
     }
+  end
+
+  def new(%{document_id: document_id, layer_ids: layer_ids, dx: dx, dy: dy}) do
+    %__MODULE__{
+      document_id: document_id,
+      layer_ids: normalize_layer_ids(layer_ids),
+      dx: dx,
+      dy: dy
+    }
+  end
+
+  defp normalize_layer_ids(layer_ids) do
+    layer_ids
+    |> List.wrap()
+    |> Enum.filter(&is_binary/1)
+    |> Enum.uniq()
   end
 
   def tags(%__MODULE__{document_id: document_id}),

@@ -1321,7 +1321,7 @@ defmodule RenewCollabWeb.LiveDocument do
       ) do
     %Actions.DocumentEditReorderLayer{
       document_id: socket.assigns.document.id,
-      layer_id: layer_id,
+      layer_ids: [layer_id],
       target_layer_id: target_layer_id,
       target: Actions.DocumentEditReorderLayer.parse_hierarchy_position(order, relative)
     }
@@ -1341,7 +1341,7 @@ defmodule RenewCollabWeb.LiveDocument do
       ) do
     %Actions.DocumentEditMoveLayerRelative{
       document_id: socket.assigns.document.id,
-      layer_id: layer_id,
+      layer_ids: [layer_id],
       dx: dx,
       dy: dy
     }
@@ -1357,7 +1357,7 @@ defmodule RenewCollabWeb.LiveDocument do
       ) do
     %Actions.DocumentEditDeleteLayer{
       document_id: socket.assigns.document.id,
-      layer_id: layer_id,
+      layer_ids: [layer_id],
       delete_children: true
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
@@ -1924,7 +1924,7 @@ defmodule RenewCollabWeb.LiveDocument do
     with s when not is_nil(s) <- socket.assigns.selection do
       %Actions.DocumentEditReorderLayerRelative{
         document_id: socket.assigns.document.id,
-        layer_id: socket.assigns.selection,
+        layer_ids: [socket.assigns.selection],
         relative_direction: rel,
         target: order
       }
