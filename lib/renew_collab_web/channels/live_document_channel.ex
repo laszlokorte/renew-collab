@@ -444,6 +444,57 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
 
   @impl true
   def handle_event(
+        "copy_layers",
+        %{"layer_ids" => layer_ids},
+        %{},
+        %{:document_id => document_id},
+        _socket
+      )
+      when is_list(layer_ids) do
+    layer_ids =
+      layer_ids
+      |> Enum.filter(&is_binary/1)
+      |> Enum.uniq()
+
+    %{document_id: document_id, layer_ids: layer_ids, original_ids: true}
+    |> RenewCollab.Queries.StrippedDocument.new()
+    |> RenewCollab.DocumentFetcher.fetch()
+    |> case do
+      {:ok, stripped_document} ->
+        {:reply, %{clipboard: RenewCollab.Document.LayerClipboard.encode(stripped_document)}}
+
+      _ ->
+        {:reply, %{error: "copy_failed"}}
+    end
+  end
+
+  @impl true
+  def handle_event(
+        "paste_layers",
+        %{
+          "clipboard" => clipboard,
+          "position" => %{"x" => x, "y" => y}
+        },
+        %{},
+        %{:document_id => document_id, :account => account},
+        _socket
+      ) do
+    %Actions.DocumentEditPasteLayers{
+      document_id: document_id,
+      clipboard: clipboard,
+      position: {x, y}
+    }
+    |> Dispatcher.perform_as(account)
+    |> case do
+      {:ok, %{layer_ids: layer_ids}} -> {:reply, %{layer_ids: layer_ids}}
+      :ok -> :ack
+      {:error, reason} -> {:reply, %{error: inspect(reason)}}
+      _ -> {:reply, %{error: "paste_failed"}}
+    end
+  end
+
+  @impl true
+  def handle_event(
         "change_style",
         %{"type" => "text", "attr" => style_attr, "layer_id" => layer_id, "val" => value},
         %{},

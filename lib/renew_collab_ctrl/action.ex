@@ -324,6 +324,23 @@ defmodule RenewCollabCtrl.Action do
     :ok
   end
 
+  def do_perform(%Actions.DocumentEditPasteLayers{
+        document_id: document_id,
+        clipboard: clipboard,
+        position: position
+      }) do
+    RenewCollab.Commands.InsertLayerClipboard.new(%{
+      document_id: document_id,
+      clipboard: clipboard,
+      position: position
+    })
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
+    |> case do
+      {:ok, %{inserted_layer_ids: layer_ids}} -> {:ok, %{layer_ids: layer_ids}}
+      other -> other
+    end
+  end
+
   def do_perform(%Actions.DocumentEditImportFile{
         document_id: document_id,
         file_name: file_name,

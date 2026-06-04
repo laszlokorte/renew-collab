@@ -218,6 +218,9 @@ defmodule RenewCollabCtrl.WriteAccess do
         can_write(account_id, :document, tgt_document_id) and
           ReadAccess.can_read(account_id, :document, src_doc_id)
 
+  def can(%{id: account_id}, %Actions.DocumentEditPasteLayers{document_id: doc_id}),
+    do: can_write(account_id, :document, doc_id)
+
   def can(%{id: account_id}, %Actions.SimulationRename{simulation_id: sim_id}),
     do: can_write(account_id, :simulation, sim_id)
 

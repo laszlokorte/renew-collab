@@ -7,19 +7,23 @@ defmodule RenewCollab.Queries.StrippedDocument do
   alias RenewCollab.Connection.Hyperlink
   alias RenewCollab.Connection.Bond
 
-  defstruct [:document_id, original_ids: false]
+  defstruct [:document_id, layer_ids: nil, original_ids: false]
 
-  def new(%{document_id: document_id, original_ids: true}) do
-    %__MODULE__{document_id: document_id, original_ids: true}
-  end
-
-  def new(%{document_id: document_id}) do
-    %__MODULE__{document_id: document_id, original_ids: false}
+  def new(%{document_id: document_id} = attrs) do
+    %__MODULE__{
+      document_id: document_id,
+      layer_ids: Map.get(attrs, :layer_ids),
+      original_ids: Map.get(attrs, :original_ids, false)
+    }
   end
 
   def tags(%__MODULE__{document_id: document_id}), do: [{:document_content, document_id}]
 
-  def multi(%__MODULE__{document_id: document_id, original_ids: original_ids}) do
+  def multi(%__MODULE__{
+        document_id: document_id,
+        layer_ids: layer_ids,
+        original_ids: original_ids
+      }) do
     Ecto.Multi.new()
     |> Ecto.Multi.one(
       :original_document_flat,
@@ -78,7 +82,23 @@ defmodule RenewCollab.Queries.StrippedDocument do
         )
       end
     )
-    |> Ecto.Multi.run(:new_layer_ids, fn _, %{original_document: %{layers: layers}} ->
+    |> Ecto.Multi.run(:selected_layer_ids, fn _,
+                                              %{
+                                                original_document: %{layers: layers},
+                                                original_parenthoods: parenthoods,
+                                                original_hyperlinks: hyperlinks,
+                                                original_bonds: bonds
+                                              } ->
+      {:ok, selected_layer_ids(layers, parenthoods, hyperlinks, bonds, layer_ids)}
+    end)
+    |> Ecto.Multi.run(:new_layer_ids, fn _,
+                                         %{
+                                           original_document: %{layers: layers},
+                                           selected_layer_ids: selected_layer_ids
+                                         } ->
+      selected_layer_ids = MapSet.new(selected_layer_ids)
+      layers = Enum.filter(layers, &MapSet.member?(selected_layer_ids, &1.id))
+
       if original_ids do
         {:ok,
          layers
@@ -107,6 +127,8 @@ defmodule RenewCollab.Queries.StrippedDocument do
                                                   new_layer_ids: new_layer_ids,
                                                   original_document: original_document
                                                 } ->
+      included = MapSet.new(Map.keys(new_layer_ids))
+
       {:ok,
        original_document
        |> Map.from_struct()
@@ -117,6 +139,7 @@ defmodule RenewCollab.Queries.StrippedDocument do
        |> strip_not_loaded()
        |> Map.update(:layers, [], fn layers ->
          layers
+         |> Enum.filter(fn %{id: old_id} -> MapSet.member?(included, old_id) end)
          |> Enum.map(fn %{id: old_id} = layer ->
            layer
            |> Map.from_struct()
@@ -132,6 +155,9 @@ defmodule RenewCollab.Queries.StrippedDocument do
                                            } ->
       {:ok,
        original_parenthoods
+       |> Enum.filter(fn %{ancestor_id: anc, descendant_id: dec} ->
+         Map.has_key?(new_layer_ids, anc) and Map.has_key?(new_layer_ids, dec)
+       end)
        |> Enum.map(fn %{depth: d, ancestor_id: anc, descendant_id: dec} ->
          {
            Map.get(new_layer_ids, anc),
@@ -147,6 +173,10 @@ defmodule RenewCollab.Queries.StrippedDocument do
                                           } ->
       {:ok,
        original_hyperlinks
+       |> Enum.filter(fn hyperlink ->
+         Map.has_key?(new_layer_ids, hyperlink.source_layer_id) and
+           Map.has_key?(new_layer_ids, hyperlink.target_layer_id)
+       end)
        |> Enum.map(fn hyperlink ->
          hyperlink
          |> Map.take([:locator_offset_x, :locator_offset_y])
@@ -161,6 +191,10 @@ defmodule RenewCollab.Queries.StrippedDocument do
                                      } ->
       {:ok,
        original_bonds
+       |> Enum.filter(fn bond ->
+         Map.has_key?(new_layer_ids, bond.edge_layer_id) and
+           Map.has_key?(new_layer_ids, bond.layer_id)
+       end)
        |> Enum.map(fn bond ->
          bond
          |> Map.update(:edge_layer_id, nil, &Map.get(new_layer_ids, &1))
@@ -184,6 +218,72 @@ defmodule RenewCollab.Queries.StrippedDocument do
          thumbnail: thumbnail
        }}
     end)
+  end
+
+  defp selected_layer_ids(layers, _parenthoods, _hyperlinks, _bonds, nil) do
+    Enum.map(layers, & &1.id)
+  end
+
+  defp selected_layer_ids(layers, parenthoods, hyperlinks, bonds, layer_ids) do
+    existing_ids = layers |> Enum.map(& &1.id) |> MapSet.new()
+
+    requested_ids =
+      layer_ids
+      |> List.wrap()
+      |> Enum.filter(&MapSet.member?(existing_ids, &1))
+      |> MapSet.new()
+
+    child_ids = with_descendants(requested_ids, parenthoods)
+
+    connected_edge_ids =
+      bonds
+      |> Enum.filter(&MapSet.member?(child_ids, &1.layer_id))
+      |> Enum.map(& &1.edge_layer_id)
+      |> MapSet.new()
+
+    outgoing_target_ids =
+      hyperlinks
+      |> Enum.filter(&MapSet.member?(child_ids, &1.source_layer_id))
+      |> Enum.map(& &1.target_layer_id)
+      |> MapSet.new()
+
+    edge_ids = MapSet.union(child_ids, MapSet.union(connected_edge_ids, outgoing_target_ids))
+
+    endpoint_ids =
+      bonds
+      |> Enum.filter(&MapSet.member?(edge_ids, &1.edge_layer_id))
+      |> Enum.map(& &1.layer_id)
+      |> MapSet.new()
+
+    referenced_target_ids =
+      child_ids
+      |> MapSet.union(connected_edge_ids)
+      |> MapSet.union(outgoing_target_ids)
+      |> MapSet.union(endpoint_ids)
+
+    hyperlinked_source_ids =
+      hyperlinks
+      |> Enum.filter(&MapSet.member?(referenced_target_ids, &1.target_layer_id))
+      |> Enum.map(& &1.source_layer_id)
+      |> MapSet.new()
+
+    child_ids
+    |> MapSet.union(connected_edge_ids)
+    |> MapSet.union(outgoing_target_ids)
+    |> MapSet.union(endpoint_ids)
+    |> MapSet.union(hyperlinked_source_ids)
+    |> with_descendants(parenthoods)
+    |> Enum.filter(&MapSet.member?(existing_ids, &1))
+  end
+
+  defp with_descendants(layer_ids, parenthoods) do
+    descendants =
+      parenthoods
+      |> Enum.filter(&MapSet.member?(layer_ids, &1.ancestor_id))
+      |> Enum.map(& &1.descendant_id)
+
+    descendants
+    |> Enum.reduce(layer_ids, &MapSet.put(&2, &1))
   end
 
   defp deep_strip(value) when is_struct(value) do

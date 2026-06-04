@@ -152,6 +152,9 @@ defmodule RenewCollabCtrl.Notification do
   def notifications_for(_proj, %Actions.DocumentEditDeleteLayer{document_id: doc_id}, _result),
     do: [document_modified(doc_id)]
 
+  def notifications_for(_proj, %Actions.DocumentEditPasteLayers{document_id: doc_id}, _result),
+    do: [document_modified(doc_id)]
+
   def notifications_for(_proj, %Actions.DocumentEditCreateEdgeBond{document_id: doc_id}, _result),
     do: [document_modified(doc_id)]
 

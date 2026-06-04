@@ -64,17 +64,17 @@ defmodule RenewCollab.Commands.InsertDocument do
     end)
   end
 
-  defp insert_into_document_multi(
-         document_id,
-         now,
-         %TransientDocument{
-           content: %{layers: layers},
-           parenthoods: parenthoods,
-           hyperlinks: hyperlinks,
-           bonds: bonds
-           # thumbnail: thumbnail
-         }
-       ) do
+  def insert_into_document_multi(
+        document_id,
+        now,
+        %TransientDocument{
+          content: %{layers: layers},
+          parenthoods: parenthoods,
+          hyperlinks: hyperlinks,
+          bonds: bonds
+          # thumbnail: thumbnail
+        }
+      ) do
     layers
     |> Enum.with_index()
     |> Enum.reduce(Ecto.Multi.new(), fn {layer, i}, mul ->
