@@ -61,9 +61,9 @@ defmodule RenewCollab.Commands.MoveLayerRelative do
         )
     end)
     |> Ecto.Multi.all(:hyperlinked_layers, fn
-      %{child_layers: child_layers, connected_edge_layers: edge_layers} ->
+      %{child_layers: child_layers} ->
         from(h in Hyperlink,
-          where: h.target_layer_id in ^child_layers or h.target_layer_id in ^edge_layers,
+          where: h.target_layer_id in ^child_layers,
           select: h.source_layer_id
         )
     end)

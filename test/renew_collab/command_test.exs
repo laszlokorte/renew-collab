@@ -1,3 +1,64 @@
 defmodule RenewCollab.CommandTest do
   use RenewCollab.DataCase
+
+  alias RenewCollab.Connection.Hyperlink
+  alias RenewCollab.DocumentCommander
+  alias RenewCollab.Element.Text
+  alias RenewCollab.Hierarchy.Layer
+  alias RenewCollab.Hierarchy.LayerParenthood
+  alias RenewCollab.Commands.MoveLayerRelative
+
+  describe "move_layer_relative" do
+    test "does not directly move text linked to a connected edge" do
+      RenewCollab.DocumentFixtures.document_fixture()
+
+      source_layer_id = "47258301-e3ea-472f-ba0b-0fc8cc0c4a1d"
+      edge_layer_id = "dd3df027-1e28-4e32-98bd-37969ef8b46f"
+      edge_text_layer_id = "6feef6e1-221c-4278-a7b0-02c7355c2d85"
+
+      document_id =
+        from(l in Layer, where: l.id == ^source_layer_id, select: l.document_id) |> Repo.one!()
+
+      %Layer{}
+      |> Layer.changeset(%{
+        id: edge_text_layer_id,
+        document_id: document_id,
+        z_index: 99,
+        hidden: false,
+        semantic_tag: "CH.ifa.draw.figures.TextFigure",
+        text: %{
+          body: "edge label",
+          position_x: 100.0,
+          position_y: 100.0
+        }
+      })
+      |> Repo.insert!()
+
+      %LayerParenthood{}
+      |> LayerParenthood.changeset(%{
+        document_id: document_id,
+        ancestor_id: edge_text_layer_id,
+        descendant_id: edge_text_layer_id,
+        depth: 0
+      })
+      |> Repo.insert!()
+
+      %Hyperlink{}
+      |> Hyperlink.changeset(%{
+        source_layer_id: edge_text_layer_id,
+        target_layer_id: edge_layer_id
+      })
+      |> Repo.insert!()
+
+      {:ok, _} =
+        %{document_id: document_id, layer_id: source_layer_id, dx: 100.0, dy: 0.0}
+        |> MoveLayerRelative.new()
+        |> DocumentCommander.run_document_command_sync(false)
+
+      text = from(t in Text, where: t.layer_id == ^edge_text_layer_id) |> Repo.one!()
+
+      assert text.position_x > 100.0
+      assert text.position_x < 200.0
+    end
+  end
 end

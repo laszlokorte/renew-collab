@@ -47,8 +47,21 @@ defmodule RenewCollab.Commands.DeleteLayerEdgeWaypoint do
         left_join: w in assoc(e, :waypoints),
         where: l.id == ^layer_id,
         select:
-          {coalesce(avg(w.position_x), (e.source_x + e.target_x) / 2),
-           coalesce(avg(w.position_y), (e.source_y + e.target_y) / 2)}
+          {fragment(
+             "(? + ? + coalesce(sum(?), 0.0)) / (count(?) + 2)",
+             e.source_x,
+             e.target_x,
+             w.position_x,
+             w.id
+           ),
+           fragment(
+             "(? + ? + coalesce(sum(?), 0.0)) / (count(?) + 2)",
+             e.source_y,
+             e.target_y,
+             w.position_y,
+             w.id
+           )},
+        group_by: [e.source_x, e.source_y, e.target_x, e.target_y]
       )
     )
     |> Ecto.Multi.delete(
@@ -74,8 +87,21 @@ defmodule RenewCollab.Commands.DeleteLayerEdgeWaypoint do
           left_join: w in assoc(e, :waypoints),
           where: l.id == ^layer_id,
           select:
-            {coalesce(avg(w.position_x), (e.source_x + e.target_x) / 2) - ^old_x,
-             coalesce(avg(w.position_y), (e.source_y + e.target_y) / 2) - ^old_y}
+            {fragment(
+               "(? + ? + coalesce(sum(?), 0.0)) / (count(?) + 2)",
+               e.source_x,
+               e.target_x,
+               w.position_x,
+               w.id
+             ) - ^old_x,
+             fragment(
+               "(? + ? + coalesce(sum(?), 0.0)) / (count(?) + 2)",
+               e.source_y,
+               e.target_y,
+               w.position_y,
+               w.id
+             ) - ^old_y},
+          group_by: [e.source_x, e.source_y, e.target_x, e.target_y]
         )
       end
     )

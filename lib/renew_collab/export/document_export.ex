@@ -21,13 +21,24 @@ defmodule RenewCollab.Export.DocumentExport do
         )
       end)
 
+    layer_lookup = Map.new(document.layers, &{&1.id, &1})
+
     refs =
       document.layers
       |> Enum.filter(fn l ->
         is_nil(l.direct_parent_hood)
       end)
       |> Enum.reduce([], fn layer, storables ->
-        export_layer(storables, view_box, document, grammar, sockets, tip_ids, layer)
+        export_layer(
+          storables,
+          view_box,
+          document,
+          grammar,
+          sockets,
+          tip_ids,
+          layer,
+          layer_lookup
+        )
       end)
 
     refs =
@@ -59,6 +70,30 @@ defmodule RenewCollab.Export.DocumentExport do
   end
 
   def export_layer(prev_storables, view_box, document, grammar, sockets, tip_ids, layer) do
+    layer_lookup = Map.new(document.layers, &{&1.id, &1})
+
+    export_layer(
+      prev_storables,
+      view_box,
+      document,
+      grammar,
+      sockets,
+      tip_ids,
+      layer,
+      layer_lookup
+    )
+  end
+
+  def export_layer(
+        prev_storables,
+        view_box,
+        document,
+        grammar,
+        sockets,
+        tip_ids,
+        layer,
+        layer_lookup
+      ) do
     child_storables =
       document.layers
       |> Enum.filter(fn l ->
@@ -68,7 +103,16 @@ defmodule RenewCollab.Export.DocumentExport do
     storables =
       child_storables
       |> Enum.reduce(prev_storables, fn sub_layer, acc_storables ->
-        export_layer(acc_storables, view_box, document, grammar, sockets, tip_ids, sub_layer)
+        export_layer(
+          acc_storables,
+          view_box,
+          document,
+          grammar,
+          sockets,
+          tip_ids,
+          sub_layer,
+          layer_lookup
+        )
       end)
 
     cond do
@@ -498,8 +542,8 @@ defmodule RenewCollab.Export.DocumentExport do
               create_ref(storables, %Renewex.Storable{
                 class_name: "CH.ifa.draw.standard.OffsetLocator",
                 fields: %{
-                  fOffsetY: text_locator_offset(layer, :y),
-                  fOffsetX: text_locator_offset(layer, :x),
+                  fOffsetY: text_locator_offset(layer, layer_lookup, :y),
+                  fOffsetX: text_locator_offset(layer, layer_lookup, :x),
                   fBase: locator_base
                 }
               })
@@ -556,8 +600,8 @@ defmodule RenewCollab.Export.DocumentExport do
               create_ref(storables, %Renewex.Storable{
                 class_name: "CH.ifa.draw.standard.OffsetLocator",
                 fields: %{
-                  fOffsetY: text_locator_offset(layer, :y),
-                  fOffsetX: text_locator_offset(layer, :x),
+                  fOffsetY: text_locator_offset(layer, layer_lookup, :y),
+                  fOffsetX: text_locator_offset(layer, layer_lookup, :x),
                   fBase: locator_base
                 }
               })
@@ -589,7 +633,8 @@ defmodule RenewCollab.Export.DocumentExport do
         end
 
       Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "CH.ifa.draw.figures.TextFigure") ->
-        {storables, parent_ref, locator_ref} = create_text_locator(storables, layer)
+        {storables, parent_ref, locator_ref} =
+          create_text_locator(storables, layer, layer_lookup)
 
         if is_nil(layer.text.style) do
           storables
@@ -700,7 +745,8 @@ defmodule RenewCollab.Export.DocumentExport do
       tip_id == Map.get(tip_ids, "arrow-tip-double") ->
         %Renewex.Storable{
           class_name: "de.renew.gui.DoubleArrowTip",
-          fields: export_arrow_tip_fields(semantic_tag != "de.renew.gui.HollowDoubleArcConnection")
+          fields:
+            export_arrow_tip_fields(semantic_tag != "de.renew.gui.HollowDoubleArcConnection")
         }
 
       true ->
@@ -720,7 +766,7 @@ defmodule RenewCollab.Export.DocumentExport do
     }
   end
 
-  defp create_text_locator(storables, layer) do
+  defp create_text_locator(storables, layer, layer_lookup) do
     parent_ref =
       with out when not is_nil(out) <- layer.outgoing_link,
            target_layer_id when not is_nil(target_layer_id) <- out.target_layer_id do
@@ -744,8 +790,8 @@ defmodule RenewCollab.Export.DocumentExport do
         create_ref(storables, %Renewex.Storable{
           class_name: "CH.ifa.draw.standard.OffsetLocator",
           fields: %{
-            fOffsetY: text_locator_offset(layer, :y),
-            fOffsetX: text_locator_offset(layer, :x),
+            fOffsetY: text_locator_offset(layer, layer_lookup, :y),
+            fOffsetX: text_locator_offset(layer, layer_lookup, :x),
             fBase: locator_base
           }
         })
@@ -762,15 +808,131 @@ defmodule RenewCollab.Export.DocumentExport do
 
   defp export_text_type(_layer, default), do: default
 
-  defp text_locator_offset(%{outgoing_link: %{locator_offset_x: offset}}, :x)
+  defp text_locator_offset(
+         %{outgoing_link: %{target_layer_id: target_layer_id}} = layer,
+         layer_lookup,
+         axis
+       )
+       when not is_nil(target_layer_id) do
+    case layer_lookup |> Map.get(target_layer_id) |> locator_anchor() do
+      {x, _y} when axis == :x -> round(text_locator_center(layer, :x) - x)
+      {_x, y} when axis == :y -> round(text_locator_center(layer, :y) - y)
+      _ -> stored_text_locator_offset(layer, axis)
+    end
+  end
+
+  defp text_locator_offset(layer, _layer_lookup, axis),
+    do: stored_text_locator_offset(layer, axis)
+
+  defp stored_text_locator_offset(%{outgoing_link: %{locator_offset_x: offset}}, :x)
        when is_integer(offset),
        do: offset
 
-  defp text_locator_offset(%{outgoing_link: %{locator_offset_y: offset}}, :y)
+  defp stored_text_locator_offset(%{outgoing_link: %{locator_offset_y: offset}}, :y)
        when is_integer(offset),
        do: offset
 
-  defp text_locator_offset(_layer, _axis), do: 0
+  defp stored_text_locator_offset(_layer, _axis), do: 0
+
+  defp text_locator_center(
+         %{text: %{position_x: position_x, size_hint: %{width: width}}},
+         :x
+       )
+       when is_number(position_x) and is_number(width),
+       do: position_x + width / 2.0
+
+  defp text_locator_center(
+         %{text: %{position_y: position_y, size_hint: %{height: height}}},
+         :y
+       )
+       when is_number(position_y) and is_number(height),
+       do: position_y + height / 2.0
+
+  defp text_locator_center(
+         %{text: %{position_x: position_x} = text},
+         :x
+       )
+       when is_number(position_x),
+       do: position_x + measured_text_dimension(text, :width) / 2.0
+
+  defp text_locator_center(
+         %{text: %{position_y: position_y} = text},
+         :y
+       )
+       when is_number(position_y),
+       do: position_y + measured_text_dimension(text, :height) / 2.0
+
+  defp measured_text_dimension(text, axis) do
+    text
+    |> measured_text_size()
+    |> elem(if(axis == :width, do: 0, else: 1))
+  end
+
+  defp measured_text_size(text) do
+    RenewCollab.TextMeasure.MeasureServer.measure(
+      {font_family(text), font_style(text), font_size(text), text_lines(text)}
+    )
+  rescue
+    _ -> {0, 0}
+  catch
+    :exit, _ -> {0, 0}
+  end
+
+  defp text_lines(%{body: body} = text) do
+    body
+    |> to_string()
+    |> String.split("\n")
+    |> Enum.filter(&(include_blank_lines?(text) or not blank?(&1)))
+  end
+
+  defp include_blank_lines?(%{style: %{blank_lines: blank_lines}}), do: blank_lines
+  defp include_blank_lines?(_text), do: false
+
+  defp font_style(%{style: %{} = text_style}) do
+    [
+      if(text_style.bold, do: 1, else: 0),
+      if(text_style.italic, do: 2, else: 0)
+    ]
+    |> Enum.reduce(0, &Bitwise.bor/2)
+  end
+
+  defp font_style(_text), do: 0
+
+  defp font_family(%{style: %{font_family: font_family}}) when is_binary(font_family),
+    do: font_family
+
+  defp font_family(_text), do: "sans-serif"
+
+  defp font_size(%{style: %{font_size: font_size}}) when is_number(font_size),
+    do: round(font_size)
+
+  defp font_size(_text), do: 12
+
+  defp blank?(str_or_nil),
+    do: "" == str_or_nil |> to_string() |> String.trim()
+
+  defp locator_anchor(%{box: %{position_x: x, position_y: y, width: width, height: height}})
+       when is_number(x) and is_number(y) and is_number(width) and is_number(height),
+       do: {x + width / 2.0, y + height / 2.0}
+
+  defp locator_anchor(%{
+         edge:
+           %{source_x: source_x, source_y: source_y, target_x: target_x, target_y: target_y} =
+             edge
+       })
+       when is_number(source_x) and is_number(source_y) and is_number(target_x) and
+              is_number(target_y) do
+    points =
+      [{edge.source_x, edge.source_y}] ++
+        ((edge.waypoints || []) |> Enum.map(&{&1.position_x, &1.position_y})) ++
+        [{edge.target_x, edge.target_y}]
+
+    {xs, ys} = Enum.unzip(points)
+
+    {(Enum.min(xs) + Enum.max(xs)) / 2.0, (Enum.min(ys) + Enum.max(ys)) / 2.0}
+  end
+
+  defp locator_anchor(_layer), do: nil
 
   defp attach_synthetic_labels(orig_refs) do
     for {%Storable{class_name: class_name, fields: %{_gen_id: gen_id}}, index} <-
@@ -833,20 +995,21 @@ defmodule RenewCollab.Export.DocumentExport do
     %Renewex.Storable{
       class_name: "CH.ifa.draw.figures.FigureAttributes",
       fields: %{
-        attributes: [
-          {"FillColor", "Color",
-           color_to_rgba(
-             style_or_default(layer, :background_color),
-             style_or_default(layer, :opacity)
-           )},
-          {"FrameColor", "Color",
-           color_to_rgba(
-             style_or_default(layer, :border_color),
-             style_or_default(layer, :opacity)
-           )},
-          {"LineWidth", "Int", round(style_or_default(layer, :border_width))},
-          {"LineStyle", "String", style_or_default(layer, :border_dash_array)}
-        ] ++ export_target_location(layer)
+        attributes:
+          [
+            {"FillColor", "Color",
+             color_to_rgba(
+               style_or_default(layer, :background_color),
+               style_or_default(layer, :opacity)
+             )},
+            {"FrameColor", "Color",
+             color_to_rgba(
+               style_or_default(layer, :border_color),
+               style_or_default(layer, :opacity)
+             )},
+            {"LineWidth", "Int", round(style_or_default(layer, :border_width))},
+            {"LineStyle", "String", style_or_default(layer, :border_dash_array)}
+          ] ++ export_target_location(layer)
       }
     }
   end
@@ -855,20 +1018,21 @@ defmodule RenewCollab.Export.DocumentExport do
     %Renewex.Storable{
       class_name: "CH.ifa.draw.figures.FigureAttributes",
       fields: %{
-        attributes: [
-          {"FrameColor", "Color",
-           color_to_rgba(
-             style_or_default(edge, :stroke_color),
-             style_or_default(layer, :opacity)
-           )},
-          {"LineWidth", "Int", round(style_or_default(edge, :stroke_width))},
-          {"LineStyle", "String", style_or_default(edge, :stroke_dash_array)},
-          {"FillColor", "Color",
-           color_to_rgba(
-             style_or_default(layer, :background_color),
-             style_or_default(layer, :opacity)
-           )}
-        ] ++ export_target_location(layer)
+        attributes:
+          [
+            {"FrameColor", "Color",
+             color_to_rgba(
+               style_or_default(edge, :stroke_color),
+               style_or_default(layer, :opacity)
+             )},
+            {"LineWidth", "Int", round(style_or_default(edge, :stroke_width))},
+            {"LineStyle", "String", style_or_default(edge, :stroke_dash_array)},
+            {"FillColor", "Color",
+             color_to_rgba(
+               style_or_default(layer, :background_color),
+               style_or_default(layer, :opacity)
+             )}
+          ] ++ export_target_location(layer)
       }
     }
   end

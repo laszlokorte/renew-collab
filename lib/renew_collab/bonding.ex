@@ -49,9 +49,21 @@ defmodule RenewCollab.Bonding do
           where: e.id in ^Enum.map(affected_bonds, & &1.bond.element_edge_id),
           select:
             {e.layer_id,
-             {coalesce(avg(w.position_x), (e.source_x + e.target_x) / 2),
-              coalesce(avg(w.position_y), (e.source_y + e.target_y) / 2)}},
-          group_by: e.layer_id
+             {fragment(
+                "(? + ? + coalesce(sum(?), 0.0)) / (count(?) + 2)",
+                e.source_x,
+                e.target_x,
+                w.position_x,
+                w.id
+              ),
+              fragment(
+                "(? + ? + coalesce(sum(?), 0.0)) / (count(?) + 2)",
+                e.source_y,
+                e.target_y,
+                w.position_y,
+                w.id
+              )}},
+          group_by: [e.layer_id, e.source_x, e.source_y, e.target_x, e.target_y]
         )
       end
     )
@@ -169,9 +181,21 @@ defmodule RenewCollab.Bonding do
           where: e.id in ^Enum.map(affected_bonds, & &1.bond.element_edge_id),
           select:
             {e.layer_id,
-             {coalesce(avg(w.position_x), (e.source_x + e.target_x) / 2),
-              coalesce(avg(w.position_y), (e.source_y + e.target_y) / 2)}},
-          group_by: e.layer_id
+             {fragment(
+                "(? + ? + coalesce(sum(?), 0.0)) / (count(?) + 2)",
+                e.source_x,
+                e.target_x,
+                w.position_x,
+                w.id
+              ),
+              fragment(
+                "(? + ? + coalesce(sum(?), 0.0)) / (count(?) + 2)",
+                e.source_y,
+                e.target_y,
+                w.position_y,
+                w.id
+              )}},
+          group_by: [e.layer_id, e.source_x, e.source_y, e.target_x, e.target_y]
         )
       end
     )
@@ -179,7 +203,9 @@ defmodule RenewCollab.Bonding do
       %{
         edge_centers_before: edge_centers_before,
         edge_centers_after: edge_centers_after
-      } ->
+      } = changes ->
+        directly_moved_layer_ids = Map.get(changes, :combined_layer_ids, [])
+
         Map.merge(Map.new(edge_centers_before), Map.new(edge_centers_after), fn _k,
                                                                                 {xa, ya},
                                                                                 {xb, yb} ->
@@ -195,7 +221,9 @@ defmodule RenewCollab.Bonding do
                 t.layer_id in subquery(
                   from(h in Hyperlink,
                     select: h.source_layer_id,
-                    where: h.target_layer_id == ^layer_id
+                    where:
+                      h.target_layer_id == ^layer_id and
+                        h.source_layer_id not in ^directly_moved_layer_ids
                   )
                 )
             ),
@@ -211,7 +239,9 @@ defmodule RenewCollab.Bonding do
                     join: l in assoc(h, :source_layer),
                     join: t in assoc(l, :text),
                     select: t.id,
-                    where: h.target_layer_id == ^layer_id
+                    where:
+                      h.target_layer_id == ^layer_id and
+                        h.source_layer_id not in ^directly_moved_layer_ids
                   )
                 )
             ),
