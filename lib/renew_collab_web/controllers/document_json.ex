@@ -219,6 +219,7 @@ defmodule RenewCollabWeb.DocumentJSON do
                     nil
                 end,
               "body" => v.body,
+              "renew_type" => v.renew_type,
               "style" =>
                 case v.style do
                   nil ->

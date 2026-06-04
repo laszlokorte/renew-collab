@@ -1,5 +1,7 @@
 import Config
 
+code_reloader? = System.get_env("RENEW_CODE_RELOADER") in ["1", "true", "TRUE"]
+
 config :renew_collab, :editor_url, "http://localhost:5173"
 
 # Configure your database
@@ -43,28 +45,35 @@ config :renew_collab, :formalisms, [
   "Single P/T Net with Channel Compiler"
 ]
 
-# For development, we disable any cache and enable
-# debugging and code reloading.
+# Keep the local development server responsive on Windows. Phoenix code
+# reloading can be enabled explicitly with RENEW_CODE_RELOADER=true.
 #
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
+live_reload =
+  if code_reloader? do
+    [
+      patterns: [
+        ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
+        ~r"priv/gettext/.*(po)$",
+        ~r"lib/renew_collab_web/(controllers|live|components)/.*(ex|heex)$"
+      ]
+    ]
+  else
+    []
+  end
+
 config :renew_collab, RenewCollabWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   http: [ip: {127, 0, 0, 1}, port: 4000],
   check_origin: false,
-  code_reloader: true,
+  code_reloader: code_reloader?,
   debug_errors: true,
   secret_key_base: "T9rh3fGUvXs/CrmQv6Us79G7Ho4Ct/BQkIpia64YDmhq6eT0FkgL/qlCvOv5UxVc",
   watchers: [],
-  live_reload: [
-    patterns: [
-      ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
-      ~r"priv/gettext/.*(po)$",
-      ~r"lib/renew_collab_web/(controllers|live|components)/.*(ex|heex)$"
-    ]
-  ]
+  live_reload: live_reload
 
 config :exqlite, make_force_build: false
 config :exqlite, force_build: false
@@ -118,7 +127,8 @@ config :renew_collab, RenewCollabSim.Commands,
 # Enable dev routes for dashboard and mailbox
 config :renew_collab, dev_routes: true
 
-# Do not include metadata nor timestamps in development logs
+# Do not include metadata nor timestamps in development logs.
+config :logger, level: :info
 config :logger, :console, format: "[$level] $message\n"
 
 # Set a higher stacktrace during development. Avoid configuring such

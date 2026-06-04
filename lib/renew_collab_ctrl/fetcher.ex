@@ -55,20 +55,13 @@ defmodule RenewCollabCtrl.Fetcher do
       when is_function(fun) and
              (lifetime == :infinity or (is_integer(lifetime) and lifetime >= 0)) do
     case CacheServer.get(key, lifetime) do
-      {:ok, value} ->
-        {:ok, value}
+      {:ok, result} ->
+        result
 
       :error ->
-        fun.()
-        |> case do
-          res = {:ok, result} ->
-            CacheServer.put(key, result, tags)
-
-            res
-
-          err = {:error, _} ->
-            err
-        end
+        result = fun.()
+        CacheServer.put(key, result, tags)
+        result
     end
   end
 end

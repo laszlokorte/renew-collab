@@ -1,11 +1,16 @@
 defmodule RenewCollabWeb.SyntaxController do
   use RenewCollabWeb, :controller
 
+  alias RenewCollabCtrl.Fetcher
+  alias RenewCollabCtrl.Views
+
   action_fallback RenewCollabWeb.FallbackController
 
   def list(conn, %{}) do
     render(conn, :list, %{
-      syntaxes: RenewCollab.Syntax.find_all()
+      syntaxes:
+        %Views.GlobalSyntaxList{}
+        |> Fetcher.fetch_as(conn.assigns.current_account)
     })
   end
 

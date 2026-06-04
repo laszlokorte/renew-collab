@@ -2,6 +2,8 @@ defmodule RenewCollabCtrl.CacheConfig do
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Actions
 
+  @static_resource_ttl 300
+
   def key_for_view(account, view)
   def key_for_view(_account, %Views.DocumentLayerRelative{}), do: nil
   def key_for_view(_account, %Views.DocumentStripped{}), do: nil
@@ -10,14 +12,14 @@ defmodule RenewCollabCtrl.CacheConfig do
   def key_for_view(_account, %Views.DocumentWithContent{}), do: nil
   def key_for_view(_account, %Views.GlobalAccounts{}), do: nil
   def key_for_view(_account, %Views.GlobalDocumentsList{}), do: nil
-  def key_for_view(_account, %Views.GlobalPrimitives{}), do: nil
+  def key_for_view(_account, %Views.GlobalPrimitives{}), do: {:global, :primitives}
   def key_for_view(_account, %Views.GlobalShadowNetSystemsList{}), do: nil
   def key_for_view(_account, %Views.GlobalSimulationsList{}), do: nil
   def key_for_view(_account, %Views.GlobalSocketById{}), do: nil
-  def key_for_view(_account, %Views.GlobalSocketSchemasList{}), do: nil
-  def key_for_view(_account, %Views.GlobalSocketSchemasMap{}), do: nil
-  def key_for_view(_account, %Views.GlobalSymbolsList{}), do: nil
-  def key_for_view(_account, %Views.GlobalSyntaxList{}), do: nil
+  def key_for_view(_account, %Views.GlobalSocketSchemasList{}), do: {:global, :socket_schemas}
+  def key_for_view(_account, %Views.GlobalSocketSchemasMap{}), do: {:global, :socket_schemas_map}
+  def key_for_view(_account, %Views.GlobalSymbolsList{}), do: {:global, :symbols}
+  def key_for_view(_account, %Views.GlobalSyntaxList{}), do: {:global, :syntax}
   def key_for_view(_account, %Views.MyProjectsList{}), do: nil
   def key_for_view(_account, %Views.ProjectDocumentsList{}), do: nil
   def key_for_view(_account, %Views.ProjectShadowNetSystemsList{}), do: nil
@@ -58,14 +60,14 @@ defmodule RenewCollabCtrl.CacheConfig do
   def ttl_for_view(%Views.DocumentWithContent{}), do: :infinity
   def ttl_for_view(%Views.GlobalAccounts{}), do: :infinity
   def ttl_for_view(%Views.GlobalDocumentsList{}), do: :infinity
-  def ttl_for_view(%Views.GlobalPrimitives{}), do: :infinity
+  def ttl_for_view(%Views.GlobalPrimitives{}), do: @static_resource_ttl
   def ttl_for_view(%Views.GlobalShadowNetSystemsList{}), do: :infinity
   def ttl_for_view(%Views.GlobalSimulationsList{}), do: :infinity
   def ttl_for_view(%Views.GlobalSocketById{}), do: :infinity
-  def ttl_for_view(%Views.GlobalSocketSchemasList{}), do: :infinity
-  def ttl_for_view(%Views.GlobalSocketSchemasMap{}), do: :infinity
-  def ttl_for_view(%Views.GlobalSymbolsList{}), do: :infinity
-  def ttl_for_view(%Views.GlobalSyntaxList{}), do: :infinity
+  def ttl_for_view(%Views.GlobalSocketSchemasList{}), do: @static_resource_ttl
+  def ttl_for_view(%Views.GlobalSocketSchemasMap{}), do: @static_resource_ttl
+  def ttl_for_view(%Views.GlobalSymbolsList{}), do: @static_resource_ttl
+  def ttl_for_view(%Views.GlobalSyntaxList{}), do: @static_resource_ttl
   def ttl_for_view(%Views.MyProjectsList{}), do: :infinity
   def ttl_for_view(%Views.ProjectDocumentsList{}), do: :infinity
   def ttl_for_view(%Views.ProjectShadowNetSystemsList{}), do: :infinity

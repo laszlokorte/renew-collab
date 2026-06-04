@@ -261,11 +261,11 @@ defmodule RenewCollabCtrl.View do
   end
 
   def do_fetch(_account, %Views.ProjectDocumentsList{project_id: project_id}) do
-    RenewCollabProj.Queries.ProjectDetails.new(%{project_id: project_id})
+    RenewCollabProj.Queries.ProjectDocumentIds.new(%{project_id: project_id})
     |> RenewCollabProj.ProjectFetcher.fetch()
     |> case do
-      {:ok, %RenewCollabProj.Entities.Project{documents: documents}} ->
-        documents |> Enum.map(fn %{document_id: id} -> id end) |> then(&%{document_ids: &1})
+      {:ok, document_ids} ->
+        %{document_ids: document_ids}
     end
     |> RenewCollab.Queries.DocumentList.new()
     |> RenewCollab.DocumentFetcher.fetch()
@@ -301,11 +301,11 @@ defmodule RenewCollabCtrl.View do
   end
 
   def do_fetch(_account, %Views.ProjectSimulationsList{project_id: project_id}) do
-    RenewCollabProj.Queries.ProjectDetails.new(%{project_id: project_id})
+    RenewCollabProj.Queries.ProjectSimulationIds.new(%{project_id: project_id})
     |> RenewCollabProj.ProjectFetcher.fetch()
     |> case do
-      {:ok, %RenewCollabProj.Entities.Project{simulations: simulations}} ->
-        simulations |> Enum.map(fn %{simulation_id: id} -> id end) |> then(&%{simulation_ids: &1})
+      {:ok, simulation_ids} ->
+        %{simulation_ids: simulation_ids}
     end
     |> RenewCollabSim.Queries.ListSimulations.new()
     |> RenewCollabSim.SimulationFetcher.fetch()

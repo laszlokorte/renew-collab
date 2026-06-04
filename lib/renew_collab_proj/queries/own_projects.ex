@@ -18,15 +18,8 @@ defmodule RenewCollabProj.Queries.OwnProjects do
         order_by: [desc: :inserted_at]
       )
     )
-    |> Ecto.Multi.run(:result, fn repo, %{projects: projects} ->
-      {:ok,
-       repo.preload(projects, [
-         :members,
-         :ownerships,
-         :documents,
-         :shadow_net_systems,
-         :simulations
-       ])}
+    |> Ecto.Multi.run(:result, fn _repo, %{projects: projects} ->
+      {:ok, projects}
     end)
   end
 end

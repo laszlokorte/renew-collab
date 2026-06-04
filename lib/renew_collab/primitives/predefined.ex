@@ -71,6 +71,7 @@ defmodule RenewCollab.Primitives.Predefined do
               content: %{
                 body: "[]",
                 hyperlink: true,
+                renew_type: 1,
                 semantic_tag: "de.renew.gui.CPNTextFigure",
                 style: %{
                   :font_size => 20

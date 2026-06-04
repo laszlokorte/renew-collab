@@ -3,7 +3,6 @@ defmodule RenewCollabWeb.BlueprintController do
 
   alias RenewCollabCtrl.Fetcher
   alias RenewCollabCtrl.Views
-  alias RenewCollab.Primitives
 
   action_fallback RenewCollabWeb.FallbackController
 
@@ -23,6 +22,10 @@ defmodule RenewCollabWeb.BlueprintController do
   end
 
   def primitives(conn, _params) do
-    render(conn, :primitives, groups: Primitives.find_all())
+    groups =
+      %Views.GlobalPrimitives{}
+      |> Fetcher.fetch_as(conn.assigns.current_account)
+
+    render(conn, :primitives, groups: groups)
   end
 end

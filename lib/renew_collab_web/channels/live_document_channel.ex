@@ -333,6 +333,7 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
           "position_x" => position_x,
           "position_y" => position_y,
           "body" => body,
+          "renew_type" => Map.get(params, "renew_type", nil),
           "style" => Map.get(params, "style", nil)
         },
         "outgoing_link" =>
