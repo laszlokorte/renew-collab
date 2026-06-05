@@ -22,7 +22,7 @@ defmodule RenewCollab.Document.LayerClipboard do
       "hyperlinks" => hyperlinks,
       "bonds" => bonds,
       "root_layer_ids" => root_layer_ids(layers, parenthoods),
-      "origin" => origin(layers)
+      "origin" => TransientDocument.layers_origin(layers)
     }
   end
 
@@ -79,7 +79,7 @@ defmodule RenewCollab.Document.LayerClipboard do
         hyperlinks: remapped_hyperlinks,
         bonds: remapped_bonds,
         thumbnail: nil
-      }, origin(layers), root_layer_ids}}
+      }, TransientDocument.layers_origin(layers), root_layer_ids}}
   end
 
   defp remap_hierarchy(%{} = parenthood, id_map) do
@@ -167,72 +167,6 @@ defmodule RenewCollab.Document.LayerClipboard do
     end
   end
 
-  defp origin(layers) do
-    case bounds(layers) do
-      nil -> %{"x" => 0, "y" => 0}
-      %{min_x: x, min_y: y} -> %{"x" => x, "y" => y}
-    end
-  end
-
-  defp bounds(layers) do
-    layers
-    |> Enum.flat_map(&layer_points/1)
-    |> case do
-      [] ->
-        nil
-
-      points ->
-        %{
-          min_x: points |> Enum.map(& &1.x) |> Enum.min(),
-          min_y: points |> Enum.map(& &1.y) |> Enum.min()
-        }
-    end
-  end
-
-  defp layer_points(layer) do
-    box_points(value(layer, :box)) ++
-      text_points(value(layer, :text)) ++ edge_points(value(layer, :edge))
-  end
-
-  defp box_points(nil), do: []
-
-  defp box_points(box) do
-    x = number(value(box, :position_x))
-    y = number(value(box, :position_y))
-    width = number(value(box, :width))
-    height = number(value(box, :height))
-
-    [
-      %{x: x, y: y},
-      %{x: x + width, y: y + height}
-    ]
-  end
-
-  defp text_points(nil), do: []
-
-  defp text_points(text) do
-    [%{x: number(value(text, :position_x)), y: number(value(text, :position_y))}]
-  end
-
-  defp edge_points(nil), do: []
-
-  defp edge_points(edge) do
-    points = [
-      %{x: number(value(edge, :source_x)), y: number(value(edge, :source_y))},
-      %{x: number(value(edge, :target_x)), y: number(value(edge, :target_y))}
-    ]
-
-    waypoint_points =
-      edge
-      |> value(:waypoints, [])
-      |> List.wrap()
-      |> Enum.map(fn waypoint ->
-        %{x: number(value(waypoint, :position_x)), y: number(value(waypoint, :position_y))}
-      end)
-
-    points ++ waypoint_points
-  end
-
   defp value(map, key, default \\ nil)
 
   defp value(%{} = map, key, default) when is_atom(key) do
@@ -241,9 +175,6 @@ defmodule RenewCollab.Document.LayerClipboard do
 
   defp value(%{} = map, key, default), do: Map.get(map, key, default)
   defp value(_, _, default), do: default
-
-  defp number(value) when is_number(value), do: value
-  defp number(_), do: 0
 
   defp deep_atomize(value) when is_map(value) do
     value

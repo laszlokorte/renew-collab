@@ -56,10 +56,17 @@ defmodule RenewCollab.Commands.InsertDocument do
                              document_id: document_id,
                              stripped_document: %TransientDocument{} = stripped_document
                            } ->
+      stripped_document = TransientDocument.ensure_text_size_hints(stripped_document)
+      origin = TransientDocument.origin(stripped_document)
+
       insert_into_document_multi(
         document_id,
         now,
-        stripped_document |> TransientDocument.shift_positions(dx, dy)
+        stripped_document
+        |> TransientDocument.shift_positions(
+          dx - Map.get(origin, "x", 0),
+          dy - Map.get(origin, "y", 0)
+        )
       )
     end)
   end
@@ -67,14 +74,16 @@ defmodule RenewCollab.Commands.InsertDocument do
   def insert_into_document_multi(
         document_id,
         now,
-        %TransientDocument{
-          content: %{layers: layers},
-          parenthoods: parenthoods,
-          hyperlinks: hyperlinks,
-          bonds: bonds
-          # thumbnail: thumbnail
-        }
+        %TransientDocument{} = transient_document
       ) do
+    %TransientDocument{
+      content: %{layers: layers},
+      parenthoods: parenthoods,
+      hyperlinks: hyperlinks,
+      bonds: bonds
+      # thumbnail: thumbnail
+    } = TransientDocument.ensure_text_size_hints(transient_document)
+
     layers
     |> Enum.with_index()
     |> Enum.reduce(Ecto.Multi.new(), fn {layer, i}, mul ->
