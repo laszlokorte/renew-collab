@@ -44,6 +44,13 @@ defmodule RenewCollab.Commands.InsertLayerClipboard do
         TransientDocument.shift_positions(transient_document, dx, dy)
       )
       |> Ecto.Multi.put(:inserted_layer_ids, root_layer_ids)
+      |> Ecto.Multi.append(
+        RenewCollab.Commands.NormalizeZIndex.new(%{
+          document_id: document_id,
+          ref_id: {__MODULE__, :paste}
+        })
+        |> RenewCollab.Commands.NormalizeZIndex.multi()
+      )
     end)
   end
 end

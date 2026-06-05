@@ -3,6 +3,7 @@ defmodule RenewCollab.CommandTest do
 
   alias RenewCollab.Connection.Hyperlink
   alias RenewCollab.Commands.InsertDocument
+  alias RenewCollab.Commands.InsertLayerClipboard
   alias RenewCollab.Commands.ReorderLayersRelative
   alias RenewCollab.DocumentCommander
   alias RenewCollab.Document.Document
@@ -62,6 +63,17 @@ defmodule RenewCollab.CommandTest do
       where: l.document_id == ^document.id and is_nil(p.id),
       order_by: [asc: l.z_index],
       select: l.id
+    )
+    |> Repo.all()
+  end
+
+  defp top_level_layer_z_indexes(document) do
+    from(l in Layer,
+      left_join: p in LayerParenthood,
+      on: p.descendant_id == l.id and p.depth == 1,
+      where: l.document_id == ^document.id and is_nil(p.id),
+      order_by: [asc: l.z_index],
+      select: l.z_index
     )
     |> Repo.all()
   end
@@ -197,6 +209,48 @@ defmodule RenewCollab.CommandTest do
       assert_in_delta missing_hint_text.size_hint.position_x, 55.0, 0.0001
       assert_in_delta missing_hint_text.size_hint.position_y, 135.0, 0.0001
       assert missing_hint_text.size_hint.height > 12.0
+    end
+  end
+
+  describe "insert_layer_clipboard" do
+    test "normalizes sibling z-indices after paste" do
+      document = test_document("Paste z-index")
+      test_layer(document, 1)
+
+      lower_layer_id = Ecto.UUID.generate()
+      upper_layer_id = Ecto.UUID.generate()
+
+      clipboard = %{
+        "format" => "renewex/layers",
+        "version" => 1,
+        "layers" => [
+          %{"id" => lower_layer_id, "z_index" => 1, "hidden" => false},
+          %{"id" => upper_layer_id, "z_index" => 2, "hidden" => false}
+        ],
+        "hierarchy" => [
+          %{"ancestor_id" => lower_layer_id, "descendant_id" => lower_layer_id, "depth" => 0},
+          %{"ancestor_id" => upper_layer_id, "descendant_id" => upper_layer_id, "depth" => 0}
+        ],
+        "hyperlinks" => [],
+        "bonds" => [],
+        "root_layer_ids" => [lower_layer_id, upper_layer_id],
+        "origin" => %{"x" => 0, "y" => 0}
+      }
+
+      {:ok, %{inserted_layer_ids: inserted_layer_ids}} =
+        %{
+          document_id: document.id,
+          clipboard: clipboard,
+          position: {0, 0}
+        }
+        |> InsertLayerClipboard.new()
+        |> DocumentCommander.run_document_command_sync(false)
+
+      z_indexes = top_level_layer_z_indexes(document)
+
+      assert length(inserted_layer_ids) == 2
+      assert z_indexes == [1, 2, 3]
+      assert Enum.uniq(z_indexes) == z_indexes
     end
   end
 
