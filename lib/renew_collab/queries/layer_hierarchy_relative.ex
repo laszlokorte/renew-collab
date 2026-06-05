@@ -2,7 +2,7 @@ defmodule RenewCollab.Queries.LayerHierarchyRelative do
   import Ecto.Query, warn: false
   alias RenewCollab.Hierarchy.Layer
 
-  defstruct [:document_id, :layer_id, :relative, :id_only, :ref_id]
+  defstruct [:document_id, :layer_id, :relative, :id_only, :ref_id, :exclude_layer_ids]
 
   def new(
         %{
@@ -17,7 +17,8 @@ defmodule RenewCollab.Queries.LayerHierarchyRelative do
       layer_id: layer_id,
       relative: relative,
       id_only: id_only,
-      ref_id: Map.get(attrs, :ref_id)
+      ref_id: Map.get(attrs, :ref_id),
+      exclude_layer_ids: normalize_layer_ids(Map.get(attrs, :exclude_layer_ids, []))
     }
   end
 
@@ -28,7 +29,8 @@ defmodule RenewCollab.Queries.LayerHierarchyRelative do
         layer_id: layer_id,
         relative: relative,
         id_only: id_only,
-        ref_id: ref_id
+        ref_id: ref_id,
+        exclude_layer_ids: exclude_layer_ids
       }) do
     result_key = result_key(ref_id)
 
@@ -52,6 +54,7 @@ defmodule RenewCollab.Queries.LayerHierarchyRelative do
             left_join: r in assoc(l, :layers_of_document),
             left_join: rp in assoc(r, :direct_parent_hood),
             where: r.id != l.id and l.document_id == ^document_id and l.id == ^layer_id,
+            where: r.id not in ^exclude_layer_ids,
             where: (is_nil(p.id) and is_nil(rp.id)) or s.descendant_id == r.id,
             where:
               (^(pos == :first) and l.z_index > r.z_index) or
@@ -101,4 +104,11 @@ defmodule RenewCollab.Queries.LayerHierarchyRelative do
 
   def result_key(nil), do: :result
   def result_key(ref_id), do: {ref_id, :result}
+
+  defp normalize_layer_ids(layer_ids) do
+    layer_ids
+    |> List.wrap()
+    |> Enum.filter(&is_binary/1)
+    |> Enum.uniq()
+  end
 end

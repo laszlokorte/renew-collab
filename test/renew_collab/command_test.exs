@@ -28,20 +28,31 @@ defmodule RenewCollab.CommandTest do
   end
 
   defp parent_layer(document, parent, child) do
-    for {ancestor, descendant, depth} <- [
-          {parent, parent, 0},
-          {child, child, 0},
-          {parent, child, 1}
-        ] do
-      %LayerParenthood{}
-      |> LayerParenthood.changeset(%{
-        document_id: document.id,
-        ancestor_id: ancestor.id,
-        descendant_id: descendant.id,
-        depth: depth
-      })
-      |> Repo.insert!()
-    end
+    parent_layers(document, parent, [child])
+  end
+
+  defp self_layer(document, layer) do
+    insert_parenthood(document, layer, layer, 0)
+  end
+
+  defp parent_layers(document, parent, children) do
+    self_layer(document, parent)
+
+    Enum.each(children, fn child ->
+      self_layer(document, child)
+      insert_parenthood(document, parent, child, 1)
+    end)
+  end
+
+  defp insert_parenthood(document, ancestor, descendant, depth) do
+    %LayerParenthood{}
+    |> LayerParenthood.changeset(%{
+      document_id: document.id,
+      ancestor_id: ancestor.id,
+      descendant_id: descendant.id,
+      depth: depth
+    })
+    |> Repo.insert!()
   end
 
   defp top_level_layer_ids(document) do
@@ -61,6 +72,16 @@ defmodule RenewCollab.CommandTest do
       select: p.ancestor_id
     )
     |> Repo.one()
+  end
+
+  defp direct_child_ids(parent) do
+    from(l in Layer,
+      join: p in LayerParenthood,
+      on: p.descendant_id == l.id and p.ancestor_id == ^parent.id and p.depth == 1,
+      order_by: [asc: l.z_index],
+      select: l.id
+    )
+    |> Repo.all()
   end
 
   describe "insert_document" do
@@ -272,6 +293,44 @@ defmodule RenewCollab.CommandTest do
       assert top_level_layer_ids(document) == [middle.id, top.id, bottom.id]
     end
 
+    test "keeps a frontmost multi-selection stable when moving frontwards" do
+      document = test_document("Reorder frontmost frontwards")
+      bottom = test_layer(document, 1)
+      middle = test_layer(document, 2)
+      top = test_layer(document, 3)
+
+      {:ok, _} =
+        %{
+          document_id: document.id,
+          layer_ids: [middle.id, top.id],
+          relative_direction: {:sibling, :next},
+          target: {:above, :outside}
+        }
+        |> ReorderLayersRelative.new()
+        |> DocumentCommander.run_document_command_sync(false)
+
+      assert top_level_layer_ids(document) == [bottom.id, middle.id, top.id]
+    end
+
+    test "keeps a backmost multi-selection stable when moving backwards" do
+      document = test_document("Reorder backmost backwards")
+      bottom = test_layer(document, 1)
+      middle = test_layer(document, 2)
+      top = test_layer(document, 3)
+
+      {:ok, _} =
+        %{
+          document_id: document.id,
+          layer_ids: [bottom.id, middle.id],
+          relative_direction: {:sibling, :prev},
+          target: {:below, :outside}
+        }
+        |> ReorderLayersRelative.new()
+        |> DocumentCommander.run_document_command_sync(false)
+
+      assert top_level_layer_ids(document) == [bottom.id, middle.id, top.id]
+    end
+
     test "moves multiple sibling layers to front without reversing them" do
       document = test_document("Reorder to front")
       bottom = test_layer(document, 1)
@@ -297,6 +356,25 @@ defmodule RenewCollab.CommandTest do
              ]
     end
 
+    test "keeps a frontmost multi-selection stable when moving to front" do
+      document = test_document("Reorder frontmost to front")
+      bottom = test_layer(document, 1)
+      middle = test_layer(document, 2)
+      top = test_layer(document, 3)
+
+      {:ok, _} =
+        %{
+          document_id: document.id,
+          layer_ids: [middle.id, top.id],
+          relative_direction: {:sibling, :last},
+          target: {:above, :outside}
+        }
+        |> ReorderLayersRelative.new()
+        |> DocumentCommander.run_document_command_sync(false)
+
+      assert top_level_layer_ids(document) == [bottom.id, middle.id, top.id]
+    end
+
     test "moves multiple sibling layers to back without reversing them" do
       document = test_document("Reorder to back")
       bottom = test_layer(document, 1)
@@ -320,6 +398,95 @@ defmodule RenewCollab.CommandTest do
                bottom.id,
                upper_middle.id
              ]
+    end
+
+    test "keeps a backmost multi-selection stable when moving to back" do
+      document = test_document("Reorder backmost to back")
+      bottom = test_layer(document, 1)
+      middle = test_layer(document, 2)
+      top = test_layer(document, 3)
+
+      {:ok, _} =
+        %{
+          document_id: document.id,
+          layer_ids: [bottom.id, middle.id],
+          relative_direction: {:sibling, :first},
+          target: {:below, :outside}
+        }
+        |> ReorderLayersRelative.new()
+        |> DocumentCommander.run_document_command_sync(false)
+
+      assert top_level_layer_ids(document) == [bottom.id, middle.id, top.id]
+    end
+
+    test "moves multiple child layers below their parent without reversing them" do
+      document = test_document("Reorder below parent")
+      parent = test_layer(document, 1)
+      lower_child = test_layer(document, 1)
+      upper_child = test_layer(document, 2)
+      parent_layers(document, parent, [lower_child, upper_child])
+
+      {:ok, _} =
+        %{
+          document_id: document.id,
+          layer_ids: [lower_child.id, upper_child.id],
+          relative_direction: :parent,
+          target: {:below, :outside}
+        }
+        |> ReorderLayersRelative.new()
+        |> DocumentCommander.run_document_command_sync(false)
+
+      assert top_level_layer_ids(document) == [lower_child.id, upper_child.id, parent.id]
+      assert direct_parent_id(lower_child) == nil
+      assert direct_parent_id(upper_child) == nil
+    end
+
+    test "moves multiple child layers above their parent without reversing them" do
+      document = test_document("Reorder above parent")
+      parent = test_layer(document, 1)
+      lower_child = test_layer(document, 1)
+      upper_child = test_layer(document, 2)
+      parent_layers(document, parent, [lower_child, upper_child])
+
+      {:ok, _} =
+        %{
+          document_id: document.id,
+          layer_ids: [lower_child.id, upper_child.id],
+          relative_direction: :parent,
+          target: {:above, :outside}
+        }
+        |> ReorderLayersRelative.new()
+        |> DocumentCommander.run_document_command_sync(false)
+
+      assert top_level_layer_ids(document) == [parent.id, lower_child.id, upper_child.id]
+      assert direct_parent_id(lower_child) == nil
+      assert direct_parent_id(upper_child) == nil
+    end
+
+    test "indents multiple sibling layers into the previous sibling without reversing them" do
+      document = test_document("Reorder indent")
+      first = test_layer(document, 1)
+      parent = test_layer(document, 2)
+      lower_child = test_layer(document, 3)
+      upper_child = test_layer(document, 4)
+      self_layer(document, parent)
+      self_layer(document, lower_child)
+      self_layer(document, upper_child)
+
+      {:ok, _} =
+        %{
+          document_id: document.id,
+          layer_ids: [lower_child.id, upper_child.id],
+          relative_direction: {:sibling, :prev},
+          target: {:above, :inside}
+        }
+        |> ReorderLayersRelative.new()
+        |> DocumentCommander.run_document_command_sync(false)
+
+      assert top_level_layer_ids(document) == [first.id, parent.id]
+      assert direct_parent_id(lower_child) == parent.id
+      assert direct_parent_id(upper_child) == parent.id
+      assert direct_child_ids(parent) == [lower_child.id, upper_child.id]
     end
 
     test "ignores selected children when their parent is selected too" do

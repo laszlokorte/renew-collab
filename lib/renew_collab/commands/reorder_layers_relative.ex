@@ -48,7 +48,7 @@ defmodule RenewCollab.Commands.ReorderLayersRelative do
     Ecto.Multi.new()
     |> Ecto.Multi.all(
       :ordered_layer_ids,
-      ordered_top_layer_ids_query(document_id, layer_ids, relative_direction)
+      ordered_top_layer_ids_query(document_id, layer_ids, relative_direction, target)
     )
     |> Ecto.Multi.merge(fn %{ordered_layer_ids: ordered_layer_ids} ->
       ordered_layer_ids
@@ -63,7 +63,8 @@ defmodule RenewCollab.Commands.ReorderLayersRelative do
             layer_id: layer_id,
             id_only: true,
             relative: relative_direction,
-            ref_id: ref_id
+            ref_id: ref_id,
+            exclude_layer_ids: ordered_layer_ids
           })
           |> RenewCollab.Queries.LayerHierarchyRelative.multi()
           |> Ecto.Multi.merge(fn changes ->
@@ -87,13 +88,9 @@ defmodule RenewCollab.Commands.ReorderLayersRelative do
     end)
   end
 
-  defp ordered_top_layer_ids_query(document_id, layer_ids, relative_direction) do
+  defp ordered_top_layer_ids_query(document_id, layer_ids, relative_direction, target) do
     order =
-      case relative_direction do
-        {:sibling, :next} -> :desc
-        {:sibling, :first} -> :desc
-        _ -> :asc
-      end
+      selected_layer_order(relative_direction, target)
 
     from(l in Layer,
       left_join: selected_parent in LayerParenthood,
@@ -106,6 +103,10 @@ defmodule RenewCollab.Commands.ReorderLayersRelative do
       select: l.id
     )
   end
+
+  defp selected_layer_order(:parent, {:above, _relative}), do: :desc
+  defp selected_layer_order({:sibling, :next}, _target), do: :desc
+  defp selected_layer_order(_relative_direction, _target), do: :asc
 
   defp normalize_layer_ids(layer_ids) do
     layer_ids
