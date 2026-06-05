@@ -646,7 +646,10 @@ defmodule RenewCollab.DocumentFixtures do
 
           RenewCollab.Commands.CreateDocument.new(%{doc: transient_doc})
           |> RenewCollab.Commands.CreateDocument.multi(id)
-          |> Ecto.Multi.append(Versioning.snapshot_multi(id))
+          |> Ecto.Multi.merge(fn
+            %{document_id: document_id} ->
+              Versioning.snapshot_multi(document_id)
+          end)
           |> rep.transact()
         end
       )

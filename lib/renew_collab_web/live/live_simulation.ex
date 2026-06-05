@@ -15,7 +15,7 @@ defmodule RenewCollabWeb.LiveSimulation do
   def load_param(:account_id, socket), do: socket.assigns.current_account.id
 
   def load_param(:project_id, %{assigns: %{simulation: %{project_assignment: %{project_id: id}}}}),
-    do: id
+      do: id
 
   def load_param(:project_id, _socket), do: nil
 

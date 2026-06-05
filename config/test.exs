@@ -5,10 +5,51 @@ import Config
 # The MIX_TEST_PARTITION environment variable can be used
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
+# Configure your database
 config :renew_collab, RenewCollab.Repo,
+  adapter: Ecto.Adapters.SQLite3,
   database: Path.expand("../renew_collab_test.db", __DIR__),
-  pool_size: 5,
+  pool_size: 1,
+  stacktrace: true,
+  show_sensitive_data_on_connection_error: true,
   pool: Ecto.Adapters.SQL.Sandbox
+
+config :renew_collab, RenewCollabSim.Repo,
+  adapter: Ecto.Adapters.SQLite3,
+  database: Path.expand("../renew_collab_sim_test.db", __DIR__),
+  pool_size: 1,
+  stacktrace: true,
+  show_sensitive_data_on_connection_error: true,
+  pool: Ecto.Adapters.SQL.Sandbox,
+  pool: Ecto.Adapters.SQL.Sandbox
+
+config :renew_collab, RenewCollabAuth.Repo,
+  adapter: Ecto.Adapters.SQLite3,
+  database: Path.expand("../renew_collab_auth_test.db", __DIR__),
+  pool_size: 1,
+  stacktrace: true,
+  show_sensitive_data_on_connection_error: true,
+  pool: Ecto.Adapters.SQL.Sandbox
+
+config :renew_collab, RenewCollabProj.Repo,
+  adapter: Ecto.Adapters.SQLite3,
+  database: Path.expand("../renew_collab_proj_test.db", __DIR__),
+  pool_size: 1,
+  stacktrace: true,
+  show_sensitive_data_on_connection_error: true,
+  pool: Ecto.Adapters.SQL.Sandbox
+
+config :renew_collab, RenewCollab.TextMeasure.MeasureServer,
+  script: "priv/text_metrics/TextMeasure.java"
+
+config :renew_collab, :formalisms, [
+  "P/T Net Compiler",
+  "P/T Net in Net Compiler",
+  "Java Net Compiler",
+  "Bool Net Compiler",
+  "Timed Java Compiler",
+  "Single P/T Net with Channel Compiler"
+]
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.

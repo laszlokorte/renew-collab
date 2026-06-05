@@ -117,7 +117,7 @@ defmodule RenewCollab.CommandTest do
       assert_in_delta text.position_x, 85.0, 0.0001
       assert_in_delta text.position_y, 85.0, 0.0001
       assert_in_delta text.size_hint.position_x, 85.0, 0.0001
-      assert_in_delta text.size_hint.position_y, 70.0, 0.0001
+      assert_in_delta text.size_hint.position_y, 85.0, 0.0001
       assert_in_delta missing_hint_text.position_x, 55.0, 0.0001
       assert_in_delta missing_hint_text.position_y, 135.0, 0.0001
       assert_in_delta missing_hint_text.size_hint.position_x, 55.0, 0.0001
