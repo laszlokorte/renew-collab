@@ -1120,6 +1120,39 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
 
   @impl true
   def handle_event(
+        "fetch_reachable",
+        %{"rel" => "all"} = params,
+        %{},
+        %{:document_id => document_id, :account => account},
+        _socket
+      ) do
+    layer_ids =
+      params
+      |> Map.get("ids", Map.get(params, "layer_ids", [Map.get(params, "id")]))
+      |> normalize_selection()
+
+    rel_ids =
+      layer_ids
+      |> Enum.map(fn layer_id ->
+        %Views.DocumentLayerReachable{
+          document_id: document_id,
+          layer_id: layer_id
+        }
+        |> Fetcher.fetch_as(account)
+      end)
+      |> List.flatten()
+      |> Enum.uniq()
+      |> Enum.filter(&is_binary/1)
+
+    case params do
+      %{"ids" => _} -> {:reply, %{ids: rel_ids}}
+      %{"layer_ids" => _} -> {:reply, %{ids: rel_ids}}
+      _ -> {:reply, %{id: List.first(rel_ids)}}
+    end
+  end
+
+  @impl true
+  def handle_event(
         "make_space",
         %{
           "base" => %{"x" => bx, "y" => by},

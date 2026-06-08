@@ -1,6 +1,8 @@
 defmodule RenewCollab.Queries.LayerGraphRelation do
   import Ecto.Query, warn: false
   alias RenewCollab.Hierarchy.Layer
+  alias RenewCollab.Connection.Bond
+  alias RenewCollab.Element.Edge
 
   defstruct [:document_id, :layer_id, :rel, :ref_id]
 
@@ -84,7 +86,7 @@ defmodule RenewCollab.Queries.LayerGraphRelation do
             select: e.layer_id
           )
 
-        :all ->
+        :any ->
           union(
             from(l in Layer,
               where: l.document_id == ^document_id,
@@ -101,6 +103,39 @@ defmodule RenewCollab.Queries.LayerGraphRelation do
               select: e.layer_id
             )
           )
+
+        :all ->
+          base =
+            from l in Layer,
+              where: l.document_id == ^document_id and l.id == ^layer_id,
+              select: %{layer_id: l.id}
+
+          edge_step =
+            from c in "component",
+              join: b in Bond,
+              on: b.layer_id == c.layer_id,
+              join: e in Edge,
+              on: e.id == b.element_edge_id,
+              select: %{layer_id: e.layer_id}
+
+          node_step =
+            from c in "component",
+              join: e in Edge,
+              on: e.layer_id == c.layer_id,
+              join: b in Bond,
+              on: b.element_edge_id == e.id,
+              select: %{layer_id: b.layer_id}
+
+          cte =
+            base
+            |> union(^edge_step)
+            |> union(^node_step)
+
+          Layer
+          |> recursive_ctes(true)
+          |> with_cte("component", as: ^cte)
+          |> join(:inner, [l], c in "component", on: c.layer_id == l.id)
+          |> select([l], l.id)
       end
     )
   end

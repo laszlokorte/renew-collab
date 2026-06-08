@@ -13,6 +13,15 @@ defmodule RenewCollabCtrl.View do
     |> RenewCollab.DocumentFetcher.fetch()
   end
 
+  def do_fetch(_account, %Views.DocumentLayerReachable{
+        document_id: document_id,
+        layer_id: layer_id
+      }) do
+    %{document_id: document_id, layer_id: layer_id}
+    |> RenewCollab.Queries.LayerAllReachable.new()
+    |> RenewCollab.DocumentFetcher.fetch()
+  end
+
   def do_fetch(_account, %Views.DocumentLayerHyperlinked{
         document_id: document_id,
         layer_id: layer_id,

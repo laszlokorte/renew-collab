@@ -7,5 +7,6 @@ defmodule RenewCollabCtrl.Views.DocumentLayerGraphConnection do
   def parse_relative("target"), do: :target
   def parse_relative("nodes"), do: :nodes
   def parse_relative("edges"), do: :edges
+  def parse_relative("any"), do: :any
   def parse_relative("all"), do: :all
 end
