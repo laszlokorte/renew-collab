@@ -951,8 +951,8 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
 
   @impl true
   def handle_event(
-        "fetch_relative_many",
-        %{"rel" => "connected"} = params,
+        "fetch_linked",
+        %{"rel" => "direct"} = params,
         %{},
         %{:document_id => document_id, :account => account},
         _socket
@@ -965,9 +965,112 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
     rel_ids =
       layer_ids
       |> Enum.map(fn layer_id ->
-        %Views.DocumentLayerConnectedComponent{
+        %Views.DocumentLayerHyperlinked{
           document_id: document_id,
-          layer_id: layer_id
+          layer_id: layer_id,
+          deep: false
+        }
+        |> Fetcher.fetch_as(account)
+      end)
+      |> List.flatten()
+      |> Enum.uniq()
+      |> Enum.filter(&is_binary/1)
+
+    case params do
+      %{"ids" => _} -> {:reply, %{ids: rel_ids}}
+      %{"layer_ids" => _} -> {:reply, %{ids: rel_ids}}
+      _ -> {:reply, %{id: List.first(rel_ids)}}
+    end
+  end
+
+  @impl true
+  def handle_event(
+        "fetch_linked",
+        %{"rel" => "deep"} = params,
+        %{},
+        %{:document_id => document_id, :account => account},
+        _socket
+      ) do
+    layer_ids =
+      params
+      |> Map.get("ids", Map.get(params, "layer_ids", [Map.get(params, "id")]))
+      |> normalize_selection()
+
+    rel_ids =
+      layer_ids
+      |> Enum.map(fn layer_id ->
+        %Views.DocumentLayerHyperlinked{
+          document_id: document_id,
+          layer_id: layer_id,
+          deep: true
+        }
+        |> Fetcher.fetch_as(account)
+      end)
+      |> List.flatten()
+      |> Enum.uniq()
+      |> Enum.filter(&is_binary/1)
+
+    case params do
+      %{"ids" => _} -> {:reply, %{ids: rel_ids}}
+      %{"layer_ids" => _} -> {:reply, %{ids: rel_ids}}
+      _ -> {:reply, %{id: List.first(rel_ids)}}
+    end
+  end
+
+  @impl true
+  def handle_event(
+        "fetch_connected",
+        %{"rel" => rel} = params,
+        %{},
+        %{:document_id => document_id, :account => account},
+        _socket
+      ) do
+    layer_ids =
+      params
+      |> Map.get("ids", Map.get(params, "layer_ids", [Map.get(params, "id")]))
+      |> normalize_selection()
+
+    rel_ids =
+      layer_ids
+      |> Enum.map(fn layer_id ->
+        %Views.DocumentLayerGraphConnection{
+          document_id: document_id,
+          layer_id: layer_id,
+          rel: Views.DocumentLayerGraphConnection.parse_relative(rel)
+        }
+        |> Fetcher.fetch_as(account)
+      end)
+      |> List.flatten()
+      |> Enum.uniq()
+      |> Enum.filter(&is_binary/1)
+
+    case params do
+      %{"ids" => _} -> {:reply, %{ids: rel_ids}}
+      %{"layer_ids" => _} -> {:reply, %{ids: rel_ids}}
+      _ -> {:reply, %{id: List.first(rel_ids)}}
+    end
+  end
+
+  @impl true
+  def handle_event(
+        "fetch_relative_many",
+        %{"rel" => rel} = params,
+        %{},
+        %{:document_id => document_id, :account => account},
+        _socket
+      ) do
+    layer_ids =
+      params
+      |> Map.get("ids", Map.get(params, "layer_ids", [Map.get(params, "id")]))
+      |> normalize_selection()
+
+    rel_ids =
+      layer_ids
+      |> Enum.map(fn layer_id ->
+        %Views.DocumentLayerRelativeMultiple{
+          document_id: document_id,
+          layer_id: layer_id,
+          relative: Views.DocumentLayerRelativeMultiple.parse_relative(rel)
         }
         |> Fetcher.fetch_as(account)
       end)

@@ -1,4 +1,4 @@
-defmodule RenewCollabCtrl.Views.DocumentLayerGraphEdge do
+defmodule RenewCollabCtrl.Views.DocumentLayerGraphConnection do
   defstruct [:document_id, :layer_id, :rel]
 
   def parse_relative("incoming"), do: :incoming

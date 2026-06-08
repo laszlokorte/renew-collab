@@ -6,6 +6,7 @@ defmodule RenewCollabCtrl.CacheConfig do
 
   def key_for_view(account, view)
   def key_for_view(_account, %Views.DocumentLayerRelative{}), do: nil
+  def key_for_view(_account, %Views.DocumentLayerHyperlinked{}), do: nil
   def key_for_view(_account, %Views.DocumentLayerConnectedComponent{}), do: nil
   def key_for_view(_account, %Views.DocumentStripped{}), do: nil
   def key_for_view(_account, %Views.DocumentVersionState{}), do: nil
