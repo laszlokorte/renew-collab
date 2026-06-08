@@ -35,7 +35,6 @@ defmodule RenewCollabCtrl.Subscription do
   def channel_for(%Views.DocumentLayerHyperlinked{}), do: nil
   def channel_for(%Views.DocumentLayerGraphConnection{}), do: nil
   def channel_for(%Views.DocumentLayerRelativeMultiple{}), do: nil
-  def channel_for(%Views.DocumentLayerConnectedComponent{}), do: nil
   def channel_for(%Views.GlobalAccounts{}), do: nil
   def channel_for(%Views.GlobalProjects{}), do: nil
   def channel_for(%Views.MyProject{project_id: proj_id}), do: "pub-project:#{proj_id}"

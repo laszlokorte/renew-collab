@@ -3,7 +3,7 @@ defmodule RenewCollab.Queries.LayerHierarchyRelativeMultiple do
   alias RenewCollab.Hierarchy.LayerParenthood
   alias RenewCollab.Hierarchy.Layer
 
-  defstruct [:document_id, :layer_id, :rel, :ref_id]
+  defstruct [:document_id, :layer_id, :rel, :self, :ref_id]
 
   def new(
         %{
@@ -16,6 +16,7 @@ defmodule RenewCollab.Queries.LayerHierarchyRelativeMultiple do
       document_id: document_id,
       layer_id: layer_id,
       rel: rel,
+      self: Map.get(attrs, :self, false),
       ref_id: Map.get(attrs, :ref_id)
     }
   end
@@ -26,6 +27,7 @@ defmodule RenewCollab.Queries.LayerHierarchyRelativeMultiple do
         document_id: document_id,
         layer_id: layer_id,
         rel: rel,
+        self: self,
         ref_id: ref_id
       }) do
     result_key = result_key(ref_id)
@@ -37,7 +39,9 @@ defmodule RenewCollab.Queries.LayerHierarchyRelativeMultiple do
         :ancestors ->
           from(l in Layer,
             inner_join: p in LayerParenthood,
-            on: p.ancestor_id == l.id and p.descendant_id == ^layer_id and p.depth > 0,
+            on:
+              p.ancestor_id == l.id and p.descendant_id == ^layer_id and
+                (p.depth > 0 or (^self == true and p.depth == 0)),
             where: l.document_id == ^document_id,
             select: l.id
           )
@@ -45,7 +49,9 @@ defmodule RenewCollab.Queries.LayerHierarchyRelativeMultiple do
         :descendants ->
           from(l in Layer,
             inner_join: p in LayerParenthood,
-            on: p.descendant_id == l.id and p.ancestor_id == ^layer_id and p.depth > 0,
+            on:
+              p.descendant_id == l.id and p.ancestor_id == ^layer_id and
+                (p.depth > 0 or (^self == true and p.depth == 0)),
             where: l.document_id == ^document_id,
             select: l.id
           )
@@ -53,9 +59,11 @@ defmodule RenewCollab.Queries.LayerHierarchyRelativeMultiple do
         :root ->
           from(l in Layer,
             inner_join: p in LayerParenthood,
-            on: p.ancestor_id == l.id and p.descendant_id == ^layer_id and p.depth > 0,
+            on:
+              p.ancestor_id == l.id and p.descendant_id == ^layer_id and
+                (p.depth > 0 or (^self == true and p.depth == 0)),
             left_join: c in LayerParenthood,
-            on: c.descendant_id == l.id and c.depth > 0,
+            on: c.descendant_id == l.id and (c.depth > 0 or (^self == true and c.depth == 0)),
             where: l.document_id == ^document_id and is_nil(c.id),
             select: l.id
           )
@@ -63,9 +71,11 @@ defmodule RenewCollab.Queries.LayerHierarchyRelativeMultiple do
         :leafs ->
           from(l in Layer,
             inner_join: p in LayerParenthood,
-            on: p.descendant_id == l.id and p.ancestor_id == ^layer_id and p.depth > 0,
+            on:
+              p.descendant_id == l.id and p.ancestor_id == ^layer_id and
+                (p.depth > 0 or (^self == true and p.depth == 0)),
             left_join: c in LayerParenthood,
-            on: c.ancestor_id == l.id and c.depth > 0,
+            on: c.ancestor_id == l.id and (c.depth > 0 or (^self == true and c.depth == 0)),
             where: l.document_id == ^document_id and is_nil(c.id),
             select: l.id
           )
@@ -81,14 +91,17 @@ defmodule RenewCollab.Queries.LayerHierarchyRelativeMultiple do
             where: (is_nil(p.id) and is_nil(rp.id)) or s.descendant_id == r.id,
             where:
               (^(pos == :before) and l.z_index > r.z_index) or
-                (^(pos == :after) and l.z_index < r.z_index) or ^(pos == :all),
+                (^(pos == :after) and l.z_index < r.z_index) or ^(pos == :all) or
+                (^self == true and r.id == l.id),
             select: r.id
           )
 
         :children ->
           from(l in Layer,
             left_join: p in assoc(l, :direct_parent_layer),
-            where: p.document_id == ^document_id and p.id == ^layer_id,
+            where:
+              p.document_id == ^document_id and
+                (p.id == ^layer_id or (^self == true and l.id == ^layer_id)),
             select: l.id
           )
       end

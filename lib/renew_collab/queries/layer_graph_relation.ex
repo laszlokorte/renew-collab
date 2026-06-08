@@ -4,17 +4,20 @@ defmodule RenewCollab.Queries.LayerGraphRelation do
   alias RenewCollab.Connection.Bond
   alias RenewCollab.Element.Edge
 
-  defstruct [:document_id, :layer_id, :rel, :ref_id]
+  defstruct [:document_id, :layer_id, :rel, :ref_id, :self]
 
-  def new(%{
-        document_id: document_id,
-        layer_id: layer_id,
-        rel: rel
-      }) do
+  def new(
+        %{
+          document_id: document_id,
+          layer_id: layer_id,
+          rel: rel
+        } = attrs
+      ) do
     %__MODULE__{
       document_id: document_id,
       layer_id: layer_id,
-      rel: rel
+      rel: rel,
+      self: Map.get(attrs, :self, true)
     }
   end
 
@@ -24,7 +27,8 @@ defmodule RenewCollab.Queries.LayerGraphRelation do
         document_id: document_id,
         layer_id: layer_id,
         ref_id: ref_id,
-        rel: rel
+        rel: rel,
+        self: self
       }) do
     result_key = result_key(ref_id)
 
@@ -137,6 +141,16 @@ defmodule RenewCollab.Queries.LayerGraphRelation do
           |> join(:inner, [l], c in "component", on: c.layer_id == l.id)
           |> select([l], l.id)
       end
+      |> then(
+        &if(self,
+          do:
+            union(
+              &1,
+              ^from(l in Layer, where: l.id == ^layer_id, select: l.id)
+            ),
+          else: &1
+        )
+      )
     )
   end
 

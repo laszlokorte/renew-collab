@@ -63,9 +63,6 @@ defmodule RenewCollabCtrl.ReadAccess do
   def can(%{id: account_id}, %Views.DocumentLayerHyperlinked{document_id: doc_id}),
     do: can_read(account_id, :document, doc_id)
 
-  def can(%{id: account_id}, %Views.DocumentLayerConnectedComponent{document_id: doc_id}),
-    do: can_read(account_id, :document, doc_id)
-
   def can(%{id: account_id}, %Views.MyProjectsList{account_id: account_id}), do: true
   def can(%{id: account_id}, %Views.MyProject{account_id: account_id}), do: true
 
