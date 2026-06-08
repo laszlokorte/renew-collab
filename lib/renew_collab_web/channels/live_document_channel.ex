@@ -1121,7 +1121,7 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
   @impl true
   def handle_event(
         "fetch_reachable",
-        %{"rel" => "all"} = params,
+        %{"rel" => rel} = params,
         %{},
         %{:document_id => document_id, :account => account},
         _socket
@@ -1131,12 +1131,16 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
       |> Map.get("ids", Map.get(params, "layer_ids", [Map.get(params, "id")]))
       |> normalize_selection()
 
+    %{uplink: uplink, downlink: downlink} = Views.DocumentLayerReachable.parse_direction(rel)
+
     rel_ids =
       layer_ids
       |> Enum.map(fn layer_id ->
         %Views.DocumentLayerReachable{
           document_id: document_id,
-          layer_id: layer_id
+          layer_id: layer_id,
+          uplink: uplink,
+          downlink: downlink
         }
         |> Fetcher.fetch_as(account)
       end)

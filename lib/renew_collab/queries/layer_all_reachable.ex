@@ -6,7 +6,22 @@ defmodule RenewCollab.Queries.LayerAllReachable do
   alias RenewCollab.Connection.Bond
   alias RenewCollab.Element.Edge
 
-  defstruct [:document_id, :layer_id, :ref_id]
+  defstruct [:document_id, :layer_id, :ref_id, :downlink, :uplink]
+
+  def new(%{
+        document_id: document_id,
+        layer_id: layer_id,
+        downlink: downlink,
+        uplink: uplink
+      })
+      when is_boolean(downlink) and is_boolean(uplink) do
+    %__MODULE__{
+      document_id: document_id,
+      layer_id: layer_id,
+      downlink: downlink,
+      uplink: uplink
+    }
+  end
 
   def new(%{
         document_id: document_id,
@@ -14,7 +29,9 @@ defmodule RenewCollab.Queries.LayerAllReachable do
       }) do
     %__MODULE__{
       document_id: document_id,
-      layer_id: layer_id
+      layer_id: layer_id,
+      downlink: true,
+      uplink: true
     }
   end
 
@@ -23,7 +40,9 @@ defmodule RenewCollab.Queries.LayerAllReachable do
   def multi(%__MODULE__{
         document_id: document_id,
         layer_id: layer_id,
-        ref_id: ref_id
+        ref_id: ref_id,
+        downlink: downlink,
+        uplink: uplink
       }) do
     result_key = result_key(ref_id)
 
@@ -70,8 +89,8 @@ defmodule RenewCollab.Queries.LayerAllReachable do
       base
       |> union(^node_step)
       |> union(^edge_step)
-      |> union(^hyprlink_in)
-      |> union(^hyprlink_out)
+      |> then(&if(downlink, do: union(&1, ^hyprlink_in), else: &1))
+      |> then(&if(uplink, do: union(&1, ^hyprlink_out), else: &1))
       |> union(^children)
 
     Ecto.Multi.new()

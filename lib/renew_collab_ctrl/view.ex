@@ -15,9 +15,11 @@ defmodule RenewCollabCtrl.View do
 
   def do_fetch(_account, %Views.DocumentLayerReachable{
         document_id: document_id,
-        layer_id: layer_id
+        layer_id: layer_id,
+        uplink: uplink,
+        downlink: downlink
       }) do
-    %{document_id: document_id, layer_id: layer_id}
+    %{document_id: document_id, layer_id: layer_id, uplink: uplink, downlink: downlink}
     |> RenewCollab.Queries.LayerAllReachable.new()
     |> RenewCollab.DocumentFetcher.fetch()
   end
