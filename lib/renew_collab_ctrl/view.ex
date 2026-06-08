@@ -13,6 +13,15 @@ defmodule RenewCollabCtrl.View do
     |> RenewCollab.DocumentFetcher.fetch()
   end
 
+  def do_fetch(_account, %Views.DocumentLayerConnectedComponent{
+        document_id: document_id,
+        layer_id: layer_id
+      }) do
+    %{document_id: document_id, layer_id: layer_id}
+    |> RenewCollab.Queries.LayerHierarchyConnectedComponent.new()
+    |> RenewCollab.DocumentFetcher.fetch()
+  end
+
   def do_fetch(_account, %Views.DocumentStripped{
         document_id: document_id,
         original_ids: original_ids

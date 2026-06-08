@@ -6,6 +6,7 @@ defmodule RenewCollabCtrl.CacheConfig do
 
   def key_for_view(account, view)
   def key_for_view(_account, %Views.DocumentLayerRelative{}), do: nil
+  def key_for_view(_account, %Views.DocumentLayerConnectedComponent{}), do: nil
   def key_for_view(_account, %Views.DocumentStripped{}), do: nil
   def key_for_view(_account, %Views.DocumentVersionState{}), do: nil
   def key_for_view(_account, %Views.DocumentVersionsList{}), do: nil
@@ -30,6 +31,7 @@ defmodule RenewCollabCtrl.CacheConfig do
 
   def tags_for_view(account, view)
   def tags_for_view(_account, %Views.DocumentLayerRelative{}), do: []
+  def tags_for_view(_account, %Views.DocumentLayerConnectedComponent{}), do: []
   def tags_for_view(_account, %Views.DocumentStripped{}), do: []
   def tags_for_view(_account, %Views.DocumentVersionState{}), do: []
   def tags_for_view(_account, %Views.DocumentVersionsList{}), do: []
@@ -54,6 +56,7 @@ defmodule RenewCollabCtrl.CacheConfig do
 
   def ttl_for_view(view)
   def ttl_for_view(%Views.DocumentLayerRelative{}), do: :infinity
+  def ttl_for_view(%Views.DocumentLayerConnectedComponent{}), do: :infinity
   def ttl_for_view(%Views.DocumentStripped{}), do: :infinity
   def ttl_for_view(%Views.DocumentVersionState{}), do: :infinity
   def ttl_for_view(%Views.DocumentVersionsList{}), do: :infinity
