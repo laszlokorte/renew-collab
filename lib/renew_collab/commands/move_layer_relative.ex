@@ -8,7 +8,6 @@ defmodule RenewCollab.Commands.MoveLayerRelative do
   alias RenewCollab.Element.Edge
   alias RenewCollab.Connection.Hyperlink
   alias RenewCollab.Connection.Waypoint
-  alias RenewCollab.Connection.Bond
   alias RenewCollab.Style.TextSizeHint
 
   defstruct [:document_id, :layer_ids, :dx, :dy]
@@ -51,43 +50,36 @@ defmodule RenewCollab.Commands.MoveLayerRelative do
       }) do
     Ecto.Multi.new()
     |> Ecto.Multi.put(:document_id, document_id)
-    |> Ecto.Multi.all(:descendant_layers, fn %{document_id: document_id} ->
-      from(p in LayerParenthood,
-        where: p.ancestor_id in ^layer_ids and p.document_id == ^document_id,
-        select: p.descendant_id,
-        group_by: p.descendant_id
-      )
-    end)
-    |> Ecto.Multi.run(:child_layers, fn _, %{descendant_layers: descendant_layers} ->
-      {:ok, Enum.uniq(layer_ids ++ descendant_layers)}
-    end)
-    |> Ecto.Multi.all(:connected_edge_layers, fn
-      %{child_layers: child_layers} ->
-        from(b in Bond,
-          join: e in assoc(b, :element_edge),
-          where: b.layer_id in ^child_layers,
-          select: e.layer_id
-        )
-    end)
-    |> Ecto.Multi.all(:hyperlinked_layers, fn
-      %{child_layers: child_layers} ->
-        from(h in Hyperlink,
-          where: h.target_layer_id in ^child_layers,
-          select: h.source_layer_id
-        )
-    end)
-    |> Ecto.Multi.run(
+    |> Ecto.Multi.all(
       :combined_layer_ids,
-      fn _,
-         %{
-           child_layers: child_layers,
-           connected_edge_layers: connected_edge_layers,
-           hyperlinked_layers: hyperlinked_layers
-         } ->
-        {:ok,
-         Enum.concat([child_layers, connected_edge_layers, hyperlinked_layers])
-         |> Enum.into(MapSet.new())
-         |> Enum.into([])}
+      fn %{} ->
+        base =
+          from l in Layer,
+            where: l.document_id == ^document_id and l.id in ^layer_ids,
+            select: %{layer_id: l.id}
+
+        hyprlink_out =
+          from c in "component",
+            join: h in Hyperlink,
+            on: h.target_layer_id == c.layer_id,
+            select: %{layer_id: h.source_layer_id}
+
+        children =
+          from c in "component",
+            join: l in LayerParenthood,
+            on: l.ancestor_id == c.layer_id and l.depth > 0,
+            select: %{layer_id: l.descendant_id}
+
+        cte =
+          base
+          |> union(^hyprlink_out)
+          |> union(^children)
+
+        Layer
+        |> recursive_ctes(true)
+        |> with_cte("component", as: ^cte)
+        |> join(:inner, [l], c in "component", on: c.layer_id == l.id)
+        |> select([l], l.id)
       end
     )
     |> Ecto.Multi.update_all(
@@ -131,9 +123,9 @@ defmodule RenewCollab.Commands.MoveLayerRelative do
     |> Ecto.Multi.update_all(
       :update_edges,
       fn
-        %{child_layers: child_layers} ->
+        %{combined_layer_ids: combined_layer_ids} ->
           from(e in Edge,
-            where: e.layer_id in ^child_layers,
+            where: e.layer_id in ^combined_layer_ids,
             update: [inc: [source_x: ^dx, source_y: ^dy, target_x: ^dx, target_y: ^dy]]
           )
       end,
@@ -142,11 +134,11 @@ defmodule RenewCollab.Commands.MoveLayerRelative do
     |> Ecto.Multi.update_all(
       :update_waypoints,
       fn
-        %{child_layers: child_layers} ->
+        %{combined_layer_ids: combined_layer_ids} ->
           from(w in Waypoint,
             where:
               w.edge_id in subquery(
-                from(e in Edge, select: e.id, where: e.layer_id in ^child_layers)
+                from(e in Edge, select: e.id, where: e.layer_id in ^combined_layer_ids)
               ),
             update: [inc: [position_x: ^dx, position_y: ^dy]]
           )
