@@ -31,6 +31,9 @@ defmodule RenewCollabCtrl.Subscription do
   def channel_for(%Views.DocumentHierarchyInvalids{}), do: nil
   def channel_for(%Views.SystemHealthReport{}), do: nil
   def channel_for(%Views.DocumentLayerRelative{}), do: nil
+  def channel_for(%Views.DocumentLayerHyperlinked{}), do: nil
+  def channel_for(%Views.DocumentLayerGraphConnection{}), do: nil
+  def channel_for(%Views.DocumentLayerRelativeMultiple{}), do: nil
   def channel_for(%Views.DocumentLayerConnectedComponent{}), do: nil
   def channel_for(%Views.GlobalAccounts{}), do: nil
   def channel_for(%Views.GlobalProjects{}), do: nil

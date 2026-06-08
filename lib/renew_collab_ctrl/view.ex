@@ -23,6 +23,26 @@ defmodule RenewCollabCtrl.View do
     |> RenewCollab.DocumentFetcher.fetch()
   end
 
+  def do_fetch(_account, %Views.DocumentLayerGraphConnection{
+        document_id: document_id,
+        layer_id: layer_id,
+        rel: rel
+      }) do
+    %{document_id: document_id, layer_id: layer_id, rel: rel}
+    |> RenewCollab.Queries.LayerGraphRelation.new()
+    |> RenewCollab.DocumentFetcher.fetch()
+  end
+
+  def do_fetch(_account, %Views.DocumentLayerRelativeMultiple{
+        document_id: document_id,
+        layer_id: layer_id,
+        rel: rel
+      }) do
+    %{document_id: document_id, layer_id: layer_id, rel: rel}
+    |> RenewCollab.Queries.LayerHierarchyRelativeMultiple.new()
+    |> RenewCollab.DocumentFetcher.fetch()
+  end
+
   def do_fetch(_account, %Views.DocumentLayerConnectedComponent{
         document_id: document_id,
         layer_id: layer_id

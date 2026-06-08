@@ -1,7 +1,5 @@
 defmodule RenewCollab.Queries.LayerHyperlinked do
   import Ecto.Query, warn: false
-  alias RenewCollab.Connection.Hyperlink
-  alias RenewCollab.Hierarchy.LayerParenthood
   alias RenewCollab.Hierarchy.Layer
 
   defstruct [:document_id, :layer_id, :deep, :ref_id]

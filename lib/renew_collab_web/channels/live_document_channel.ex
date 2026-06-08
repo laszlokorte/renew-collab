@@ -1019,7 +1019,7 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
 
   @impl true
   def handle_event(
-        "fetch_connected",
+        "fetch_relative_graph",
         %{"rel" => rel} = params,
         %{},
         %{:document_id => document_id, :account => account},
@@ -1070,7 +1070,7 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
         %Views.DocumentLayerRelativeMultiple{
           document_id: document_id,
           layer_id: layer_id,
-          relative: Views.DocumentLayerRelativeMultiple.parse_relative(rel)
+          rel: Views.DocumentLayerRelativeMultiple.parse_relative(rel)
         }
         |> Fetcher.fetch_as(account)
       end)
