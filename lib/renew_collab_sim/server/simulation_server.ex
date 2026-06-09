@@ -1,8 +1,6 @@
 defmodule RenewCollabSim.Server.SimulationServer do
   use GenServer
 
-  @setup_timeout 30_000
-
   def start_monitor(project_id, pubsub_channels) do
     with {:ok, pid} <-
            GenServer.start_link(__MODULE__, %{
@@ -21,10 +19,12 @@ defmodule RenewCollabSim.Server.SimulationServer do
   end
 
   def setup_and_wait(pid, simulation_id) do
+    timeout = setup_timeout()
+
     Task.async(fn ->
-      GenServer.call(pid, {:setup, simulation_id}, @setup_timeout)
+      GenServer.call(pid, {:setup, simulation_id}, timeout)
     end)
-    |> Task.await(@setup_timeout + 1_000)
+    |> Task.await(timeout + 1_000)
   end
 
   def step(pid, simulation_id) do
@@ -265,5 +265,11 @@ defmodule RenewCollabSim.Server.SimulationServer do
   defp simulation_pubsub_channels(simulation_id, channels) do
     ["simulation:#{simulation_id}" | channels]
     |> Enum.uniq()
+  end
+
+  defp setup_timeout do
+    :renew_collab
+    |> Application.get_env(RenewCollabSim.Server, [])
+    |> Keyword.get(:setup_timeout, 30_000)
   end
 end

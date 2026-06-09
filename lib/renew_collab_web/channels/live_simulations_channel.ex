@@ -16,10 +16,13 @@ defmodule RenewCollabWeb.LiveSimulationsChannel do
     }
     |> Fetcher.fetch_as(account)
     |> case do
+      {:error, :access} ->
+        {:error, %{reason: "not found"}}
+
       nil ->
         {:error, %{reason: "not found"}}
 
-      sims ->
+      sims when is_list(sims) ->
         Phoenix.PubSub.subscribe(RenewCollab.PubSub, "pub-project-simulations:#{project_id}")
 
         {:ok,
@@ -46,10 +49,13 @@ defmodule RenewCollabWeb.LiveSimulationsChannel do
     }
     |> Fetcher.fetch_as(account)
     |> case do
+      {:error, :access} ->
+        {:error, %{reason: "not found"}}
+
       nil ->
         {:error, %{reason: "not found"}}
 
-      sims ->
+      sims when is_list(sims) ->
         {:noreply,
          RenewCollabWeb.SimulationJSON.index_content(%{
            project_id: project_id,
@@ -74,10 +80,13 @@ defmodule RenewCollabWeb.LiveSimulationsChannel do
     }
     |> Fetcher.fetch_as(account)
     |> case do
+      {:error, :access} ->
+        {:error, %{reason: "not found"}}
+
       nil ->
         {:error, %{reason: "not found"}}
 
-      sims ->
+      sims when is_list(sims) ->
         {:noreply,
          RenewCollabWeb.SimulationJSON.index_content(%{
            project_id: project_id,
@@ -92,7 +101,7 @@ defmodule RenewCollabWeb.LiveSimulationsChannel do
   end
 
   @impl true
-  def handle_message(_, state, {:project_id, _project_id}) do
+  def handle_message(_, state, _scope) do
     {:noreply, state}
   end
 

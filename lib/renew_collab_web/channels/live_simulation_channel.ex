@@ -6,19 +6,21 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
   alias RenewCollabCtrl.Dispatcher
   alias RenewCollabCtrl.Actions
   alias RenewCollabWeb.Presence
+  alias RenewCollabSim.Entities
   alias LiveState.Event
 
   @impl true
   def init("live:simulation:" <> simulation_id, _params, socket) do
-    dbg(socket.assigns.current_account)
-
     %Views.SimulationWithState{simulation_id: simulation_id}
     |> Fetcher.fetch_as(socket.assigns.current_account)
     |> case do
+      {:error, :access} ->
+        {:error, %{reason: "not found"}}
+
       nil ->
         {:error, %{reason: "not found"}}
 
-      %{} = sim ->
+      %Entities.Simulation{} = sim ->
         Phoenix.PubSub.subscribe(RenewCollab.PubSub, "simulation:#{simulation_id}")
 
         account_id = socket.assigns.current_account.id
@@ -66,10 +68,13 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
     %Views.SimulationWithState{simulation_id: simulation_id}
     |> Fetcher.fetch_as(account)
     |> case do
+      {:error, :access} ->
+        :stop
+
       nil ->
         :stop
 
-      %{} = sim ->
+      %Entities.Simulation{} = sim ->
         {:noreply,
          RenewCollabWeb.SimulationJSON.show_content(
            sim,
@@ -92,10 +97,13 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
     %Views.SimulationWithState{simulation_id: simulation_id}
     |> Fetcher.fetch_as(account)
     |> case do
+      {:error, :access} ->
+        :stop
+
       nil ->
         :stop
 
-      %{} = sim ->
+      %Entities.Simulation{} = sim ->
         {:noreply,
          RenewCollabWeb.SimulationJSON.show_content(
            sim,
@@ -124,10 +132,16 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
   end
 
   @impl true
-  def handle_event("step", _payload, _state, %{
-        simulation_id: simulation_id,
-        account: account
-      }, socket) do
+  def handle_event(
+        "step",
+        _payload,
+        _state,
+        %{
+          simulation_id: simulation_id,
+          account: account
+        },
+        socket
+      ) do
     %Actions.SimulationStep{
       simulation_id: simulation_id
     }
@@ -140,10 +154,16 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
   end
 
   @impl true
-  def handle_event("play", _payload, _state, %{
-        simulation_id: simulation_id,
-        account: account
-      }, socket) do
+  def handle_event(
+        "play",
+        _payload,
+        _state,
+        %{
+          simulation_id: simulation_id,
+          account: account
+        },
+        socket
+      ) do
     %Actions.SimulationPlay{
       simulation_id: simulation_id
     }
@@ -156,10 +176,16 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
   end
 
   @impl true
-  def handle_event("pause", _payload, _state, %{
-        simulation_id: simulation_id,
-        account: account
-      }, socket) do
+  def handle_event(
+        "pause",
+        _payload,
+        _state,
+        %{
+          simulation_id: simulation_id,
+          account: account
+        },
+        socket
+      ) do
     %Actions.SimulationPause{
       simulation_id: simulation_id
     }
@@ -191,10 +217,16 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
   end
 
   @impl true
-  def handle_event("init", _payload, _state, %{
-        simulation_id: simulation_id,
-        account: account
-      }, socket) do
+  def handle_event(
+        "init",
+        _payload,
+        _state,
+        %{
+          simulation_id: simulation_id,
+          account: account
+        },
+        socket
+      ) do
     %Actions.SimulationInitialize{
       simulation_id: simulation_id
     }

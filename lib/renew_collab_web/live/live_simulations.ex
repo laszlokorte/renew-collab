@@ -389,4 +389,8 @@ defmodule RenewCollabWeb.LiveSimulations do
         {:noreply, socket |> put_flash(:error, "Payusing simulation failed")}
     end
   end
+
+  def handle_info({:simulation_error, {_simulation_id, _error}}, socket) do
+    {:noreply, socket}
+  end
 end

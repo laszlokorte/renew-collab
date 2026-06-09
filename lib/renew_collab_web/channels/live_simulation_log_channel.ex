@@ -1,6 +1,7 @@
 defmodule RenewCollabWeb.LiveSimulationLogChannel do
   alias RenewCollabCtrl.Fetcher
   alias RenewCollabCtrl.Views
+  alias RenewCollabSim.Entities
   use RenewCollabWeb.StateChannel, web_module: RenewCollabWeb
 
   @impl true
@@ -10,10 +11,13 @@ defmodule RenewCollabWeb.LiveSimulationLogChannel do
     }
     |> Fetcher.fetch_as(socket.assigns.current_account)
     |> case do
+      {:error, :access} ->
+        {:error, %{reason: "not found"}}
+
       nil ->
         {:error, %{reason: "not found"}}
 
-      sim ->
+      %Entities.Simulation{} = sim ->
         Phoenix.PubSub.subscribe(RenewCollab.PubSub, "simulation:#{sim.id}")
 
         {:ok,
@@ -34,13 +38,21 @@ defmodule RenewCollabWeb.LiveSimulationLogChannel do
     }
     |> Fetcher.fetch_as(account)
     |> case do
+      {:error, :access} ->
+        :stop
+
       nil ->
         :stop
 
-      sim ->
+      %Entities.Simulation{} = sim ->
         {:noreply,
          sim.log_entries
          |> RenewCollabWeb.SimulationJSON.show_log_content()}
     end
+  end
+
+  @impl true
+  def handle_message(_, state, _scope) do
+    {:noreply, state}
   end
 end

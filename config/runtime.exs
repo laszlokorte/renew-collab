@@ -22,6 +22,16 @@ end
 
 maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
+sim_setup_timeout =
+  ["SIM_SETUP_TIMEOUT_MS", "SIMULATOR_SETUP_TIMEOUT_MS", "SIM_SETUP_TIMEOUT"]
+  |> Enum.find_value(&System.get_env/1)
+  |> case do
+    nil -> 30_000
+    timeout -> String.to_integer(timeout)
+  end
+
+config :renew_collab, RenewCollabSim.Server, setup_timeout: sim_setup_timeout
+
 if config_env() == :prod do
   read_db_config = fn adapter, prefix ->
     case adapter do

@@ -2,8 +2,6 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
   alias RenewCollabSim.Server.SimulationServer
   use GenServer
 
-  @setup_timeout 30_000
-
   def start_link(_defaults) do
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
   end
@@ -13,14 +11,16 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
   end
 
   def setup_and_wait(simulation_scope, simulation_id, pubsub_channels) do
+    timeout = setup_timeout()
+
     Task.async(fn ->
       GenServer.call(
         __MODULE__,
         {:setup, simulation_scope, simulation_id, pubsub_channels},
-        @setup_timeout
+        timeout
       )
     end)
-    |> Task.await(@setup_timeout + 1_000)
+    |> Task.await(timeout + 1_000)
   end
 
   def step(simulation_scope, simulation_id) do
@@ -139,7 +139,6 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
                  "simulation:#{simulation_id}" | pubsub_channels
                ]),
              :ok <- RenewCollabSim.Server.SimulationServer.setup_and_wait(pid, simulation_id) do
-
           {:reply, :ok,
            Map.put(state, simulation_scope, %{
              server_process: pid
@@ -256,5 +255,11 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
     for {_scope_id, %{server_process: pid}} <- state do
       RenewCollabSim.Server.SimulationServer.stop_all(pid)
     end
+  end
+
+  defp setup_timeout do
+    :renew_collab
+    |> Application.get_env(RenewCollabSim.Server, [])
+    |> Keyword.get(:setup_timeout, 30_000)
   end
 end
