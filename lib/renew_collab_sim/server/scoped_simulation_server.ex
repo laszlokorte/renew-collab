@@ -2,6 +2,8 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
   alias RenewCollabSim.Server.SimulationServer
   use GenServer
 
+  @setup_timeout 30_000
+
   def start_link(_defaults) do
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
   end
@@ -12,9 +14,13 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
 
   def setup_and_wait(simulation_scope, simulation_id, pubsub_channels) do
     Task.async(fn ->
-      GenServer.call(__MODULE__, {:setup, simulation_scope, simulation_id, pubsub_channels})
+      GenServer.call(
+        __MODULE__,
+        {:setup, simulation_scope, simulation_id, pubsub_channels},
+        @setup_timeout
+      )
     end)
-    |> Task.await()
+    |> Task.await(@setup_timeout + 1_000)
   end
 
   def step(simulation_scope, simulation_id) do
@@ -78,7 +84,7 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
            })}
         else
           _ ->
-            {:reply, :error, state}
+            {:noreply, state}
         end
 
       %{server_process: pid} ->
@@ -131,21 +137,21 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
         with {:ok, pid} <-
                RenewCollabSim.Server.SimulationServer.start_monitor(simulation_scope, [
                  "simulation:#{simulation_id}" | pubsub_channels
-               ]) do
-          RenewCollabSim.Server.SimulationServer.setup_and_wait(pid, simulation_id)
+               ]),
+             :ok <- RenewCollabSim.Server.SimulationServer.setup_and_wait(pid, simulation_id) do
 
           {:reply, :ok,
            Map.put(state, simulation_scope, %{
              server_process: pid
            })}
         else
-          _ ->
-            {:reply, :error, state}
+          error ->
+            {:reply, error, state}
         end
 
       %{server_process: pid} ->
         RenewCollabSim.Server.SimulationServer.setup_and_wait(pid, simulation_id)
-        {:reply, :ok, state}
+        |> then(&{:reply, &1, state})
     end
   end
 

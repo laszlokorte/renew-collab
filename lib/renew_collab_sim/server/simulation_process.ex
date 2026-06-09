@@ -70,6 +70,47 @@ defmodule RenewCollabSim.Server.SimulationProcess do
     end
   end
 
+  defp broadcast_error(
+         %{
+           simulation_id: sim_id,
+           pubsub_channels: pubsub_channels
+         } = state,
+         detail
+       ) do
+    payload = simulation_error_payload(detail)
+
+    for channel <- pubsub_channels do
+      Phoenix.PubSub.broadcast(
+        RenewCollab.PubSub,
+        channel,
+        {:simulation_error, {sim_id, payload}}
+      )
+    end
+
+    state
+  end
+
+  defp simulation_error_payload(detail) do
+    %{
+      error: "simulation_process_failed",
+      title: "Simulation Error",
+      message: "Renew stopped the simulation before it could be initialized.",
+      detail: explain_simulation_error(detail)
+    }
+  end
+
+  defp explain_simulation_error(detail) when is_binary(detail) do
+    cond do
+      String.contains?(detail, "Transitions may not carry inscriptions") ->
+        "Renew reported: #{detail}. This means that at least one transition has an inscription that Renew does not accept for simulation. Remove that inscription from the transition, or move it to a supported net element, then create or initialize the simulation again."
+
+      true ->
+        "Renew reported: #{detail}"
+    end
+  end
+
+  defp explain_simulation_error(detail), do: inspect(detail)
+
   @impl true
   def handle_info({:retry_broadcast, event}, state) do
     {:noreply, state |> broadcast_change(event)}
@@ -94,8 +135,8 @@ defmodule RenewCollabSim.Server.SimulationProcess do
            ) do
       {:ok, state}
     else
-      _e ->
-        :ignore
+      error ->
+        {:stop, error}
     end
   end
 
@@ -143,6 +184,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
       })
     )
     |> State.commit(:strict)
+    |> maybe_broadcast_exit_error(status)
     |> broadcast_change(:stop)
     |> then(&{:stop, :normal, &1})
   end
@@ -183,6 +225,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
       else
         state
       end
+      |> maybe_remember_simulation_error(content)
 
     {:noreply, state}
   end
@@ -214,6 +257,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
       else
         state
       end
+      |> maybe_remember_simulation_error(content)
 
     RenewCollabSim.Server.SimulationParser.parse(content)
     |> case do
@@ -347,4 +391,29 @@ defmodule RenewCollabSim.Server.SimulationProcess do
 
     state |> broadcast_change(:stop)
   end
+
+  defp maybe_remember_simulation_error(state, content) do
+    if simulation_error_line?(content) do
+      %{state | last_error: String.trim(content)}
+    else
+      state
+    end
+  end
+
+  defp simulation_error_line?(content) when is_binary(content) do
+    String.contains?(content, ["Exception", "ERROR:", "Error occurred"])
+  end
+
+  defp simulation_error_line?(_content), do: false
+
+  defp maybe_broadcast_exit_error(%{last_error: error} = state, _status)
+       when is_binary(error) and error != "" do
+    broadcast_error(state, error)
+  end
+
+  defp maybe_broadcast_exit_error(state, status) when status not in [nil, 0] do
+    broadcast_error(state, "Simulation process exited with status #{status}")
+  end
+
+  defp maybe_broadcast_exit_error(state, _status), do: state
 end

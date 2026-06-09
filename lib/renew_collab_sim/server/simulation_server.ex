@@ -1,6 +1,8 @@
 defmodule RenewCollabSim.Server.SimulationServer do
   use GenServer
 
+  @setup_timeout 30_000
+
   def start_monitor(project_id, pubsub_channels) do
     with {:ok, pid} <-
            GenServer.start_link(__MODULE__, %{
@@ -20,9 +22,9 @@ defmodule RenewCollabSim.Server.SimulationServer do
 
   def setup_and_wait(pid, simulation_id) do
     Task.async(fn ->
-      GenServer.call(pid, {:setup, simulation_id})
+      GenServer.call(pid, {:setup, simulation_id}, @setup_timeout)
     end)
-    |> Task.await()
+    |> Task.await(@setup_timeout + 1_000)
   end
 
   def step(pid, simulation_id) do
@@ -140,7 +142,7 @@ defmodule RenewCollabSim.Server.SimulationServer do
         %{processes: procs, pubsub_channels: pubsub_channels} = state
       ) do
     if Map.has_key?(procs, simulation_id) do
-      {:noreply, state}
+      {:reply, :ok, state}
     else
       with {:ok, pid} <-
              RenewCollabSim.Server.SimulationProcess.start_monitor(simulation_id, pubsub_channels) do
@@ -155,8 +157,8 @@ defmodule RenewCollabSim.Server.SimulationServer do
                })
          }}
       else
-        _ ->
-          {:reply, :error, state}
+        error ->
+          {:reply, error, state}
       end
     end
   end

@@ -25,7 +25,7 @@ defmodule RenewCollabWeb.FallbackController do
   # This clause is an example of how to handle resources that cannot be found.
   def call(conn, {:error, :forbidden}) do
     conn
-    |> put_status(:unauthorized)
+    |> put_status(:forbidden)
     |> put_view(html: RenewCollabWeb.ErrorHTML, json: RenewCollabWeb.ErrorJSON)
     |> render(:"403")
   end

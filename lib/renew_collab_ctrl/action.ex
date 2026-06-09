@@ -1420,7 +1420,7 @@ defmodule RenewCollabCtrl.Action do
       %RenewCollabProj.Queries.SimulationsProject{simulation_id: simulation_id}
       |> RenewCollabProj.ProjectFetcher.fetch()
 
-    RenewCollabSim.Server.ScopedSimulationServer.setup(project_id, simulation_id, [
+    RenewCollabSim.Server.ScopedSimulationServer.setup_and_wait(project_id, simulation_id, [
       "projects/#{project_id}/simulations"
     ])
   end

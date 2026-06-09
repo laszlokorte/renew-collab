@@ -28,19 +28,19 @@ defmodule RenewCollabWeb.SimulationController do
       {:error, :invalid_rnw} ->
         conn
         |> put_status(:bad_request)
-        |> Phoenix.Controller.json(%{message: "Not a valid renew file"})
+        |> Phoenix.Controller.json(%{message: "The document is not a valid Renew file"})
         |> halt()
 
       {:error, :export_rnw} ->
         conn
         |> put_status(:bad_request)
-        |> Phoenix.Controller.json(%{message: "Conversion to rnw file failed"})
+        |> Phoenix.Controller.json(%{message: "Conversion to Renew format failed"})
         |> halt()
 
       _ ->
         conn
         |> put_status(:bad_request)
-        |> Phoenix.Controller.json(%{message: "Compiling Shadow Net System failed"})
+        |> Phoenix.Controller.json(%{message: "Compiling the shadow net system failed"})
         |> halt()
     end
   end
