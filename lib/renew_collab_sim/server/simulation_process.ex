@@ -99,15 +99,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
     }
   end
 
-  defp explain_simulation_error(detail) when is_binary(detail) do
-    cond do
-      String.contains?(detail, "Transitions may not carry inscriptions") ->
-        "Renew reported: #{detail}. This means that at least one transition has an inscription that Renew does not accept for simulation. Remove that inscription from the transition, or move it to a supported net element, then create or initialize the simulation again."
-
-      true ->
-        "Renew reported: #{detail}"
-    end
-  end
+  defp explain_simulation_error(detail) when is_binary(detail), do: "Renew reported: #{detail}"
 
   defp explain_simulation_error(detail), do: inspect(detail)
 
