@@ -106,6 +106,7 @@ defmodule RenewCollab.Commands.ReorderLayersRelative do
 
   defp selected_layer_order(:parent, {:above, _relative}), do: :desc
   defp selected_layer_order({:sibling, :next}, _target), do: :desc
+  defp selected_layer_order({:sibling, :last}, _target), do: :desc
   defp selected_layer_order(_relative_direction, _target), do: :asc
 
   defp normalize_layer_ids(layer_ids) do
