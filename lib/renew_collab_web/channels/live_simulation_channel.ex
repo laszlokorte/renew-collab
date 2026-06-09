@@ -124,7 +124,7 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
   end
 
   @impl true
-  def handle_event("step", %{}, _state, %{
+  def handle_event("step", _payload, _state, %{
         simulation_id: simulation_id,
         account: account
       }, socket) do
@@ -140,7 +140,7 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
   end
 
   @impl true
-  def handle_event("play", %{}, _state, %{
+  def handle_event("play", _payload, _state, %{
         simulation_id: simulation_id,
         account: account
       }, socket) do
@@ -156,7 +156,7 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
   end
 
   @impl true
-  def handle_event("pause", %{}, _state, %{
+  def handle_event("pause", _payload, _state, %{
         simulation_id: simulation_id,
         account: account
       }, socket) do
@@ -174,7 +174,7 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
   @impl true
   def handle_event(
         "terminate",
-        %{},
+        _payload,
         _state,
         %{simulation_id: simulation_id, account: account},
         socket
@@ -191,7 +191,7 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
   end
 
   @impl true
-  def handle_event("init", %{}, _state, %{
+  def handle_event("init", _payload, _state, %{
         simulation_id: simulation_id,
         account: account
       }, socket) do

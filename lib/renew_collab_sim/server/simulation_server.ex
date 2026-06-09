@@ -79,9 +79,10 @@ defmodule RenewCollabSim.Server.SimulationServer do
       {:noreply, state}
     else
       with {:ok, pid} <-
-             RenewCollabSim.Server.SimulationProcess.start_monitor(simulation_id, [
-               "simulation:#{simulation_id}" | pubsub_channels
-             ]) do
+             RenewCollabSim.Server.SimulationProcess.start_monitor(
+               simulation_id,
+               simulation_pubsub_channels(simulation_id, pubsub_channels)
+             ) do
         broadcast_state_change(state, simulation_id)
 
         {:noreply,
@@ -145,7 +146,10 @@ defmodule RenewCollabSim.Server.SimulationServer do
       {:reply, :ok, state}
     else
       with {:ok, pid} <-
-             RenewCollabSim.Server.SimulationProcess.start_monitor(simulation_id, pubsub_channels) do
+             RenewCollabSim.Server.SimulationProcess.start_monitor(
+               simulation_id,
+               simulation_pubsub_channels(simulation_id, pubsub_channels)
+             ) do
         broadcast_state_change(state, simulation_id)
 
         {:reply, :ok,
@@ -249,12 +253,17 @@ defmodule RenewCollabSim.Server.SimulationServer do
   end
 
   defp broadcast_state_change(%{pubsub_channels: channels}, simulation_id) do
-    for channel <- ["simulation:#{simulation_id}" | channels] do
+    for channel <- simulation_pubsub_channels(simulation_id, channels) do
       Phoenix.PubSub.broadcast(
         RenewCollab.PubSub,
         channel,
         {:simulation_change, {simulation_id, :state}}
       )
     end
+  end
+
+  defp simulation_pubsub_channels(simulation_id, channels) do
+    ["simulation:#{simulation_id}" | channels]
+    |> Enum.uniq()
   end
 end
