@@ -13,6 +13,47 @@ defmodule RenewCollabCtrl.View do
     |> RenewCollab.DocumentFetcher.fetch()
   end
 
+  def do_fetch(_account, %Views.DocumentLayerReachable{
+        document_id: document_id,
+        layer_id: layer_id,
+        uplink: uplink,
+        downlink: downlink
+      }) do
+    %{document_id: document_id, layer_id: layer_id, uplink: uplink, downlink: downlink}
+    |> RenewCollab.Queries.LayerAllReachable.new()
+    |> RenewCollab.DocumentFetcher.fetch()
+  end
+
+  def do_fetch(_account, %Views.DocumentLayerHyperlinked{
+        document_id: document_id,
+        layer_id: layer_id,
+        deep: deep
+      }) do
+    %{document_id: document_id, layer_id: layer_id, deep: deep}
+    |> RenewCollab.Queries.LayerHyperlinked.new()
+    |> RenewCollab.DocumentFetcher.fetch()
+  end
+
+  def do_fetch(_account, %Views.DocumentLayerGraphConnection{
+        document_id: document_id,
+        layer_id: layer_id,
+        rel: rel
+      }) do
+    %{document_id: document_id, layer_id: layer_id, rel: rel}
+    |> RenewCollab.Queries.LayerGraphRelation.new()
+    |> RenewCollab.DocumentFetcher.fetch()
+  end
+
+  def do_fetch(_account, %Views.DocumentLayerRelativeMultiple{
+        document_id: document_id,
+        layer_id: layer_id,
+        rel: rel
+      }) do
+    %{document_id: document_id, layer_id: layer_id, rel: rel}
+    |> RenewCollab.Queries.LayerHierarchyRelativeMultiple.new()
+    |> RenewCollab.DocumentFetcher.fetch()
+  end
+
   def do_fetch(_account, %Views.DocumentStripped{
         document_id: document_id,
         original_ids: original_ids

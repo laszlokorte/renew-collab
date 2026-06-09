@@ -48,7 +48,19 @@ defmodule RenewCollabCtrl.ReadAccess do
   def can(%{id: account_id}, %Views.DocumentHierarchyInvalids{document_id: doc_id}),
     do: can_read(account_id, :document, doc_id)
 
+  def can(%{id: account_id}, %Views.DocumentLayerReachable{document_id: doc_id}),
+    do: can_read(account_id, :document, doc_id)
+
   def can(%{id: account_id}, %Views.DocumentLayerRelative{document_id: doc_id}),
+    do: can_read(account_id, :document, doc_id)
+
+  def can(%{id: account_id}, %Views.DocumentLayerGraphConnection{document_id: doc_id}),
+    do: can_read(account_id, :document, doc_id)
+
+  def can(%{id: account_id}, %Views.DocumentLayerRelativeMultiple{document_id: doc_id}),
+    do: can_read(account_id, :document, doc_id)
+
+  def can(%{id: account_id}, %Views.DocumentLayerHyperlinked{document_id: doc_id}),
     do: can_read(account_id, :document, doc_id)
 
   def can(%{id: account_id}, %Views.MyProjectsList{account_id: account_id}), do: true
