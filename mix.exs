@@ -7,7 +7,7 @@ defmodule RenewCollab.MixProject do
     "RENEW_SIM_DB_TYPE",
     "RENEW_PROJ_DB_TYPE"
   ]
-  #  lib/renew_collab_web/channels/live_documents_channel.ex:68:30: RenewCollabWeb.LiveDocumentsChannel.handle_event/4
+
   def project do
     [
       app: :renew_collab,
@@ -76,11 +76,11 @@ defmodule RenewCollab.MixProject do
 
   defp db_adapters do
     for {dep, true} <- [
-          {{:myxql, "~> 0.7.0"}, use_mysql()},
-          {{:postgrex, "~> 0.19.3"}, use_postgresql()},
-          {{:ecto_sqlite3_extras, "~> 1.2.0"}, true},
-          {{:ecto_mysql_extras, "~> 0.3"}, use_mysql()},
-          {{:ecto_psql_extras, "~> 0.6"}, use_postgresql()}
+          {{:myxql, "~> 0.9.0"}, use_mysql()},
+          {{:postgrex, "~> 0.22.2"}, use_postgresql()},
+          {{:ecto_sqlite3_extras, "~> 1.2.2"}, true},
+          {{:ecto_mysql_extras, "~> 0.6.3"}, use_mysql()},
+          {{:ecto_psql_extras, "~> 0.8.8"}, use_postgresql()}
         ] do
       dep
     end

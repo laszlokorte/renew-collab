@@ -64,16 +64,22 @@ defmodule RenewCollabWeb.SimulationController do
         |> Phoenix.Controller.json(%{message: "Simulation not found"})
         |> halt()
 
-      sim ->
+      %{project_assignment: %{project_id: project_id}} = sim ->
         render(conn, :show,
           simulation: sim,
           running:
             %Views.SimulationIsActive{
-              project_id: sim.project_assignment.project_id,
+              project_id: project_id,
               simulation_id: simulation_id
             }
             |> Fetcher.fetch_as(conn.assigns.current_account)
         )
+
+      _ ->
+        conn
+        |> put_status(:not_found)
+        |> Phoenix.Controller.json(%{message: "Simulation not found"})
+        |> halt()
     end
   end
 
