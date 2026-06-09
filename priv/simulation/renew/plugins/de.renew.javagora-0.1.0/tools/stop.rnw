@@ -1,0 +1,13 @@
+12 
+    de.renew.gui.CPNDrawing 5 
+        de.renew.netcomponents.NetComponentFigure "attributes" "attributes" 4 "LineStyle" "String" "1 2" "FigureWithID" "Int" 3418 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 1 
+            de.renew.gui.TransitionFigure "attributes" "attributes" 3 "FigureWithID" "Int" 3394 "Visibility" "Boolean" "TRUE" "FillColor" "Color" 0 255 0 255 2 -6 24 16 NULL   REF 2 
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 5 "TextAlignment" "Int" 1 "FigureWithID" "Int" 3395 "FrameColor" "Color" 255 199 158 255 "Visibility" "Boolean" "TRUE" "FillColor" "Color" 255 199 158 255 -1 -27 ":stop()" "SansSerif" 0 12 0 REF 2 
+            CH.ifa.draw.standard.OffsetLocator 2 -21 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   1  
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 4 "TextAlignment" "Int" 1 "FigureWithID" "Int" 3417 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 -1 14 "STOP" "SansSerif" 1 12 0 REF 2 
+            CH.ifa.draw.standard.OffsetLocator 1 20 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   2  
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 5 "TextAlignment" "Int" 1 "FigureWithID" "Int" 3398 "FrameColor" "Color" 255 199 158 255 "TextColor" "Color" 255 0 0 255 "FillColor" "Color" 255 199 158 255 -2 -7 ">" "SansSerif" 1 12 0 REF 2 
+            CH.ifa.draw.standard.OffsetLocator -13 -1 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   2  NULL  

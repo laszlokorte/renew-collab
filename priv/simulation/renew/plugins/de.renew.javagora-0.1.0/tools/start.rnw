@@ -1,0 +1,27 @@
+12 
+    de.renew.gui.CPNDrawing 12 
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 4 "FrameColor" "Color" 255 199 158 255 "FigureWithID" "Int" 8330 "TextAlignment" "Int" 1 "FillColor" "Color" 255 199 158 255 21 -7 "START" "SansSerif" 1 12 0
+            de.renew.gui.PlaceFigure "attributes" "attributes" 1 "FigureWithID" "Int" 3903 84 -8 20 20 NULL  
+            CH.ifa.draw.standard.OffsetLocator -59 -1 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   2  
+        CH.ifa.draw.figures.RectangleFigure "attributes" "attributes" 3 "FrameColor" "Color" 224 224 224 255 "FigureWithID" "Int" 3901 "FillColor" "Color" 240 240 240 255 -34 -15 116 33  
+        de.renew.netcomponents.NetComponentFigure "attributes" "attributes" 4 "FrameColor" "Color" 255 199 158 255 "FigureWithID" "Int" 3902 "FillColor" "Color" 255 199 158 255 "LineStyle" "String" "1 2" 4 REF 2 
+            de.renew.gui.TransitionFigure "attributes" "attributes" 3 "FigureWithID" "Int" 3904 "FillColor" "Color" 192 192 192 255 "Visibility" "Boolean" "TRUE" -12 -6 24 16 NULL  
+            de.renew.gui.ArcConnection "attributes" "attributes" 1 "FigureWithID" "Int" 3905 2 12 2 85 2 NULL 
+                CH.ifa.draw.figures.ArrowTip 0.4 8.0 8.0 1  "CH.ifa.draw.figures.ArrowTip" 
+                CH.ifa.draw.standard.ChopBoxConnector REF 7  
+                CH.ifa.draw.figures.ChopEllipseConnector REF 2   REF 5  REF 2 REF 7 REF 8 
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 5 "FigureWithID" "Int" 3906 "TextColor" "Color" 255 0 0 255 "TextAlignment" "Int" 1 "FillColor" "Color" 255 199 158 255 "FrameColor" "Color" 255 199 158 255 97 -7 ">" "SansSerif" 1 12 0 REF 2 
+            CH.ifa.draw.standard.OffsetLocator 6 -1 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   2  
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 5 "FigureWithID" "Int" 3907 "TextAlignment" "Int" 1 "FillColor" "Color" 255 199 158 255 "Visibility" "Boolean" "TRUE" "FrameColor" "Color" 255 199 158 255 -31 -28 ":start()" "SansSerif" 0 12 0 REF 7 
+            CH.ifa.draw.standard.OffsetLocator -13 -22 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   1  
+        de.renew.gui.DeclarationFigure "attributes" "attributes" 5 "FigureWithID" "Int" 3908 "TextAlignment" "Int" 0 "FillColor" "Color" 255 199 158 255 "Visibility" "Boolean" "TRUE" "FrameColor" "Color" 255 199 158 255 7 106 "import de.renew.agent.repr.acl.*;\nimport java.util.*;\nimport de.renew.agent.webgateway.ontology.*;\nimport de.renew.agent.repr.capamgmt.*;\nimport de.renew.agent.repr.common.*;\nimport de.renew.agent.repr.sl.*;\nimport de.renew.net.NetInstance;\nimport net.paose.cap.p2aose.ontology.*;\nimport net.paose.cap.p2aose$PLUGIN.roles.$ROLE_NAME.$HELPER_CLASS;\n\nNetInstance wb,kb;\nAclMessage p, p2, ack;\nAgentIdentifier aid,selfAid;\n\nBoolean bool;\nboolean cond;\nObject o;\nObject[] os;\nString s, message;\nVector v;\nint y,id;\nIterator  it;\nVTSet aidvts;" "SansSerif" 0 12 0 NULL NULL 1  
+        CH.ifa.draw.figures.RoundRectangleFigure "attributes" "attributes" 2 "FigureWithID" "Int" 8327 "FillColor" "Color" 204 204 204 255 -36 -478 664 149 50 34  
+        CH.ifa.draw.figures.TextFigure "attributes" "attributes" 4 "FrameColor" "Color" 255 199 158 255 "FigureWithID" "Int" 8329 "TextAlignment" "Int" 0 "FillColor" "Color" 255 199 158 255 1 -466 "Role_interaction" "SansSerif" 0 18 0 REF 19 
+            CH.ifa.draw.standard.OffsetLocator -226 -49 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5    
+        CH.ifa.draw.figures.TextFigure "attributes" "attributes" 4 "FrameColor" "Color" 255 199 158 255 "FigureWithID" "Int" 8328 "TextAlignment" "Int" 0 "FillColor" "Color" 255 199 158 255 20 -444 "@date yyyy-mm-dd\n@author 0musterm\n@version\n\nPlease add a description, what the interaction does." "SansSerif" 0 12 0 REF 19 
+            CH.ifa.draw.standard.OffsetLocator -133 2 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5    NULL  

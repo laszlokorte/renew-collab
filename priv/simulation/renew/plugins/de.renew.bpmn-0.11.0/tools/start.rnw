@@ -1,0 +1,17 @@
+11 
+    de.renew.gui.CPNDrawing 8 
+        CH.ifa.draw.figures.RectangleFigure "attributes" "attributes" 3 "FigureWithID" "Int" 3893 "FrameColor" "Color" 224 224 224 255 "FillColor" "Color" 240 240 240 255 -30 -15 116 33  
+        de.renew.netcomponents.NetComponentFigure "attributes" "attributes" 4 "LineStyle" "String" "1 2" "FigureWithID" "Int" 3894 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 4 
+            de.renew.gui.PlaceFigure "attributes" "attributes" 1 "FigureWithID" "Int" 3895 88 -9 20 20 NULL  
+            de.renew.gui.TransitionFigure "attributes" "attributes" 3 "FigureWithID" "Int" 3896 "Visibility" "Boolean" "TRUE" "FillColor" "Color" 192 192 192 255 -8 -6 24 16 NULL  
+            de.renew.gui.ArcConnection "attributes" "attributes" 1 "FigureWithID" "Int" 3897 2 16 1 89 1 NULL 
+                CH.ifa.draw.figures.ArrowTip 0.4 8.0 8.0 1  "CH.ifa.draw.figures.ArrowTip" 
+                CH.ifa.draw.standard.ChopBoxConnector REF 4  
+                CH.ifa.draw.figures.ChopEllipseConnector REF 3   REF 1  REF 3 REF 4 REF 5 
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 5 "TextAlignment" "Int" 1 "FigureWithID" "Int" 3898 "FrameColor" "Color" 255 199 158 255 "TextColor" "Color" 255 0 0 255 "FillColor" "Color" 255 199 158 255 99 -7 ">" "SansSerif" 1 12 0 REF 3 
+            CH.ifa.draw.standard.OffsetLocator 6 -1 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   2  
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 5 "TextAlignment" "Int" 1 "FigureWithID" "Int" 3899 "FrameColor" "Color" 255 199 158 255 "Visibility" "Boolean" "TRUE" "FillColor" "Color" 255 199 158 255 -31 -27 ":start()" "SansSerif" 0 12 0 REF 4 
+            CH.ifa.draw.standard.OffsetLocator -13 -22 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   1  
+        de.renew.gui.DeclarationFigure "attributes" "attributes" 5 "TextAlignment" "Int" 0 "FigureWithID" "Int" 3900 "FrameColor" "Color" 255 199 158 255 "Visibility" "Boolean" "TRUE" "FillColor" "Color" 255 199 158 255 11 106 "import de.renew.agent.repr.acl.*;\nimport java.util.*;\nimport de.renew.agent.webgateway.ontology.*;\nimport de.renew.agent.repr.capamgmt.*;\nimport de.renew.agent.repr.common.*;\nimport de.renew.agent.repr.sl.*;\nimport de.renew.net.NetInstance;\nimport net.paose.cap.p2aose.ontology.*;\nimport net.paose.cap.p2aose$PLUGIN.roles.$ROLE_NAME.$HELPER_CLASS;\n\nNetInstance wb,kb;\nAclMessage p, p2, ack;\nAgentIdentifier aid,selfAid;\n\nBoolean bool;\nboolean cond;\nObject o;\nObject[] os;\nString s, message;\nVector v;\nint y,id;\nIterator  it;\nVTSet aidvts;" "SansSerif" 0 12 0 NULL NULL 1  NULL  1769 163 997 778 

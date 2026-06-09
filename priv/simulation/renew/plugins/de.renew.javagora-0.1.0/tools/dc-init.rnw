@@ -1,0 +1,13 @@
+12 
+    de.renew.gui.CPNDrawing 5 
+        CH.ifa.draw.figures.RoundRectangleFigure "attributes" "attributes" 2 "FigureWithID" "Int" 12960 "FillColor" "Color" 183 217 246 255 10 -401 447 205 26 22  
+        CH.ifa.draw.figures.TextFigure "attributes" "attributes" 4 "TextAlignment" "Int" 1 "FigureWithID" "Int" 11856 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 32 -388 "Role_DC_name" "SansSerif" 0 24 0 REF 1 
+            CH.ifa.draw.standard.OffsetLocator -117 -73 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5    
+        CH.ifa.draw.figures.TextFigure "attributes" "attributes" 4 "TextAlignment" "Int" 1 "FigureWithID" "Int" 11857 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 38 -359 "@date dd-mm-yyyy   @author author_name    @version 0.1" "SansSerif" 0 12 0 REF 1 
+            CH.ifa.draw.standard.OffsetLocator -33 -52 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5    
+        CH.ifa.draw.figures.TextFigure "attributes" "attributes" 4 "TextAlignment" "Int" 0 "FigureWithID" "Int" 12963 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 29 -326 "Description of the DC" "SansSerif" 0 12 0 REF 1 
+            CH.ifa.draw.standard.OffsetLocator -145 -19 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5    
+        de.renew.gui.DeclarationFigure "attributes" "attributes" 4 "TextAlignment" "Int" 0 "FigureWithID" "Int" 11855 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 19 130 "import de.renew.agent.repr.acl.*;\nimport java.util.*;\nimport de.renew.agent.settler.ontology.*;\nimport de.renew.agent.repr.capamgmt.*;\nimport de.renew.agent.repr.common.*;\nimport de.renew.agent.repr.sl.*;\nimport de.renew.net.NetInstance;\n\nNetInstance wb,kb;\nAclMessage p, p2,message,ack ;\nAgentIdentifier aid,wfmsAId;\n\nBoolean bool;\nboolean cond;\nObject o;\nObject[] os;\nString s;\nVector v;\nint y,id;\nIterator  it;\nVTSet aidvts;" "SansSerif" 0 12 0 NULL NULL 1  NULL  

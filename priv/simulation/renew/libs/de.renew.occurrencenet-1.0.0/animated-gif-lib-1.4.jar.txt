@@ -1,0 +1,1 @@
+../shared/animated-gif-lib-1.4.jar

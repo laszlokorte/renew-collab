@@ -1,0 +1,11 @@
+11 
+    de.renew.diagram.drawing.DiagramDrawing $figureNumber 
+        CH.ifa.draw.figures.RoundRectangleFigure "attributes" "attributes" 1 "FillColor" "Color" 183 217 246 255 38 23 361 88 26 22  
+        de.renew.diagram.figures.DiagramTextFigure "attributes" "attributes" 3 "TextAlignment" "Int" 0 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 53 28 "$InteractionName" "SansSerif" 0 18 0 NULL NULL
+        CH.ifa.draw.figures.TextFigure "attributes" "attributes" 3 "FrameColor" "Color" 255 199 158 255 "TextAlignment" "Int" 0 "FillColor" "Color" 255 199 158 255 67 50 "@generator PluginGenerator\n@generation-date $generationDate\n@author\n@version" "SansSerif" 0 12 0 NULL NULL  
+#foreach ($theRole in $actorVector)        
+        de.renew.diagram.figures.RoleDescriptorFigure "attributes" "attributes" 1 "FillColor" "Color" 255 255 255 255 $actorPosMap.get($theRole) 128 72 36
+        de.renew.diagram.figures.DiagramTextFigure "attributes" "attributes" 2 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 $actorPosMap.get($theRole) 139 "${theRole}_${caseName}" "SansSerif" 0 12 0 REF $actorRefMap.get($theRole)
+            CH.ifa.draw.standard.OffsetLocator 4 0 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   
+#end 0 197 539 600 

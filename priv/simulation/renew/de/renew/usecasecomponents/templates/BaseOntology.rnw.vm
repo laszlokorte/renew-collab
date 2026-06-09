@@ -1,0 +1,43 @@
+11 
+    de.renew.gui.CPNDrawing 20 
+        CH.ifa.draw.figures.RectangleFigure "attributes" "attributes" 3 "FigureWithID" "Int" 8373 "FillColor" "Color" 192 192 192 255 "IsaType" "Boolean" "TRUE" 431 365 122 37  
+        CH.ifa.draw.figures.RoundRectangleFigure "attributes" "attributes" 3 "IsaType" "Boolean" "TRUE" "FigureWithID" "Int" 8374 "FillColor" "Color" 221 219 219 255 55 48 685 134 32 78  
+        CH.ifa.draw.figures.RectangleFigure "attributes" "attributes" 3 "FigureWithID" "Int" 8375 "FillColor" "Color" 192 192 192 255 "IsaType" "Boolean" "TRUE" 518 268 77 37  
+        de.renew.gui.fs.ConceptFigure "attributes" "attributes" 4 "FigureWithID" "Int" 8376 "FrameColor" "Color" 0 0 0 255 "FillColor" "Color" 255 255 255 255 "IsaType" "Boolean" "TRUE" 534 278 "concept" "SansSerif" 0 12 0 NULL NULL  
+        de.renew.gui.fs.IsaConnection "attributes" "attributes" 2 "FillColor" "Color" 255 255 255 255 "FigureWithID" "Int" 8377 4 767 375 767 334 557 334 557 294 NULL 
+            de.renew.gui.IsaArrowTip 0.6 15.0 12.0 0  "de.renew.gui.IsaArrowTip" 
+            CH.ifa.draw.standard.ChopBoxConnector 
+                de.renew.gui.fs.ConceptFigure "attributes" "attributes" 4 "FigureWithID" "Int" 8386 "FrameColor" "Color" 0 0 0 255 "FillColor" "Color" 255 255 255 255 "IsaType" "Boolean" "TRUE" 713 375 "/** The example concept (example comment).\n */\nexample-concept\n\n/** Slots can be of basic of defined type.\n *   Use form: \"identifier:Type\"\n */\nname:String" "SansSerif" 0 12 0 NULL NULL   
+            CH.ifa.draw.standard.ChopBoxConnector REF 4  1  
+        de.renew.gui.DeclarationFigure "attributes" "attributes" 5 "FigureWithID" "Int" 8380 "FrameColor" "Color" 255 199 158 255 "TextAlignment" "Int" 0 "FillColor" "Color" 255 199 158 255 "IsaType" "Boolean" "TRUE" 60 216 "package de.renew.agent.${smallAppName}.ontology;" "SansSerif" 0 12 0 NULL NULL 1  
+        CH.ifa.draw.figures.RectangleFigure "attributes" "attributes" 3 "FigureWithID" "Int" 8381 "FillColor" "Color" 192 192 192 255 "IsaType" "Boolean" "TRUE" 255 364 92 37  
+        de.renew.gui.fs.ConceptFigure "attributes" "attributes" 4 "FigureWithID" "Int" 8382 "FrameColor" "Color" 0 0 0 255 "FillColor" "Color" 255 255 255 255 "IsaType" "Boolean" "TRUE" 269 375 "predicate" "SansSerif" 0 12 0 NULL NULL  
+        de.renew.gui.fs.IsaConnection "attributes" "attributes" 2 "FigureWithID" "Int" 8383 "FillColor" "Color" 255 255 255 255 4 297 375 297 334 557 334 557 294 NULL 
+            de.renew.gui.IsaArrowTip 0.6 15.0 12.0 0  "de.renew.gui.IsaArrowTip" 
+            CH.ifa.draw.standard.ChopBoxConnector REF 12  
+            CH.ifa.draw.standard.ChopBoxConnector REF 4  1  
+        de.renew.gui.fs.ConceptFigure "attributes" "attributes" 4 "FigureWithID" "Int" 8384 "FrameColor" "Color" 0 0 0 255 "FillColor" "Color" 255 255 255 255 "IsaType" "Boolean" "TRUE" 450 375 "agent-action" "SansSerif" 0 12 0 NULL NULL  
+        de.renew.gui.fs.IsaConnection "attributes" "attributes" 2 "FillColor" "Color" 255 255 255 255 "FigureWithID" "Int" 8385 4 490 375 490 334 557 334 557 294 NULL 
+            de.renew.gui.IsaArrowTip 0.6 15.0 12.0 0  "de.renew.gui.IsaArrowTip" 
+            CH.ifa.draw.standard.ChopBoxConnector REF 17  
+            CH.ifa.draw.standard.ChopBoxConnector REF 4  1  REF 8 
+        de.renew.gui.fs.UMLNoteFigure "attributes" "attributes" 5 "FigureWithID" "Int" 8387 "TextColor" "Color" 0 0 255 255 "FrameColor" "Color" 0 0 0 255 "FillColor" "Color" 255 255 255 255 "IsaType" "Boolean" "TRUE" 348 298 "Agent Actions" "SansSerif" 0 18 0 REF 1 
+            CH.ifa.draw.standard.OffsetLocator -65 -69 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5    
+        CH.ifa.draw.figures.LineConnection "attributes" "attributes" 2 "LineStyle" "String" "1 2" "FigureWithID" "Int" 8388 2 248 321 283 364 NULL NULL "CH.ifa.draw.figures.ArrowTip" 
+            CH.ifa.draw.contrib.ChopPolygonConnector 
+                de.renew.gui.fs.UMLNoteFigure "attributes" "attributes" 5 "TextColor" "Color" 0 0 255 255 "FigureWithID" "Int" 8392 "FrameColor" "Color" 0 0 0 255 "FillColor" "Color" 255 255 255 255 "IsaType" "Boolean" "TRUE" 173 294 "Predicates" "SansSerif" 0 18 0 REF 11 
+                    CH.ifa.draw.standard.OffsetLocator -66 -72 
+                        CH.ifa.draw.standard.RelativeLocator 0.5 0.5     
+            CH.ifa.draw.standard.ChopBoxConnector REF 11   
+        CH.ifa.draw.figures.LineConnection "attributes" "attributes" 2 "LineStyle" "String" "1 2" "FigureWithID" "Int" 8389 2 443 325 474 365 NULL NULL "CH.ifa.draw.figures.ArrowTip" 
+            CH.ifa.draw.contrib.ChopPolygonConnector REF 22  
+            CH.ifa.draw.standard.ChopBoxConnector REF 1   
+        CH.ifa.draw.figures.LineConnection "attributes" "attributes" 2 "LineStyle" "String" "1 2" "FigureWithID" "Int" 8390 3 669 250 636 267 595 277 NULL NULL "CH.ifa.draw.figures.ArrowTip" 
+            CH.ifa.draw.contrib.ChopPolygonConnector 
+                de.renew.gui.fs.UMLNoteFigure "attributes" "attributes" 5 "TextColor" "Color" 0 0 255 255 "FigureWithID" "Int" 8391 "FrameColor" "Color" 0 0 0 255 "FillColor" "Color" 255 255 255 255 "IsaType" "Boolean" "TRUE" 638 223 "Concepts" "SansSerif" 0 18 0 REF 3 
+                    CH.ifa.draw.standard.OffsetLocator 140 -47 
+                        CH.ifa.draw.standard.RelativeLocator 0.5 0.5     
+            CH.ifa.draw.standard.ChopBoxConnector REF 3   REF 36 REF 27 
+        CH.ifa.draw.figures.TextFigure "attributes" "attributes" 5 "FigureWithID" "Int" 8378 "FrameColor" "Color" 255 199 158 255 "TextAlignment" "Int" 0 "FillColor" "Color" 255 199 158 255 "IsaType" "Boolean" "TRUE" 77 48 "${appName} ontology" "SansSerif" 1 24 0 NULL NULL  
+        CH.ifa.draw.figures.TextFigure "attributes" "attributes" 5 "FigureWithID" "Int" 8379 "FrameColor" "Color" 255 199 158 255 "TextAlignment" "Int" 0 "FillColor" "Color" 255 199 158 255 "IsaType" "Boolean" "TRUE" 86 83 "Please define agent actions, predicates and ordinary concepts for the ${appName} ontology.\n\n@generator UseCaseComponents\n@date ${generationDate}\n@author\n@version 0.0.1" "SansSerif" 0 12 0 NULL NULL  NULL  0 22 1276 778 

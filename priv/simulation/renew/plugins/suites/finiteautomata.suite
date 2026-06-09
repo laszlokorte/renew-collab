@@ -1,0 +1,22 @@
+# Suite to model and simulate finite automata
+name = Finite Automata
+description = This suite is a collection of all plugins that are needed to model and simulate finite automata. This includes the plugin for FA-Formalism and the plugin for modeling FA called 'Finite Automata Base'.
+plugins = de.renew.formalism.gui(Renew Formalism Gui), de.renew.export(Renew FreeHep Export), de.renew.faformalism(Renew FAFormalism), de.renew.fa(Renew Finite Automata Base)
+# -----------------------------------
++++ Begin Properties +++
+renew.compiler = FA Compiler = setFormalism
+de.renew.gui.autostart = true
+de.renew.fa.init = true
+de.renew.fa.mode = standard, alternative
+de.renew.fa.useindices = true, false
+de.renew.fa.state-prefix = Z, Q, S, P, z, q, s, p
++++ End Properties +++
+# -----------------------------------
++++ Begin Menu Layout +++
+
++++ End Menu Layout +++
+#------------------------------
++++ Begin Functions +++
+
++++ End Functions +++
+#------------------------------

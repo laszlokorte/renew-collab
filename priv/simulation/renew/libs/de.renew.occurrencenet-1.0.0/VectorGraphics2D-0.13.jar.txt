@@ -1,0 +1,1 @@
+../shared/VectorGraphics2D-0.13.jar

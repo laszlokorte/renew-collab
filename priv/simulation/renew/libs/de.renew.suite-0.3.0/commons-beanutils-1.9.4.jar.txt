@@ -1,0 +1,1 @@
+../shared/commons-beanutils-1.9.4.jar

@@ -1,0 +1,15 @@
+11 
+    de.renew.interfacenets.figures.InterfaceNetsDrawing 7 
+        de.renew.interfacenets.figures.InterfaceFigure "attributes" "attributes" 4 "FrameColor" "Color" 0 0 0 255 "FigureWithID" "Int" 3418 "RightInterface" "Boolean" "FALSE" "FillColor" "Color" 0 0 0 255 0 0 0 10 74  
+        de.renew.interfacenets.figures.InterfaceBoxFigure "attributes" "attributes" 3 "FrameColor" "Color" 0 0 0 255 "FigureWithID" "Int" 3420 "FillColor" "Color" 192 192 192 255 3 REF 1 
+            de.renew.interfacenets.figures.InterfaceFigure "attributes" "attributes" 4 "FrameColor" "Color" 0 0 0 255 "FigureWithID" "Int" 3419 "RightInterface" "Boolean" "TRUE" "FillColor" "Color" 0 0 0 255 0 397 0 10 74  
+            de.renew.gui.TransitionFigure "attributes" "attributes" 3 "FigureWithID" "Int" 3394 "FillColor" "Color" 0 255 0 255 "Visibility" "Boolean" "TRUE" 185 29 24 16 NULL  0 0 407 74  REF 4 
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 5 "FigureWithID" "Int" 3398 "TextColor" "Color" 255 0 0 255 "TextAlignment" "Int" 1 "FillColor" "Color" 255 199 158 255 "FrameColor" "Color" 255 199 158 255 191 21 ">" "SansSerif" 1 12 0 REF 4 
+            CH.ifa.draw.standard.OffsetLocator -1 -9 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   2  REF 3 
+        de.renew.interfacenets.figures.InterfaceLabelTextFigure "attributes" "attributes" 4 "FrameColor" "Color" 255 199 158 255 "FigureWithID" "Int" 3421 "TextColor" "Color" 0 157 255 255 "FillColor" "Color" 255 199 158 255 189 -15 "stop" "SansSerif" 3 12 0 REF 2 
+            CH.ifa.draw.standard.OffsetLocator 0 -8 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.0    
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 5 "FigureWithID" "Int" 3395 "TextAlignment" "Int" 1 "FillColor" "Color" 255 199 158 255 "Visibility" "Boolean" "TRUE" "FrameColor" "Color" 255 199 158 255 178 49 ":stop()" "SansSerif" 0 12 0 REF 4 
+            CH.ifa.draw.standard.OffsetLocator 2 19 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   1  NULL  

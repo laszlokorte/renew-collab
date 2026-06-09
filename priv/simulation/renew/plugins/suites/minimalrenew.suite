@@ -1,0 +1,17 @@
+# Minimal Renew with Refnet functionality
+name = Minimal Renew with GUI
+description = This suite is a collection of plugins that form a minimal running version of Renew. This includes all plugins that are required to simulate reference nets. This version of the minimal Renew suite also includes the graphical user interface of Renew.
+plugins = CH.ifa.draw(Renew JHotDraw), de.renew.gui(Renew Gui), de.renew.formalism(Renew Formalism), de.renew.formalism.gui(Renew Formalism Gui), de.renew.simulator(Renew Simulator), de.renew.windowmanagement(Renew Window Management), de.renew.util(Renew Util), de.renew.misc(Renew Misc), de.renew.remote(Renew Remote), de.renew.export(Renew FreeHep Export)
+# -----------------------------------
++++ Begin Properties +++
+renew.compiler = Java Net Compiler, P/T Net Compiler = setFormalism
++++ End Properties +++
+# -----------------------------------
++++ Begin Menu Layout +++
+
++++ End Menu Layout +++
+#------------------------------
++++ Begin Functions +++
+
++++ End Functions +++
+#------------------------------

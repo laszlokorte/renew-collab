@@ -1,0 +1,9 @@
+; Tue Oct 09 15:51:51 CEST 2007
+; 
+;+ (version "3.1.1")
+;+ (build "Build 216")
+
+
+(defclass %3ACLIPS_TOP_LEVEL_SLOT_CLASS "Fake class to save top-level slot information"
+	(is-a USER)
+	(role abstract))

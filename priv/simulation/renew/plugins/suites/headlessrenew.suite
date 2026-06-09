@@ -1,0 +1,16 @@
+# Minimal Renew without GUI
+name = Headless Renew
+description = This suite is a collection of plugins that form a minimal running version of Renew. This includes all plugins that are required to simulate reference nets. It runs without a gui.
+plugins = CH.ifa.draw(Renew JHotDraw), de.renew.formalism(Renew Formalism), de.renew.simulator(Renew Simulator), de.renew.util(Renew Util), de.renew.misc(Renew Misc), de.renew.remote(Renew Remote), de.renew.export(Renew FreeHep Export), de.renew.netcomponents(Renew NetComponents)
+# -----------------------------------
++++ Begin Properties +++
++++ End Properties +++
+# -----------------------------------
++++ Begin Menu Layout +++
+
++++ End Menu Layout +++
+#------------------------------
++++ Begin Functions +++
+
++++ End Functions +++
+#------------------------------

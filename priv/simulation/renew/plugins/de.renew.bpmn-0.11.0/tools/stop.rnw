@@ -1,0 +1,12 @@
+8 
+    de.renew.gui.CPNDrawing 4 
+        de.renew.gui.TransitionFigure "attributes" "attributes" 3 "FigureWithID" "Int" 3394 "Visibility" "Boolean" "TRUE" "FillColor" "Color" 0 255 0 2 -5 24 16 NULL  
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 5 "TextAlignment" "Int" 1 "FigureWithID" "Int" 3395 "FrameColor" "Color" 255 199 158 "Visibility" "Boolean" "TRUE" "FillColor" "Color" 255 199 158 -2 -25 ":stop()" "SansSerif" 0 12 0 REF 1 
+            CH.ifa.draw.standard.OffsetLocator 2 -21 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   1  
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 4 "TextAlignment" "Int" 1 "FigureWithID" "Int" 3417 "FrameColor" "Color" 255 199 158 "FillColor" "Color" 255 199 158 -1 16 "STOP" "SansSerif" 1 12 0 REF 1 
+            CH.ifa.draw.standard.OffsetLocator 1 20 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   2  
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 5 "TextAlignment" "Int" 1 "FigureWithID" "Int" 3398 "FrameColor" "Color" 255 199 158 "TextColor" "Color" 255 0 0 "FillColor" "Color" 255 199 158 -4 -5 ">" "SansSerif" 1 12 0 REF 1 
+            CH.ifa.draw.standard.OffsetLocator -13 -1 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   2  NULL  67 125 160 169 

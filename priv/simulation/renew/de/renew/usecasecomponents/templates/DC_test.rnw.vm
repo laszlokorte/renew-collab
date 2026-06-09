@@ -1,0 +1,36 @@
+11 
+    de.renew.gui.CPNDrawing 14 
+        CH.ifa.draw.figures.RoundRectangleFigure "attributes" "attributes" 2 "FigureWithID" "Int" 1304 "FillColor" "Color" 204 204 204 255 22 19 664 149 50 34  
+        CH.ifa.draw.figures.TextFigure "attributes" "attributes" 4 "TextAlignment" "Int" 0 "FigureWithID" "Int" 1306 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 52 63 "@date 2007-11-22\n@authors\n@version 0.1\n\nAutomatically generated empty test DC." "SansSerif" 0 12 0 REF 1 
+            CH.ifa.draw.standard.OffsetLocator -188 7 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5    
+        de.renew.gui.TransitionFigure "attributes" "attributes" 3 "FigureWithID" "Int" 5 "FrameColor" "Color" 255 0 0 255 "FillColor" "Color" 255 200 0 255 176 217 24 16 NULL  
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 4 "TextAlignment" "Int" 1 "FigureWithID" "Int" 6 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 167 198 "manual" "SansSerif" 0 12 0 REF 5 
+            CH.ifa.draw.standard.OffsetLocator 0 -20 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   1  
+        de.renew.gui.DeclarationFigure "attributes" "attributes" 4 "TextAlignment" "Int" 0 "FigureWithID" "Int" 12851 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 53 333 "import de.renew.agent.repr.acl.*; \nimport de.renew.net.NetInstance;\nimport de.renew.agent.repr.sl.*; \nimport ${pluginPackage}.ontology.*;\nimport ${pluginPackage}.roles.${smallActor}.*;\n\nAclMessage p;\nBoolean bool;   \nAgentIdentifier aid;    \nNetInstance kb;   \nString name, key, s;    \nint id;  \nObject o,oo;\nde.renew.unify.List l,newl;" "SansSerif" 0 12 0 NULL NULL 1  
+        CH.ifa.draw.figures.TextFigure "attributes" "attributes" 4 "TextAlignment" "Int" 1 "FigureWithID" "Int" 1305 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 87 32 "$appName: ${actor}_DC_test" "SansSerif" 0 18 0 REF 1 
+            CH.ifa.draw.standard.OffsetLocator -143 -50 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5    
+        de.renew.gui.ArcConnection "attributes" "attributes" 1 "FigureWithID" "Int" 12852 2 200 225 224 225 NULL 
+            CH.ifa.draw.figures.ArrowTip 0.4 8.0 8.0 1  "CH.ifa.draw.figures.ArrowTip" 
+            CH.ifa.draw.standard.ChopBoxConnector REF 5  
+            CH.ifa.draw.figures.ChopEllipseConnector 
+                de.renew.gui.PlaceFigure "attributes" "attributes" 1 "FigureWithID" "Int" 12853 223 215 20 20 NULL    REF 17 
+        de.renew.gui.ArcConnection "attributes" "attributes" 1 "FigureWithID" "Int" 12855 2 243 225 286 225 NULL 
+            CH.ifa.draw.figures.ArrowTip 0.4 8.0 8.0 1  "CH.ifa.draw.figures.ArrowTip" 
+            CH.ifa.draw.figures.ChopEllipseConnector REF 17  
+            CH.ifa.draw.standard.ChopBoxConnector 
+                de.renew.gui.TransitionFigure "attributes" "attributes" 1 "FigureWithID" "Int" 12856 286 218 24 16 NULL    REF 22 
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 4 "TextAlignment" "Int" 1 "FigureWithID" "Int" 10 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 262 234 ":access(kb)" "SansSerif" 0 12 0 REF 22 
+            CH.ifa.draw.standard.OffsetLocator -4 15 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   1  
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 4 "TextAlignment" "Int" 1 "FigureWithID" "Int" 12 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 239 251 "kb:ask(\"Name\",aid)" "SansSerif" 0 12 0 REF 22 
+            CH.ifa.draw.standard.OffsetLocator -4 32 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   1  
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 4 "TextAlignment" "Int" 1 "FigureWithID" "Int" 9 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 186 268 "action p = Sl0Creator.createActionRequest(aid,\"start\");" "SansSerif" 0 12 0 REF 22 
+            CH.ifa.draw.standard.OffsetLocator 45 49 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   1  
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 4 "TextAlignment" "Int" 1 "FigureWithID" "Int" 11 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 213 284 "kb:newPlan(\"simpleSend\",p)" "SansSerif" 0 12 0 REF 22 
+            CH.ifa.draw.standard.OffsetLocator -5 65 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   1  NULL  0 161 856 527 

@@ -1,0 +1,13 @@
+11 
+    de.renew.gui.CPNDrawing 7 
+        CH.ifa.draw.figures.RoundRectangleFigure "attributes" "attributes" 2 "FigureWithID" "Int" 1304 "FillColor" "Color" 204 204 204 255 45 67 664 149 50 34  
+        CH.ifa.draw.figures.RoundRectangleFigure "attributes" "attributes" 3 "FrameColor" "Color" 0 0 0 255 "FigureWithID" "Int" 2 "FillColor" "Color" 0 0 255 38 54 334 392 375 8 8  
+        de.renew.netcomponents.NetComponentFigure "attributes" "attributes" 4 "FrameColor" "Color" 255 199 158 255 "FigureWithID" "Int" 5229 "FillColor" "Color" 255 199 158 255 "LineStyle" "String" "1 2" 4 REF 1 
+            de.renew.gui.DeclarationFigure "attributes" "attributes" 4 "FrameColor" "Color" 255 199 158 255 "FigureWithID" "Int" 1 "TextAlignment" "Int" 0 "FillColor" "Color" 255 199 158 255 65 437 "import de.renew.mailnotificationnetcomponents.Notification;\nimport de.renew.mailnotificationnetcomponents.Mailserver;\nimport de.renew.mailnotificationnetcomponents.ErrorMessage;\nimport de.renew.unify.List;\nimport de.renew.unify.Tuple;\n\nString senderName, senderMail, subject, body,\n contentTransferEncoding, personalName,\n\	hint, stacktrace;\nint port;\nList receivers;\nNotification notification;\nMailserver mailclient;\nObject[] errorList;\nObject result, ignore;\nErrorMessage e;\nTuple error;" "SansSerif" 0 12 0 NULL NULL 1  
+            CH.ifa.draw.figures.TextFigure "attributes" "attributes" 5 "FrameColor" "Color" 255 199 158 255 "FigureWithID" "Int" 5228 "TextAlignment" "Int" 0 "TextColor" "Color" 0 0 0 255 "FillColor" "Color" 255 199 158 255 64 343 "imports for \nMailNotificationNetComponents" "SansSerif" 1 24 0 NULL NULL  REF 2  REF 4 
+        CH.ifa.draw.figures.TextFigure "attributes" "attributes" 4 "FrameColor" "Color" 255 199 158 255 "FigureWithID" "Int" 1305 "TextAlignment" "Int" 0 "FillColor" "Color" 255 199 158 255 70 79 "EMail_Notification" "SansSerif" 0 18 0 REF 1 
+            CH.ifa.draw.standard.OffsetLocator -235 -50 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5    REF 5 
+        CH.ifa.draw.figures.TextFigure "attributes" "attributes" 4 "FrameColor" "Color" 255 199 158 255 "FigureWithID" "Int" 1306 "TextAlignment" "Int" 0 "FillColor" "Color" 255 199 158 255 109 124 "@authors 8rodenbe, 9guecuek, 9simic\n@date 2022-5-22\n\nCreate a Notification, connect to a Mailserver and send the Mail to the authorized Mailserver." "SansSerif" 0 12 0 REF 1 
+            CH.ifa.draw.standard.OffsetLocator -20 15 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5    NULL  

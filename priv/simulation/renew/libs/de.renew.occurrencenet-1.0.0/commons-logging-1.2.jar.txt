@@ -1,0 +1,1 @@
+../shared/commons-logging-1.2.jar

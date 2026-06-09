@@ -1,0 +1,18 @@
+11 
+    de.renew.agent.modeller.diagram.view.MASDiagramDrawing 11 
+        CH.ifa.draw.figures.RoundRectangleFigure "attributes" "attributes" 1 "FillColor" "Color" 255 200 0 255 1252 279 236 126 26 26  
+        de.renew.agent.modeller.diagram.view.figures.DiagramElementFigure "AgentRole" "CapaAgent" 1 "StateDescription" "de.renew.agent.modeller.diagram.agent.StateDescriptionEntry" 0 2 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<entry argTypes=\"\" valueType=\"de.renew.agent.repr.acl.AgentIdentifier\" xmlns=\"http://tempuri.org/XMLSchema.xsd\">\n    <comment>AgentIdentifier</comment>\n    <name>Name</name>\n    <value>;</value>\n</entry>\n\n" 0 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<entry argTypes=\"java.lang.String\" valueType=\"java.util.Vector\" xmlns=\"http://tempuri.org/XMLSchema.xsd\">\n    <comment/>\n    <name>proaktiv</name>\n    <value>generalAgentSetup;</value>\n</entry>\n\n" 0 
+            CH.ifa.draw.figures.RectangleFigure "attributes" "attributes" 2 "FrameColor" "Color" 0 255 0 255 "FillColor" "Color" 255 255 255 255 1274 295 189 94  0  
+        CH.ifa.draw.figures.TextFigure "attributes" "attributes" 3 "TextAlignment" "Int" 0 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 510 107 "@generator PluginGenerator\n@author <please fill in Modeller>\n\n@date 2007...\n\n@version 0.1" "SansSerif" 0 14 0 NULL NULL  
+        CH.ifa.draw.figures.RoundRectangleFigure "no_attributes" 488 11 726 86 40 22  
+        CH.ifa.draw.figures.TextFigure "attributes" "attributes" 3 "TextAlignment" "Int" 0 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 510 33 "Agent Roles in $appName" "SansSerif" 0 36 0 NULL NULL  
+        CH.ifa.draw.figures.TextFigure "attributes" "attributes" 3 "TextAlignment" "Int" 0 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 1334 41 "Defines Agent Roles (hierarchically) and Services (grouped by Interfaces).\nTo be used with KBE (use Modeller for Layout stuff).\nKBE can generate all Agents (*.kb files) from this diagram.\nClass WBHelper will prepend each Protocol and IncomingMessage with \"<rolename>_\".\n" "SansSerif" 0 14 0 NULL NULL  
+        CH.ifa.draw.figures.TextFigure "attributes" "attributes" 3 "TextAlignment" "Int" 0 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 1334 16 "Description" "SansSerif" 0 18 0 NULL NULL  
+        CH.ifa.draw.figures.TextFigure "attributes" "attributes" 3 "TextAlignment" "Int" 0 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 1151 123 "Legend" "SansSerif" 0 18 0 NULL NULL  
+        CH.ifa.draw.figures.GroupFigure 2 
+            CH.ifa.draw.figures.RoundRectangleFigure "attributes" "attributes" 1 "FillColor" "Color" 192 192 192 255 1014 150 200 27 10 12  
+            CH.ifa.draw.figures.TextFigure "attributes" "attributes" 3 "TextAlignment" "Int" 0 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 1021 156 "Interface" "SansSerif" 1 12 0 NULL NULL   
+        CH.ifa.draw.figures.GroupFigure 2 
+            CH.ifa.draw.figures.RoundRectangleFigure "attributes" "attributes" 1 "FillColor" "Color" 255 200 0 255 1014 185 200 27 10 12  
+            CH.ifa.draw.figures.TextFigure "attributes" "attributes" 3 "TextAlignment" "Int" 0 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 1021 191 "Super Role" "SansSerif" 1 12 0 NULL NULL   
+        CH.ifa.draw.figures.TextFigure "attributes" "attributes" 3 "TextAlignment" "Int" 0 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 1334 178 "TODO" "SansSerif" 0 18 0 NULL NULL   1 22 1269 714 

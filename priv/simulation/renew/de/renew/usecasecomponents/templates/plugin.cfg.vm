@@ -1,0 +1,22 @@
+# +-------------------------------------------------------------------
+# | plugin.cfg
+# |
+# | Configures the $appName plug-in for CAPA.
+# | This plug-in enhances CAPA by agents and interaction protocols
+# | thus providing an multi-agent application.
+# | This file is generated from a template (de/renew/agent/netcomponents/plugin.vm).
+# | However, it may be edited / cutomized.
+# +-------------------------------------------------------------------
+
+# Fixed properties of the plugin
+# ------------------------------
+name = $appName
+mainClass = de.renew.${smallAppName}.${appName}Plugin
+provides = de.renew.$smallAppName
+requires = de.renew.util,de.renew.simulator,de.renew.agent.mulan.platform,de.renew.agent.fipa
+version = 0.1
+versionDate = ${generationDate}
+versionText = Initial generated version
+
+# User-configurable plugin properties
+# -----------------------------------

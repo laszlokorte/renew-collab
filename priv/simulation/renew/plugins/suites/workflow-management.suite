@@ -1,0 +1,22 @@
+# Renew as Workflow-Management-System
+name = Workflow-Management
+description = This suite is a collection of plugins that form a workflow-management-system. This includes the access-plugin for role management, the wfnet-plugin for the task transition and its formalism and the workflow-plugin that provides the workflow-engine. Note: Without setting de.renew.access.properties and de.renew.workflow.properties the workflow-management-system is not working. They must be set before Renew is started.
+plugins = de.renew.formalism.gui(Renew Formalism Gui), de.renew.export(Renew FreeHep Export), de.renew.access(Renew Access), de.renew.wfnet(Renew WFNet), de.renew.workflow(Renew Workflow)
+# -----------------------------------
++++ Begin Properties +++
+renew.compiler = Workflow Compiler = setFormalism
+de.renew.remote.enable = true
+de.renew.gui.autostart = true
+# de.renew.access.properties = samples.mwe.Access
+# de.renew.workflow.properties = samples.mwe.Workflow
+# de.renew.access.adaptor = de.renew.workflow.impl.ResourceBundleAdaptor
++++ End Properties +++
+# -----------------------------------
++++ Begin Menu Layout +++
+
++++ End Menu Layout +++
+#------------------------------
++++ Begin Functions +++
+
++++ End Functions +++
+#------------------------------

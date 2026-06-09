@@ -1,0 +1,19 @@
+12 
+    de.renew.gui.CPNDrawing 8 
+        de.renew.netcomponents.NetComponentFigure "attributes" "attributes" 4 "LineStyle" "String" "1 2" "FigureWithID" "Int" 5005 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 4 
+            de.renew.gui.TransitionFigure "attributes" "attributes" 3 "FigureWithID" "Int" 3394 "Visibility" "Boolean" "TRUE" "FillColor" "Color" 0 255 0 255 -9 -6 24 16 NULL  
+            de.renew.gui.PlaceFigure "attributes" "attributes" 1 "FigureWithID" "Int" 4988 66 -8 20 20 NULL  
+            CH.ifa.draw.figures.RectangleFigure "attributes" "attributes" 3 "FigureWithID" "Int" 742 "FrameColor" "Color" 224 224 224 255 "FillColor" "Color" 240 240 240 255 -26 -14 69 33  
+            de.renew.gui.ArcConnection "attributes" "attributes" 1 "FigureWithID" "Int" 3418 2 15 2 67 2 NULL 
+                CH.ifa.draw.figures.ArrowTip 0.4 8.0 8.0 1  "CH.ifa.draw.figures.ArrowTip" 
+                CH.ifa.draw.standard.ChopBoxConnector REF 2  
+                CH.ifa.draw.figures.ChopEllipseConnector REF 3    REF 4 REF 2 REF 3 
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 5 "TextAlignment" "Int" 1 "FigureWithID" "Int" 5004 "FrameColor" "Color" 255 199 158 255 "TextColor" "Color" 255 0 0 255 "FillColor" "Color" 255 199 158 255 82 -7 ">" "SansSerif" 1 12 0 REF 3 
+            CH.ifa.draw.standard.OffsetLocator 9 -1 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   2  
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 5 "TextAlignment" "Int" 1 "FigureWithID" "Int" 3398 "FrameColor" "Color" 255 199 158 255 "TextColor" "Color" 255 0 0 255 "FillColor" "Color" 255 199 158 255 -13 -7 ">" "SansSerif" 1 12 0 REF 2 
+            CH.ifa.draw.standard.OffsetLocator -13 -1 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   2  REF 5 
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 4 "TextAlignment" "Int" 1 "FigureWithID" "Int" 3417 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 -13 17 "STOP" "SansSerif" 1 12 0 REF 3 
+            CH.ifa.draw.standard.OffsetLocator -73 23 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   2  NULL  

@@ -1,0 +1,22 @@
+# Renew as Workflow-Management-System with PhoneShop
+name = PhoneShop-Workflow-Management-System
+description = Warning: This suite is not working yet. This suite is a collection of all plugins for workflow-management with phoneshop as workflow-management-system. This includes the access-plugin for role management, the wfnet-plugin for the task transition and the workflow-plugin that provides the workflow-engine. The phoneshop-plugin provides a workflow-management-system.
+plugins = de.renew.formalism.gui(Renew Formalism Gui), de.renew.access(Renew Access), de.renew.wfnet(Renew WFNet), de.renew.workflow(Renew Workflow), de.renew.phoneshop(Renew PhoneShop)
+# -----------------------------------
++++ Begin Properties +++
+renew.compiler = Workflow Compiler = setFormalism
+de.renew.access.adaptor = de.renew.workflow.impl.ResourceBundleAdaptor
+de.renew.remote.enable = true
+de.renew.gui.autostart = true
+de.renew.access.properties = de.renew.phoneshop.Access
+de.renew.workflow.properties = de.renew.phoneshop.Workflow
++++ End Properties +++
+# -----------------------------------
++++ Begin Menu Layout +++
+
++++ End Menu Layout +++
+#------------------------------
++++ Begin Functions +++
+
++++ End Functions +++
+#------------------------------

@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE project SYSTEM "../ant/renewAnt.dtd" [
+   <!ENTITY commonproperties SYSTEM "../ant/commonproperties.xml">
+   <!ENTITY commontasks      SYSTEM "../ant/commontasks.xml">
+   <!ENTITY commontargets    SYSTEM "../ant/commontargets.xml">
+   <!ENTITY cvstargets       SYSTEM "../ant/cvstargets.xml">
+   <!ENTITY mulantargets     SYSTEM "../ant/mulantargets.xml">
+]>
+
+<project name="$appName" default="dist" basedir=".">
+  <description>
+$generic-description
+  </description>
+
+  <!-- makes some checks. (internal). -->
+  <!-- if there is something to initialize, insert here -->
+  <target name="configure">
+    <property name="plugin.name" value="$generic-name"/>
+
+    &commonproperties;
+    <property name="dir.samples" location="samples"/>
+    
+    <path id="ref.classpath">
+      <path refid="ref.renewclasspath"/>
+      <fileset dir="${dir.mulan.dist.plugins}">
+        <include name="capa*.jar"/>
+      	<include name="remoteDC*.jar"/>
+    	<include name="fipa*.jar"/>
+      </fileset>
+    </path>
+
+    <!-- include/exclude pattern for shadow net compilation. -->
+    <patternset id="ref.netpattern">
+      <include name="**/*.rnw"/>		
+    </patternset>
+  </target>
+
+  <target name="init" depends="configure">
+    &commontasks;
+  </target>
+
+  &commontargets;
+  &cvstargets;
+  &mulantargets;
+
+  <target name="compile" 
+    depends="init,prepare, configure.roles, roles, netstubs, ${ontologytarget}, channelspecifications, javac, sns"
+    description="Compiles the ${appName} with all dependencies.">
+  </target>
+
+  <target name="dist" 
+    depends="init, compile, jar, copytodist.jar" 
+    description="Builds the ${appName} plug-in completely. Prepend 'clean' to build from scratch. (default)">
+  </target>
+    
+  <target name="clean" 
+    depends="configure, clean.common.jar"
+    description="Removes all generated code/classes/doc.">
+  </target>
+
+#if(${ontologytarget} == "ontology.app")
+  <target name="ontology.app" depends="init.mulanontologytasks">
+    <createontology projectSource="${dir.src}/ontology/${appName}.pprj" targetDir="${dir.build.gensrc}"/>
+    <!--     <createontology projectSource="${dir.src}/ontology/changeRequest.pprj" targetDir="${dir.build.gensrc}"/> -->
+  </target>
+#end
+
+  <target name="javadoc" 
+    depends="init, compile" 
+    description="Creates javadoc documentation.">
+    <delete dir="${dir.javadoc}"/>
+    <mkdir dir="${dir.javadoc}"/>
+    <javadoc	destdir="${dir.javadoc}"
+      author="true"
+      version="true"
+      use="true"
+      access="${option.javadoc.access}"
+      classpathref="ref.classpath"
+      source="${option.compile.source}"
+      maxmemory="128M"
+      windowtitle="$appName API documentation">
+      <packageset dir="${dir.src}" defaultexcludes="yes">
+	<include name="**" />
+      </packageset>
+      <packageset dir="${dir.build.gensrc}" defaultexcludes="yes">
+	<include name="**" />
+      </packageset>
+      <link href="${link.javadoc.java}" />
+      <link href="${link.javadoc.junit}" />
+      <link href="${link.javadoc.ant}"/>
+      <link href="${link.javadoc.renew}"
+         offline="${link.javadoc.renew.isOffline}"
+	 packagelistloc="${link.javadoc.renew.offline}"/>
+      <link offline="true" href="${link.javadoc.Fipa}"
+                 packagelistloc="${link.javadoc.Fipa.offline}"/>
+      <link offline="true" href="${link.javadoc.Platform}"
+                 packagelistloc="${link.javadoc.Platform.offline}"/>
+      <link offline="true" href="${link.javadoc.RemoteDC}"
+                 packagelistloc="${link.javadoc.RemoteDC.offline}"/>
+    </javadoc>
+  </target>
+
+  <!-- creates a plugin jar file including all libraries and classes. -->
+  <target name="jar"
+    depends="configure">
+    <jar destfile="${file.build.jar}">
+      <fileset dir="${dir.build.classes}"/>
+    </jar>
+  </target>
+
+  <!-- copies all non source files from src to build -->
+  <target name="prepare" 
+    depends="configure">
+    <mkdir dir="${dir.build.classes}"/>
+    <copy todir="${dir.build.classes}">
+      <fileset dir="${dir.src}">
+	<include name="**/*.wis"/>
+	<include name="**/*.kb"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <!-- Generates .eps files from Renew net drawings .rnw -->
+  <target name="eps"
+    description="eps"
+    depends="init">
+    <createeps destdir="${dir.build}">
+      <fileset dir="${dir.src}">
+	<include name="**/*.rnw" />
+      </fileset>
+    </createeps>
+  </target>
+  
+  
+  
+  
+  <target name="documentation"
+    description="creates the documentation of the agentsystem"
+    depends="init, compile">
+    <mkdir dir="./build/documentation" />	
+
+    
+    <createdocumentation destdir="${dir.build.documentation}">
+      
+    </createdocumentation>
+    
+
+    <createeps destdir="${dir.build.documentation}">
+      <fileset dir="${dir.build.documentation}">
+	<include name="**/*.rnw" />
+	<include name="**/*.aip" />
+      </fileset>
+    </createeps>
+
+    <javadoc	destdir="${dir.build.documentation}"
+      author="true"
+      version="true"
+      use="true"
+      access="${option.javadoc.access}"
+      classpathref="ref.classpath"
+      source="${option.compile.source}"
+      maxmemory="128M"
+      windowtitle="$appName API documentation">
+      <packageset dir="${dir.src}" defaultexcludes="yes">
+	<include name="**" />
+      </packageset>
+      <packageset dir="${dir.build.gensrc}" defaultexcludes="yes">
+	<include name="**" />
+      </packageset>
+      <link href="${link.javadoc.java}" />
+      <link href="${link.javadoc.junit}" />
+      <link href="${link.javadoc.ant}"/>
+      <link href="${link.javadoc.renew}" />
+      <link href="${link.javadoc.platform}" />
+    </javadoc>
+    
+    <exec executable="latex">
+      <arg line="${dir.build}/documentation/documentation.tex"/>
+    </exec> 
+    
+    <exec executable="dvipdfm">
+      <arg line="${dir.build}/documentation/documentation.dvi"/>
+    </exec>    
+  </target>  
+
+  <target name="mulandoc"
+        description="generates documentation of the agent project"
+    depends="init, init.roles, init.mulantasks">
+        <mulanDoc
+          sourcesDir="${sourcePath}"
+          sourcesDirExternal="${dir}/documentation"
+          outputDir="${dir.build.documentation}" 
+          netpath="ref.armnetpath"/>
+        <mulanDocImageMap
+              source="${dir.etc}/${cddFilename}"
+              outputDir="${dir.build.documentation}" />
+  </target>
+  
+  	<target name="configure.roles" depends="configure.roles.default"
+				description="Configure custom arm net path">
+		<path id="ref.armnetpath">
+			<path refid="ref.defaultarmnetpath" />
+			<path location="${sourcePath}/agents" />
+		</path>
+	</target>
+
+
+</project>

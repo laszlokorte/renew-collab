@@ -1,0 +1,5 @@
+11 
+    de.renew.gui.CPNDrawing 3 
+        CH.ifa.draw.figures.RectangleFigure "attributes" "attributes" 3 "FrameColor" "Color" 224 224 224 255 "FigureWithID" "Int" 742 "FillColor" "Color" 240 240 240 255 -4 -13 116 33  
+        de.renew.netcomponents.NetComponentFigure "attributes" "attributes" 4 "LineStyle" "String" "1 2" "FigureWithID" "Int" 743 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 2 REF 1 
+            CH.ifa.draw.figures.TextFigure "attributes" "attributes" 4 "FrameColor" "Color" 255 199 158 255 "FigureWithID" "Int" 1 "TextAlignment" "Int" 0 "FillColor" "Color" 255 199 158 255 1 -7 "$role" "SansSerif" 1 14 0 NULL NULL   REF 3 NULL  

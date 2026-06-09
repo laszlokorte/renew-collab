@@ -1,0 +1,7 @@
+package de.renew.usecasecomponents.templates.${smallAppName}.ontology;
+
+public class ${appName}Ontology {
+    public static void registerClasses() {
+        ${appName}OntologyOntology.registerClasses();
+    }
+}

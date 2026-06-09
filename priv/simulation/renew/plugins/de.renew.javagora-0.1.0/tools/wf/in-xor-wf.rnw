@@ -1,0 +1,35 @@
+12 
+    de.renew.gui.CPNDrawing 15 
+        CH.ifa.draw.figures.RectangleFigure "attributes" "attributes" 3 "FigureWithID" "Int" 5677 "FrameColor" "Color" 224 224 224 255 "FillColor" "Color" 240 240 240 255 -4 -14 69 57  
+        de.renew.netcomponents.NetComponentFigure "attributes" "attributes" 4 "LineStyle" "String" "1 2" "FigureWithID" "Int" 5679 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 8 REF 1 
+            de.renew.gui.PlaceFigure "attributes" "attributes" 2 "FigureWithID" "Int" 5663 "FillColor" "Color" 0 0 255 102 79 51 20 20 NULL  
+            de.renew.gui.PlaceFigure "attributes" "attributes" 1 "FigureWithID" "Int" 3847 6 51 20 20 NULL  
+            de.renew.gui.PlaceFigure "attributes" "attributes" 2 "FigureWithID" "Int" 5665 "FillColor" "Color" 0 0 255 102 79 -69 20 20 NULL  
+            de.renew.gui.ArcConnection "attributes" "attributes" 1 "FigureWithID" "Int" 3844 2 28 2 80 2 NULL 
+                CH.ifa.draw.figures.ArrowTip 0.4 8.0 8.0 1  "CH.ifa.draw.figures.ArrowTip" 
+                CH.ifa.draw.standard.ChopBoxConnector 
+                    de.renew.gui.TransitionFigure "attributes" "attributes" 3 "FigureWithID" "Int" 3616 "Visibility" "Boolean" "TRUE" "FillColor" "Color" 192 192 192 255 4 -6 24 16 NULL   
+                CH.ifa.draw.figures.ChopEllipseConnector 
+                    de.renew.gui.PlaceFigure "attributes" "attributes" 1 "FigureWithID" "Int" 3631 79 -8 20 20 NULL    REF 11 REF 9 
+            de.renew.gui.ArcConnection "attributes" "attributes" 1 "FigureWithID" "Int" 3848 2 16 52 16 10 NULL 
+                CH.ifa.draw.figures.ArrowTip 0.4 8.0 8.0 1  "CH.ifa.draw.figures.ArrowTip" 
+                CH.ifa.draw.figures.ChopEllipseConnector REF 4  
+                CH.ifa.draw.standard.ChopBoxConnector REF 9    REF 3 REF 4 REF 5 REF 11 REF 9 
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 5 "TextAlignment" "Int" 1 "FigureWithID" "Int" 3640 "FrameColor" "Color" 255 199 158 255 "TextColor" "Color" 255 0 0 255 "FillColor" "Color" 255 199 158 255 95 -6 ">" "SansSerif" 1 12 0 REF 11 
+            CH.ifa.draw.standard.OffsetLocator 9 0 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   2  
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 4 "TextAlignment" "Int" 1 "FigureWithID" "Int" 5666 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 34 -107 "[control]\nmessage_join_true" "SansSerif" 1 12 0 REF 5 
+            CH.ifa.draw.standard.OffsetLocator 0 -31 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   2  REF 6 
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 4 "TextAlignment" "Int" 1 "FigureWithID" "Int" 3845 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 -6 -29 "IN-XOR" "SansSerif" 1 12 0 REF 11 
+            CH.ifa.draw.standard.OffsetLocator -73 -23 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   2  
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 5 "TextAlignment" "Int" 1 "FigureWithID" "Int" 3850 "FrameColor" "Color" 255 199 158 255 "TextColor" "Color" 0 0 255 255 "FillColor" "Color" 255 199 158 255 20 53 "<" "SansSerif" 1 12 0 REF 4 
+            CH.ifa.draw.standard.OffsetLocator 7 0 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   2  
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 5 "TextAlignment" "Int" 1 "FigureWithID" "Int" 3639 "FrameColor" "Color" 255 199 158 255 "TextColor" "Color" 255 0 0 255 "FillColor" "Color" 255 199 158 255 2 -7 ">" "SansSerif" 1 12 0 REF 9 
+            CH.ifa.draw.standard.OffsetLocator -11 -1 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   2  REF 12 
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 4 "TextAlignment" "Int" 1 "FigureWithID" "Int" 5664 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 32 75 "[control]\nmessage_join_false" "SansSerif" 1 12 0 REF 3 
+            CH.ifa.draw.standard.OffsetLocator 0 31 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   2  NULL  

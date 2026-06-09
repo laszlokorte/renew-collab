@@ -1,0 +1,7 @@
+11 
+    de.renew.gui.CPNDrawing 1
+        de.renew.usecasecomponents.figures.UseCaseFigure 2
+                CH.ifa.draw.figures.EllipseFigure "attributes" "attributes" 2 "FigureWithID" "Int" 1 "FillColor" "Color" 255 255 255 255 -82 -23 166 48
+                de.renew.usecasecomponents.figures.UCCLabelTextFigure "attributes" "attributes" 4 "TextAlignment" "Int" 1 "FigureWithID" "Int" 2 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 -14 -6 "case" "SansSerif" 0 12 0 REF 2
+                    CH.ifa.draw.standard.OffsetLocator 0 0
+                        CH.ifa.draw.standard.RelativeLocator 0.5 0.5    NULL  61 161 290 213

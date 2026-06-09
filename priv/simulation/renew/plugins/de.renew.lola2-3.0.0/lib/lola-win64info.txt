@@ -1,0 +1,2 @@
+These are the executables for lola based on 2.0 compiled on Windows 64 bit with cygwin. 
+It contains a fix to enable the build on Windows (see https://git.informatik.uni-hamburg.de/tgipublic/lola/lola/-/tree/version-2.0-cygwin)

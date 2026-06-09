@@ -1,0 +1,14 @@
+11
+    de.renew.gui.CPNDrawing 1
+    de.renew.usecasecomponents.figures.ActorFigure 2
+        de.renew.usecasecomponents.figures.StickFigure 7
+        CH.ifa.draw.figures.EllipseFigure "attributes" "attributes" 3 "FigureWithID" "Int" 257 "ArrowMode" "Int" 0 "FillColor" "Color" 255 255 255 255 -9 -48 22 21
+        CH.ifa.draw.figures.LineFigure "attributes" "attributes" 1 "FigureWithID" "Int" 262 2 2 10 25 33 NULL NULL "CH.ifa.draw.figures.ArrowTip"
+        CH.ifa.draw.figures.LineFigure "attributes" "attributes" 1 "FigureWithID" "Int" 263 2 2 10 -21 33 NULL NULL "CH.ifa.draw.figures.ArrowTip"
+        CH.ifa.draw.figures.LineFigure "attributes" "attributes" 1 "FigureWithID" "Int" 264 2 2 -28 2 -17 NULL NULL "CH.ifa.draw.figures.ArrowTip"
+        CH.ifa.draw.figures.LineFigure "attributes" "attributes" 1 "FigureWithID" "Int" 265 2 2 -17 2 10 NULL NULL "CH.ifa.draw.figures.ArrowTip"
+        CH.ifa.draw.figures.LineFigure "attributes" "attributes" 1 "FigureWithID" "Int" 266 2 2 -17 28 -33 NULL NULL "CH.ifa.draw.figures.ArrowTip"
+        CH.ifa.draw.figures.LineFigure "attributes" "attributes" 1 "FigureWithID" "Int" 267 2 -24 -34 2 -17 NULL NULL "CH.ifa.draw.figures.ArrowTip"
+        de.renew.usecasecomponents.figures.UCCLabelTextFigure "attributes" "attributes" 4 "TextAlignment" "Int" 1 "FigureWithID" "Int" 283 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 -17 36 "Actor" "SansSerif" 0 14 0 REF 2
+            CH.ifa.draw.standard.OffsetLocator -1 0
+                CH.ifa.draw.standard.RelativeLocator 0.5 1.1    NULL  210 155 239 189

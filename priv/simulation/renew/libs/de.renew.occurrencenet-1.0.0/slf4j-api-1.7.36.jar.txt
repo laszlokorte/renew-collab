@@ -1,0 +1,1 @@
+../shared/slf4j-api-1.7.36.jar

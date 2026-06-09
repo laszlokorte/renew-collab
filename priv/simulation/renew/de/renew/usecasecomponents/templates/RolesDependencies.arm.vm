@@ -1,0 +1,20 @@
+11 
+    de.renew.agent.arm.diagram.ARMDrawing $figureNumber 
+        de.renew.gui.fs.UMLNoteFigure "attributes" "attributes" 3 "FigureWithID" "Int" 94 "FrameColor" "Color" 0 0 0 255 "FillColor" "Color" 255 255 255 255 514 173 "Note" "SansSerif" 0 12 0 NULL NULL  
+        de.renew.gui.fs.UMLNoteFigure "attributes" "attributes" 3 "FigureWithID" "Int" 95 "FrameColor" "Color" 0 0 0 255 "FillColor" "Color" 255 255 255 255 639 174 "Note" "SansSerif" 0 12 0 NULL NULL  
+        CH.ifa.draw.figures.RoundRectangleFigure "attributes" "attributes" 3 "FigureWithID" "Int" 84 "FrameColor" "Color" 255 0 0 255 "FillColor" "Color" 192 192 192 255 25 30 458 132 8 8  
+        CH.ifa.draw.figures.TextFigure "attributes" "attributes" 4 "TextAlignment" "Int" 1 "FigureWithID" "Int" 85 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 46 43 "Agent Role Model in ${appName}" "SansSerif" 0 27 0 REF 3 
+            CH.ifa.draw.standard.OffsetLocator 0 -37 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5    
+        CH.ifa.draw.figures.TextFigure "attributes" "attributes" 4 "TextAlignment" "Int" 0 "FigureWithID" "Int" 86 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 27 93 "@generator PluginGenerator (${generatorVersion})\n@author ${modelerName}\n@date ${generationDate}\n@version 0.1" "SansSerif" 0 12 0 REF 3 
+            CH.ifa.draw.standard.OffsetLocator -83 27 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5    
+        de.renew.gui.fs.UMLNoteFigure "attributes" "attributes" 3 "FigureWithID" "Int" 93 "FrameColor" "Color" 0 0 0 255 "FillColor" "Color" 255 255 255 255 540 47 "AgentRoleModeler constructs\n- AgentRole Tool for specification of Role-Attributes.\n- Model role-rchies using the generalization feature.\n- Define service dependencies with the Service Tool.\n- Create an agent to roles mapping to create concrete agent model " "SansSerif" 0 12 0 NULL NULL  
+        de.renew.gui.DeclarationFigure "attributes" "attributes" 4 "TextAlignment" "Int" 0 "FigureWithID" "Int" 96 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 38 190 "access AgentRole;\naccess WebGateway;" "SansSerif" 0 12 0 NULL NULL 1  
+        de.renew.agent.arm.diagram.figures.AgentRoleMappingFigure "attributes" "attributes" 4 "FigureWithID" "Int" 89 "IsHidden" "Boolean" "TRUE" "FrameColor" "Color" 0 0 0 255 "FillColor" "Color" 255 255 255 255 60 280 "(agent-roles-mapping\n :ar-map (sequence\n   (ar-map-entry\n     :agentName SOME_AGENT\n     :roleNames (sequence\n       SOME_ROLE))))" "SansSerif" 0 12 0 NULL NULL  
+        de.renew.agent.arm.diagram.figures.AccessFigure "attributes" "attributes" 3 "FigureWithID" "Int" 97 "FrameColor" "Color" 0 0 0 255 "FillColor" "Color" 255 255 255 255 578 280 "AgentRole::CapaAgent" "SansSerif" 0 12 0 NULL NULL  
+        de.renew.agent.arm.diagram.figures.AccessFigure "attributes" "attributes" 3 "FigureWithID" "Int" 98 "FrameColor" "Color" 0 0 0 255 "FillColor" "Color" 255 255 255 255 349 280 "WebGateway::Agentlet" "SansSerif" 0 12 0 NULL NULL  
+#foreach ($theRole in $actorVector)        
+        de.renew.agent.arm.diagram.figures.AgentRoleFigure "attributes" "attributes" 4 "FigureWithID" "Int" 90 "IsHidden" "Boolean" "TRUE" "FrameColor" "Color" 0 0 255 255 "FillColor" "Color" 255 255 255 255 $actorPosMap.get(${theRole}) 411 "(agent-role\n  :roleName ${theRole}\n  :stateDescriptions (sequence\n    $actorWebappMap.get(${theRole})(state-description\n      :name decisionComponents\n      :value (sequence \"${theRole}_DC\")))\n  :protocols (sequence\n    (protocol\n      :protocolName ${theRole}_PROTOCOL\n      :incomingMessage (request\n        :content \"((action\n          (agent-identifier)\n          (SOME_ACTION)))\"\n        :language FIPA-SL0))))" "SansSerif" 0 12 0 NULL NULL  
+#end        
+        NULL  0 57 1029 658

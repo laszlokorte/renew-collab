@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<MASModel MASName="${appName}" startAllAgentsOnSamePlatform="true" xmlns="http://tempuri.org/XMLSchema.xsd">
+#foreach ($theRole in $actorVector)
+    <Agent CAPAPlattform="" start="true">
+        <agentName>${theRole}</agentName>
+        <kbNetName>wissensbasisKBE</kbNetName>
+        <roleName>${theRole}</roleName>
+        <instancesToStart>1</instancesToStart>
+    </Agent>
+#end
+</MASModel>
+

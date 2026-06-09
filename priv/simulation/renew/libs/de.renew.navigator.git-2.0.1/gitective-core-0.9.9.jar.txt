@@ -1,0 +1,1 @@
+../shared/gitective-core-0.9.9.jar

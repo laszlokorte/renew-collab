@@ -1,0 +1,1 @@
+../shared/automata-distribution-0.10.0-dependencies-bundle.jar

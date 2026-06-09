@@ -1,0 +1,16 @@
+# Suite for Suite Management
+name = Suite Management
+description = This suite contains all plugins for suite-management. This includes the suite-plugin, the suitegui-plugin and the plugin for suite-management, the suitecreator.
+plugins = de.renew.suite(Renew Suite), de.renew.suite.gui(Renew SuiteGui), de.renew.suite.creator(Renew SuiteCreator), de.renew.gui(Renew Gui)
+# -----------------------------------
++++ Begin Properties +++
++++ End Properties +++
+# -----------------------------------
++++ Begin Menu Layout +++
+
++++ End Menu Layout +++
+#------------------------------------
++++ Begin Functions +++
+
++++ End Functions +++
+#------------------------------

@@ -91,7 +91,6 @@ RUN java -jar Interceptor.jar echo
 FROM ${RUNNER_IMAGE}
 
 
-ARG RENEW_DOWNLOAD_TARGET="/tmp/renew-download.zip"
 ARG JAVA_VERSION="21"
 
 ARG DATA_ROOT_PATH="/data"
@@ -103,7 +102,7 @@ WORKDIR ${SIMULATOR_ROOT_PATH}
 
 RUN apt-get update -y && \
     apt-get install -y libstdc++6 openssl libncurses6 locales \
-    ca-certificates openjdk-$JAVA_VERSION-jdk xvfb unzip \
+    ca-certificates openjdk-$JAVA_VERSION-jdk xvfb \
     && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
 ENV JAVA_HOME=/usr/lib/jvm/jdk-${JAVA_VERSION}/
@@ -113,13 +112,9 @@ RUN java --version
 
 COPY --chmod=0755 --from=java_builder /interceptor/Interceptor.jar "./Interceptor.jar"
 COPY priv/simulation/log4j.properties "./log4j.properties"
-COPY priv/simulation/vendor/renew4.2base.zip /tmp/renew-download.zip
+COPY priv/simulation/renew ./renew
 
-RUN mkdir -p ./renew /tmp/renew-download && \
-    unzip -q "${RENEW_DOWNLOAD_TARGET}" -d /tmp/renew-download && \
-    mv /tmp/renew-download/*/* ./renew/ && \
-    rm -rf "${RENEW_DOWNLOAD_TARGET}" /tmp/renew-download && \
-    chown -R nobody:nogroup ./renew
+RUN chown -R nobody:nogroup ./renew
 
 WORKDIR /text_metrics
 COPY --chmod=0755 priv/text_metrics/TextMeasure.java "./TextMeasure.java"

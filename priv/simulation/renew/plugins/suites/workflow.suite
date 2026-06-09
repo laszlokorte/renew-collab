@@ -1,0 +1,21 @@
+# Suite for workflow modeling
+name = Workflow
+description = Warning: HierarchicalWorkflowNets-plugin not working after reloading. This suite contains all plugins that provide workflow modeling, analysis and simulation.
+plugins = de.renew.formalism.gui(Renew Formalism Gui), de.renew.export(Renew FreeHep Export), de.renew.access(Renew Access), de.renew.wfnet(Renew WFNet), de.renew.workflow(Renew Workflow), de.renew.mvs(Renew MVS), de.renew.averto(Renew Averto), de.renew.bpmn(Renew BPMN), de.renew.cn.formalism(Renew CNFormalism), de.renew.momoc(Renew MoMoC), de.renew.momocgui(Renew MoMoC Gui), de.renew.net.analysis(Renew NetAnalysis), de.renew.hierarchicalworkflownets(Renew HierarchicalWorkflowNets)
+# -----------------------------------
++++ Begin Properties +++
+renew.compiler = P/T Net Compiler, CN Compiler, Workflow Compiler, Hierarchical Net Compiler = setFormalism
+
+# Use multi-set representations for nodes if true
+# vectors (tuples) otherwise. (dynamic)
+de.renew.na.rg-multi-set = true, false
++++ End Properties +++
+# -----------------------------------
++++ Begin Menu Layout +++
+
++++ End Menu Layout +++
+#------------------------------
++++ Begin Functions +++
+
++++ End Functions +++
+#------------------------------

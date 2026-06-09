@@ -1,0 +1,22 @@
+11 
+    de.renew.gui.CPNDrawing 9 
+        CH.ifa.draw.figures.RectangleFigure "attributes" "attributes" 3 "FigureWithID" "Int" 742 "FrameColor" "Color" 224 224 224 255 "FillColor" "Color" 240 240 240 255 -17 -15 116 33  
+        de.renew.netcomponents.NetComponentFigure "attributes" "attributes" 1 "FigureWithID" "Int" 743 4 
+            de.renew.gui.ArcConnection "attributes" "attributes" 1 "FigureWithID" "Int" 738 2 26 1 109 1 NULL 
+                CH.ifa.draw.figures.ArrowTip 0.4 8.0 8.0 1  "CH.ifa.draw.figures.ArrowTip" 
+                CH.ifa.draw.standard.ChopBoxConnector 
+                    de.renew.gui.TransitionFigure "attributes" "attributes" 4 "FigureWithID" "Int" 737 "FrameColor" "Color" 204 0 51 255 "Visibility" "Boolean" "TRUE" "FillColor" "Color" 255 200 0 255 2 -6 24 16 NULL   
+                CH.ifa.draw.figures.ChopEllipseConnector 
+                    de.renew.gui.PlaceFigure "attributes" "attributes" 4 "FigureWithID" "Int" 740 "FrameColor" "Color" 0 0 0 255 "Visibility" "Boolean" "TRUE" "FillColor" "Color" 112 219 147 255 108 -9 20 20 NULL    REF 8 REF 6 REF 1  REF 8 REF 6 
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 6 "TextAlignment" "Int" 1 "FigureWithID" "Int" 741 "FrameColor" "Color" 255 199 158 255 "TextColor" "Color" 255 0 0 255 "Visibility" "Boolean" "TRUE" "FillColor" "Color" 255 199 158 255 122 -7 ">" "SansSerif" 1 12 0 REF 8 
+            CH.ifa.draw.standard.OffsetLocator 9 -1 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   0  REF 3 
+        CH.ifa.draw.figures.TextFigure "attributes" "attributes" 5 "TextAlignment" "Int" 1 "FigureWithID" "Int" 739 "FrameColor" "Color" 255 199 158 255 "TextColor" "Color" 255 0 0 255 "FillColor" "Color" 255 199 158 255 -2 -5 ">" "SansSerif" 1 12 0 REF 6 
+            CH.ifa.draw.standard.OffsetLocator -11 0 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5    
+        de.renew.gui.CPNTextFigure "attributes" "attributes" 4 "TextAlignment" "Int" 1 "FigureWithID" "Int" 744 "FrameColor" "Color" 255 199 158 255 "FillColor" "Color" 255 199 158 255 -2 17 "manual" "SansSerif" 0 12 0 REF 6 
+            CH.ifa.draw.standard.OffsetLocator 7 22 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5   1  
+        CH.ifa.draw.figures.TextFigure "attributes" "attributes" 5 "TextAlignment" "Int" 1 "FigureWithID" "Int" 758 "FrameColor" "Color" 255 199 158 255 "TextColor" "Color" 0 0 255 255 "FillColor" "Color" 255 199 158 255 -44 36 "$comment" "SansSerif" 0 18 0 REF 2 
+            CH.ifa.draw.standard.OffsetLocator -51 46 
+                CH.ifa.draw.standard.RelativeLocator 0.5 0.5    NULL  535 214 399 314 

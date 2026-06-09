@@ -1,0 +1,1 @@
+../shared/org.eclipse.jgit-2.1.0.201209190230-r.jar
