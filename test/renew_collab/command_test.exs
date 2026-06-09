@@ -2,6 +2,7 @@ defmodule RenewCollab.CommandTest do
   use RenewCollab.DataCase
 
   alias RenewCollab.Connection.Hyperlink
+  alias RenewCollab.Commands.CreateParentLayer
   alias RenewCollab.Commands.InsertDocument
   alias RenewCollab.Commands.InsertLayerClipboard
   alias RenewCollab.Commands.ReorderLayersRelative
@@ -251,6 +252,29 @@ defmodule RenewCollab.CommandTest do
       assert length(inserted_layer_ids) == 2
       assert z_indexes == [1, 2, 3]
       assert Enum.uniq(z_indexes) == z_indexes
+    end
+  end
+
+  describe "create_parent_layer" do
+    test "wraps multiple sibling layers in one parent without reversing them" do
+      document = test_document("Wrap multiple layers")
+      bottom = test_layer(document, 1)
+      middle = test_layer(document, 2)
+      top = test_layer(document, 3)
+
+      Enum.each([bottom, middle, top], &self_layer(document, &1))
+
+      {:ok, %{layer: group}} =
+        %{
+          document_id: document.id,
+          layer_ids: [bottom.id, top.id],
+          attrs: %{"semantic_tag" => "CH.ifa.draw.figures.GroupFigure"}
+        }
+        |> CreateParentLayer.new()
+        |> DocumentCommander.run_document_command_sync(false)
+
+      assert direct_child_ids(group) == [bottom.id, top.id]
+      assert direct_parent_id(middle) == nil
     end
   end
 

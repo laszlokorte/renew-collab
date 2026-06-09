@@ -244,10 +244,11 @@ defmodule RenewCollabCtrl.Action do
   def do_perform(%Actions.DocumentEditCreateParentLayer{
         document_id: document_id,
         attrs: attrs,
-        child_layer_id: child_layer_id
+        child_layer_id: child_layer_id,
+        layer_ids: layer_ids
       }) do
     RenewCollab.Commands.CreateParentLayer.new(%{
-      child_layer_id: child_layer_id,
+      layer_ids: create_parent_layer_ids(layer_ids, child_layer_id),
       document_id: document_id,
       attrs: %{
         "semantic_tag" => Map.get(attrs, "semantic_tag", "CH.ifa.draw.figures.GroupFigure")
@@ -1714,5 +1715,13 @@ defmodule RenewCollabCtrl.Action do
       _ ->
         :error
     end
+  end
+
+  defp create_parent_layer_ids(layer_ids, child_layer_id) do
+    layer_ids
+    |> List.wrap()
+    |> Kernel.++([child_layer_id])
+    |> Enum.filter(&is_binary/1)
+    |> Enum.uniq()
   end
 end

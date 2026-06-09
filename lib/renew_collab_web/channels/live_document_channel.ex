@@ -416,6 +416,35 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
   def handle_event(
         "create_layer",
         %{
+          "layer_ids" => layer_ids
+        } = params,
+        %{},
+        %{:document_id => document_id, :account => account},
+        _socket
+      ) do
+    layer_ids = normalize_selection(layer_ids)
+
+    if layer_ids == [] do
+      {:reply, %{id: nil}}
+    else
+      %Actions.DocumentEditCreateParentLayer{
+        layer_ids: layer_ids,
+        document_id: document_id,
+        attrs: %{
+          "semantic_tag" => Map.get(params, "semantic_tag", "CH.ifa.draw.figures.GroupFigure")
+        }
+      }
+      |> Dispatcher.perform_as(account)
+      |> case do
+        {:ok, %{layer: layer}} -> {:reply, %{id: layer.id}}
+      end
+    end
+  end
+
+  @impl true
+  def handle_event(
+        "create_layer",
+        %{
           "child_layer_id" => child_layer_id
         } = params,
         %{},
