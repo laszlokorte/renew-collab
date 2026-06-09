@@ -40,8 +40,7 @@ defmodule RenewCollab.Hierarchy.Layer do
 
     has_one :ancestors, RenewCollab.Hierarchy.LayerParenthood,
       foreign_key: :descendant_id,
-      where: [depth: {:>, 0}],
-      preload_order: [asc: :depth]
+      where: [depth: {:>, 0}]
 
     has_many :incoming_links, RenewCollab.Connection.Hyperlink,
       on_delete: :delete_all,
