@@ -1,56 +1,64 @@
 defmodule RenewCollabSim.Compiler.SnsCompiler do
   def compile(formalism, nets) do
-    {:ok, compiler} = compiler_name(formalism)
+    with {:ok, compiler} <- compiler_name(formalism) do
+      uuid_dir = "petristation/renew-sns-compilation-#{UUID.uuid4(:default)}"
+      {:ok, output_root} = Path.safe_relative_to(uuid_dir, System.tmp_dir!())
+      output_root = Path.absname(output_root, System.tmp_dir!())
 
-    uuid_dir = "petristation/renew-sns-compilation-#{UUID.uuid4(:default)}"
-    {:ok, output_root} = Path.safe_relative_to(uuid_dir, System.tmp_dir!())
-    output_root = Path.absname(output_root, System.tmp_dir!())
+      {:ok, output_root_upload} = Path.safe_relative_to("uploads", output_root)
 
-    {:ok, output_root_upload} = Path.safe_relative_to("uploads", output_root)
+      {:ok, output_path} = Path.safe_relative_to("compiled.sns", output_root)
+      {:ok, script_path} = Path.safe_relative_to("compile-script", output_root)
 
-    {:ok, output_path} = Path.safe_relative_to("compiled.sns", output_root)
-    {:ok, script_path} = Path.safe_relative_to("compile-script", output_root)
+      output_root_upload = Path.absname(output_root_upload, output_root)
+      output_path = Path.absname(output_path, output_root)
+      script_path = Path.absname(script_path, output_root)
 
-    output_root_upload = Path.absname(output_root_upload, output_root)
-    output_path = Path.absname(output_path, output_root)
-    script_path = Path.absname(script_path, output_root)
+      with {:ok, nets} <- normalize_net_names(nets) do
+        try do
+          File.mkdir_p(output_root_upload)
 
-    with {:ok, nets} <- normalize_net_names(nets) do
-      try do
-        File.mkdir_p(output_root_upload)
+          paths =
+            for {normalized_name, content} <- nets do
+              {:ok, name} = Path.safe_relative_to(normalized_name, output_root_upload)
+              net_file_name = Path.absname(name, output_root_upload)
+              File.write(net_file_name, content)
 
-        paths =
-          for {normalized_name, content} <- nets do
-            {:ok, name} = Path.safe_relative_to(normalized_name, output_root_upload)
-            net_file_name = Path.absname(name, output_root_upload)
-            File.write(net_file_name, content)
+              net_file_name
+            end
 
-            net_file_name
+          conf = Application.fetch_env!(:renew_collab, RenewCollabSim.Commands)
+          renew_set_formalism = Keyword.get(conf, :set_formalism)
+          renew_export = Keyword.get(conf, :export)
+          renew_shadow_net_system = Keyword.get(conf, :sns)
+
+          script_content =
+            [
+              "#{renew_set_formalism} #{compiler}",
+              "#{renew_export} #{renew_shadow_net_system} -a #{Enum.map_join(paths, " ", &"\"#{&1}\"")} -o \"#{output_path}\""
+            ]
+            |> Enum.join("\n")
+
+          File.write!(script_path, script_content)
+
+          with {:ok, 0, _output} <- RenewCollabSim.Script.Runner.start_and_capture(script_path),
+               {:ok, content} when content != [] <- File.read(output_path) do
+            {:ok, content}
+          else
+            {:ok, status, output} ->
+              {:error, {:compile_failed, status, normalize_output(output)}}
+
+            :timedout ->
+              {:error, :compile_timed_out}
+
+            e ->
+              {:error, e}
           end
-
-        conf = Application.fetch_env!(:renew_collab, RenewCollabSim.Commands)
-        renew_set_formalism = Keyword.get(conf, :set_formalism)
-        renew_export = Keyword.get(conf, :export)
-        renew_shadow_net_system = Keyword.get(conf, :sns)
-
-        script_content =
-          [
-            "#{renew_set_formalism} #{compiler}",
-            "#{renew_export} #{renew_shadow_net_system} -a #{Enum.map_join(paths, " ", &"\"#{&1}\"")} -o \"#{output_path}\""
-          ]
-          |> Enum.join("\n")
-
-        File.write!(script_path, script_content)
-
-        with {:ok, 0} <- RenewCollabSim.Script.Runner.start_and_wait(script_path),
-             {:ok, content} when content != [] <- File.read(output_path) do
-          {:ok, content}
-        else
-          e ->
-            {:error, e}
+        after
+          File.rm_rf(output_root_upload)
         end
-      after
-        File.rm_rf(output_root_upload)
+      else
+        e -> {:error, e}
       end
     else
       e -> {:error, e}
@@ -92,4 +100,20 @@ defmodule RenewCollabSim.Compiler.SnsCompiler do
   def normalize_net_name(name) do
     String.split(name, ".") |> List.first() |> String.trim()
   end
+
+  defp normalize_output(output) when is_list(output) do
+    output
+    |> Enum.flat_map(&normalize_output_item/1)
+    |> Enum.map(&String.trim/1)
+    |> Enum.reject(&(&1 == ""))
+    |> Enum.uniq()
+  end
+
+  defp normalize_output(_output), do: []
+
+  defp normalize_output_item({:eol, value}), do: normalize_output_item(value)
+  defp normalize_output_item({:noeol, value}), do: normalize_output_item(value)
+  defp normalize_output_item({_, {:data, value}}), do: normalize_output_item(value)
+  defp normalize_output_item(value) when is_binary(value), do: String.split(value, ~r/\R/)
+  defp normalize_output_item(_value), do: []
 end

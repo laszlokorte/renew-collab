@@ -5,6 +5,7 @@ defmodule RenewCollabWeb.LiveDocuments do
 
   alias RenewCollabCtrl.Actions
   alias RenewCollabCtrl.Dispatcher
+  alias RenewCollabWeb.SimulationError
 
   use RenewCollabCtrl.Helper,
     project: {Views.MyProject, [:account_id, :project_id], :project_changed},
@@ -46,11 +47,8 @@ defmodule RenewCollabWeb.LiveDocuments do
         flash={@flash}
         project_id={@project.id}
       />
-
       <div style="padding: 1em">
-        <.link navigate={~p"/projects"}>
-          Projects
-        </.link>
+        <.link navigate={~p"/projects"}>Projects</.link>
         / Documents
         <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
           <img class="icon" src="/images/icon-document.svg" /> Documents
@@ -89,9 +87,7 @@ defmodule RenewCollabWeb.LiveDocuments do
             Import Renew (.rnw) Files
           </legend>
 
-          <p>
-            Select up to 10 Renew files from your computer:
-          </p>
+          <p>Select up to 10 Renew files from your computer:</p>
 
           <.form for={@import_form} phx-submit="import_document" phx-change="validate-import">
             <.live_file_input
@@ -110,8 +106,7 @@ defmodule RenewCollabWeb.LiveDocuments do
                       aria-label="cancel"
                     >
                       &times;
-                    </button>
-                    {entry.client_name}
+                    </button> {entry.client_name}
                   </dt>
 
                   <dd>
@@ -184,8 +179,7 @@ defmodule RenewCollabWeb.LiveDocuments do
                       navigate={~p"/document/#{document.id}"}
                     >
                       <img class="icon" src="/images/icon-document.svg" />
-                      <img class="icon" src={"/documents/#{document.id}/thumbnail"} />
-                      {document.name}
+                      <img class="icon" src={"/documents/#{document.id}/thumbnail"} /> {document.name}
                     </.link>
                   </td>
 
@@ -193,13 +187,9 @@ defmodule RenewCollabWeb.LiveDocuments do
                     <code>{if(document.syntax, do: document.syntax.name, else: "-")}</code>
                   </td>
 
-                  <td>
-                    <RenewCollabWeb.RenewComponents.timestamp value={document.inserted_at} />
-                  </td>
+                  <td><RenewCollabWeb.RenewComponents.timestamp value={document.inserted_at} /></td>
 
-                  <td>
-                    <RenewCollabWeb.RenewComponents.timestamp value={document.inserted_at} />
-                  </td>
+                  <td><RenewCollabWeb.RenewComponents.timestamp value={document.inserted_at} /></td>
 
                   <td width="50">
                     <form phx-submit="compile">
@@ -218,6 +208,7 @@ defmodule RenewCollabWeb.LiveDocuments do
                           style="cursor: pointer; grid-area: 1/1/-1/-1;opacity: 0; width: 100%; "
                         >
                           <option selected>---cancel---</option>
+
                           <%= for f <- RenewCollabSim.Compiler.SnsCompiler.formalisms() do %>
                             <option>{f}</option>
                           <% end %>
@@ -261,6 +252,7 @@ defmodule RenewCollabWeb.LiveDocuments do
                           >
                             <optgroup label="Copy Into Project">
                               <option selected>---cancel---</option>
+
                               <%= for p <- @projects do %>
                                 <option value={p.id}>{p.name}</option>
                               <% end %>
@@ -402,8 +394,13 @@ defmodule RenewCollabWeb.LiveDocuments do
       {:ok, %RenewCollabSim.Entities.Simulation{} = sim} ->
         {:noreply, redirect(socket, to: ~p"/simulation/#{sim.id}")}
 
-      {:error, _} ->
-        {:noreply, socket |> put_flash(:error, "Failed to create simulation")}
+      {:error, reason} ->
+        {:noreply,
+         socket
+         |> put_flash(
+           :error,
+           SimulationError.format(reason, "Failed to create simulation")
+         )}
     end
   end
 end

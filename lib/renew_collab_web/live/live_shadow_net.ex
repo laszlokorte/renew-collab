@@ -5,6 +5,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
   use RenewCollabWeb, :live_view
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Fetcher
+  alias RenewCollabWeb.SimulationError
 
   use RenewCollabCtrl.Helper,
     shadow_net_system:
@@ -58,11 +59,8 @@ defmodule RenewCollabWeb.LiveShadowNet do
           @shadow_net_system.project_assignment && @shadow_net_system.project_assignment.project_id
         }
       />
-
       <div style="padding: 1em">
-        <.link navigate={~p"/projects"}>
-          Projects
-        </.link>
+        <.link navigate={~p"/projects"}>Projects</.link>
         <%= case @shadow_net_system.project_assignment do %>
           <% %ProjectShadowNetSystem{project_id: project_id} -> %>
             /
@@ -87,21 +85,19 @@ defmodule RenewCollabWeb.LiveShadowNet do
             <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
               Nets
             </legend>
+
             <dl style="display: grid; grid-template-columns: auto 1fr;">
               <dt>Main Net Name</dt>
 
-              <dd>
-                <code>{@shadow_net_system.main_net_name}</code>
-              </dd>
-              <dt>
-                <label>
-                  Change main net:
-                </label>
-              </dt>
+              <dd><code>{@shadow_net_system.main_net_name}</code></dd>
+
+              <dt><label>Change main net:</label></dt>
+
               <dd>
                 <form phx-change="change_main_net">
                   <select name="main_net">
                     <option></option>
+
                     <%= for net <- @shadow_net_system.nets do %>
                       <option selected={net.name == @shadow_net_system.main_net_name}>
                         {net.name}
@@ -120,13 +116,13 @@ defmodule RenewCollabWeb.LiveShadowNet do
                       <%= if net.thumbnail_json do %>
                         has thumbnail
                       <% end %>
+
                       <%= if net.document_json do %>
                         <details>
                           <summary>
                             <button name="shadow_net_id" phx-click="clear_net_document" value={net.id}>
                               X
-                            </button>
-                            <code>{net.name}</code>
+                            </button> <code>{net.name}</code>
                           </summary>
 
                           <div style="width: 10em; height: 5em;">
@@ -145,9 +141,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
                               <option>Assign Document</option>
 
                               <%= for doc <- @documents do %>
-                                <option value={doc.id}>
-                                  {doc.name}
-                                </option>
+                                <option value={doc.id}>{doc.name}</option>
                               <% end %>
                             </select>
                           </label>
@@ -159,6 +153,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
               </dd>
             </dl>
           </fieldset>
+
           <fieldset style="margin-bottom: 1em">
             <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
               Rename
@@ -183,6 +178,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
             </.form>
           </fieldset>
         </div>
+
         <div>
           <button
             type="button"
@@ -191,7 +187,6 @@ defmodule RenewCollabWeb.LiveShadowNet do
           >
             New Simulation
           </button>
-
           <a
             style="color: #078"
             href={~p"/shadow_net/#{@shadow_net_system.id}/binary"}
@@ -212,6 +207,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
               <th style="border-bottom: 1px solid #333;" align="left" width="100%">Simulations</th>
 
               <th style="border-bottom: 1px solid #333;" align="left" width="100%">Created at</th>
+
               <th style="border-bottom: 1px solid #333;" align="left" width="100%">Timestep</th>
 
               <th style="border-bottom: 1px solid #333;" align="right" colspan="6">Actions</th>
@@ -223,9 +219,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
               <tr>
                 <td colspan="9">
                   <div style="padding: 2em; border: 3px dashed #aaa; text-align: center; font-style: italic;">
-                    <p>
-                      No Simulations created yet.
-                    </p>
+                    <p>No Simulations created yet.</p>
 
                     <button
                       type="button"
@@ -245,25 +239,18 @@ defmodule RenewCollabWeb.LiveShadowNet do
                       <img class="icon" src="/images/icon-simulation.svg" />
                       <span>
                         <%= if sim.label do %>
-                          <.link navigate={~p"/simulation/#{sim.id}"}>
-                            {sim.label}
-                          </.link>
+                          <.link navigate={~p"/simulation/#{sim.id}"}>{sim.label}</.link>
                           <br /><small><code>{sim.id}</code></small>
                         <% else %>
-                          <.link navigate={~p"/simulation/#{sim.id}"}>
-                            <code>{sim.id}</code>
-                          </.link>
+                          <.link navigate={~p"/simulation/#{sim.id}"}><code>{sim.id}</code></.link>
                         <% end %>
                       </span>
                     </div>
                   </td>
 
-                  <td>
-                    <RenewCollabWeb.RenewComponents.timestamp value={sim.inserted_at} />
-                  </td>
-                  <td>
-                    {sim.timestep}
-                  </td>
+                  <td><RenewCollabWeb.RenewComponents.timestamp value={sim.inserted_at} /></td>
+
+                  <td>{sim.timestep}</td>
 
                   <td>
                     <button
@@ -275,6 +262,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
                       Duplicate
                     </button>
                   </td>
+
                   <%= if MapSet.member?(@running, sim.id) do %>
                     <td>
                       <button
@@ -286,6 +274,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
                         Play
                       </button>
                     </td>
+
                     <td>
                       <button
                         type="button"
@@ -296,6 +285,7 @@ defmodule RenewCollabWeb.LiveShadowNet do
                         Pause
                       </button>
                     </td>
+
                     <td>
                       <button
                         type="button"
@@ -305,7 +295,6 @@ defmodule RenewCollabWeb.LiveShadowNet do
                       >
                         Step
                       </button>
-
                       <td>
                         <button
                           type="button"
@@ -391,8 +380,11 @@ defmodule RenewCollabWeb.LiveShadowNet do
       :ok ->
         {:noreply, socket |> put_flash(:info, "Initializing simulation")}
 
-      _ ->
-        {:noreply, socket |> put_flash(:error, "Initializing simulation failed")}
+      {:error, reason} ->
+        {:noreply, socket |> put_simulation_error("Initializing simulation failed", reason)}
+
+      reason ->
+        {:noreply, socket |> put_simulation_error("Initializing simulation failed", reason)}
     end
   end
 
@@ -405,8 +397,11 @@ defmodule RenewCollabWeb.LiveShadowNet do
       :ok ->
         {:noreply, socket |> put_flash(:info, "Stopping simulation")}
 
-      _ ->
-        {:noreply, socket |> put_flash(:error, "Stopping simulation failed")}
+      {:error, reason} ->
+        {:noreply, socket |> put_simulation_error("Stopping simulation failed", reason)}
+
+      reason ->
+        {:noreply, socket |> put_simulation_error("Stopping simulation failed", reason)}
     end
   end
 
@@ -419,8 +414,11 @@ defmodule RenewCollabWeb.LiveShadowNet do
       :ok ->
         {:noreply, socket |> put_flash(:info, "Stepping simulation")}
 
-      _ ->
-        {:noreply, socket |> put_flash(:error, "Stepping simulation failed")}
+      {:error, reason} ->
+        {:noreply, socket |> put_simulation_error("Stepping simulation failed", reason)}
+
+      reason ->
+        {:noreply, socket |> put_simulation_error("Stepping simulation failed", reason)}
     end
   end
 
@@ -433,8 +431,11 @@ defmodule RenewCollabWeb.LiveShadowNet do
       :ok ->
         {:noreply, socket |> put_flash(:info, "Playing simulation")}
 
-      _ ->
-        {:noreply, socket |> put_flash(:error, "Playing simulation failed")}
+      {:error, reason} ->
+        {:noreply, socket |> put_simulation_error("Playing simulation failed", reason)}
+
+      reason ->
+        {:noreply, socket |> put_simulation_error("Playing simulation failed", reason)}
     end
   end
 
@@ -447,8 +448,11 @@ defmodule RenewCollabWeb.LiveShadowNet do
       :ok ->
         {:noreply, socket |> put_flash(:info, "Pausing simulation")}
 
-      _ ->
-        {:noreply, socket |> put_flash(:error, "Payusing simulation failed")}
+      {:error, reason} ->
+        {:noreply, socket |> put_simulation_error("Pausing simulation failed", reason)}
+
+      reason ->
+        {:noreply, socket |> put_simulation_error("Pausing simulation failed", reason)}
     end
   end
 
@@ -506,8 +510,19 @@ defmodule RenewCollabWeb.LiveShadowNet do
       {:ok, _} ->
         {:noreply, socket |> put_flash(:info, "Simulated created")}
 
-      _ ->
-        {:noreply, socket |> put_flash(:error, "Creating Simulation failed")}
+      {:error, reason} ->
+        {:noreply, socket |> put_simulation_error("Creating Simulation failed", reason)}
+
+      reason ->
+        {:noreply, socket |> put_simulation_error("Creating Simulation failed", reason)}
     end
+  end
+
+  def handle_info({:simulation_error, {_simulation_id, error}}, socket) do
+    {:noreply, socket |> put_simulation_error("Simulation Error", error)}
+  end
+
+  defp put_simulation_error(socket, message, reason) do
+    put_flash(socket, :error, SimulationError.format(reason, message))
   end
 end

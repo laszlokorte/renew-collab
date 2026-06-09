@@ -1167,10 +1167,77 @@ defmodule RenewCollabCtrl.Action do
         formalism: formalism,
         main_net_name: main_net_name
       }) do
-    {:ok, project} =
-      %RenewCollabProj.Queries.ProjectDetails{project_id: project_id}
-      |> RenewCollabProj.ProjectFetcher.fetch()
+    with {:ok, project} <-
+           %RenewCollabProj.Queries.ProjectDetails{project_id: project_id}
+           |> RenewCollabProj.ProjectFetcher.fetch(),
+         {:ok, nets} <- simulation_nets(project, document_ids),
+         [%{net_name: default_main_name} | _] <- nets,
+         main_name = main_net_name || default_main_name,
+         {:ok, content} <-
+           RenewCollabSim.Compiler.SnsCompiler.compile(
+             formalism,
+             nets
+             |> Enum.map(fn %{net_name: name, rnw: rnw} -> {name, rnw} end)
+           ),
+         {:ok, %{shadow_net_system: %{id: sns_id}}} <-
+           RenewCollabSim.Commands.CreateShadowNetSystem.new(%{
+             label: "Fooo",
+             compiled: content,
+             main_net_name: main_name,
+             nets:
+               nets
+               |> Enum.map(fn %{
+                                net_name: net_name,
+                                document_json: document_json,
+                                thumbnail_json: thumbnail_json
+                              } ->
+                 %{
+                   "name" => net_name,
+                   "document_json" => document_json,
+                   "thumbnail_json" => thumbnail_json
+                 }
+               end)
+           })
+           |> RenewCollabSim.SimulationCommander.run_simulation_command_sync() do
+      RenewCollabProj.Commands.AssignProjectShadowNetSystem.new(%{
+        project_id: project_id,
+        shadow_net_system_id: sns_id
+      })
+      |> RenewCollabProj.ProjectCommander.run_project_command_sync()
 
+      RenewCollabSim.Commands.CreateSimulation.new(%{
+        shadow_net_system_id: sns_id
+      })
+      |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
+      |> case do
+        {:ok, %{simulation: %{id: sim_id} = simulation}} ->
+          RenewCollabProj.Commands.AssignProjectSimulation.new(%{
+            project_id: project_id,
+            simulation_id: sim_id
+          })
+          |> RenewCollabProj.ProjectCommander.run_project_command_sync()
+
+          RenewCollab.Commands.LinkDocumenstToSimulation.new(%{
+            simulation_id: sim_id,
+            document_ids:
+              nets
+              |> Enum.map(fn %{snapshot_id: snap_id} -> snap_id end)
+          })
+          |> RenewCollab.DocumentCommander.run_document_command_sync()
+
+          {:ok, simulation}
+
+        e ->
+          {:error, e}
+      end
+    else
+      [] -> {:error, :no_documents}
+      {:error, reason} -> {:error, reason}
+      e -> {:error, e}
+    end
+  end
+
+  defp simulation_nets(project, document_ids) do
     document_id_set = MapSet.new(document_ids)
 
     actual_document_ids =
@@ -1178,102 +1245,39 @@ defmodule RenewCollabCtrl.Action do
       |> Enum.map(fn %{document_id: id} -> id end)
       |> Enum.filter(&MapSet.member?(document_id_set, &1))
 
-    nets =
-      try do
-        actual_document_ids
-        |> Enum.map(fn doc_id ->
-          {:ok, document} =
-            %{document_id: doc_id}
-            |> RenewCollab.Queries.DocumentWithElements.new()
-            |> RenewCollab.DocumentFetcher.fetch()
+    try do
+      {:ok,
+       actual_document_ids
+       |> Enum.map(fn doc_id ->
+         {:ok, document} =
+           %{document_id: doc_id}
+           |> RenewCollab.Queries.DocumentWithElements.new()
+           |> RenewCollab.DocumentFetcher.fetch()
 
-          {:ok, document_thumbnail} =
-            %{document_id: doc_id, root_layer_id: :thumbnail}
-            |> RenewCollab.Queries.DocumentWithElements.new()
-            |> RenewCollab.DocumentFetcher.fetch()
+         {:ok, document_thumbnail} =
+           %{document_id: doc_id, root_layer_id: :thumbnail}
+           |> RenewCollab.Queries.DocumentWithElements.new()
+           |> RenewCollab.DocumentFetcher.fetch()
 
-          {:ok, rnw} = RenewCollab.Export.DocumentExport.export(document, synthetic: true)
+         {:ok, rnw} = RenewCollab.Export.DocumentExport.export(document, synthetic: true)
 
-          {:ok, document_json} =
-            RenewCollabWeb.DocumentJSON.show_content(document) |> Jason.encode()
+         {:ok, document_json} =
+           RenewCollabWeb.DocumentJSON.show_content(document) |> Jason.encode()
 
-          {:ok, thumbnail_json} =
-            RenewCollabWeb.DocumentJSON.show_content(document_thumbnail, 0) |> Jason.encode()
+         {:ok, thumbnail_json} =
+           RenewCollabWeb.DocumentJSON.show_content(document_thumbnail, 0) |> Jason.encode()
 
-          %{
-            net_name: RenewCollabSim.Compiler.SnsCompiler.normalize_net_name(document.name),
-            rnw: rnw,
-            document_json: document_json,
-            thumbnail_json: thumbnail_json,
-            snapshot_id: {document.id, document.current_snaptshot.id}
-          }
-        end)
-      rescue
-        e ->
-          {:error, {:export_error, e}}
-      end
-
-    [%{net_name: default_main_name} | _] = nets
-    main_name = main_net_name || default_main_name
-
-    {:ok, content} =
-      RenewCollabSim.Compiler.SnsCompiler.compile(
-        formalism,
-        nets
-        |> Enum.map(fn %{net_name: name, rnw: rnw} -> {name, rnw} end)
-      )
-
-    {:ok, %{shadow_net_system: %{id: sns_id}}} =
-      RenewCollabSim.Commands.CreateShadowNetSystem.new(%{
-        label: "Fooo",
-        compiled: content,
-        main_net_name: main_name,
-        nets:
-          nets
-          |> Enum.map(fn %{
-                           net_name: net_name,
-                           document_json: document_json,
-                           thumbnail_json: thumbnail_json
-                         } ->
-            %{
-              "name" => net_name,
-              "document_json" => document_json,
-              "thumbnail_json" => thumbnail_json
-            }
-          end)
-      })
-      |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
-
-    RenewCollabProj.Commands.AssignProjectShadowNetSystem.new(%{
-      project_id: project_id,
-      shadow_net_system_id: sns_id
-    })
-    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
-
-    RenewCollabSim.Commands.CreateSimulation.new(%{
-      shadow_net_system_id: sns_id
-    })
-    |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
-    |> case do
-      {:ok, %{simulation: %{id: sim_id} = simulation}} ->
-        RenewCollabProj.Commands.AssignProjectSimulation.new(%{
-          project_id: project_id,
-          simulation_id: sim_id
-        })
-        |> RenewCollabProj.ProjectCommander.run_project_command_sync()
-
-        RenewCollab.Commands.LinkDocumenstToSimulation.new(%{
-          simulation_id: sim_id,
-          document_ids:
-            nets
-            |> Enum.map(fn %{snapshot_id: snap_id} -> snap_id end)
-        })
-        |> RenewCollab.DocumentCommander.run_document_command_sync()
-
-        {:ok, simulation}
-
+         %{
+           net_name: RenewCollabSim.Compiler.SnsCompiler.normalize_net_name(document.name),
+           rnw: rnw,
+           document_json: document_json,
+           thumbnail_json: thumbnail_json,
+           snapshot_id: {document.id, document.current_snaptshot.id}
+         }
+       end)}
+    rescue
       e ->
-        {:error, e}
+        {:error, {:export_error, e}}
     end
   end
 
@@ -1306,28 +1310,30 @@ defmodule RenewCollabCtrl.Action do
         project_id: project_id,
         rnws: rnws
       }) do
-    {:ok, content} =
-      RenewCollabSim.Compiler.SnsCompiler.compile(
-        formalism,
-        rnws
-      )
-
-    {:ok, %{shadow_net_system: %{id: sns_id} = sns}} =
-      RenewCollabSim.Commands.CreateShadowNetSystem.new(%{
-        label: "Fooo",
-        compiled: content,
-        main_net_name: main_name,
-        nets: []
+    with {:ok, content} <-
+           RenewCollabSim.Compiler.SnsCompiler.compile(
+             formalism,
+             rnws
+           ),
+         {:ok, %{shadow_net_system: %{id: sns_id} = sns}} <-
+           RenewCollabSim.Commands.CreateShadowNetSystem.new(%{
+             label: "Fooo",
+             compiled: content,
+             main_net_name: main_name,
+             nets: []
+           })
+           |> RenewCollabSim.SimulationCommander.run_simulation_command_sync() do
+      RenewCollabProj.Commands.AssignProjectShadowNetSystem.new(%{
+        project_id: project_id,
+        shadow_net_system_id: sns_id
       })
-      |> RenewCollabSim.SimulationCommander.run_simulation_command_sync()
+      |> RenewCollabProj.ProjectCommander.run_project_command_sync()
 
-    RenewCollabProj.Commands.AssignProjectShadowNetSystem.new(%{
-      project_id: project_id,
-      shadow_net_system_id: sns_id
-    })
-    |> RenewCollabProj.ProjectCommander.run_project_command_sync()
-
-    {:ok, sns}
+      {:ok, sns}
+    else
+      {:error, reason} -> {:error, reason}
+      e -> {:error, e}
+    end
   end
 
   def do_perform(%Actions.ShadowNetSystemDeleteAsUser{shadow_net_system_id: shadow_net_system_id}) do
@@ -1484,6 +1490,57 @@ defmodule RenewCollabCtrl.Action do
       |> RenewCollabProj.ProjectFetcher.fetch()
 
     RenewCollabSim.Server.ScopedSimulationServer.step(project_id, simulation_id)
+  end
+
+  def do_perform(%Actions.SimulationNetStep{
+        simulation_id: simulation_id,
+        net_instance_label: net_instance_label
+      }) do
+    {:ok, %{project_id: project_id}} =
+      %RenewCollabProj.Queries.SimulationsProject{simulation_id: simulation_id}
+      |> RenewCollabProj.ProjectFetcher.fetch()
+
+    RenewCollabSim.Server.ScopedSimulationServer.net_step(
+      project_id,
+      simulation_id,
+      net_instance_label
+    )
+  end
+
+  def do_perform(%Actions.SimulationTransitionBindings{
+        simulation_id: simulation_id,
+        net_instance_label: net_instance_label,
+        transition_id: transition_id
+      }) do
+    {:ok, %{project_id: project_id}} =
+      %RenewCollabProj.Queries.SimulationsProject{simulation_id: simulation_id}
+      |> RenewCollabProj.ProjectFetcher.fetch()
+
+    RenewCollabSim.Server.ScopedSimulationServer.transition_bindings(
+      project_id,
+      simulation_id,
+      net_instance_label,
+      transition_id
+    )
+  end
+
+  def do_perform(%Actions.SimulationFireTransition{
+        simulation_id: simulation_id,
+        net_instance_label: net_instance_label,
+        transition_id: transition_id,
+        binding_index: binding_index
+      }) do
+    {:ok, %{project_id: project_id}} =
+      %RenewCollabProj.Queries.SimulationsProject{simulation_id: simulation_id}
+      |> RenewCollabProj.ProjectFetcher.fetch()
+
+    RenewCollabSim.Server.ScopedSimulationServer.fire_transition(
+      project_id,
+      simulation_id,
+      net_instance_label,
+      transition_id,
+      binding_index
+    )
   end
 
   def do_perform(%Actions.SimulationTerminate{simulation_id: simulation_id}) do

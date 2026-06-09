@@ -325,6 +325,15 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(%{id: account_id}, %Actions.SimulationStep{simulation_id: sim_id}),
     do: can_write(account_id, :simulation, sim_id)
 
+  def can(%{id: account_id}, %Actions.SimulationNetStep{simulation_id: sim_id}),
+    do: can_write(account_id, :simulation, sim_id)
+
+  def can(%{id: account_id}, %Actions.SimulationTransitionBindings{simulation_id: sim_id}),
+    do: can_write(account_id, :simulation, sim_id)
+
+  def can(%{id: account_id}, %Actions.SimulationFireTransition{simulation_id: sim_id}),
+    do: can_write(account_id, :simulation, sim_id)
+
   def can(%{id: account_id}, %Actions.SimulationTerminate{simulation_id: sim_id}),
     do: can_write(account_id, :simulation, sim_id)
 

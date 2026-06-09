@@ -3,6 +3,8 @@ defmodule RenewCollabSim.Server.SimulationProcess do
 
   alias RenewCollabSim.Server.SimulationProcess.State
 
+  @simulation_command_timeout 30_000
+
   def start_monitor(simulation_id, pubsub_channels) do
     with {:ok, pid} <-
            GenServer.start(__MODULE__, %{
@@ -27,6 +29,18 @@ defmodule RenewCollabSim.Server.SimulationProcess do
 
   def step(pid) do
     GenServer.cast(pid, :step)
+  end
+
+  def net_step(pid, net_instance_label) do
+    GenServer.cast(pid, {:net_step, net_instance_label})
+  end
+
+  def transition_bindings(pid, net_instance_label, transition_id) do
+    safe_call(pid, {:transition_bindings, net_instance_label, transition_id})
+  end
+
+  def fire_transition(pid, net_instance_label, transition_id, binding_index) do
+    safe_call(pid, {:fire_transition, net_instance_label, transition_id, binding_index})
   end
 
   def play(pid) do
@@ -188,6 +202,43 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   end
 
   @impl true
+  def handle_cast({:net_step, net_instance_label}, state) do
+    State.net_step(state, net_instance_label)
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_call({:transition_bindings, net_instance_label, transition_id}, from, state) do
+    request_id = UUID.uuid4(:default)
+    State.transition_bindings(state, request_id, net_instance_label, transition_id)
+
+    {:noreply,
+     put_in(state.binding_requests[request_id], %{
+       from: from,
+       transition_id: transition_id,
+       transition_instance: nil,
+       expected_count: nil,
+       bindings: []
+     })}
+  end
+
+  @impl true
+  def handle_call(
+        {:fire_transition, net_instance_label, transition_id, binding_index},
+        from,
+        state
+      ) do
+    request_id = UUID.uuid4(:default)
+    State.fire_transition(state, request_id, net_instance_label, transition_id, binding_index)
+
+    {:noreply,
+     put_in(state.fire_requests[request_id], %{
+       from: from,
+       transition_id: transition_id
+     })}
+  end
+
+  @impl true
   def handle_cast(:play, state) do
     State.step(state)
     {:noreply, %{state | playing: true}}
@@ -209,7 +260,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
         } = state
       ) do
     state =
-      if logging and not playing do
+      if logging and not playing and not simulation_protocol_line?(content) do
         state
         |> State.append_command(
           RenewCollabSim.Commands.LogEvent.new(%{simulation_id: simulation_id, content: content})
@@ -241,7 +292,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
          content
        ) do
     state =
-      if logging and not playing do
+      if logging and not playing and not simulation_protocol_line?(content) do
         state
         |> State.append_command(
           RenewCollabSim.Commands.LogEvent.new(%{simulation_id: simulation_id, content: content})
@@ -368,8 +419,119 @@ defmodule RenewCollabSim.Server.SimulationProcess do
         |> broadcast_change(:init)
         |> then(&{:noreply, &1})
 
+      {:bindings_start, request_id, transition_id, transition_instance, count} ->
+        {:noreply,
+         update_in(
+           state.binding_requests[request_id],
+           &binding_request_started(&1, transition_id, transition_instance, count)
+         )}
+
+      {:binding, request_id, index, description} ->
+        {:noreply,
+         update_in(
+           state.binding_requests[request_id],
+           &binding_request_add_binding(&1, index, description)
+         )}
+
+      {:bindings_end, request_id} ->
+        {:noreply, finish_binding_request(state, request_id)}
+
+      {:bindings_error, request_id, detail} ->
+        {:noreply, finish_binding_request_error(state, request_id, detail)}
+
+      {:fire_result, request_id, "OK", _detail} ->
+        {:noreply, finish_fire_request(state, request_id, :ok)}
+
+      {:fire_result, request_id, "NO_BINDING", _detail} ->
+        {:noreply, finish_fire_request(state, request_id, {:error, :no_enabled_binding})}
+
+      {:fire_result, request_id, _status, detail} ->
+        {:noreply, finish_fire_request(state, request_id, {:error, detail})}
+
       nil ->
         {:noreply, state}
+    end
+  end
+
+  defp binding_request_started(nil, transition_id, transition_instance, count) do
+    %{
+      from: nil,
+      transition_id: transition_id,
+      transition_instance: transition_instance,
+      expected_count: count,
+      bindings: []
+    }
+  end
+
+  defp binding_request_started(request, transition_id, transition_instance, count) do
+    %{
+      request
+      | transition_id: transition_id,
+        transition_instance: transition_instance,
+        expected_count: count
+    }
+  end
+
+  defp binding_request_add_binding(nil, index, description) do
+    %{
+      from: nil,
+      transition_id: nil,
+      transition_instance: nil,
+      expected_count: nil,
+      bindings: [{index, description}]
+    }
+  end
+
+  defp binding_request_add_binding(request, index, description) do
+    update_in(request.bindings, &[{index, description} | &1])
+  end
+
+  defp finish_binding_request(%{binding_requests: requests} = state, request_id) do
+    case Map.get(requests, request_id) do
+      %{from: from} = request ->
+        bindings =
+          request.bindings
+          |> Enum.sort_by(fn {index, _description} -> index end)
+          |> Enum.map(fn {_index, description} -> description end)
+
+        if from,
+          do:
+            GenServer.reply(
+              from,
+              {:ok,
+               %{
+                 transition_id: request.transition_id,
+                 transition_instance: request.transition_instance,
+                 bindings: bindings
+               }}
+            )
+
+        %{state | binding_requests: Map.delete(requests, request_id)}
+
+      _ ->
+        state
+    end
+  end
+
+  defp finish_binding_request_error(%{binding_requests: requests} = state, request_id, detail) do
+    case Map.get(requests, request_id) do
+      %{from: from} ->
+        if from, do: GenServer.reply(from, {:error, detail})
+        %{state | binding_requests: Map.delete(requests, request_id)}
+
+      _ ->
+        state
+    end
+  end
+
+  defp finish_fire_request(%{fire_requests: requests} = state, request_id, result) do
+    case Map.get(requests, request_id) do
+      %{from: from} ->
+        if from, do: GenServer.reply(from, result)
+        %{state | fire_requests: Map.delete(requests, request_id)}
+
+      _ ->
+        state
     end
   end
 
@@ -385,8 +547,10 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   end
 
   defp maybe_remember_simulation_error(state, content) do
-    if simulation_error_line?(content) do
-      %{state | last_error: String.trim(content)}
+    content = String.trim(content)
+
+    if content != "" and simulation_error_line?(content) do
+      remember_simulation_error(state, content)
     else
       state
     end
@@ -398,9 +562,18 @@ defmodule RenewCollabSim.Server.SimulationProcess do
 
   defp simulation_error_line?(_content), do: false
 
+  defp simulation_protocol_line?(content) when is_binary(content) do
+    String.contains?(content, "PETRISTATION_")
+  end
+
+  defp simulation_protocol_line?(_content), do: false
+
   defp maybe_broadcast_exit_error(%{last_error: error} = state, _status)
-       when is_binary(error) and error != "" do
-    broadcast_error(state, error)
+       when is_binary(error) or is_list(error) do
+    case simulation_error_text(error) do
+      "" -> state
+      text -> broadcast_error(state, text)
+    end
   end
 
   defp maybe_broadcast_exit_error(state, status) when status not in [nil, 0] do
@@ -408,4 +581,33 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   end
 
   defp maybe_broadcast_exit_error(state, _status), do: state
+
+  defp remember_simulation_error(%{last_error: nil} = state, content) do
+    %{state | last_error: [content]}
+  end
+
+  defp remember_simulation_error(%{last_error: error} = state, content) when is_binary(error) do
+    remember_simulation_error(%{state | last_error: [error]}, content)
+  end
+
+  defp remember_simulation_error(%{last_error: errors} = state, content) when is_list(errors) do
+    %{state | last_error: Enum.take(errors ++ [content], -8)}
+  end
+
+  defp simulation_error_text(errors) when is_list(errors) do
+    errors
+    |> Enum.map(&String.trim/1)
+    |> Enum.reject(&(&1 == ""))
+    |> Enum.uniq()
+    |> Enum.join("\n")
+  end
+
+  defp simulation_error_text(error) when is_binary(error), do: String.trim(error)
+
+  defp safe_call(pid, message) do
+    GenServer.call(pid, message, @simulation_command_timeout)
+  catch
+    :exit, {:timeout, _} -> {:error, :simulation_command_timed_out}
+    :exit, reason -> {:error, reason}
+  end
 end

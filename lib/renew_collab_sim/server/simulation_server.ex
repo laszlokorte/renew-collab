@@ -1,6 +1,8 @@
 defmodule RenewCollabSim.Server.SimulationServer do
   use GenServer
 
+  @simulation_command_timeout 30_000
+
   def start_monitor(project_id, pubsub_channels) do
     with {:ok, pid} <-
            GenServer.start_link(__MODULE__, %{
@@ -29,6 +31,18 @@ defmodule RenewCollabSim.Server.SimulationServer do
 
   def step(pid, simulation_id) do
     GenServer.cast(pid, {:step, simulation_id})
+  end
+
+  def net_step(pid, simulation_id, net_instance_label) do
+    GenServer.cast(pid, {:net_step, simulation_id, net_instance_label})
+  end
+
+  def transition_bindings(pid, simulation_id, net_instance_label, transition_id) do
+    safe_call(pid, {:transition_bindings, simulation_id, net_instance_label, transition_id})
+  end
+
+  def fire_transition(pid, simulation_id, net_instance_label, transition_id, binding_index) do
+    safe_call(pid, {:fire_transition, simulation_id, net_instance_label, transition_id, binding_index})
   end
 
   def play(pid, simulation_id) do
@@ -113,6 +127,18 @@ defmodule RenewCollabSim.Server.SimulationServer do
   end
 
   @impl true
+  def handle_cast({:net_step, simulation_id, net_instance_label}, %{processes: procs} = state) do
+    case Map.get(procs, simulation_id, nil) do
+      %{sim_process: p} ->
+        RenewCollabSim.Server.SimulationProcess.net_step(p, net_instance_label)
+        {:noreply, state}
+
+      nil ->
+        {:noreply, state}
+    end
+  end
+
+  @impl true
   def handle_cast({:play, simulation_id}, %{processes: procs} = state) do
     case Map.get(procs, simulation_id, nil) do
       %{sim_process: p} ->
@@ -173,6 +199,47 @@ defmodule RenewCollabSim.Server.SimulationServer do
       %{sim_process: p} ->
         RenewCollabSim.Server.SimulationProcess.stop(p)
         {:reply, true, state}
+
+      nil ->
+        {:reply, false, state}
+    end
+  end
+
+  @impl true
+  def handle_call(
+        {:transition_bindings, simulation_id, net_instance_label, transition_id},
+        _from,
+        %{processes: procs} = state
+      ) do
+    case Map.get(procs, simulation_id, nil) do
+      %{sim_process: p} ->
+        {:reply,
+         RenewCollabSim.Server.SimulationProcess.transition_bindings(
+           p,
+           net_instance_label,
+           transition_id
+         ), state}
+
+      nil ->
+        {:reply, false, state}
+    end
+  end
+
+  @impl true
+  def handle_call(
+        {:fire_transition, simulation_id, net_instance_label, transition_id, binding_index},
+        _from,
+        %{processes: procs} = state
+      ) do
+    case Map.get(procs, simulation_id, nil) do
+      %{sim_process: p} ->
+        {:reply,
+         RenewCollabSim.Server.SimulationProcess.fire_transition(
+           p,
+           net_instance_label,
+           transition_id,
+           binding_index
+         ), state}
 
       nil ->
         {:reply, false, state}
@@ -271,5 +338,12 @@ defmodule RenewCollabSim.Server.SimulationServer do
     :renew_collab
     |> Application.get_env(RenewCollabSim.Server, [])
     |> Keyword.get(:setup_timeout, 30_000)
+  end
+
+  defp safe_call(pid, message) do
+    GenServer.call(pid, message, @simulation_command_timeout)
+  catch
+    :exit, {:timeout, _} -> {:error, :simulation_command_timed_out}
+    :exit, reason -> {:error, reason}
   end
 end

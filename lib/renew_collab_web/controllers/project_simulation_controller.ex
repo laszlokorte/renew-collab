@@ -4,6 +4,7 @@ defmodule RenewCollabWeb.ProjectSimulationController do
   alias RenewCollabCtrl.Dispatcher
   alias RenewCollabCtrl.Actions
   alias RenewCollabSim.Entities.Simulation
+  alias RenewCollabWeb.SimulationError
   use RenewCollabWeb, :controller
 
   action_fallback RenewCollabWeb.FallbackController
@@ -46,19 +47,41 @@ defmodule RenewCollabWeb.ProjectSimulationController do
       {:error, :invalid_rnw} ->
         conn
         |> put_status(:bad_request)
-        |> Phoenix.Controller.json(%{message: "The document is not a valid Renew file"})
+        |> Phoenix.Controller.json(%{
+          error: "invalid_rnw",
+          message: "The document is not a valid Renew file",
+          detail: SimulationError.detail(:invalid_rnw)
+        })
         |> halt()
 
       {:error, :export_rnw} ->
         conn
         |> put_status(:bad_request)
-        |> Phoenix.Controller.json(%{message: "Conversion to Renew format failed"})
+        |> Phoenix.Controller.json(%{
+          error: "export_rnw",
+          message: "Conversion to Renew format failed",
+          detail: SimulationError.detail(:export_rnw)
+        })
         |> halt()
 
-      _ ->
+      {:error, reason} ->
         conn
         |> put_status(:bad_request)
-        |> Phoenix.Controller.json(%{message: "Compiling the shadow net system failed"})
+        |> Phoenix.Controller.json(%{
+          error: "simulation_create_failed",
+          message: "Compiling the shadow net system failed",
+          detail: SimulationError.detail(reason)
+        })
+        |> halt()
+
+      reason ->
+        conn
+        |> put_status(:bad_request)
+        |> Phoenix.Controller.json(%{
+          error: "simulation_create_failed",
+          message: "Compiling the shadow net system failed",
+          detail: SimulationError.detail(reason)
+        })
         |> halt()
     end
   end

@@ -3,6 +3,8 @@ defmodule RenewCollabWeb.LiveSimulationsChannel do
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Dispatcher
   alias RenewCollabCtrl.Actions
+  alias LiveState.Event
+  alias RenewCollabWeb.SimulationError
   use RenewCollabWeb.StateChannel, web_module: RenewCollabWeb
 
   @impl true
@@ -101,6 +103,15 @@ defmodule RenewCollabWeb.LiveSimulationsChannel do
   end
 
   @impl true
+  def handle_message(
+        {:simulation_error, {_simulation_id, error}},
+        state,
+        _scope
+      ) do
+    {:reply, %Event{name: "error", detail: error}, state}
+  end
+
+  @impl true
   def handle_message(_, state, _scope) do
     {:noreply, state}
   end
@@ -111,14 +122,17 @@ defmodule RenewCollabWeb.LiveSimulationsChannel do
         %{"id" => simulation_id},
         _state,
         %{account: account},
-        _socket
+        socket
       ) do
     %Actions.SimulationStep{
       simulation_id: simulation_id
     }
-    |> Dispatcher.perform_as(account)
-
-    :silent
+    |> perform_simulation_action(
+      account,
+      socket,
+      "simulation_step_failed",
+      "Simulation step could not be performed"
+    )
   end
 
   @impl true
@@ -127,14 +141,17 @@ defmodule RenewCollabWeb.LiveSimulationsChannel do
         %{"id" => simulation_id},
         _state,
         %{account: account},
-        _socket
+        socket
       ) do
     %Actions.SimulationTerminate{
       simulation_id: simulation_id
     }
-    |> Dispatcher.perform_as(account)
-
-    :silent
+    |> perform_simulation_action(
+      account,
+      socket,
+      "simulation_terminate_failed",
+      "Simulation could not be terminated"
+    )
   end
 
   @impl true
@@ -143,14 +160,17 @@ defmodule RenewCollabWeb.LiveSimulationsChannel do
         %{"id" => simulation_id},
         _state,
         %{account: account},
-        _socket
+        socket
       ) do
     %Actions.SimulationInitialize{
       simulation_id: simulation_id
     }
-    |> Dispatcher.perform_as(account)
-
-    :silent
+    |> perform_simulation_action(
+      account,
+      socket,
+      "simulation_init_failed",
+      "Simulation could not be initialized"
+    )
   end
 
   @impl true
@@ -159,13 +179,60 @@ defmodule RenewCollabWeb.LiveSimulationsChannel do
         %{"id" => simulation_id},
         _state,
         %{account: account},
-        _socket
+        socket
       ) do
     %Actions.SimulationDeleteAsUser{
       simulation_id: simulation_id
     }
-    |> Dispatcher.perform_as(account)
+    |> perform_simulation_action(
+      account,
+      socket,
+      "simulation_delete_failed",
+      "Simulation could not be deleted"
+    )
+  end
 
-    :silent
+  defp perform_simulation_action(action, account, socket, error, message) do
+    try do
+      Dispatcher.perform_as(action, account)
+    rescue
+      exception -> {:error, exception}
+    catch
+      :exit, reason -> {:error, reason}
+      kind, reason -> {:error, {kind, reason}}
+    end
+    |> handle_simulation_result(socket, error, message)
+  end
+
+  defp handle_simulation_result(result, socket, error, message) do
+    case result do
+      :ok ->
+        :ack
+
+      {:ok, _} ->
+        :ack
+
+      true ->
+        :ack
+
+      false ->
+        push_simulation_error(socket, error, message, "The simulation is not running.")
+
+      {:error, reason} ->
+        push_simulation_error(socket, error, message, SimulationError.detail(reason))
+
+      reason ->
+        push_simulation_error(socket, error, message, SimulationError.detail(reason))
+    end
+  end
+
+  defp push_simulation_error(socket, error, message, detail) do
+    push_error(socket, %{
+      error: error,
+      message: message,
+      detail: detail
+    })
+
+    :ack
   end
 end

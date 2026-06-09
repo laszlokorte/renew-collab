@@ -6,6 +6,7 @@ defmodule RenewCollabWeb.LiveDocument do
   alias RenewCollabCtrl.Fetcher
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Actions
+  alias RenewCollabWeb.SimulationError
 
   import RenewCollabWeb.RenewComponents
 
@@ -68,11 +69,10 @@ defmodule RenewCollabWeb.LiveDocument do
           tab={:documents}
         />
       </div>
+
       <div style="grid-area: top; padding: 1em; background: #555; color: #fff; display: flex; justify-content: space-between; align-items: stretch;">
         <div>
-          <.link navigate={~p"/projects"} style="color: inherit">
-            Projects
-          </.link>
+          <.link navigate={~p"/projects"} style="color: inherit">Projects</.link>
           <%= case @document.project_assignment do %>
             <% %ProjectDocument{project_id: project_id} -> %>
               /
@@ -108,7 +108,6 @@ defmodule RenewCollabWeb.LiveDocument do
             <option>{class_name}</option>
           <% end %>
         </datalist>
-
         <%= if @show_grid do %>
           <div style="font-family: sans-serif; grid-area: 1 / 1 / span 1 / span 1; display: block; width: 100%; height: 100%;background: #f5f5f5;z-index: 100;">
             <table width="100%" border="1" cellspacing="0">
@@ -124,9 +123,7 @@ defmodule RenewCollabWeb.LiveDocument do
                     >
                       <small style="font-weight: normal;">
                         {layer.semantic_tag |> String.split(".") |> Enum.at(-1)}<br />
-                        <span style="font-size: 10px; font-family: monospace">
-                          {layer.id}
-                        </span>
+                        <span style="font-size: 10px; font-family: monospace">{layer.id}</span>
                       </small>
                     </th>
                   </:item>
@@ -143,11 +140,8 @@ defmodule RenewCollabWeb.LiveDocument do
                     >
                       <small style="font-weight: normal;">
                         {layer_a.semantic_tag |> String.split(".") |> Enum.at(-1)}<br />
-                        <span style="font-size: 10px; font-family: monospace">
-                          {layer_a.id}
-                        </span>
+                        <span style="font-size: 10px; font-family: monospace">{layer_a.id}</span>
                       </small>
-
                       <div>
                         <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: socket_schemas} <- @socket_schemas do %>
                           <select
@@ -183,10 +177,9 @@ defmodule RenewCollabWeb.LiveDocument do
                         <td align="center">
                           <%= for edge_layer = %{edge: %{source_bond: %{layer_id: ^layer_a_id}, target_bond: %{layer_id: ^layer_b_id}}} <- @document.layers do %>
                             <div style="display: flex; gap: 1ex; padding: 1ex; align-items: center;">
-                              <button phx-click="delete_layer" phx-value-id={edge_layer.id}>
-                                X
-                              </button>
-                              {edge_layer.semantic_tag |> String.split(".") |> Enum.at(-1)}
+                              <button phx-click="delete_layer" phx-value-id={edge_layer.id}>X</button> {edge_layer.semantic_tag
+                              |> String.split(".")
+                              |> Enum.at(-1)}
                             </div>
                           <% end %>
 
@@ -223,7 +216,7 @@ defmodule RenewCollabWeb.LiveDocument do
                                   <% else _ -> %>
                                     Loading...
                                 <% end %>
-                                <button>Connect</button>
+                                 <button>Connect</button>
                               </form>
                             <% end %>
                           </div>
@@ -293,7 +286,6 @@ defmodule RenewCollabWeb.LiveDocument do
           >
             Refit Camera
           </button>
-
           <button
             style={"border: none; padding: 1ex; color: #fff; background-color: #{if(@show_grid, do: "#33ae33", else: "black")}; cursor: pointer"}
             phx-click="toggle-grid"
@@ -308,7 +300,6 @@ defmodule RenewCollabWeb.LiveDocument do
         >
           Make Space
         </button>
-
         <div style="display: flex; gap: 1ex; padding: 1ex 0; height: 2em; box-sizing: border-box">
           <form target="" phx-change="insert_document">
             <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: other_documents} <- @other_documents do %>
@@ -345,7 +336,6 @@ defmodule RenewCollabWeb.LiveDocument do
           >
             Create Group
           </button>
-
           <button
             type="button"
             phx-click="create_text"
@@ -354,7 +344,6 @@ defmodule RenewCollabWeb.LiveDocument do
           >
             Create Text
           </button>
-
           <button
             type="button"
             phx-click="create_box"
@@ -363,7 +352,6 @@ defmodule RenewCollabWeb.LiveDocument do
           >
             Create Box
           </button>
-
           <button
             type="button"
             phx-click="create_edge"
@@ -383,7 +371,6 @@ defmodule RenewCollabWeb.LiveDocument do
           >
             Create Transition
           </button>
-
           <button
             type="button"
             phx-click="create_place"
@@ -392,7 +379,6 @@ defmodule RenewCollabWeb.LiveDocument do
           >
             Create Place
           </button>
-
           <button
             disabled={is_nil(@selection)}
             type="button"
@@ -402,7 +388,6 @@ defmodule RenewCollabWeb.LiveDocument do
           >
             Create Inscription
           </button>
-
           <form phx-submit="simulate">
             <label style="display: grid; grid-template-columns: 6em;">
               <button
@@ -418,6 +403,7 @@ defmodule RenewCollabWeb.LiveDocument do
                 style="cursor: pointer; grid-area: 1/1/-1/-1;opacity: 0; stretch; align-self: stretch;"
               >
                 <option selected>---cancel---</option>
+
                 <%= for f <- RenewCollabSim.Compiler.SnsCompiler.formalisms() do %>
                   <option>{f}</option>
                 <% end %>
@@ -428,9 +414,7 @@ defmodule RenewCollabWeb.LiveDocument do
 
         <div>
           <.form for={@import_form} phx-submit="import_document" phx-change="validate-import">
-            <label>
-              Import Rnw:<br /> <.live_file_input upload={@uploads.import_file} />
-            </label>
+            <label>Import Rnw:<br /> <.live_file_input upload={@uploads.import_file} /></label>
             <%= unless Enum.empty?(@uploads.import_file.entries) do %>
               <dl style="display: grid; grid-template-columns: auto auto auto; justify-content: start; gap: 2px ; align-items: center">
                 <%= for entry <- @uploads.import_file.entries do %>
@@ -443,8 +427,7 @@ defmodule RenewCollabWeb.LiveDocument do
                       aria-label="cancel"
                     >
                       &times;
-                    </button>
-                    {entry.client_name}
+                    </button> {entry.client_name}
                   </dt>
 
                   <dd>
@@ -462,6 +445,7 @@ defmodule RenewCollabWeb.LiveDocument do
                 <% end %>
               </dl>
             <% end %>
+
             <%= if Enum.count(@uploads.import_file.entries) > 0 and Enum.count(@uploads.import_file.errors) == 0 do %>
               <button
                 type="submit"
@@ -532,6 +516,7 @@ defmodule RenewCollabWeb.LiveDocument do
                     style="padding: 1ex; box-sizing:border-box; width: 100%;"
                   >
                     <option value="none">None</option>
+
                     <%= for s <-  @syntax_types do %>
                       <option selected={@document.syntax_id == s.id} value={s.id}>{s.name}</option>
                     <% end %>
@@ -551,7 +536,7 @@ defmodule RenewCollabWeb.LiveDocument do
               </dl>
             </form>
           </div>
-          <hr />
+           <hr />
           <button
             type="button"
             phx-click="remove_thumbnail"
@@ -597,7 +582,6 @@ defmodule RenewCollabWeb.LiveDocument do
               >
                 Go to Parent
               </button>
-
               <button
                 phx-click="select-relative"
                 value="first_sibling"
@@ -605,7 +589,6 @@ defmodule RenewCollabWeb.LiveDocument do
               >
                 First Sibling
               </button>
-
               <button
                 phx-click="select-relative"
                 value="prev_sibling"
@@ -613,7 +596,6 @@ defmodule RenewCollabWeb.LiveDocument do
               >
                 Prev Sibling
               </button>
-
               <button
                 phx-click="select-relative"
                 value="first_child"
@@ -621,7 +603,6 @@ defmodule RenewCollabWeb.LiveDocument do
               >
                 Go to first Child
               </button>
-
               <button
                 phx-click="select-relative"
                 value="last_child"
@@ -629,7 +610,6 @@ defmodule RenewCollabWeb.LiveDocument do
               >
                 Go to last Child
               </button>
-
               <button
                 phx-click="select-relative"
                 value="next_sibling"
@@ -637,7 +617,6 @@ defmodule RenewCollabWeb.LiveDocument do
               >
                 Next Sibling
               </button>
-
               <button
                 phx-click="select-relative"
                 value="last_sibling"
@@ -655,7 +634,6 @@ defmodule RenewCollabWeb.LiveDocument do
               >
                 Move before parent
               </button>
-
               <button
                 phx-click="move-relative"
                 value="after_parent"
@@ -663,7 +641,6 @@ defmodule RenewCollabWeb.LiveDocument do
               >
                 Move after parent
               </button>
-
               <button
                 phx-click="move-relative"
                 value="into_prev"
@@ -671,7 +648,6 @@ defmodule RenewCollabWeb.LiveDocument do
               >
                 Indent
               </button>
-
               <button
                 phx-click="move-relative"
                 value="backwards"
@@ -679,7 +655,6 @@ defmodule RenewCollabWeb.LiveDocument do
               >
                 Move backwards
               </button>
-
               <button
                 phx-click="move-relative"
                 value="frontwards"
@@ -687,7 +662,6 @@ defmodule RenewCollabWeb.LiveDocument do
               >
                 Move frontwards
               </button>
-
               <button
                 phx-click="move-relative"
                 value="to_front"
@@ -695,7 +669,6 @@ defmodule RenewCollabWeb.LiveDocument do
               >
                 Move to back
               </button>
-
               <button
                 phx-click="move-relative"
                 value="to_back"
@@ -804,13 +777,11 @@ defmodule RenewCollabWeb.LiveDocument do
                   <li style={"opacity: #{if(lnk.snapshot_id == @document.current_snaptshot.id, do: 1, else: 0.5)}"}>
                     <%= if lnk.simulation do %>
                       <.link navigate={~p"/simulation/#{lnk.simulation_id}"}>
-                        <RenewCollabWeb.RenewComponents.timestamp value={lnk.inserted_at} />
-                        <br />
+                        <RenewCollabWeb.RenewComponents.timestamp value={lnk.inserted_at} /> <br />
                         <small>{lnk.simulation_id}</small>
                       </.link>
                     <% else %>
-                      <RenewCollabWeb.RenewComponents.timestamp value={lnk.inserted_at} />
-                      <br />
+                      <RenewCollabWeb.RenewComponents.timestamp value={lnk.inserted_at} /> <br />
                       <small>{lnk.simulation_id}</small>
                     <% end %>
                   </li>
@@ -835,6 +806,7 @@ defmodule RenewCollabWeb.LiveDocument do
                 style="cursor: pointer; grid-area: 1/1/-1/-1;opacity: 0; justify-self: stretch; align-self: stretch; "
               >
                 <option selected>---cancel---</option>
+
                 <%= for f <- RenewCollabSim.Compiler.SnsCompiler.formalisms() do %>
                   <option>{f}</option>
                 <% end %>
@@ -1895,8 +1867,13 @@ defmodule RenewCollabWeb.LiveDocument do
              |> redirect(to: ~p"/simulation/#{sim.id}")}
         end
 
-      {:error, _} ->
-        {:noreply, socket |> put_flash(:error, "Failed to create simulation")}
+      {:error, reason} ->
+        {:noreply,
+         socket
+         |> put_flash(
+           :error,
+           SimulationError.format(reason, "Failed to create simulation")
+         )}
     end
   end
 

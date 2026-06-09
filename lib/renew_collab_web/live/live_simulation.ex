@@ -5,6 +5,7 @@ defmodule RenewCollabWeb.LiveSimulation do
   use RenewCollabWeb, :live_view
   alias RenewCollabCtrl.Views
   alias RenewCollabCtrl.Fetcher
+  alias RenewCollabWeb.SimulationError
 
   use RenewCollabCtrl.Helper,
     simulation: {Views.SimulationWithState, [:simulation_id], :simulation_change},
@@ -45,11 +46,8 @@ defmodule RenewCollabWeb.LiveSimulation do
         tab={:simulations}
         project_id={@simulation.project_assignment && @simulation.project_assignment.project_id}
       />
-
       <div style="padding: 1em">
-        <.link navigate={~p"/projects"}>
-          Projects
-        </.link>
+        <.link navigate={~p"/projects"}>Projects</.link>
         <%= case @simulation.project_assignment do %>
           <% %ProjectSimulation{project_id: project_id} -> %>
             /
@@ -58,10 +56,7 @@ defmodule RenewCollabWeb.LiveSimulation do
             </.link>
           <% _ -> %>
         <% end %>
-        /
-        <.link navigate={~p"/shadow_net/#{@simulation.shadow_net_system_id}"}>
-          Simulations
-        </.link>
+        / <.link navigate={~p"/shadow_net/#{@simulation.shadow_net_system_id}"}>Simulations</.link>
         / Simulation
         <h2 style="margin: 0; display: flex; gap: 1ex; align-items: start;">
           <img class="icon" src="/images/icon-simulation.svg" />
@@ -70,11 +65,13 @@ defmodule RenewCollabWeb.LiveSimulation do
             (<small><code>{@simulation.id}</code></small>)
           </span>
         </h2>
+
         <div style="padding: 1em 1em 0; display: flex; align-items: start; gap: 1em">
           <fieldset style="margin-bottom: 1em">
             <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
               Progress
             </legend>
+
             <dl style="display: grid; grid-template-columns: auto 1fr;">
               <dt>Timestep</dt>
 
@@ -90,7 +87,6 @@ defmodule RenewCollabWeb.LiveSimulation do
                 >
                   Step
                 </button>
-
                 <button
                   type="button"
                   phx-click="play"
@@ -98,7 +94,6 @@ defmodule RenewCollabWeb.LiveSimulation do
                 >
                   play
                 </button>
-
                 <button
                   type="button"
                   phx-click="pause"
@@ -106,7 +101,6 @@ defmodule RenewCollabWeb.LiveSimulation do
                 >
                   pause
                 </button>
-
                 <button
                   type="button"
                   phx-click="terminate"
@@ -122,7 +116,6 @@ defmodule RenewCollabWeb.LiveSimulation do
                 >
                   Initialize
                 </button>
-
                 <button
                   type="button"
                   phx-click="reset"
@@ -158,6 +151,7 @@ defmodule RenewCollabWeb.LiveSimulation do
             </.form>
           </fieldset>
         </div>
+
         <h3>Net Instances</h3>
 
         <%= if Enum.empty?(@simulation.net_instances) do %>
@@ -172,7 +166,6 @@ defmodule RenewCollabWeb.LiveSimulation do
           >
             Clear Instances
           </button>
-
           <ul>
             <%= for ins <- @simulation.net_instances do %>
               <li>
@@ -207,9 +200,7 @@ defmodule RenewCollabWeb.LiveSimulation do
             <div style="max-height:10em; overflow: auto; overscroll-behavior: contain;">
               <dl>
                 <%= for net <- @simulation.net_instances do %>
-                  <dt>
-                    <strong>Net: {net.label}</strong>
-                  </dt>
+                  <dt><strong>Net: {net.label}</strong></dt>
 
                   <dd>
                     <dl style="display: grid; grid-template-columns: auto 1fr;">
@@ -236,7 +227,6 @@ defmodule RenewCollabWeb.LiveSimulation do
           >
             Clear Log
           </button>
-
           <button
             type="button"
             phx-click="debug-log"
@@ -368,8 +358,11 @@ defmodule RenewCollabWeb.LiveSimulation do
       :ok ->
         {:noreply, socket |> put_flash(:info, "Stepping")}
 
-      _ ->
-        {:noreply, socket |> put_flash(:error, "Stepping failed failed")}
+      {:error, reason} ->
+        {:noreply, socket |> put_simulation_error("Stepping simulation failed", reason)}
+
+      reason ->
+        {:noreply, socket |> put_simulation_error("Stepping simulation failed", reason)}
     end
   end
 
@@ -382,8 +375,11 @@ defmodule RenewCollabWeb.LiveSimulation do
       :ok ->
         {:noreply, socket |> put_flash(:info, "Start playing simulation")}
 
-      _ ->
-        {:noreply, socket |> put_flash(:error, "Playing simulation failed")}
+      {:error, reason} ->
+        {:noreply, socket |> put_simulation_error("Playing simulation failed", reason)}
+
+      reason ->
+        {:noreply, socket |> put_simulation_error("Playing simulation failed", reason)}
     end
   end
 
@@ -396,8 +392,11 @@ defmodule RenewCollabWeb.LiveSimulation do
       :ok ->
         {:noreply, socket |> put_flash(:info, "Pause playing simulation")}
 
-      _ ->
-        {:noreply, socket |> put_flash(:error, "Pausing simulation failed")}
+      {:error, reason} ->
+        {:noreply, socket |> put_simulation_error("Pausing simulation failed", reason)}
+
+      reason ->
+        {:noreply, socket |> put_simulation_error("Pausing simulation failed", reason)}
     end
   end
 
@@ -410,8 +409,11 @@ defmodule RenewCollabWeb.LiveSimulation do
       :ok ->
         {:noreply, socket |> put_flash(:info, "Terminating simulation")}
 
-      _ ->
-        {:noreply, socket |> put_flash(:error, "Termination failed")}
+      {:error, reason} ->
+        {:noreply, socket |> put_simulation_error("Termination failed", reason)}
+
+      reason ->
+        {:noreply, socket |> put_simulation_error("Termination failed", reason)}
     end
   end
 
@@ -424,8 +426,11 @@ defmodule RenewCollabWeb.LiveSimulation do
       :ok ->
         {:noreply, socket |> put_flash(:info, "Initializing simulation")}
 
-      _ ->
-        {:noreply, socket |> put_flash(:error, "Initializing simulation failed")}
+      {:error, reason} ->
+        {:noreply, socket |> put_simulation_error("Initializing simulation failed", reason)}
+
+      reason ->
+        {:noreply, socket |> put_simulation_error("Initializing simulation failed", reason)}
     end
   end
 
@@ -444,7 +449,11 @@ defmodule RenewCollabWeb.LiveSimulation do
     end
   end
 
-  def handle_info({:simulation_error, {_simulation_id, _error}}, socket) do
-    {:noreply, socket}
+  def handle_info({:simulation_error, {_simulation_id, error}}, socket) do
+    {:noreply, socket |> put_simulation_error("Simulation Error", error)}
+  end
+
+  defp put_simulation_error(socket, message, reason) do
+    put_flash(socket, :error, SimulationError.format(reason, message))
   end
 end

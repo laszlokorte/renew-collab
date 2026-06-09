@@ -8,6 +8,7 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
   alias RenewCollabWeb.Presence
   alias RenewCollabSim.Entities
   alias LiveState.Event
+  alias RenewCollabWeb.SimulationError
 
   @impl true
   def init("live:simulation:" <> simulation_id, _params, socket) do
@@ -155,6 +156,160 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
 
   @impl true
   def handle_event(
+        "net_step",
+        payload,
+        _state,
+        %{
+          simulation_id: simulation_id,
+          account: account
+        },
+        socket
+      ) do
+    %Actions.SimulationNetStep{
+      simulation_id: simulation_id,
+      net_instance_label: payload_value(payload, "net_instance_label")
+    }
+    |> perform_simulation_action(
+      account,
+      socket,
+      "simulation_net_step_failed",
+      "Simulation net step could not be performed"
+    )
+  end
+
+  @impl true
+  def handle_event(
+        "transition_bindings",
+        payload,
+        _state,
+        %{
+          simulation_id: simulation_id,
+          account: account
+        },
+        socket
+      ) do
+    transition_id = payload_value(payload, "transition_id")
+
+    result =
+      %Actions.SimulationTransitionBindings{
+        simulation_id: simulation_id,
+        net_instance_label: payload_value(payload, "net_instance_label"),
+        transition_id: transition_id
+      }
+      |> perform_action(account)
+
+    case result do
+      {:ok,
+       %{
+         bindings: bindings,
+         transition_id: result_transition_id,
+         transition_instance: transition_instance
+       }} ->
+        {:reply,
+         %{
+           transition_id: result_transition_id,
+           transition_instance: transition_instance,
+           bindings: bindings
+         }, socket}
+
+      false ->
+        push_error(socket, %{
+          error: "transition_bindings_failed",
+          message: "Transition bindings could not be loaded",
+          detail: "The simulation is not running."
+        })
+
+        {:reply, %{transition_id: transition_id, bindings: []}, socket}
+
+      {:error, reason} ->
+        detail = simulation_error_detail(reason)
+
+        push_error(socket, %{
+          error: "transition_bindings_failed",
+          message: "Transition bindings could not be loaded",
+          detail: detail
+        })
+
+        {:reply, %{transition_id: transition_id, bindings: [], error: detail}, socket}
+
+      reason ->
+        detail = simulation_error_detail(reason)
+
+        push_error(socket, %{
+          error: "transition_bindings_failed",
+          message: "Transition bindings could not be loaded",
+          detail: detail
+        })
+
+        {:reply, %{transition_id: transition_id, bindings: [], error: detail}, socket}
+    end
+  end
+
+  @impl true
+  def handle_event(
+        "fire_transition",
+        payload,
+        _state,
+        %{
+          simulation_id: simulation_id,
+          account: account
+        },
+        socket
+      ) do
+    result =
+      %Actions.SimulationFireTransition{
+        simulation_id: simulation_id,
+        net_instance_label: payload_value(payload, "net_instance_label"),
+        transition_id: payload_value(payload, "transition_id"),
+        binding_index: payload_value(payload, "binding_index")
+      }
+      |> perform_action(account)
+
+    case result do
+      :ok ->
+        {:reply, %{fired: true}, socket}
+
+      true ->
+        {:reply, %{fired: true}, socket}
+
+      {:ok, _} ->
+        {:reply, %{fired: true}, socket}
+
+      false ->
+        push_error(socket, %{
+          error: "fire_transition_failed",
+          message: "Transition could not be fired",
+          detail: "The simulation is not running."
+        })
+
+        {:reply, %{fired: false}, socket}
+
+      {:error, reason} ->
+        detail = simulation_error_detail(reason)
+
+        push_error(socket, %{
+          error: "fire_transition_failed",
+          message: "Transition could not be fired",
+          detail: detail
+        })
+
+        {:reply, %{fired: false, error: detail}, socket}
+
+      reason ->
+        detail = simulation_error_detail(reason)
+
+        push_error(socket, %{
+          error: "fire_transition_failed",
+          message: "Transition could not be fired",
+          detail: detail
+        })
+
+        {:reply, %{fired: false, error: detail}, socket}
+    end
+  end
+
+  @impl true
+  def handle_event(
         "play",
         _payload,
         _state,
@@ -246,6 +401,12 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
   end
 
   defp perform_simulation_action(action, account, socket, error, message) do
+    action
+    |> perform_action(account)
+    |> handle_simulation_result(socket, error, message)
+  end
+
+  defp perform_action(action, account) do
     try do
       Dispatcher.perform_as(action, account)
     rescue
@@ -254,7 +415,6 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
       :exit, reason -> {:error, reason}
       kind, reason -> {:error, {kind, reason}}
     end
-    |> handle_simulation_result(socket, error, message)
   end
 
   defp handle_simulation_result(result, socket, error, message) do
@@ -289,16 +449,13 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
     :ack
   end
 
-  defp simulation_error_detail(nil), do: nil
-  defp simulation_error_detail(:error), do: "The simulation process could not be started."
-  defp simulation_error_detail(:ignore), do: "The simulation process could not be started."
-  defp simulation_error_detail({:error, reason}), do: simulation_error_detail(reason)
-  defp simulation_error_detail({:stop, reason}), do: simulation_error_detail(reason)
+  defp simulation_error_detail(reason), do: SimulationError.detail(reason)
 
-  defp simulation_error_detail(%{__exception__: true} = error) do
-    Exception.message(error)
+  defp payload_value(payload, key) when is_map(payload) do
+    Map.get(payload, key) || Map.get(payload, String.to_existing_atom(key))
+  rescue
+    ArgumentError -> Map.get(payload, key)
   end
 
-  defp simulation_error_detail(reason) when is_binary(reason), do: reason
-  defp simulation_error_detail(reason), do: inspect(reason)
+  defp payload_value(_payload, _key), do: nil
 end

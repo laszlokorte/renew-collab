@@ -8,8 +8,26 @@ defmodule RenewCollabSim.Server.SimulationParser do
   @firing ~r/\((?<fr_time_number>\d+)\)Firing (?<fr_instance_name>[^\[]+)\[(?<fr_instance_number>\d+)\].(?<fr_transition_id>\S+)/
   @sync ~r/\((?<sc_time_number>\d+)\)-------- Synchronously --------/
   @setup ~r/(?<setup>Simulation set up,\s+)/
+  @bindings_start ~r/PETRISTATION_BINDINGS (?<bs_request_id>\S+) (?<bs_transition_id>\S+)(?: (?<bs_transition_instance>\S+))? (?<bs_count>\d+)/
+  @binding ~r/PETRISTATION_BINDING (?<bd_request_id>\S+) (?<bd_index>\d+) (?<bd_description>\S+)/
+  @bindings_end ~r/PETRISTATION_BINDINGS_END (?<be_request_id>\S+)/
+  @bindings_error ~r/PETRISTATION_BINDINGS_ERROR (?<ber_request_id>\S+) (?<ber_detail>\S+)/
+  @fire_result ~r/PETRISTATION_FIRE (?<fire_request_id>\S+) (?<fire_status>\S+)(?: (?<fire_detail>\S+))?/
 
-  @combined [@new_instance, @init_token, @putting, @removing, @firing, @sync, @setup]
+  @combined [
+              @bindings_start,
+              @binding,
+              @bindings_end,
+              @bindings_error,
+              @fire_result,
+              @new_instance,
+              @init_token,
+              @putting,
+              @removing,
+              @firing,
+              @sync,
+              @setup
+            ]
             |> Enum.map_join("|", & &1.source)
             |> then(&"(:?#{@prompt})?(?:#{&1})")
             |> Regex.compile!("um")
@@ -17,6 +35,45 @@ defmodule RenewCollabSim.Server.SimulationParser do
   def parse(line) do
     Regex.named_captures(@combined, line)
     |> case do
+      %{
+        "bs_request_id" => request_id,
+        "bs_transition_id" => transition_id,
+        "bs_transition_instance" => transition_instance,
+        "bs_count" => count
+      }
+      when "" != request_id ->
+        {:bindings_start, request_id, decode(transition_id), decode(transition_instance),
+         String.to_integer(count)}
+
+      %{
+        "bd_request_id" => request_id,
+        "bd_index" => index,
+        "bd_description" => description
+      }
+      when "" != request_id ->
+        {:binding, request_id, String.to_integer(index), decode(description)}
+
+      %{
+        "be_request_id" => request_id
+      }
+      when "" != request_id ->
+        {:bindings_end, request_id}
+
+      %{
+        "ber_request_id" => request_id,
+        "ber_detail" => detail
+      }
+      when "" != request_id ->
+        {:bindings_error, request_id, decode(detail)}
+
+      %{
+        "fire_request_id" => request_id,
+        "fire_status" => status,
+        "fire_detail" => detail
+      }
+      when "" != request_id ->
+        {:fire_result, request_id, status, decode(detail)}
+
       %{
         "ni_time_number" => time_number,
         "ni_instance_name" => instance_name,
@@ -98,6 +155,16 @@ defmodule RenewCollabSim.Server.SimulationParser do
 
       nil ->
         nil
+    end
+  end
+
+  defp decode(nil), do: nil
+  defp decode(""), do: nil
+
+  defp decode(value) do
+    case Base.decode64(value) do
+      {:ok, decoded} -> decoded
+      :error -> value
     end
   end
 end

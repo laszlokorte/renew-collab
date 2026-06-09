@@ -2,6 +2,8 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
   alias RenewCollabSim.Server.SimulationServer
   use GenServer
 
+  @simulation_command_timeout 30_000
+
   def start_link(_defaults) do
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
   end
@@ -25,6 +27,29 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
 
   def step(simulation_scope, simulation_id) do
     GenServer.cast(__MODULE__, {:step, simulation_scope, simulation_id})
+  end
+
+  def net_step(simulation_scope, simulation_id, net_instance_label) do
+    GenServer.cast(__MODULE__, {:net_step, simulation_scope, simulation_id, net_instance_label})
+  end
+
+  def transition_bindings(simulation_scope, simulation_id, net_instance_label, transition_id) do
+    safe_call(
+      {:transition_bindings, simulation_scope, simulation_id, net_instance_label, transition_id}
+    )
+  end
+
+  def fire_transition(
+        simulation_scope,
+        simulation_id,
+        net_instance_label,
+        transition_id,
+        binding_index
+      ) do
+    safe_call(
+      {:fire_transition, simulation_scope, simulation_id, net_instance_label, transition_id,
+       binding_index}
+    )
   end
 
   def play(simulation_scope, simulation_id) do
@@ -106,6 +131,18 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
   end
 
   @impl true
+  def handle_cast({:net_step, simulation_scope, simulation_id, net_instance_label}, state) do
+    case Map.get(state, simulation_scope, nil) do
+      %{server_process: p} ->
+        RenewCollabSim.Server.SimulationServer.net_step(p, simulation_id, net_instance_label)
+        {:noreply, state}
+
+      nil ->
+        {:noreply, state}
+    end
+  end
+
+  @impl true
   def handle_cast({:play, simulation_scope, simulation_id}, state) do
     case Map.get(state, simulation_scope, nil) do
       %{server_process: p} ->
@@ -160,6 +197,50 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
       %{server_process: p} ->
         RenewCollabSim.Server.SimulationServer.stop(p, simulation_id)
         {:reply, true, state}
+
+      nil ->
+        {:reply, false, state}
+    end
+  end
+
+  @impl true
+  def handle_call(
+        {:transition_bindings, simulation_scope, simulation_id, net_instance_label, transition_id},
+        _from,
+        state
+      ) do
+    case Map.get(state, simulation_scope, nil) do
+      %{server_process: p} ->
+        {:reply,
+         RenewCollabSim.Server.SimulationServer.transition_bindings(
+           p,
+           simulation_id,
+           net_instance_label,
+           transition_id
+         ), state}
+
+      nil ->
+        {:reply, false, state}
+    end
+  end
+
+  @impl true
+  def handle_call(
+        {:fire_transition, simulation_scope, simulation_id, net_instance_label, transition_id,
+         binding_index},
+        _from,
+        state
+      ) do
+    case Map.get(state, simulation_scope, nil) do
+      %{server_process: p} ->
+        {:reply,
+         RenewCollabSim.Server.SimulationServer.fire_transition(
+           p,
+           simulation_id,
+           net_instance_label,
+           transition_id,
+           binding_index
+         ), state}
 
       nil ->
         {:reply, false, state}
@@ -261,5 +342,12 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
     :renew_collab
     |> Application.get_env(RenewCollabSim.Server, [])
     |> Keyword.get(:setup_timeout, 30_000)
+  end
+
+  defp safe_call(message) do
+    GenServer.call(__MODULE__, message, @simulation_command_timeout)
+  catch
+    :exit, {:timeout, _} -> {:error, :simulation_command_timed_out}
+    :exit, reason -> {:error, reason}
   end
 end

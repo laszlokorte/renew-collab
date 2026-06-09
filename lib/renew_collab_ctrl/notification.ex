@@ -462,6 +462,9 @@ defmodule RenewCollabCtrl.Notification do
   def notifications_for(_proj, %Actions.SimulationPlay{}, _result), do: []
   def notifications_for(_proj, %Actions.SimulationReset{}, _result), do: []
   def notifications_for(_proj, %Actions.SimulationStep{}, _result), do: []
+  def notifications_for(_proj, %Actions.SimulationNetStep{}, _result), do: []
+  def notifications_for(_proj, %Actions.SimulationTransitionBindings{}, _result), do: []
+  def notifications_for(_proj, %Actions.SimulationFireTransition{}, _result), do: []
   def notifications_for(_proj, %Actions.SimulationTerminate{}, _result), do: []
 
   def notifications_for(_proj, _action, _result), do: []

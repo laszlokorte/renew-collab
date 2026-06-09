@@ -12,6 +12,8 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
     :scheduled,
     :logging,
     :last_error,
+    :binding_requests,
+    :fire_requests,
     :open_multi,
     :throttle,
     :pubsub_channels,
@@ -27,7 +29,10 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
       cmds = %{
         sim_start: Keyword.get(conf, :sim_start),
         sim: Keyword.get(conf, :sim),
-        sim_step: Keyword.get(conf, :sim_step)
+        sim_step: Keyword.get(conf, :sim_step),
+        sim_net_step: Keyword.get(conf, :sim_net_step, "netstep"),
+        sim_bindings: Keyword.get(conf, :sim_bindings, "bindings"),
+        sim_fire: Keyword.get(conf, :sim_fire, "fire")
       }
 
       {sim_process, directory} = init_process(parent, simulation, Map.get(cmds, :sim_start))
@@ -46,6 +51,8 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
          throttle: {100, :millisecond},
          logging: true,
          last_error: nil,
+         binding_requests: %{},
+         fire_requests: %{},
          cmds: cmds,
          open_multi:
            {0,
@@ -116,6 +123,63 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
 
   def step(%__MODULE__{sim_process: sim_process, cmds: %{sim: sim_cmd, sim_step: sim_cmd_step}}) do
     send(sim_process, {:command, "#{sim_cmd} #{sim_cmd_step}\n"})
+  end
+
+  def net_step(%__MODULE__{
+        sim_process: sim_process,
+        cmds: %{sim: sim_cmd, sim_net_step: sim_cmd_net_step}
+      }, net_instance_label) do
+    send(sim_process, {:command, "#{sim_cmd} #{sim_cmd_net_step} #{quote_arg(net_instance_label)}\n"})
+  end
+
+  def transition_bindings(
+        %__MODULE__{
+          sim_process: sim_process,
+          cmds: %{sim: sim_cmd, sim_bindings: sim_cmd_bindings}
+        },
+        request_id,
+        net_instance_label,
+        transition_id
+      ) do
+    send(
+      sim_process,
+      {:command,
+       "#{sim_cmd} #{sim_cmd_bindings} #{request_id} #{quote_arg(net_instance_label)} #{quote_arg(transition_id)}\n"}
+    )
+  end
+
+  def fire_transition(
+        %__MODULE__{
+          sim_process: sim_process,
+          cmds: %{sim: sim_cmd, sim_fire: sim_cmd_fire}
+        },
+        request_id,
+        net_instance_label,
+        transition_id,
+        binding_index
+      ) do
+    binding_arg =
+      if is_nil(binding_index) do
+        ""
+      else
+        " #{binding_index}"
+      end
+
+    send(
+      sim_process,
+      {:command,
+       "#{sim_cmd} #{sim_cmd_fire} #{request_id} #{quote_arg(net_instance_label)} #{quote_arg(transition_id)}#{binding_arg}\n"}
+    )
+  end
+
+  defp quote_arg(value) do
+    escaped =
+      value
+      |> to_string()
+      |> String.replace("\\", "\\\\")
+      |> String.replace("\"", "\\\"")
+
+    "\"#{escaped}\""
   end
 
   def append_command(

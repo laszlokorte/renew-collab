@@ -40,6 +40,26 @@ defmodule RenewCollabSim.Script.Runner do
     end
   end
 
+  def start_and_capture(script_path) do
+    s = self()
+
+    pid =
+      spawn_link(fn ->
+        {status, output} = exec(["script", script_path], nil, [])
+
+        send(s, {:finished, status, Enum.reverse(output)})
+      end)
+
+    receive do
+      {:finished, status, output} ->
+        {:ok, status, output}
+    after
+      @timeout ->
+        Process.exit(pid, :kill)
+        :timedout
+    end
+  end
+
   def check_status(cmd \\ ["packageCount"], time_limit_ms \\ @timeout) do
     s = self()
 
