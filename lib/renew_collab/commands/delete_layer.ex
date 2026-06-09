@@ -7,14 +7,6 @@ defmodule RenewCollab.Commands.DeleteLayer do
   alias RenewCollab.Hierarchy.Layer
   alias RenewCollab.Hierarchy.LayerParenthood
 
-  def new(%{document_id: document_id, layer_id: layer_id, delete_children: delete_children}) do
-    %__MODULE__{
-      document_id: document_id,
-      layer_ids: normalize_layer_ids([layer_id]),
-      delete_children: delete_children
-    }
-  end
-
   def new(%{
         document_id: document_id,
         layer_ids: layer_ids,

@@ -8,20 +8,6 @@ defmodule RenewCollab.Commands.ReorderLayersRelative do
 
   def new(%{
         document_id: document_id,
-        layer_id: layer_id,
-        relative_direction: relative_direction,
-        target: target
-      }) do
-    %__MODULE__{
-      document_id: document_id,
-      layer_ids: normalize_layer_ids([layer_id]),
-      relative_direction: relative_direction,
-      target: target
-    }
-  end
-
-  def new(%{
-        document_id: document_id,
         layer_ids: layer_ids,
         relative_direction: relative_direction,
         target: target

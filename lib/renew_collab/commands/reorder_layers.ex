@@ -3,20 +3,6 @@ defmodule RenewCollab.Commands.ReorderLayers do
 
   def new(%{
         document_id: document_id,
-        layer_id: layer_id,
-        target_layer_id: target_layer_id,
-        target: target
-      }) do
-    %__MODULE__{
-      document_id: document_id,
-      layer_ids: normalize_layer_ids([layer_id]),
-      target_layer_id: target_layer_id,
-      target: target
-    }
-  end
-
-  def new(%{
-        document_id: document_id,
         layer_ids: layer_ids,
         target_layer_id: target_layer_id,
         target: target

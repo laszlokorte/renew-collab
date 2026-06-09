@@ -128,24 +128,12 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
   @impl true
   def handle_event(
         "delete_layer",
-        params,
+        %{"layer_ids" => layer_ids},
         _state,
         %{:document_id => document_id, :account => account},
         _socket
       ) do
-    layer_ids =
-      case params do
-        layer_id when is_binary(layer_id) ->
-          [layer_id]
-
-        %{} ->
-          params
-          |> Map.get("layer_ids", [Map.get(params, "layer_id")])
-          |> normalize_selection()
-
-        _ ->
-          []
-      end
+    layer_ids = normalize_selection(layer_ids)
 
     if layer_ids != [] do
       %Actions.DocumentEditDeleteLayer{
@@ -893,18 +881,16 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
   def handle_event(
         "move_layer",
         %{
+          "layer_ids" => layer_ids,
           "target_layer_id" => target_layer_id,
           "order" => order,
           "relative" => relative
-        } = params,
+        },
         %{},
         %{:document_id => document_id, :account => account},
         _socket
       ) do
-    layer_ids =
-      params
-      |> Map.get("layer_ids", [Map.get(params, "layer_id")])
-      |> normalize_selection()
+    layer_ids = normalize_selection(layer_ids)
 
     if layer_ids != [] do
       %Actions.DocumentEditReorderLayer{
@@ -923,19 +909,15 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
   def handle_event(
         "move_layer_relative",
         %{
+          "layer_ids" => layer_ids,
           "dx" => dx,
           "dy" => dy
-        } = params,
+        },
         %{},
         %{:document_id => document_id, :account => account},
         _socket
       ) do
-    layer_ids =
-      params
-      |> Map.get("layer_ids", [Map.get(params, "layer_id")])
-      |> List.wrap()
-      |> Enum.filter(&is_binary/1)
-      |> Enum.uniq()
+    layer_ids = normalize_selection(layer_ids)
 
     if layer_ids != [] do
       %Actions.DocumentEditMoveLayerRelative{
@@ -953,17 +935,13 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
   @impl true
   def handle_event(
         "reorder_relative",
-        %{"target_rel" => target_rel} = params,
+        %{"layer_ids" => layer_ids, "target_rel" => target_rel},
         %{},
         %{:document_id => document_id, :account => account},
         _socket
       ) do
     {rel, target} = Actions.DocumentEditReorderLayerRelative.parse_direction(target_rel)
-
-    layer_ids =
-      params
-      |> Map.get("ids", Map.get(params, "layer_ids", [Map.get(params, "id")]))
-      |> normalize_selection()
+    layer_ids = normalize_selection(layer_ids)
 
     if layer_ids != [] do
       %Actions.DocumentEditReorderLayerRelative{
@@ -975,21 +953,18 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
       |> Dispatcher.perform_as(account)
     end
 
-    {:reply, %{ids: layer_ids}}
+    {:reply, %{layer_ids: layer_ids}}
   end
 
   @impl true
   def handle_event(
         "fetch_linked",
-        %{"rel" => "direct"} = params,
+        %{"layer_ids" => layer_ids, "rel" => "direct"},
         %{},
         %{:document_id => document_id, :account => account},
         _socket
       ) do
-    layer_ids =
-      params
-      |> Map.get("ids", Map.get(params, "layer_ids", [Map.get(params, "id")]))
-      |> normalize_selection()
+    layer_ids = normalize_selection(layer_ids)
 
     rel_ids =
       layer_ids
@@ -1005,25 +980,18 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
       |> Enum.uniq()
       |> Enum.filter(&is_binary/1)
 
-    case params do
-      %{"ids" => _} -> {:reply, %{ids: rel_ids}}
-      %{"layer_ids" => _} -> {:reply, %{ids: rel_ids}}
-      _ -> {:reply, %{id: List.first(rel_ids)}}
-    end
+    {:reply, %{layer_ids: rel_ids}}
   end
 
   @impl true
   def handle_event(
         "fetch_linked",
-        %{"rel" => "deep"} = params,
+        %{"layer_ids" => layer_ids, "rel" => "deep"},
         %{},
         %{:document_id => document_id, :account => account},
         _socket
       ) do
-    layer_ids =
-      params
-      |> Map.get("ids", Map.get(params, "layer_ids", [Map.get(params, "id")]))
-      |> normalize_selection()
+    layer_ids = normalize_selection(layer_ids)
 
     rel_ids =
       layer_ids
@@ -1039,25 +1007,18 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
       |> Enum.uniq()
       |> Enum.filter(&is_binary/1)
 
-    case params do
-      %{"ids" => _} -> {:reply, %{ids: rel_ids}}
-      %{"layer_ids" => _} -> {:reply, %{ids: rel_ids}}
-      _ -> {:reply, %{id: List.first(rel_ids)}}
-    end
+    {:reply, %{layer_ids: rel_ids}}
   end
 
   @impl true
   def handle_event(
         "fetch_relative_graph",
-        %{"rel" => rel} = params,
+        %{"layer_ids" => layer_ids, "rel" => rel},
         %{},
         %{:document_id => document_id, :account => account},
         _socket
       ) do
-    layer_ids =
-      params
-      |> Map.get("ids", Map.get(params, "layer_ids", [Map.get(params, "id")]))
-      |> normalize_selection()
+    layer_ids = normalize_selection(layer_ids)
 
     rel_ids =
       layer_ids
@@ -1073,25 +1034,18 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
       |> Enum.uniq()
       |> Enum.filter(&is_binary/1)
 
-    case params do
-      %{"ids" => _} -> {:reply, %{ids: rel_ids}}
-      %{"layer_ids" => _} -> {:reply, %{ids: rel_ids}}
-      _ -> {:reply, %{id: List.first(rel_ids)}}
-    end
+    {:reply, %{layer_ids: rel_ids}}
   end
 
   @impl true
   def handle_event(
         "fetch_relative_many",
-        %{"rel" => rel} = params,
+        %{"layer_ids" => layer_ids, "rel" => rel},
         %{},
         %{:document_id => document_id, :account => account},
         _socket
       ) do
-    layer_ids =
-      params
-      |> Map.get("ids", Map.get(params, "layer_ids", [Map.get(params, "id")]))
-      |> normalize_selection()
+    layer_ids = normalize_selection(layer_ids)
 
     rel_ids =
       layer_ids
@@ -1107,25 +1061,18 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
       |> Enum.uniq()
       |> Enum.filter(&is_binary/1)
 
-    case params do
-      %{"ids" => _} -> {:reply, %{ids: rel_ids}}
-      %{"layer_ids" => _} -> {:reply, %{ids: rel_ids}}
-      _ -> {:reply, %{id: List.first(rel_ids)}}
-    end
+    {:reply, %{layer_ids: rel_ids}}
   end
 
   @impl true
   def handle_event(
         "fetch_relative",
-        %{"rel" => rel} = params,
+        %{"layer_ids" => layer_ids, "rel" => rel},
         %{},
         %{:document_id => document_id, :account => account},
         _socket
       ) do
-    layer_ids =
-      params
-      |> Map.get("ids", Map.get(params, "layer_ids", [Map.get(params, "id")]))
-      |> normalize_selection()
+    layer_ids = normalize_selection(layer_ids)
 
     rel_ids =
       layer_ids
@@ -1140,25 +1087,18 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
       end)
       |> Enum.filter(&is_binary/1)
 
-    case params do
-      %{"ids" => _} -> {:reply, %{ids: rel_ids}}
-      %{"layer_ids" => _} -> {:reply, %{ids: rel_ids}}
-      _ -> {:reply, %{id: List.first(rel_ids)}}
-    end
+    {:reply, %{layer_ids: rel_ids}}
   end
 
   @impl true
   def handle_event(
         "fetch_reachable",
-        %{"rel" => rel} = params,
+        %{"layer_ids" => layer_ids, "rel" => rel},
         %{},
         %{:document_id => document_id, :account => account},
         _socket
       ) do
-    layer_ids =
-      params
-      |> Map.get("ids", Map.get(params, "layer_ids", [Map.get(params, "id")]))
-      |> normalize_selection()
+    layer_ids = normalize_selection(layer_ids)
 
     %{uplink: uplink, downlink: downlink} = Views.DocumentLayerReachable.parse_direction(rel)
 
@@ -1177,11 +1117,7 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
       |> Enum.uniq()
       |> Enum.filter(&is_binary/1)
 
-    case params do
-      %{"ids" => _} -> {:reply, %{ids: rel_ids}}
-      %{"layer_ids" => _} -> {:reply, %{ids: rel_ids}}
-      _ -> {:reply, %{id: List.first(rel_ids)}}
-    end
+    {:reply, %{layer_ids: rel_ids}}
   end
 
   @impl true

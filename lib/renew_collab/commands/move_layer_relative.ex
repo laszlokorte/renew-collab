@@ -12,15 +12,6 @@ defmodule RenewCollab.Commands.MoveLayerRelative do
 
   defstruct [:document_id, :layer_ids, :dx, :dy]
 
-  def new(%{document_id: document_id, layer_id: layer_id, dx: dx, dy: dy}) do
-    %__MODULE__{
-      document_id: document_id,
-      layer_ids: normalize_layer_ids([layer_id]),
-      dx: dx,
-      dy: dy
-    }
-  end
-
   def new(%{document_id: document_id, layer_ids: layer_ids, dx: dx, dy: dy}) do
     %__MODULE__{
       document_id: document_id,

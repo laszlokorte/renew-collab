@@ -321,7 +321,7 @@ defmodule RenewCollab.CommandTest do
       |> Repo.insert!()
 
       {:ok, _} =
-        %{document_id: document_id, layer_id: source_layer_id, dx: 100.0, dy: 0.0}
+        %{document_id: document_id, layer_ids: [source_layer_id], dx: 100.0, dy: 0.0}
         |> MoveLayerRelative.new()
         |> DocumentCommander.run_document_command_sync(false)
 
