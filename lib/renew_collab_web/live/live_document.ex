@@ -1490,10 +1490,10 @@ defmodule RenewCollabWeb.LiveDocument do
       attrs: %{
         "semantic_tag" => "de.renew.gui.TransitionFigure",
         "box" => %{
-          "position_x" => cx - 100,
-          "position_y" => cy - 50,
-          "width" => 200,
-          "height" => 100
+          "position_x" => cx - 12,
+          "position_y" => cy - 8,
+          "width" => 24,
+          "height" => 16
         },
         "interface" => %{
           "socket_schema_id" => "4FDF577B-DB81-462E-971E-FA842F0ABA1E"
@@ -1518,10 +1518,10 @@ defmodule RenewCollabWeb.LiveDocument do
       attrs: %{
         "semantic_tag" => "de.renew.gui.PlaceFigure",
         "box" => %{
-          "position_x" => cx - 100,
-          "position_y" => cy - 50,
-          "width" => 100,
-          "height" => 100,
+          "position_x" => cx - 10,
+          "position_y" => cy - 10,
+          "width" => 20,
+          "height" => 20,
           "symbol_shape_id" => "3B66E69A-057A-40B9-A1A0-9DB44EF5CE42"
         },
         "interface" => %{

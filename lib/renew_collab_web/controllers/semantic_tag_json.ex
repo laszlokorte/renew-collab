@@ -18,7 +18,9 @@ defmodule RenewCollabWeb.SemanticTagJSON do
           "target" => %{
             "shape_id" => "3B66E69A-057A-40B9-A1A0-9DB44EF5CE42",
             "semantic_tag" => "de.renew.gui.PlaceFigure",
-            "socket_schema_id" => "2C5DE751-2FB8-48DE-99B6-D99648EBDFFC"
+            "socket_schema_id" => "2C5DE751-2FB8-48DE-99B6-D99648EBDFFC",
+            "width" => 20,
+            "height" => 20
           },
           "edge" => %{
             "target" => %{
@@ -31,7 +33,9 @@ defmodule RenewCollabWeb.SemanticTagJSON do
           "target" => %{
             "shape_id" => "2DD432FE-CC8A-4259-8A84-63F75AF0ECE0",
             "semantic_tag" => "de.renew.gui.TransitionFigure",
-            "socket_schema_id" => "4FDF577B-DB81-462E-971E-FA842F0ABA1E"
+            "socket_schema_id" => "4FDF577B-DB81-462E-971E-FA842F0ABA1E",
+            "width" => 24,
+            "height" => 16
           },
           "edge" => %{
             "target" => %{

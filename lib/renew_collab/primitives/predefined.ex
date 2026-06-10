@@ -15,14 +15,16 @@ defmodule RenewCollab.Primitives.Predefined do
               content: %{
                 semantic_tag: "de.renew.gui.PlaceFigure",
                 shape_id: "3B66E69A-057A-40B9-A1A0-9DB44EF5CE42",
-                socket_schema_id: "2C5DE751-2FB8-48DE-99B6-D99648EBDFFC"
+                socket_schema_id: "2C5DE751-2FB8-48DE-99B6-D99648EBDFFC",
+                width: 20,
+                height: 20
               },
               mimeType: "application/json+renewex-layer",
               alignX: 0.5,
               alignY: 0.5
             },
             icon:
-              ~H(<circle fill="#24d188" cx="16" cy="16" r="16" stroke="#047138" stroke-width="2" />)
+              ~H(<circle fill="#24d188" cx="16" cy="16" r="15" stroke="#047138" stroke-width="2" />)
               |> html_to_string
           },
           %{
@@ -31,14 +33,16 @@ defmodule RenewCollab.Primitives.Predefined do
               content: %{
                 semantic_tag: "de.renew.gui.TransitionFigure",
                 shape_id: "2DD432FE-CC8A-4259-8A84-63F75AF0ECE0",
-                socket_schema_id: "4FDF577B-DB81-462E-971E-FA842F0ABA1E"
+                socket_schema_id: "4FDF577B-DB81-462E-971E-FA842F0ABA1E",
+                width: 24,
+                height: 16
               },
               mimeType: "application/json+renewex-layer",
               alignX: 0.5,
               alignY: 0.5
             },
             icon:
-              ~H(<rect fill="#24d188" x="1" y="1" width="30" height="30" stroke="#047138" stroke-width="2" />)
+              ~H(<rect fill="#24d188" x="1" y="5" width="30" height="22" stroke="#047138" stroke-width="2" />)
               |> html_to_string
           }
         ]
@@ -54,7 +58,7 @@ defmodule RenewCollab.Primitives.Predefined do
                 body: "Text",
                 semantic_tag: "CH.ifa.draw.figures.TextFigure",
                 style: %{
-                  :font_size => 20
+                  :font_size => 12
                 }
               },
               mimeType: "application/json+renewex-layer",
@@ -62,7 +66,7 @@ defmodule RenewCollab.Primitives.Predefined do
               alignY: 0.5
             },
             icon:
-              ~H(<text text-anchor="middle" font-size="40" x="16" y="30" font-family="serif">T</text>)
+              ~H(<text text-anchor="middle" font-size="32" x="16" y="29" font-family="serif">T</text>)
               |> html_to_string
           },
           %{
@@ -74,7 +78,7 @@ defmodule RenewCollab.Primitives.Predefined do
                 renew_type: 1,
                 semantic_tag: "de.renew.gui.CPNTextFigure",
                 style: %{
-                  :font_size => 20
+                  :font_size => 12
                 }
               },
               mimeType: "application/json+renewex-layer",
@@ -82,7 +86,7 @@ defmodule RenewCollab.Primitives.Predefined do
               alignY: 0.5
             },
             icon:
-              ~H(<text text-anchor="middle" font-size="30" x="16" y="30" font-family="serif">A</text>
+              ~H(<text text-anchor="middle" font-size="28" x="19" y="29" font-family="serif">A</text>
 
 <rect x="1" y="3" width="9" height="14" fill="none" rx="5" ry="5" stroke="#555" stroke-width="2" />
 <rect x="3" y="9" width="5" height="14" fill="#555" rx="3" ry="3" stroke="none" />)
@@ -101,6 +105,8 @@ defmodule RenewCollab.Primitives.Predefined do
                 semantic_tag: "de.renew.fa.figures.FAStateFigure",
                 shape_id: "3B66E69A-057A-40B9-A1A0-9DB44EF5CE42",
                 socket_schema_id: "2C5DE751-2FB8-48DE-99B6-D99648EBDFFC",
+                width: 40,
+                height: 40,
                 style: %{
                   background_color: "white",
                   border_color: "black",
@@ -112,7 +118,7 @@ defmodule RenewCollab.Primitives.Predefined do
               alignY: 0.5
             },
             icon:
-              ~H(<circle fill="#fff" cx="16" cy="16" r="16" stroke="#111" stroke-width="2" />)
+              ~H(<circle fill="#fff" cx="16" cy="16" r="15" stroke="#111" stroke-width="2" />)
               |> html_to_string
           }
         ]

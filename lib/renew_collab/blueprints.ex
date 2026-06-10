@@ -465,12 +465,12 @@ defmodule RenewCollab.Blueprints do
             edge: nil,
             style: nil,
             box: %{
-              width: 176.72887420654297,
-              position_x: -80.79034042358398,
-              position_y: -50.93304252624512,
+              width: 24.0,
+              position_x: -12.0,
+              position_y: -8.0,
               symbol_shape_attributes: nil,
               symbol_shape_id: nil,
-              height: 95.60922241210938
+              height: 16.0
             },
             z_index: 0,
             semantic_tag: "de.renew.gui.TransitionFigure"
@@ -497,12 +497,12 @@ defmodule RenewCollab.Blueprints do
             edge: nil,
             style: nil,
             box: %{
-              width: 200.0,
-              position_x: -37.321624755859375,
-              position_y: -27.222834587097168,
+              width: 20.0,
+              position_x: -10.0,
+              position_y: -10.0,
               symbol_shape_attributes: nil,
               symbol_shape_id: "3B66E69A-057A-40B9-A1A0-9DB44EF5CE42",
-              height: 100.0
+              height: 20.0
             },
             z_index: 0,
             semantic_tag: "de.renew.gui.PlaceFigure"

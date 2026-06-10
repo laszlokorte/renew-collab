@@ -159,8 +159,9 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
         %{:document_id => document_id, :account => account},
         _socket
       ) do
-    width = Map.get(params, "width", 50)
-    height = Map.get(params, "height", 50)
+    {default_width, default_height} = default_box_size(params)
+    width = Map.get(params, "width", default_width)
+    height = Map.get(params, "height", default_height)
 
     %Actions.DocumentEditCreateLayerWithEdge{
       base_layer_id: Map.get(params, "base_layer_id", nil),
@@ -203,8 +204,9 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
         %{:document_id => document_id, :account => account},
         _socket
       ) do
-    width = Map.get(params, "width", 50)
-    height = Map.get(params, "height", 50)
+    {default_width, default_height} = default_box_size(params)
+    width = Map.get(params, "width", default_width)
+    height = Map.get(params, "height", default_height)
 
     %Actions.DocumentEditCreateLayer{
       base_layer_id: Map.get(params, "base_layer_id", nil),
@@ -1215,6 +1217,16 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
 
     :ack
   end
+
+  @impl true
+  def handle_event(event_name, _payload, _state, _scope, _socket) do
+    {:reply, %{error: "unknown_document_event", event: event_name}}
+  end
+
+  defp default_box_size(%{"semantic_tag" => "de.renew.gui.PlaceFigure"}), do: {20, 20}
+  defp default_box_size(%{"semantic_tag" => "de.renew.gui.TransitionFigure"}), do: {24, 16}
+  defp default_box_size(%{"semantic_tag" => "de.renew.fa.figures.FAStateFigure"}), do: {40, 40}
+  defp default_box_size(_params), do: {50, 50}
 
   defp normalize_selection(selection) when is_list(selection) do
     selection
