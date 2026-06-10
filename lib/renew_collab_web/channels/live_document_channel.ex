@@ -493,10 +493,30 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
     |> RenewCollab.DocumentFetcher.fetch()
     |> case do
       {:ok, stripped_document} ->
-        {:reply, %{clipboard: RenewCollab.Document.LayerClipboard.encode(stripped_document)}}
+        clipboard = RenewCollab.Document.LayerClipboard.encode(stripped_document)
+
+        case RenewCollab.Document.LayerClipboard.to_rnw(stripped_document) do
+          {:ok, rnw} -> {:reply, %{clipboard: clipboard, rnw: rnw}}
+          _ -> {:reply, %{clipboard: clipboard}}
+        end
 
       _ ->
         {:reply, %{error: "copy_failed"}}
+    end
+  end
+
+  @impl true
+  def handle_event(
+        "import_rnw_clipboard",
+        %{"content" => content},
+        %{},
+        %{},
+        _socket
+      )
+      when is_binary(content) do
+    case RenewCollab.Document.LayerClipboard.from_rnw("clipboard.rnw", content) do
+      {:ok, clipboard} -> {:reply, %{clipboard: clipboard}}
+      _ -> {:reply, %{error: "invalid_rnw_clipboard"}}
     end
   end
 

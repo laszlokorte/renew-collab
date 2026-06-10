@@ -1,5 +1,8 @@
 defmodule RenewCollab.Document.LayerClipboard do
+  alias RenewCollab.Document.Document
   alias RenewCollab.Document.TransientDocument
+
+  @default_document_kind "de.renew.gui.CPNDrawing"
 
   def encode(%TransientDocument{
         content: %{layers: layers},
@@ -24,6 +27,33 @@ defmodule RenewCollab.Document.LayerClipboard do
       "root_layer_ids" => root_layer_ids(layers, parenthoods),
       "origin" => TransientDocument.layers_origin(layers)
     }
+  end
+
+  def to_rnw(%TransientDocument{} = clipboard_document) do
+    clipboard_document
+    |> export_document()
+    |> RenewCollab.Export.DocumentExport.export()
+  rescue
+    _ -> :error
+  end
+
+  def from_rnw(file_name, content) do
+    with {:ok, imported} <- RenewCollab.Import.DocumentImport.import(file_name, content) do
+      {:ok,
+       encode(%TransientDocument{
+         content: %{
+           name: imported.name,
+           kind: imported.kind,
+           layers: imported.layers
+         },
+         parenthoods: imported.hierarchy,
+         hyperlinks: imported.hyperlinks,
+         bonds: imported.bonds,
+         thumbnail: imported.thumbnail
+       })}
+    end
+  rescue
+    _ -> :error
   end
 
   def decode(%{} = clipboard) do
@@ -165,6 +195,91 @@ defmodule RenewCollab.Document.LayerClipboard do
       depth when is_integer(depth) and depth > 0 -> [value(parenthood, :descendant_id)]
       _ -> []
     end
+  end
+
+  defp export_document(%TransientDocument{
+         content: content,
+         parenthoods: parenthoods,
+         hyperlinks: hyperlinks,
+         bonds: bonds
+       }) do
+    parent_by_child = parent_by_child(parenthoods)
+    outgoing_link_by_source = outgoing_link_by_source(hyperlinks)
+    bonds_by_edge = bonds_by_edge(bonds)
+
+    %Document{
+      name: value(content, :name, "Clipboard"),
+      kind: value(content, :kind, @default_document_kind),
+      layers:
+        content
+        |> value(:layers, [])
+        |> Enum.map(
+          &prepare_export_layer(
+            &1,
+            parent_by_child,
+            outgoing_link_by_source,
+            bonds_by_edge
+          )
+        )
+    }
+  end
+
+  defp prepare_export_layer(layer, parent_by_child, outgoing_link_by_source, bonds_by_edge) do
+    layer = deep_atomize(layer)
+    id = value(layer, :id)
+
+    layer
+    |> Map.put(:direct_parent_hood, Map.get(parent_by_child, id))
+    |> Map.put(:outgoing_link, Map.get(outgoing_link_by_source, id))
+    |> Map.update(:edge, nil, &prepare_export_edge(&1, Map.get(bonds_by_edge, id, [])))
+  end
+
+  defp prepare_export_edge(nil, _bonds), do: nil
+
+  defp prepare_export_edge(edge, bonds) do
+    edge = deep_atomize(edge)
+
+    edge
+    |> Map.put(:source_bond, Enum.find(bonds, &(parse_bond_kind(value(&1, :kind)) == :source)))
+    |> Map.put(:target_bond, Enum.find(bonds, &(parse_bond_kind(value(&1, :kind)) == :target)))
+  end
+
+  defp parent_by_child(parenthoods) do
+    parenthoods
+    |> Enum.flat_map(fn
+      {ancestor_id, descendant_id, 1} -> [{descendant_id, %{ancestor_id: ancestor_id}}]
+      %{} = parenthood ->
+        case {value(parenthood, :ancestor_id), value(parenthood, :descendant_id),
+              value(parenthood, :depth)} do
+          {ancestor_id, descendant_id, 1} -> [{descendant_id, %{ancestor_id: ancestor_id}}]
+          _ -> []
+        end
+
+      _ ->
+        []
+    end)
+    |> Map.new()
+  end
+
+  defp outgoing_link_by_source(hyperlinks) do
+    hyperlinks
+    |> Enum.flat_map(fn
+      %{} = hyperlink ->
+        case value(hyperlink, :source_layer_id) do
+          nil -> []
+          source_layer_id -> [{source_layer_id, deep_atomize(hyperlink)}]
+        end
+
+      _ ->
+        []
+    end)
+    |> Map.new()
+  end
+
+  defp bonds_by_edge(bonds) do
+    bonds
+    |> Enum.map(&deep_atomize/1)
+    |> Enum.group_by(&value(&1, :edge_layer_id))
   end
 
   defp value(map, key, default \\ nil)
