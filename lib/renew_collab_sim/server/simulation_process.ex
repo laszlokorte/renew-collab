@@ -563,7 +563,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   defp simulation_error_line?(_content), do: false
 
   defp simulation_protocol_line?(content) when is_binary(content) do
-    String.contains?(content, "PETRISTATION_")
+    String.contains?(content, "SIMULATION_")
   end
 
   defp simulation_protocol_line?(_content), do: false

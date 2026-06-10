@@ -8,11 +8,11 @@ defmodule RenewCollabSim.Server.SimulationParser do
   @firing ~r/\((?<fr_time_number>\d+)\)Firing (?<fr_instance_name>[^\[]+)\[(?<fr_instance_number>\d+)\].(?<fr_transition_id>\S+)/
   @sync ~r/\((?<sc_time_number>\d+)\)-------- Synchronously --------/
   @setup ~r/(?<setup>Simulation set up,\s+)/
-  @bindings_start ~r/PETRISTATION_BINDINGS (?<bs_request_id>\S+) (?<bs_transition_id>\S+)(?: (?<bs_transition_instance>\S+))? (?<bs_count>\d+)/
-  @binding ~r/PETRISTATION_BINDING (?<bd_request_id>\S+) (?<bd_index>\d+) (?<bd_description>\S+)/
-  @bindings_end ~r/PETRISTATION_BINDINGS_END (?<be_request_id>\S+)/
-  @bindings_error ~r/PETRISTATION_BINDINGS_ERROR (?<ber_request_id>\S+) (?<ber_detail>\S+)/
-  @fire_result ~r/PETRISTATION_FIRE (?<fire_request_id>\S+) (?<fire_status>\S+)(?: (?<fire_detail>\S+))?/
+  @bindings_start ~r/SIMULATION_BINDINGS (?<bs_request_id>\S+) (?<bs_transition_id>\S+)(?: (?<bs_transition_instance>\S+))? (?<bs_count>\d+)/
+  @binding ~r/SIMULATION_BINDING (?<bd_request_id>\S+) (?<bd_index>\d+) (?<bd_description>\S+)/
+  @bindings_end ~r/SIMULATION_BINDINGS_END (?<be_request_id>\S+)/
+  @bindings_error ~r/SIMULATION_BINDINGS_ERROR (?<ber_request_id>\S+) (?<ber_detail>\S+)/
+  @fire_result ~r/SIMULATION_FIRE (?<fire_request_id>\S+) (?<fire_status>\S+)(?: (?<fire_detail>\S+))?/
 
   @combined [
               @bindings_start,
