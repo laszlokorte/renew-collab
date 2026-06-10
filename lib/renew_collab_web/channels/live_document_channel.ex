@@ -464,7 +464,7 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
         },
         %{},
         %{:document_id => target_document_id, :account => account},
-        _socket
+        socket
       ) do
     %Actions.DocumentEditInsertDocument{
       target_document_id: target_document_id,
@@ -472,8 +472,12 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
       position: {x, y}
     }
     |> Dispatcher.perform_as(account)
-
-    :ack
+    |> case do
+      {:ok, %{layer_ids: layer_ids}} -> reply_with_selection(socket, layer_ids)
+      :ok -> :ack
+      {:error, reason} -> {:reply, %{error: inspect(reason)}}
+      _ -> {:reply, %{error: "insert_document_failed"}}
+    end
   end
 
   @impl true
@@ -531,7 +535,7 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
         },
         %{},
         %{:document_id => document_id, :account => account},
-        _socket
+        socket
       ) do
     %Actions.DocumentEditPasteLayers{
       document_id: document_id,
@@ -540,7 +544,7 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
     }
     |> Dispatcher.perform_as(account)
     |> case do
-      {:ok, %{layer_ids: layer_ids}} -> {:reply, %{layer_ids: layer_ids}}
+      {:ok, %{layer_ids: layer_ids}} -> reply_with_selection(socket, layer_ids)
       :ok -> :ack
       {:error, reason} -> {:reply, %{error: inspect(reason)}}
       _ -> {:reply, %{error: "paste_failed"}}
@@ -1204,7 +1208,7 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
         %{"content" => content, "file_name" => file_name, "x" => x, "y" => y},
         %{},
         %{:document_id => document_id, :account => account},
-        _socket
+        socket
       ) do
     %Actions.DocumentEditImportFile{
       document_id: document_id,
@@ -1214,8 +1218,12 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
       y: y
     }
     |> Dispatcher.perform_as(account)
-
-    :ack
+    |> case do
+      {:ok, %{layer_ids: layer_ids}} -> reply_with_selection(socket, layer_ids)
+      :ok -> :ack
+      {:error, reason} -> {:reply, %{error: inspect(reason)}}
+      _ -> {:reply, %{error: "insert_file_failed"}}
+    end
   end
 
   @impl true
@@ -1227,6 +1235,21 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
   defp default_box_size(%{"semantic_tag" => "de.renew.gui.TransitionFigure"}), do: {24, 16}
   defp default_box_size(%{"semantic_tag" => "de.renew.fa.figures.FAStateFigure"}), do: {40, 40}
   defp default_box_size(_params), do: {50, 50}
+
+  defp reply_with_selection(socket, selection) do
+    selection = normalize_selection(selection)
+    account_id = socket.assigns.current_account.id
+
+    Presence.update(
+      socket,
+      account_id,
+      &Map.merge(&1, %{
+        selection: selection
+      })
+    )
+
+    {:reply, %{layer_ids: selection}}
+  end
 
   defp normalize_selection(selection) when is_list(selection) do
     selection

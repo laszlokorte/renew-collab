@@ -3,6 +3,7 @@ defmodule RenewCollab.Export.DocumentExport do
   alias Renewex.Storable
   alias Renewex.Grammar
   alias Renewex.Hierarchy
+  alias Renewex.Serializer
   alias RenewCollab.Document.Document
 
   def export(%Document{} = document, opts \\ [synthetic: false]) do
@@ -48,7 +49,7 @@ defmodule RenewCollab.Export.DocumentExport do
         refs
       end
 
-    Renewex.serialize_document(%Renewex.Document{
+    serialize_document(%Renewex.Document{
       version: 11,
       root: %Renewex.Storable{
         class_name: document.kind,
@@ -63,6 +64,43 @@ defmodule RenewCollab.Export.DocumentExport do
       refs: refs,
       size: nil
     })
+  end
+
+  defp serialize_document(%Renewex.Document{version: version, root: root, refs: refs, size: size}) do
+    serializer = Serializer.new(refs, export_grammar(version))
+
+    with {:ok, ser} <- Serializer.serialize_storable(serializer, root) do
+      ser =
+        if version == -1,
+          do: ser,
+          else: Serializer.prepend_token(ser, {:int, version})
+
+      ser =
+        if size == nil do
+          ser
+        else
+          Enum.reduce(Tuple.to_list(size), ser, fn s, ser ->
+            Serializer.append_token(ser, {:int, s})
+          end)
+        end
+
+      {:ok, Serializer.get_output_string(ser)}
+    end
+  end
+
+  defp export_grammar(version) do
+    grammar = Grammar.new(version)
+    fa_state_class = "de.renew.fa.figures.FAStateFigure"
+
+    update_in(grammar.hierarchy[fa_state_class].fields, fn fields ->
+      Enum.map(fields, fn
+        {nil, [:ref, :string, default: {:string, "SKIPPED_WHILE_PARSING"}]} ->
+          {nil, [:ref, :string, default: {:string, "de.renew.fa.figures.NullDecoration"}]}
+
+        field ->
+          field
+      end)
+    end)
   end
 
   def export_layer(prev_storables, view_box, document, grammar, sockets, layer) do
@@ -233,20 +271,25 @@ defmodule RenewCollab.Export.DocumentExport do
         ])
 
       Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "CH.ifa.draw.figures.EllipseFigure") ->
+        {storables, fa_state_fields} =
+          create_fa_state_refs(storables, layer.semantic_tag)
+
         storables
         |> Enum.concat([
           %Renewex.Storable{
             class_name: layer.semantic_tag,
-            fields: %{
-              # layer.direct_parent_hood == nil,
-              _root: true,
-              _gen_id: layer.id,
-              attributes: export_attributes(:box, layer),
-              x: round(-view_box.x + layer.box.position_x),
-              y: round(-view_box.y + layer.box.position_y),
-              w: round(layer.box.width),
-              h: round(layer.box.height)
-            }
+            fields:
+              %{
+                # layer.direct_parent_hood == nil,
+                _root: true,
+                _gen_id: layer.id,
+                attributes: export_attributes(:box, layer),
+                x: round(-view_box.x + layer.box.position_x),
+                y: round(-view_box.y + layer.box.position_y),
+                w: round(layer.box.width),
+                h: round(layer.box.height)
+              }
+              |> Map.merge(fa_state_fields)
           }
         ])
 
@@ -461,7 +504,7 @@ defmodule RenewCollab.Export.DocumentExport do
                 ]),
               start_decoration: source_arrow_ref,
               end_decoration: target_arrow_ref,
-              arrow_name: "",
+              arrow_name: "CH.ifa.draw.figures.ArrowTip",
               start: start_ref,
               end: end_ref
             }
@@ -734,6 +777,22 @@ defmodule RenewCollab.Export.DocumentExport do
         []
     end
   end
+
+  defp create_fa_state_refs(storables, "de.renew.fa.figures.FAStateFigure") do
+    {storables, decoration_ref} =
+      create_ref(storables, %Storable{
+        class_name: "de.renew.fa.figures.NullDecoration",
+        fields: %{}
+      })
+
+    {storables,
+     %{
+       figure: nil,
+       decoration: decoration_ref
+     }}
+  end
+
+  defp create_fa_state_refs(storables, _semantic_tag), do: {storables, %{}}
 
   defp export_edge_decoration(nil, _tip_ids, _semantic_tag), do: nil
 

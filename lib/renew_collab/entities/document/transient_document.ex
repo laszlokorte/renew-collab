@@ -43,6 +43,33 @@ defmodule RenewCollab.Document.TransientDocument do
     end
   end
 
+  def root_layer_ids(%__MODULE__{content: %{layers: layers}, parenthoods: parenthoods}) do
+    root_layer_ids(layers, parenthoods)
+  end
+
+  def root_layer_ids(layers, parenthoods) do
+    layer_ids =
+      layers
+      |> List.wrap()
+      |> Enum.map(&value(&1, :id))
+      |> Enum.reject(&is_nil/1)
+      |> MapSet.new()
+
+    nested_ids =
+      parenthoods
+      |> List.wrap()
+      |> Enum.flat_map(fn
+        {_, descendant_id, depth} when depth > 0 -> [descendant_id]
+        %{} = parenthood -> nested_descendant(parenthood)
+        _ -> []
+      end)
+      |> MapSet.new()
+
+    layer_ids
+    |> MapSet.difference(nested_ids)
+    |> Enum.into([])
+  end
+
   def shift_positions(%__MODULE__{content: content} = doc, dx, dy) do
     %__MODULE__{
       doc
@@ -173,6 +200,13 @@ defmodule RenewCollab.Document.TransientDocument do
 
   defp number(value) when is_number(value), do: value
   defp number(_), do: 0
+
+  defp nested_descendant(parenthood) do
+    case value(parenthood, :depth) do
+      depth when is_integer(depth) and depth > 0 -> [value(parenthood, :descendant_id)]
+      _ -> []
+    end
+  end
 
   defp ensure_layer_text_size_hint(layer) do
     Map.update(layer, :text, nil, fn

@@ -321,8 +321,10 @@ defmodule RenewCollabCtrl.Action do
       position: position
     })
     |> RenewCollab.DocumentCommander.run_document_command_sync()
-
-    :ok
+    |> case do
+      {:ok, %{inserted_layer_ids: layer_ids}} -> {:ok, %{layer_ids: layer_ids}}
+      other -> other
+    end
   end
 
   def do_perform(%Actions.DocumentEditPasteLayers{
@@ -356,8 +358,10 @@ defmodule RenewCollabCtrl.Action do
         position: {x, y}
       }
       |> RenewCollab.DocumentCommander.run_document_command_sync()
-
-      :ok
+      |> case do
+        {:ok, %{inserted_layer_ids: layer_ids}} -> {:ok, %{layer_ids: layer_ids}}
+        other -> other
+      end
     end
   end
 

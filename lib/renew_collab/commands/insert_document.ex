@@ -59,15 +59,19 @@ defmodule RenewCollab.Commands.InsertDocument do
       stripped_document = TransientDocument.ensure_text_size_hints(stripped_document)
       origin = TransientDocument.origin(stripped_document)
 
-      insert_into_document_multi(
-        document_id,
-        now,
+      shifted_document =
         stripped_document
         |> TransientDocument.shift_positions(
           dx - Map.get(origin, "x", 0),
           dy - Map.get(origin, "y", 0)
         )
+
+      insert_into_document_multi(
+        document_id,
+        now,
+        shifted_document
       )
+      |> Ecto.Multi.put(:inserted_layer_ids, TransientDocument.root_layer_ids(shifted_document))
     end)
   end
 

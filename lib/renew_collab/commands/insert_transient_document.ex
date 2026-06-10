@@ -45,8 +45,11 @@ defmodule RenewCollab.Commands.InsertTransientDocument do
         converted_document: converted_document,
         position: {dx, dy}
       }) do
+    shifted_document = converted_document |> Converted.shift_positions(dx, dy)
+
     Ecto.Multi.new()
-    |> Ecto.Multi.put(:stripped_document, converted_document |> Converted.shift_positions(dx, dy))
+    |> Ecto.Multi.put(:stripped_document, shifted_document)
+    |> Ecto.Multi.put(:inserted_layer_ids, root_layer_ids(shifted_document))
     |> Ecto.Multi.put(:document_id, target_document_id)
     |> Ecto.Multi.run(:now, fn _, %{} ->
       {:ok, DateTime.utc_now() |> DateTime.truncate(:second)}
@@ -63,6 +66,46 @@ defmodule RenewCollab.Commands.InsertTransientDocument do
       )
     end)
   end
+
+  defp root_layer_ids(%Converted{layers: layers, hierarchy: hierarchy}) do
+    layer_ids =
+      layers
+      |> List.wrap()
+      |> Enum.map(&value(&1, "id"))
+      |> Enum.reject(&is_nil/1)
+      |> MapSet.new()
+
+    nested_ids =
+      hierarchy
+      |> List.wrap()
+      |> Enum.flat_map(fn
+        {_, descendant_id, depth} when depth > 0 -> [descendant_id]
+        %{} = parenthood -> nested_descendant(parenthood)
+        _ -> []
+      end)
+      |> MapSet.new()
+
+    layer_ids
+    |> MapSet.difference(nested_ids)
+    |> Enum.into([])
+  end
+
+  defp nested_descendant(parenthood) do
+    case value(parenthood, "depth") do
+      depth when is_integer(depth) and depth > 0 -> [value(parenthood, "descendant_id")]
+      _ -> []
+    end
+  end
+
+  defp value(%{} = map, "ancestor_id"),
+    do: Map.get(map, "ancestor_id", Map.get(map, :ancestor_id))
+
+  defp value(%{} = map, "descendant_id"),
+    do: Map.get(map, "descendant_id", Map.get(map, :descendant_id))
+
+  defp value(%{} = map, "depth"), do: Map.get(map, "depth", Map.get(map, :depth))
+  defp value(%{} = map, "id"), do: Map.get(map, "id", Map.get(map, :id))
+  defp value(_, _), do: nil
 
   defp insert_into_document_multi(
          document_id,
