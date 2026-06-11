@@ -216,6 +216,66 @@ defmodule RenewCollab.CommandTest do
   end
 
   describe "insert_transient_document" do
+    test "preserves finite automata state decorations during import" do
+      RenewCollab.SymbolFixtures.shape_fixture()
+
+      rnw = """
+      12
+          de.renew.gui.CPNDrawing 4
+              de.renew.fa.figures.FAStateFigure "attributes" "attributes" 2 "FigureWithID" "Int" 1 "FillColor" "Color" 255 255 255 255 10 20 40 40 NULL
+                  de.renew.fa.figures.StartDecoration  "de.renew.fa.figures.StartDecoration"
+              de.renew.fa.figures.FAStateFigure "attributes" "attributes" 2 "FigureWithID" "Int" 2 "FillColor" "Color" 255 255 255 255 60 20 40 40 NULL
+                  de.renew.fa.figures.EndDecoration  "de.renew.fa.figures.EndDecoration"
+              de.renew.fa.figures.FAStateFigure "attributes" "attributes" 2 "FigureWithID" "Int" 3 "FillColor" "Color" 255 255 255 255 110 20 40 40 NULL
+                  de.renew.fa.figures.StartEndDecoration  "de.renew.fa.figures.StartEndDecoration"
+              de.renew.fa.figures.FAStateFigure "attributes" "attributes" 2 "FigureWithID" "Int" 4 "FillColor" "Color" 255 255 255 255 160 20 40 40 NULL
+                  de.renew.fa.figures.NullDecoration  "de.renew.fa.figures.NullDecoration"
+              NULL
+      """
+
+      assert {:ok, imported} = RenewCollab.Import.DocumentImport.import("fa-states.rnw", rnw)
+
+      decorations =
+        imported.layers
+        |> Enum.map(fn layer ->
+          {layer["box"]["position_x"],
+           get_in(layer, ["box", "symbol_shape_attributes", "fa_decoration"])}
+        end)
+        |> Map.new()
+
+      assert decorations[10] == "start"
+      assert decorations[60] == "end"
+      assert decorations[110] == "start_end"
+      assert decorations[160] == nil
+
+      target_doc = test_document("Import FA state decorations")
+
+      assert {:ok, _} =
+               %InsertTransientDocument{
+                 target_document_id: target_doc.id,
+                 converted_document: imported,
+                 position: {0, 0}
+               }
+               |> DocumentCommander.run_document_command_sync(false)
+
+      stored_decorations =
+        from(l in Layer,
+          join: b in assoc(l, :box),
+          where: l.document_id == ^target_doc.id,
+          where: l.semantic_tag == "de.renew.fa.figures.FAStateFigure",
+          select: {b.position_x, b.symbol_shape_attributes}
+        )
+        |> Repo.all()
+        |> Map.new(fn {position_x, attributes} ->
+          {round(position_x), attributes && Map.get(attributes, "fa_decoration")}
+        end)
+
+      assert stored_decorations[10] == "start"
+      assert stored_decorations[60] == "end"
+      assert stored_decorations[110] == "start_end"
+      assert stored_decorations[160] == nil
+    end
+
     test "ignores arc connector owners that are not visible drawing figures" do
       RenewCollab.SymbolFixtures.shape_fixture()
       RenewCollab.SocketFixtures.interface_fixture()

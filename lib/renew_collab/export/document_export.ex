@@ -272,7 +272,7 @@ defmodule RenewCollab.Export.DocumentExport do
 
       Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "CH.ifa.draw.figures.EllipseFigure") ->
         {storables, fa_state_fields} =
-          create_fa_state_refs(storables, layer.semantic_tag)
+          create_fa_state_refs(storables, layer)
 
         storables
         |> Enum.concat([
@@ -778,10 +778,13 @@ defmodule RenewCollab.Export.DocumentExport do
     end
   end
 
-  defp create_fa_state_refs(storables, "de.renew.fa.figures.FAStateFigure") do
+  defp create_fa_state_refs(
+         storables,
+         %{semantic_tag: "de.renew.fa.figures.FAStateFigure", box: box}
+       ) do
     {storables, decoration_ref} =
       create_ref(storables, %Storable{
-        class_name: "de.renew.fa.figures.NullDecoration",
+        class_name: fa_state_decoration_class(box),
         fields: %{}
       })
 
@@ -792,7 +795,18 @@ defmodule RenewCollab.Export.DocumentExport do
      }}
   end
 
-  defp create_fa_state_refs(storables, _semantic_tag), do: {storables, %{}}
+  defp create_fa_state_refs(storables, _layer), do: {storables, %{}}
+
+  defp fa_state_decoration_class(box) do
+    shape_attributes = box.symbol_shape_attributes || %{}
+
+    case Map.get(shape_attributes, "fa_decoration") do
+      "start" -> "de.renew.fa.figures.StartDecoration"
+      "end" -> "de.renew.fa.figures.EndDecoration"
+      "start_end" -> "de.renew.fa.figures.StartEndDecoration"
+      _ -> "de.renew.fa.figures.NullDecoration"
+    end
+  end
 
   defp export_edge_decoration(nil, _tip_ids, _semantic_tag), do: nil
 

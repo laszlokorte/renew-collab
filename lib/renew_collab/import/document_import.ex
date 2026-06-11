@@ -105,7 +105,7 @@ defmodule RenewCollab.Import.DocumentImport do
                 end
 
               {shape_name, shape_attributes} =
-                convert_shape(parser.grammar, class_name, fields, attrs)
+                convert_shape(parser.grammar, class_name, fields, attrs, refs)
 
               %{
                 "semantic_tag" => class_name,
@@ -640,7 +640,7 @@ defmodule RenewCollab.Import.DocumentImport do
     end
   end
 
-  defp convert_shape(grammar, class_name, fields, attrs) do
+  defp convert_shape(grammar, class_name, fields, attrs, refs) do
     cond do
       Renewex.Hierarchy.is_subtype_of(
         grammar,
@@ -756,6 +756,13 @@ defmodule RenewCollab.Import.DocumentImport do
       Renewex.Hierarchy.is_subtype_of(grammar, class_name, "de.renew.gui.VirtualPlaceFigure") ->
         {"ellipse-double-in", nil}
 
+      Renewex.Hierarchy.is_subtype_of(
+        grammar,
+        class_name,
+        "de.renew.fa.figures.FAStateFigure"
+      ) ->
+        {"ellipse", fa_state_shape_attributes(fields, refs)}
+
       Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.figures.EllipseFigure") ->
         {"ellipse", nil}
 
@@ -789,6 +796,30 @@ defmodule RenewCollab.Import.DocumentImport do
         }
     end
   end
+
+  defp fa_state_shape_attributes(fields, refs) do
+    case fa_state_decoration(resolve_ref(refs, Map.get(fields, :decoration))) do
+      nil -> nil
+      decoration -> %{"fa_decoration" => decoration}
+    end
+  end
+
+  defp fa_state_decoration(%Renewex.Storable{
+         class_name: "de.renew.fa.figures.StartDecoration"
+       }),
+       do: "start"
+
+  defp fa_state_decoration(%Renewex.Storable{
+         class_name: "de.renew.fa.figures.EndDecoration"
+       }),
+       do: "end"
+
+  defp fa_state_decoration(%Renewex.Storable{
+         class_name: "de.renew.fa.figures.StartEndDecoration"
+       }),
+       do: "start_end"
+
+  defp fa_state_decoration(_), do: nil
 
   defp collect_nested_figures({:ref, r}, index, refs_with_ids) do
     case Enum.at(refs_with_ids, r) do
