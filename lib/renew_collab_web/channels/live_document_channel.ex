@@ -174,7 +174,8 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
           "position_y" => cy - height / 2,
           "width" => width,
           "height" => height,
-          "symbol_shape_id" => shape_id
+          "symbol_shape_id" => shape_id,
+          "symbol_shape_attributes" => Map.get(params, "shape_attributes", nil)
         },
         "style" => Map.get(params, "style", nil),
         "interface" =>
@@ -218,7 +219,8 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
           "position_y" => cy - height / 2,
           "width" => width,
           "height" => height,
-          "symbol_shape_id" => shape_id
+          "symbol_shape_id" => shape_id,
+          "symbol_shape_attributes" => Map.get(params, "shape_attributes", nil)
         },
         "style" => Map.get(params, "style", nil),
         "interface" =>
@@ -670,7 +672,7 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
   @impl true
   def handle_event(
         "change_layer_shape",
-        %{"layer_id" => layer_id, "shape_id" => shape_id},
+        %{"layer_id" => layer_id, "shape_id" => shape_id} = params,
         %{},
         %{:document_id => document_id, :account => account},
         _socket
@@ -680,7 +682,7 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
       document_id: document_id,
       layer_id: layer_id,
       shape_id: shape_id,
-      attributes: %{}
+      attributes: Map.get(params, "attributes", %{})
     }
     |> Dispatcher.perform_as(account)
 

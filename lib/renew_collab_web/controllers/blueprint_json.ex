@@ -1,9 +1,10 @@
 defmodule RenewCollabWeb.BlueprintJSON do
   use RenewCollabWeb, :verified_routes
 
-  @group_order ["Nodes", "Text", "FA"]
+  @group_order ["Nodes", "Shapes", "Text", "FA"]
   @item_order %{
-    "Nodes" => ["Transition", "Place", "Edge"],
+    "Nodes" => ["Transition", "Virtual Transition", "Place", "Virtual Place", "Edge"],
+    "Shapes" => ["Round Rectangle", "Triangle"],
     "Text" => ["Free Text", "Inscription"],
     "FA" => ["State"]
   }

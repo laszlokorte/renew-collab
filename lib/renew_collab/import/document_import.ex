@@ -372,7 +372,7 @@ defmodule RenewCollab.Import.DocumentImport do
             Renewex.Hierarchy.is_subtype_of(
               parser.grammar,
               class_name,
-              "de.renew.gui.VirtualPlaceFigure"
+              "de.renew.gui.VirtualTransitionFigure"
             ),
             target_id =
               Enum.at(refs_with_ids, place_ref)
@@ -615,6 +615,9 @@ defmodule RenewCollab.Import.DocumentImport do
 
       "de.renew.gui.VirtualPlaceFigure" ->
         "simple-ellipse"
+
+      "de.renew.gui.VirtualTransitionFigure" ->
+        "simple-rect"
 
       "de.renew.gui.fs.ConceptFigure" ->
         "sides"

@@ -43,6 +43,7 @@ defmodule RenewCollabWeb.SimulationJSON do
       href: url(~p"/api/simulations/#{simulation}"),
       topic: "live:simulation:#{simulation.id}",
       id: simulation.id,
+      breakpoints: breakpoints(simulation.id),
       links: %{
         project:
           with %{project_id: project_id} <- simulation.project_assignment do
@@ -89,6 +90,14 @@ defmodule RenewCollabWeb.SimulationJSON do
         }
       },
       content: show_content(simulation, running, nil)
+    }
+  end
+
+  defp breakpoints(simulation_id) do
+    %{
+      id: "#{simulation_id}:breakpoints",
+      topic: "live:simulation_breakpoints:#{simulation_id}",
+      content: %{breakpoints: []}
     }
   end
 

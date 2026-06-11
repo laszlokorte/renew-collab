@@ -339,14 +339,15 @@ defmodule RenewCollabSim.Server.SimulationProcess do
 
   @impl true
   def handle_cast(:play, state) do
+    state = %{state | playing: true}
     State.step(state)
-    {:noreply, %{state | playing: true}}
+    {:noreply, state |> broadcast_change(:play)}
   end
 
   @impl true
   def handle_cast(:pause, %{sim_process: _sim_process} = state) do
     # send(sim_process, {:command, "simulation stop\n"})
-    {:noreply, %{state | playing: false}}
+    {:noreply, %{state | playing: false, scheduled: false} |> broadcast_change(:pause)}
   end
 
   @impl true
