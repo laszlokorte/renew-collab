@@ -5,7 +5,9 @@ defmodule RenewCollab.CommandTest do
   alias RenewCollab.Commands.CreateParentLayer
   alias RenewCollab.Commands.InsertDocument
   alias RenewCollab.Commands.InsertLayerClipboard
+  alias RenewCollab.Commands.InsertTransientDocument
   alias RenewCollab.Commands.ReorderLayersRelative
+  alias RenewCollab.Connection.Bond
   alias RenewCollab.DocumentCommander
   alias RenewCollab.Document.Document
   alias RenewCollab.Element.Text
@@ -210,6 +212,66 @@ defmodule RenewCollab.CommandTest do
       assert_in_delta missing_hint_text.size_hint.position_x, 55.0, 0.0001
       assert_in_delta missing_hint_text.size_hint.position_y, 135.0, 0.0001
       assert missing_hint_text.size_hint.height > 12.0
+    end
+  end
+
+  describe "insert_transient_document" do
+    test "ignores arc connector owners that are not visible drawing figures" do
+      RenewCollab.SymbolFixtures.shape_fixture()
+      RenewCollab.SocketFixtures.interface_fixture()
+
+      target_doc = test_document("Import arc connector owners")
+
+      rnw = """
+      12
+          de.renew.gui.CPNDrawing 2
+              de.renew.gui.ArcConnection "attributes" "attributes" 1 "FigureWithID" "Int" 2 2 165 120 366 133 NULL
+                  CH.ifa.draw.figures.ArrowTip 0.4 8.0 8.0 1  "CH.ifa.draw.figures.ArrowTip"
+                  CH.ifa.draw.figures.ChopEllipseConnector
+                      de.renew.gui.PlaceFigure "attributes" "attributes" 1 "FigureWithID" "Int" 1 65 76 101 83 NULL
+                  CH.ifa.draw.standard.ChopBoxConnector
+                      de.renew.gui.TransitionFigure "attributes" "attributes" 1 "FigureWithID" "Int" 3 366 126 24 16 NULL    REF 6 NULL
+      """
+
+      assert {:ok, imported} = RenewCollab.Import.DocumentImport.import("arctest.rnw", rnw)
+
+      assert imported.layers |> Enum.map(& &1["semantic_tag"]) |> Enum.sort() == [
+               "de.renew.gui.ArcConnection",
+               "de.renew.gui.TransitionFigure"
+             ]
+
+      assert length(imported.bonds) == 1
+
+      assert {:ok, %{inserted_layer_ids: inserted_layer_ids}} =
+               %InsertTransientDocument{
+                 target_document_id: target_doc.id,
+                 converted_document: imported,
+                 position: {0, 0}
+               }
+               |> DocumentCommander.run_document_command_sync(false)
+
+      assert length(inserted_layer_ids) == 2
+
+      imported_tags =
+        from(l in Layer,
+          where: l.document_id == ^target_doc.id,
+          select: l.semantic_tag
+        )
+        |> Repo.all()
+        |> Enum.sort()
+
+      assert imported_tags == [
+               "de.renew.gui.ArcConnection",
+               "de.renew.gui.TransitionFigure"
+             ]
+
+      assert from(b in Bond,
+               join: e in assoc(b, :element_edge),
+               join: l in assoc(e, :layer),
+               where: l.document_id == ^target_doc.id,
+               select: count(b.id)
+             )
+             |> Repo.one() == 1
     end
   end
 

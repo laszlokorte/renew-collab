@@ -406,6 +406,11 @@ defmodule RenewCollab.Import.DocumentImport do
 
       hyperlinks = Enum.concat([text_annotations, virtual_place_links, virtual_transition_links])
 
+      visible_layer_ids =
+        unique_figs
+        |> Enum.map(fn {{_, layer_id}, _} -> layer_id end)
+        |> MapSet.new()
+
       bonds =
         for {{%Renewex.Storable{
                 fields: %{start: start_figure, end: end_figure}
@@ -420,7 +425,8 @@ defmodule RenewCollab.Import.DocumentImport do
              }, _} = connector,
             {_, layer_id} =
               Enum.at(refs_with_ids, target_ref),
-            not is_nil(layer_id) do
+            not is_nil(layer_id),
+            MapSet.member?(visible_layer_ids, layer_id) do
           %{
             edge_layer_id: uuid,
             layer_id: layer_id,
