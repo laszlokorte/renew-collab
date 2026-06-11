@@ -12,8 +12,8 @@ defmodule RenewCollabWeb.BlueprintJSON do
     name: "Edge",
     data: %{},
     icon: """
-    <path d="M 5 25 L 26 4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="butt" />
-    <path d="M 26 4 L 18 6.5 L 23.5 9.8 Z" fill="currentColor" stroke="currentColor" />
+    <path d="M 5 27 L 27 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="butt" />
+    <path d="M 27 5 L 22.6 6.4 L 25.6 9.4 Z" fill="currentColor" stroke="currentColor" stroke-linejoin="miter" />
     """
   }
 
