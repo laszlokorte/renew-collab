@@ -55,7 +55,7 @@ defmodule RenewCollab.Commands.CreateLayerWithEdge do
         })
         |> CreateLayer.multi()
 
-      with {:ok, %{layer: %{id: target_layer_id}}} <- repo.transact(create_layer) do
+      with {:ok, %{layer: target_layer = %{id: target_layer_id}}} <- repo.transact(create_layer) do
         reverse = Map.get(edge, "reverse", false)
 
         source_bond =
@@ -95,8 +95,8 @@ defmodule RenewCollab.Commands.CreateLayerWithEdge do
           })
           |> CreateLayer.multi()
 
-        with {:ok, %{layer: final_layer}} <- repo.transact(create_edge) do
-          {:ok, final_layer}
+        with {:ok, %{layer: _edge_layer}} <- repo.transact(create_edge) do
+          {:ok, target_layer}
         end
       else
         error -> error
