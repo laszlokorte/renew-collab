@@ -1547,6 +1547,52 @@ defmodule RenewCollabCtrl.Action do
     )
   end
 
+  def do_perform(%Actions.SimulationListBreakpoints{simulation_id: simulation_id}) do
+    {:ok, %{project_id: project_id}} =
+      %RenewCollabProj.Queries.SimulationsProject{simulation_id: simulation_id}
+      |> RenewCollabProj.ProjectFetcher.fetch()
+
+    RenewCollabSim.Server.ScopedSimulationServer.list_breakpoints(project_id, simulation_id)
+  end
+
+  def do_perform(%Actions.SimulationSetTransitionBreakpoint{
+        simulation_id: simulation_id,
+        transition_id: transition_id
+      }) do
+    {:ok, %{project_id: project_id}} =
+      %RenewCollabProj.Queries.SimulationsProject{simulation_id: simulation_id}
+      |> RenewCollabProj.ProjectFetcher.fetch()
+
+    RenewCollabSim.Server.ScopedSimulationServer.set_transition_breakpoint(
+      project_id,
+      simulation_id,
+      transition_id
+    )
+  end
+
+  def do_perform(%Actions.SimulationClearTransitionBreakpoint{
+        simulation_id: simulation_id,
+        transition_id: transition_id
+      }) do
+    {:ok, %{project_id: project_id}} =
+      %RenewCollabProj.Queries.SimulationsProject{simulation_id: simulation_id}
+      |> RenewCollabProj.ProjectFetcher.fetch()
+
+    RenewCollabSim.Server.ScopedSimulationServer.clear_transition_breakpoint(
+      project_id,
+      simulation_id,
+      transition_id
+    )
+  end
+
+  def do_perform(%Actions.SimulationClearBreakpoints{simulation_id: simulation_id}) do
+    {:ok, %{project_id: project_id}} =
+      %RenewCollabProj.Queries.SimulationsProject{simulation_id: simulation_id}
+      |> RenewCollabProj.ProjectFetcher.fetch()
+
+    RenewCollabSim.Server.ScopedSimulationServer.clear_breakpoints(project_id, simulation_id)
+  end
+
   def do_perform(%Actions.SimulationTerminate{simulation_id: simulation_id}) do
     {:ok, %{project_id: project_id}} =
       %RenewCollabProj.Queries.SimulationsProject{simulation_id: simulation_id}

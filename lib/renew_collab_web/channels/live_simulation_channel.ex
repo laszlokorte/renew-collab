@@ -332,6 +332,92 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
 
   @impl true
   def handle_event(
+        "list_breakpoints",
+        _payload,
+        _state,
+        %{
+          simulation_id: simulation_id,
+          account: account
+        },
+        socket
+      ) do
+    %Actions.SimulationListBreakpoints{
+      simulation_id: simulation_id
+    }
+    |> perform_action(account)
+    |> handle_breakpoints_result(
+      socket,
+      "breakpoints_load_failed",
+      "Breakpoints could not be loaded"
+    )
+  end
+
+  @impl true
+  def handle_event(
+        "set_transition_breakpoint",
+        payload,
+        _state,
+        %{
+          simulation_id: simulation_id,
+          account: account
+        },
+        socket
+      ) do
+    %Actions.SimulationSetTransitionBreakpoint{
+      simulation_id: simulation_id,
+      transition_id: payload_value(payload, "transition_id")
+    }
+    |> perform_action(account)
+    |> handle_breakpoints_result(socket, "breakpoint_set_failed", "Breakpoint could not be set")
+  end
+
+  @impl true
+  def handle_event(
+        "clear_transition_breakpoint",
+        payload,
+        _state,
+        %{
+          simulation_id: simulation_id,
+          account: account
+        },
+        socket
+      ) do
+    %Actions.SimulationClearTransitionBreakpoint{
+      simulation_id: simulation_id,
+      transition_id: payload_value(payload, "transition_id")
+    }
+    |> perform_action(account)
+    |> handle_breakpoints_result(
+      socket,
+      "breakpoint_clear_failed",
+      "Breakpoint could not be cleared"
+    )
+  end
+
+  @impl true
+  def handle_event(
+        "clear_breakpoints",
+        _payload,
+        _state,
+        %{
+          simulation_id: simulation_id,
+          account: account
+        },
+        socket
+      ) do
+    %Actions.SimulationClearBreakpoints{
+      simulation_id: simulation_id
+    }
+    |> perform_action(account)
+    |> handle_breakpoints_result(
+      socket,
+      "breakpoints_clear_failed",
+      "Breakpoints could not be cleared"
+    )
+  end
+
+  @impl true
+  def handle_event(
         "pause",
         _payload,
         _state,
@@ -436,6 +522,44 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
 
       reason ->
         push_simulation_error(socket, error, message, simulation_error_detail(reason))
+    end
+  end
+
+  defp handle_breakpoints_result(result, socket, error, message) do
+    case result do
+      {:ok, breakpoints} when is_list(breakpoints) ->
+        {:reply, %{breakpoints: breakpoints}, socket}
+
+      false ->
+        push_error(socket, %{
+          error: error,
+          message: message,
+          detail: "The simulation is not running."
+        })
+
+        {:reply, %{breakpoints: []}, socket}
+
+      {:error, reason} ->
+        detail = simulation_error_detail(reason)
+
+        push_error(socket, %{
+          error: error,
+          message: message,
+          detail: detail
+        })
+
+        {:reply, %{breakpoints: [], error: detail}, socket}
+
+      reason ->
+        detail = simulation_error_detail(reason)
+
+        push_error(socket, %{
+          error: error,
+          message: message,
+          detail: detail
+        })
+
+        {:reply, %{breakpoints: [], error: detail}, socket}
     end
   end
 

@@ -260,7 +260,7 @@ defmodule RenewCollabWeb.DocumentJSON do
               "shape_attributes" => v.symbol_shape_attributes,
               "shape" =>
                 case v.symbol_shape do
-                  nil -> nil
+                  nil -> v.symbol_shape_id
                   symbol -> symbol.id
                 end
             }

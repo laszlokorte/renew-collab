@@ -14,6 +14,7 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
     :last_error,
     :binding_requests,
     :fire_requests,
+    :breakpoints,
     :open_multi,
     :throttle,
     :pubsub_channels,
@@ -53,6 +54,7 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
          last_error: nil,
          binding_requests: %{},
          fire_requests: %{},
+         breakpoints: %{},
          cmds: cmds,
          open_multi:
            {0,
@@ -125,11 +127,17 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
     send(sim_process, {:command, "#{sim_cmd} #{sim_cmd_step}\n"})
   end
 
-  def net_step(%__MODULE__{
-        sim_process: sim_process,
-        cmds: %{sim: sim_cmd, sim_net_step: sim_cmd_net_step}
-      }, net_instance_label) do
-    send(sim_process, {:command, "#{sim_cmd} #{sim_cmd_net_step} #{quote_arg(net_instance_label)}\n"})
+  def net_step(
+        %__MODULE__{
+          sim_process: sim_process,
+          cmds: %{sim: sim_cmd, sim_net_step: sim_cmd_net_step}
+        },
+        net_instance_label
+      ) do
+    send(
+      sim_process,
+      {:command, "#{sim_cmd} #{sim_cmd_net_step} #{quote_arg(net_instance_label)}\n"}
+    )
   end
 
   def transition_bindings(

@@ -815,10 +815,23 @@ defmodule RenewCollab.Export.DocumentExport do
   defp fa_state_decoration(%{symbol_shape: %{name: "ellipse-double-in-arrow-inward-north-west"}}),
     do: "start_end"
 
+  defp fa_state_decoration(%{symbol_shape_id: symbol_shape_id}) when is_binary(symbol_shape_id) do
+    symbol_shape_id
+    |> RenewCollab.Symbols.custom_shape_name_by_id()
+    |> fa_state_decoration_by_shape_name()
+  end
+
   defp fa_state_decoration(%{symbol_shape_attributes: attributes}) when is_map(attributes),
     do: Map.get(attributes, "fa_decoration")
 
   defp fa_state_decoration(_), do: nil
+
+  defp fa_state_decoration_by_shape_name("ellipse-arrow-inward-north-west"), do: "start"
+
+  defp fa_state_decoration_by_shape_name("ellipse-double-in-arrow-inward-north-west"),
+    do: "start_end"
+
+  defp fa_state_decoration_by_shape_name(_), do: nil
 
   defp export_edge_decoration(nil, _tip_ids, _semantic_tag), do: nil
 

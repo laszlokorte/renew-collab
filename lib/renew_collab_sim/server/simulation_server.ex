@@ -42,7 +42,26 @@ defmodule RenewCollabSim.Server.SimulationServer do
   end
 
   def fire_transition(pid, simulation_id, net_instance_label, transition_id, binding_index) do
-    safe_call(pid, {:fire_transition, simulation_id, net_instance_label, transition_id, binding_index})
+    safe_call(
+      pid,
+      {:fire_transition, simulation_id, net_instance_label, transition_id, binding_index}
+    )
+  end
+
+  def list_breakpoints(pid, simulation_id) do
+    safe_call(pid, {:list_breakpoints, simulation_id})
+  end
+
+  def set_transition_breakpoint(pid, simulation_id, transition_id) do
+    safe_call(pid, {:set_transition_breakpoint, simulation_id, transition_id})
+  end
+
+  def clear_transition_breakpoint(pid, simulation_id, transition_id) do
+    safe_call(pid, {:clear_transition_breakpoint, simulation_id, transition_id})
+  end
+
+  def clear_breakpoints(pid, simulation_id) do
+    safe_call(pid, {:clear_breakpoints, simulation_id})
   end
 
   def play(pid, simulation_id) do
@@ -240,6 +259,62 @@ defmodule RenewCollabSim.Server.SimulationServer do
            transition_id,
            binding_index
          ), state}
+
+      nil ->
+        {:reply, false, state}
+    end
+  end
+
+  @impl true
+  def handle_call({:list_breakpoints, simulation_id}, _from, %{processes: procs} = state) do
+    case Map.get(procs, simulation_id, nil) do
+      %{sim_process: p} ->
+        {:reply, RenewCollabSim.Server.SimulationProcess.list_breakpoints(p), state}
+
+      nil ->
+        {:reply, false, state}
+    end
+  end
+
+  @impl true
+  def handle_call(
+        {:set_transition_breakpoint, simulation_id, transition_id},
+        _from,
+        %{processes: procs} = state
+      ) do
+    case Map.get(procs, simulation_id, nil) do
+      %{sim_process: p} ->
+        {:reply,
+         RenewCollabSim.Server.SimulationProcess.set_transition_breakpoint(p, transition_id),
+         state}
+
+      nil ->
+        {:reply, false, state}
+    end
+  end
+
+  @impl true
+  def handle_call(
+        {:clear_transition_breakpoint, simulation_id, transition_id},
+        _from,
+        %{processes: procs} = state
+      ) do
+    case Map.get(procs, simulation_id, nil) do
+      %{sim_process: p} ->
+        {:reply,
+         RenewCollabSim.Server.SimulationProcess.clear_transition_breakpoint(p, transition_id),
+         state}
+
+      nil ->
+        {:reply, false, state}
+    end
+  end
+
+  @impl true
+  def handle_call({:clear_breakpoints, simulation_id}, _from, %{processes: procs} = state) do
+    case Map.get(procs, simulation_id, nil) do
+      %{sim_process: p} ->
+        {:reply, RenewCollabSim.Server.SimulationProcess.clear_breakpoints(p), state}
 
       nil ->
         {:reply, false, state}

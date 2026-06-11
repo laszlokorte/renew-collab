@@ -52,6 +52,22 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
     )
   end
 
+  def list_breakpoints(simulation_scope, simulation_id) do
+    safe_call({:list_breakpoints, simulation_scope, simulation_id})
+  end
+
+  def set_transition_breakpoint(simulation_scope, simulation_id, transition_id) do
+    safe_call({:set_transition_breakpoint, simulation_scope, simulation_id, transition_id})
+  end
+
+  def clear_transition_breakpoint(simulation_scope, simulation_id, transition_id) do
+    safe_call({:clear_transition_breakpoint, simulation_scope, simulation_id, transition_id})
+  end
+
+  def clear_breakpoints(simulation_scope, simulation_id) do
+    safe_call({:clear_breakpoints, simulation_scope, simulation_id})
+  end
+
   def play(simulation_scope, simulation_id) do
     GenServer.cast(__MODULE__, {:play, simulation_scope, simulation_id})
   end
@@ -205,7 +221,8 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
 
   @impl true
   def handle_call(
-        {:transition_bindings, simulation_scope, simulation_id, net_instance_label, transition_id},
+        {:transition_bindings, simulation_scope, simulation_id, net_instance_label,
+         transition_id},
         _from,
         state
       ) do
@@ -241,6 +258,69 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
            transition_id,
            binding_index
          ), state}
+
+      nil ->
+        {:reply, false, state}
+    end
+  end
+
+  @impl true
+  def handle_call({:list_breakpoints, simulation_scope, simulation_id}, _from, state) do
+    case Map.get(state, simulation_scope, nil) do
+      %{server_process: p} ->
+        {:reply, RenewCollabSim.Server.SimulationServer.list_breakpoints(p, simulation_id), state}
+
+      nil ->
+        {:reply, false, state}
+    end
+  end
+
+  @impl true
+  def handle_call(
+        {:set_transition_breakpoint, simulation_scope, simulation_id, transition_id},
+        _from,
+        state
+      ) do
+    case Map.get(state, simulation_scope, nil) do
+      %{server_process: p} ->
+        {:reply,
+         RenewCollabSim.Server.SimulationServer.set_transition_breakpoint(
+           p,
+           simulation_id,
+           transition_id
+         ), state}
+
+      nil ->
+        {:reply, false, state}
+    end
+  end
+
+  @impl true
+  def handle_call(
+        {:clear_transition_breakpoint, simulation_scope, simulation_id, transition_id},
+        _from,
+        state
+      ) do
+    case Map.get(state, simulation_scope, nil) do
+      %{server_process: p} ->
+        {:reply,
+         RenewCollabSim.Server.SimulationServer.clear_transition_breakpoint(
+           p,
+           simulation_id,
+           transition_id
+         ), state}
+
+      nil ->
+        {:reply, false, state}
+    end
+  end
+
+  @impl true
+  def handle_call({:clear_breakpoints, simulation_scope, simulation_id}, _from, state) do
+    case Map.get(state, simulation_scope, nil) do
+      %{server_process: p} ->
+        {:reply, RenewCollabSim.Server.SimulationServer.clear_breakpoints(p, simulation_id),
+         state}
 
       nil ->
         {:reply, false, state}

@@ -43,6 +43,22 @@ defmodule RenewCollabSim.Server.SimulationProcess do
     safe_call(pid, {:fire_transition, net_instance_label, transition_id, binding_index})
   end
 
+  def list_breakpoints(pid) do
+    safe_call(pid, :list_breakpoints)
+  end
+
+  def set_transition_breakpoint(pid, transition_id) do
+    safe_call(pid, {:set_transition_breakpoint, transition_id})
+  end
+
+  def clear_transition_breakpoint(pid, transition_id) do
+    safe_call(pid, {:clear_transition_breakpoint, transition_id})
+  end
+
+  def clear_breakpoints(pid) do
+    safe_call(pid, :clear_breakpoints)
+  end
+
   def play(pid) do
     GenServer.cast(pid, :play)
   end
@@ -92,6 +108,32 @@ defmodule RenewCollabSim.Server.SimulationProcess do
          detail
        ) do
     payload = simulation_error_payload(detail)
+
+    for channel <- pubsub_channels do
+      Phoenix.PubSub.broadcast(
+        RenewCollab.PubSub,
+        channel,
+        {:simulation_error, {sim_id, payload}}
+      )
+    end
+
+    state
+  end
+
+  defp broadcast_breakpoint_hit(
+         %{
+           simulation_id: sim_id,
+           pubsub_channels: pubsub_channels
+         } = state,
+         net_instance_label,
+         transition_id
+       ) do
+    payload = %{
+      error: "simulation_breakpoint_hit",
+      title: "Breakpoint Hit",
+      message: "Simulation paused at breakpoint.",
+      detail: "Transition #{transition_id} fired in #{net_instance_label}."
+    }
 
     for channel <- pubsub_channels do
       Phoenix.PubSub.broadcast(
@@ -236,6 +278,46 @@ defmodule RenewCollabSim.Server.SimulationProcess do
        from: from,
        transition_id: transition_id
      })}
+  end
+
+  @impl true
+  def handle_call(:list_breakpoints, _from, state) do
+    {:reply, {:ok, breakpoint_list(state)}, state}
+  end
+
+  @impl true
+  def handle_call({:set_transition_breakpoint, transition_id}, _from, state)
+      when is_binary(transition_id) do
+    breakpoint = %{
+      kind: "transition",
+      mode: "firing_starts",
+      scope: "global",
+      transition_id: transition_id
+    }
+
+    state = put_in(state.breakpoints[transition_id], breakpoint)
+    {:reply, {:ok, breakpoint_list(state)}, state}
+  end
+
+  def handle_call({:set_transition_breakpoint, _transition_id}, _from, state) do
+    {:reply, {:error, :invalid_transition_id}, state}
+  end
+
+  @impl true
+  def handle_call({:clear_transition_breakpoint, transition_id}, _from, state)
+      when is_binary(transition_id) do
+    state = %{state | breakpoints: Map.delete(state.breakpoints, transition_id)}
+    {:reply, {:ok, breakpoint_list(state)}, state}
+  end
+
+  def handle_call({:clear_transition_breakpoint, _transition_id}, _from, state) do
+    {:reply, {:error, :invalid_transition_id}, state}
+  end
+
+  @impl true
+  def handle_call(:clear_breakpoints, _from, state) do
+    state = %{state | breakpoints: %{}}
+    {:reply, {:ok, []}, state}
   end
 
   @impl true
@@ -387,7 +469,8 @@ defmodule RenewCollabSim.Server.SimulationProcess do
              transition_id: transition_id,
              time_number: time_number
            })
-         )}
+         )
+         |> maybe_pause_at_breakpoint(instance_name, instance_number, transition_id)}
 
       {:timestep, time_number} ->
         state =
@@ -533,6 +616,29 @@ defmodule RenewCollabSim.Server.SimulationProcess do
       _ ->
         state
     end
+  end
+
+  defp maybe_pause_at_breakpoint(
+         %{breakpoints: breakpoints} = state,
+         instance_name,
+         instance_number,
+         transition_id
+       ) do
+    if Map.has_key?(breakpoints, transition_id) do
+      net_instance_label = "#{instance_name}[#{instance_number}]"
+
+      state
+      |> then(&%{&1 | playing: false, scheduled: false})
+      |> broadcast_breakpoint_hit(net_instance_label, transition_id)
+    else
+      state
+    end
+  end
+
+  defp breakpoint_list(%{breakpoints: breakpoints}) do
+    breakpoints
+    |> Map.values()
+    |> Enum.sort_by(& &1.transition_id)
   end
 
   @impl true
