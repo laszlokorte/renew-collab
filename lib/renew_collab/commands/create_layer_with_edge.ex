@@ -55,49 +55,53 @@ defmodule RenewCollab.Commands.CreateLayerWithEdge do
         })
         |> CreateLayer.multi()
 
-      with {:ok, %{layer: target_layer = %{id: target_layer_id}}} <- repo.transact(create_layer) do
-        reverse = Map.get(edge, "reverse", false)
+      with {:ok, %{layer: target_layer}} <- repo.transact(create_layer) do
+        {:ok, target_layer}
+      else
+        error -> error
+      end
+    end)
+    |> Ecto.Multi.run(:edge_layer, fn repo, %{layer: %{id: target_layer_id}} ->
+      reverse = Map.get(edge, "reverse", false)
 
-        source_bond =
-          %{
-            "layer_id" => source_layer_id,
-            "socket_id" => source_socket_id
-          }
-
-        target_bond = %{
-          "layer_id" => target_layer_id,
-          "socket_id" => target_socket_id
+      source_bond =
+        %{
+          "layer_id" => source_layer_id,
+          "socket_id" => source_socket_id
         }
 
-        {source_bond, target_bond} =
-          if(reverse, do: {target_bond, source_bond}, else: {source_bond, target_bond})
+      target_bond = %{
+        "layer_id" => target_layer_id,
+        "socket_id" => target_socket_id
+      }
 
-        create_edge =
-          CreateLayer.new(%{
-            document_id: document_id,
-            attrs: %{
-              "semantic_tag" => Map.get(edge, "semantic_tag", "de.renew.gui.ArcConnection"),
-              "edge" => %{
-                "source_x" => 0,
-                "source_y" => 0,
-                "target_x" => 0,
-                "target_y" => 0,
-                "source_bond" => source_bond,
-                "target_bond" => target_bond,
-                "style" => %{
-                  "target_tip_symbol_shape_id" =>
-                    Map.get(edge, "target_tip_symbol_shape_id", nil),
-                  "source_tip_symbol_shape_id" => Map.get(edge, "source_tip_symbol_shape_id", nil)
-                }
+      {source_bond, target_bond} =
+        if(reverse, do: {target_bond, source_bond}, else: {source_bond, target_bond})
+
+      create_edge =
+        CreateLayer.new(%{
+          document_id: document_id,
+          attrs: %{
+            "semantic_tag" => Map.get(edge, "semantic_tag", "de.renew.gui.ArcConnection"),
+            "edge" => %{
+              "source_x" => 0,
+              "source_y" => 0,
+              "target_x" => 0,
+              "target_y" => 0,
+              "source_bond" => source_bond,
+              "target_bond" => target_bond,
+              "style" => %{
+                "target_tip_symbol_shape_id" => Map.get(edge, "target_tip_symbol_shape_id", nil),
+                "source_tip_symbol_shape_id" => Map.get(edge, "source_tip_symbol_shape_id", nil)
               }
-            },
-            base_layer_id: target_layer_id
-          })
-          |> CreateLayer.multi()
+            }
+          },
+          base_layer_id: target_layer_id
+        })
+        |> CreateLayer.multi()
 
-        with {:ok, %{layer: _edge_layer}} <- repo.transact(create_edge) do
-          {:ok, target_layer}
-        end
+      with {:ok, %{layer: edge_layer}} <- repo.transact(create_edge) do
+        {:ok, edge_layer}
       else
         error -> error
       end

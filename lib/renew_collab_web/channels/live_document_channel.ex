@@ -191,8 +191,8 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
     }
     |> Dispatcher.perform_as(account)
     |> case do
-      {:ok, %{layer: layer}} ->
-        {:reply, %{id: layer.id}}
+      {:ok, %{layer: layer, edge_layer: edge_layer}} ->
+        {:reply, %{id: layer.id, target_layer_id: layer.id, edge_layer_id: edge_layer.id}}
     end
   end
 

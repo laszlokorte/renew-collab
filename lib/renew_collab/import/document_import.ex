@@ -761,7 +761,7 @@ defmodule RenewCollab.Import.DocumentImport do
         class_name,
         "de.renew.fa.figures.FAStateFigure"
       ) ->
-        {"ellipse", fa_state_shape_attributes(fields, refs)}
+        {fa_state_shape_name(fields, refs), nil}
 
       Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.figures.EllipseFigure") ->
         {"ellipse", nil}
@@ -797,10 +797,12 @@ defmodule RenewCollab.Import.DocumentImport do
     end
   end
 
-  defp fa_state_shape_attributes(fields, refs) do
+  defp fa_state_shape_name(fields, refs) do
     case fa_state_decoration(resolve_ref(refs, Map.get(fields, :decoration))) do
-      nil -> nil
-      decoration -> %{"fa_decoration" => decoration}
+      "start" -> "ellipse-arrow-inward-north-west"
+      "end" -> "ellipse-double-in"
+      "start_end" -> "ellipse-double-in-arrow-inward-north-west"
+      _ -> "ellipse"
     end
   end
 

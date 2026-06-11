@@ -3,7 +3,7 @@ defmodule RenewCollab.SymbolFixtures do
   alias RenewCollab.Repo
 
   def shape_fixture() do
-    RenewexIconset.Predefined.all()
+    RenewCollab.Symbols.predefined_shapes()
     |> Enum.reduce(Ecto.Multi.new(), fn shape, m ->
       m
       |> Ecto.Multi.insert(

@@ -798,15 +798,27 @@ defmodule RenewCollab.Export.DocumentExport do
   defp create_fa_state_refs(storables, _layer), do: {storables, %{}}
 
   defp fa_state_decoration_class(box) do
-    shape_attributes = box.symbol_shape_attributes || %{}
-
-    case Map.get(shape_attributes, "fa_decoration") do
+    case fa_state_decoration(box) do
       "start" -> "de.renew.fa.figures.StartDecoration"
       "end" -> "de.renew.fa.figures.EndDecoration"
       "start_end" -> "de.renew.fa.figures.StartEndDecoration"
       _ -> "de.renew.fa.figures.NullDecoration"
     end
   end
+
+  defp fa_state_decoration(%{symbol_shape: %{name: "ellipse-arrow-inward-north-west"}}),
+    do: "start"
+
+  defp fa_state_decoration(%{symbol_shape: %{name: "ellipse-double-in"}}),
+    do: "end"
+
+  defp fa_state_decoration(%{symbol_shape: %{name: "ellipse-double-in-arrow-inward-north-west"}}),
+    do: "start_end"
+
+  defp fa_state_decoration(%{symbol_shape_attributes: attributes}) when is_map(attributes),
+    do: Map.get(attributes, "fa_decoration")
+
+  defp fa_state_decoration(_), do: nil
 
   defp export_edge_decoration(nil, _tip_ids, _semantic_tag), do: nil
 

@@ -13,7 +13,7 @@ defmodule RenewCollab.Init do
       # |> Ecto.Multi.delete_all(:delete_shapes, RenewCollab.Symbol.Shape)
       # |> Ecto.Multi.delete_all(:delete_socketschemas, RenewCollab.Connection.SocketSchema)
       |> then(
-        &(RenewexIconset.Predefined.all()
+        &(RenewCollab.Symbols.predefined_shapes()
           |> Enum.reduce(&1, fn shape, m ->
             m
             |> Ecto.Multi.insert_or_update(

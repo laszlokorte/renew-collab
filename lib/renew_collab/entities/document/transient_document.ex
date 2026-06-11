@@ -80,53 +80,62 @@ defmodule RenewCollab.Document.TransientDocument do
 
   def shift_layer(layer, dx, dy) do
     layer
-    |> Map.update(:box, nil, fn
-      nil ->
-        nil
-
-      box = %{position_x: old_x, position_y: old_y} ->
-        %{box | position_x: old_x + dx, position_y: old_y + dy}
-    end)
-    |> Map.update(:text, nil, fn
-      nil ->
-        nil
-
-      text = %{position_x: old_x, position_y: old_y} ->
-        text
-        |> Map.put(:position_x, old_x + dx)
-        |> Map.put(:position_y, old_y + dy)
-        |> Map.update(:size_hint, nil, &shift_size_hint(&1, dx, dy))
-    end)
-    |> Map.update(
-      :edge,
-      nil,
-      fn
-        nil ->
-          nil
-
-        edge = %{
-          source_x: old_sx,
-          source_y: old_sy,
-          target_x: old_tx,
-          target_y: old_ty,
-          waypoints: waypoints
-        } ->
-          %{
-            edge
-            | source_x: old_sx + dx,
-              source_y: old_sy + dy,
-              target_x: old_tx + dx,
-              target_y: old_ty + dy,
-              waypoints:
-                waypoints
-                |> Enum.map(fn
-                  wp = %{position_x: px, position_y: py} ->
-                    %{wp | position_x: px + dx, position_y: py + dy}
-                end)
-          }
-      end
-    )
+    |> update_existing(:box, &shift_box(&1, dx, dy))
+    |> update_existing(:text, &shift_text(&1, dx, dy))
+    |> update_existing(:edge, &shift_edge(&1, dx, dy))
   end
+
+  defp shift_box(nil, _dx, _dy), do: nil
+
+  defp shift_box(%{} = box, dx, dy) do
+    box
+    |> shift_number(:position_x, dx)
+    |> shift_number(:position_y, dy)
+  end
+
+  defp shift_box(box, _dx, _dy), do: box
+
+  defp shift_text(nil, _dx, _dy), do: nil
+
+  defp shift_text(%{} = text, dx, dy) do
+    text
+    |> shift_number(:position_x, dx)
+    |> shift_number(:position_y, dy)
+    |> update_existing(:size_hint, &shift_size_hint(&1, dx, dy))
+  end
+
+  defp shift_text(text, _dx, _dy), do: text
+
+  defp shift_edge(nil, _dx, _dy), do: nil
+
+  defp shift_edge(%{} = edge, dx, dy) do
+    edge
+    |> shift_number(:source_x, dx)
+    |> shift_number(:source_y, dy)
+    |> shift_number(:target_x, dx)
+    |> shift_number(:target_y, dy)
+    |> update_waypoints(dx, dy)
+  end
+
+  defp shift_edge(edge, _dx, _dy), do: edge
+
+  defp update_waypoints(edge, dx, dy) do
+    case value(edge, :waypoints) do
+      nil ->
+        edge
+
+      waypoints ->
+        put_value(edge, :waypoints, Enum.map(List.wrap(waypoints), &shift_waypoint(&1, dx, dy)))
+    end
+  end
+
+  defp shift_waypoint(%{} = waypoint, dx, dy) do
+    waypoint
+    |> shift_number(:position_x, dx)
+    |> shift_number(:position_y, dy)
+  end
+
+  defp shift_waypoint(waypoint, _dx, _dy), do: waypoint
 
   defp layer_points(layer) do
     box_points(value(layer, :box)) ++
@@ -197,6 +206,37 @@ defmodule RenewCollab.Document.TransientDocument do
 
   defp value(%{} = map, key, default), do: Map.get(map, key, default)
   defp value(_, _, default), do: default
+
+  defp update_existing(%{} = map, key, updater) when is_atom(key) do
+    string_key = Atom.to_string(key)
+
+    cond do
+      Map.has_key?(map, key) -> Map.update!(map, key, updater)
+      Map.has_key?(map, string_key) -> Map.update!(map, string_key, updater)
+      true -> map
+    end
+  end
+
+  defp update_existing(map, _key, _updater), do: map
+
+  defp put_value(%{} = map, key, value) when is_atom(key) do
+    string_key = Atom.to_string(key)
+
+    cond do
+      Map.has_key?(map, key) -> Map.put(map, key, value)
+      Map.has_key?(map, string_key) -> Map.put(map, string_key, value)
+      true -> Map.put(map, key, value)
+    end
+  end
+
+  defp put_value(%{} = map, key, value), do: Map.put(map, key, value)
+
+  defp shift_number(%{} = map, key, delta) do
+    case value(map, key) do
+      value when is_number(value) -> put_value(map, key, value + delta)
+      _ -> map
+    end
+  end
 
   defp number(value) when is_number(value), do: value
   defp number(_), do: 0
@@ -311,10 +351,10 @@ defmodule RenewCollab.Document.TransientDocument do
 
   defp shift_size_hint(nil, _dx, _dy), do: nil
 
-  defp shift_size_hint(%{position_x: old_x, position_y: old_y} = size_hint, dx, dy) do
+  defp shift_size_hint(%{} = size_hint, dx, dy) do
     size_hint
-    |> Map.put(:position_x, old_x + dx)
-    |> Map.put(:position_y, old_y + dy)
+    |> shift_number(:position_x, dx)
+    |> shift_number(:position_y, dy)
   end
 
   defp shift_size_hint(size_hint, _dx, _dy), do: size_hint

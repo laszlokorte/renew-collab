@@ -10,6 +10,7 @@ defmodule RenewCollab.CommandTest do
   alias RenewCollab.Connection.Bond
   alias RenewCollab.DocumentCommander
   alias RenewCollab.Document.Document
+  alias RenewCollab.Document.TransientDocument
   alias RenewCollab.Element.Text
   alias RenewCollab.Hierarchy.Layer
   alias RenewCollab.Hierarchy.LayerParenthood
@@ -234,19 +235,22 @@ defmodule RenewCollab.CommandTest do
       """
 
       assert {:ok, imported} = RenewCollab.Import.DocumentImport.import("fa-states.rnw", rnw)
+      shape_ids = RenewCollab.Symbols.ids_by_name()
 
-      decorations =
+      shapes =
         imported.layers
         |> Enum.map(fn layer ->
-          {layer["box"]["position_x"],
-           get_in(layer, ["box", "symbol_shape_attributes", "fa_decoration"])}
+          {layer["box"]["position_x"], layer["box"]["symbol_shape_id"],
+           layer["box"]["symbol_shape_attributes"]}
         end)
-        |> Map.new()
+        |> Map.new(fn {position_x, shape_id, attributes} ->
+          {position_x, {shape_id, attributes}}
+        end)
 
-      assert decorations[10] == "start"
-      assert decorations[60] == "end"
-      assert decorations[110] == "start_end"
-      assert decorations[160] == nil
+      assert shapes[10] == {shape_ids["ellipse-arrow-inward-north-west"], nil}
+      assert shapes[60] == {shape_ids["ellipse-double-in"], nil}
+      assert shapes[110] == {shape_ids["ellipse-double-in-arrow-inward-north-west"], nil}
+      assert shapes[160] == {shape_ids["ellipse"], nil}
 
       target_doc = test_document("Import FA state decorations")
 
@@ -258,22 +262,23 @@ defmodule RenewCollab.CommandTest do
                }
                |> DocumentCommander.run_document_command_sync(false)
 
-      stored_decorations =
+      stored_shapes =
         from(l in Layer,
           join: b in assoc(l, :box),
+          join: s in assoc(b, :symbol_shape),
           where: l.document_id == ^target_doc.id,
           where: l.semantic_tag == "de.renew.fa.figures.FAStateFigure",
-          select: {b.position_x, b.symbol_shape_attributes}
+          select: {b.position_x, s.name, b.symbol_shape_attributes}
         )
         |> Repo.all()
-        |> Map.new(fn {position_x, attributes} ->
-          {round(position_x), attributes && Map.get(attributes, "fa_decoration")}
+        |> Map.new(fn {position_x, shape_name, attributes} ->
+          {round(position_x), {shape_name, attributes}}
         end)
 
-      assert stored_decorations[10] == "start"
-      assert stored_decorations[60] == "end"
-      assert stored_decorations[110] == "start_end"
-      assert stored_decorations[160] == nil
+      assert stored_shapes[10] == {"ellipse-arrow-inward-north-west", nil}
+      assert stored_shapes[60] == {"ellipse-double-in", nil}
+      assert stored_shapes[110] == {"ellipse-double-in-arrow-inward-north-west", nil}
+      assert stored_shapes[160] == {"ellipse", nil}
     end
 
     test "ignores arc connector owners that are not visible drawing figures" do
@@ -336,6 +341,34 @@ defmodule RenewCollab.CommandTest do
   end
 
   describe "insert_layer_clipboard" do
+    test "shifts copied edges without waypoints" do
+      doc = %TransientDocument{
+        content: %{
+          layers: [
+            %{
+              id: "edge",
+              edge: %{
+                source_x: 10.0,
+                source_y: 20.0,
+                target_x: 30.0,
+                target_y: 40.0,
+                style: %{stroke_color: "black"}
+              }
+            }
+          ]
+        }
+      }
+
+      shifted = TransientDocument.shift_positions(doc, 5, -10)
+      [layer] = shifted.content.layers
+
+      assert layer.edge.source_x == 15.0
+      assert layer.edge.source_y == 10.0
+      assert layer.edge.target_x == 35.0
+      assert layer.edge.target_y == 30.0
+      refute Map.has_key?(layer.edge, :waypoints)
+    end
+
     test "normalizes sibling z-indices after paste" do
       document = test_document("Paste z-index")
       test_layer(document, 1)

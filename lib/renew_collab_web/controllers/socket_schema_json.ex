@@ -8,7 +8,12 @@ defmodule RenewCollabWeb.SocketSchemaJSON do
   end
 
   defp socket_data({id, socket}) do
-    %{id: id, name: socket.name, sockets: Enum.map(socket.sockets, &socket_data/1)}
+    %{
+      id: id,
+      name: socket.name,
+      stencil: socket.stencil,
+      sockets: Enum.map(socket.sockets, &socket_data/1)
+    }
   end
 
   defp socket_data(path) do
