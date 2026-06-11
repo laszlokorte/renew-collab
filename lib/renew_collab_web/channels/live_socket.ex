@@ -13,6 +13,7 @@ defmodule RenewCollabWeb.LiveSocket do
   channel "live:net_instance:*", RenewCollabWeb.LiveSimulationNetInstanceChannel
   channel "live:simulation_links:*", RenewCollabWeb.LiveSimulationLinksChannel
   channel "live:simulation_log:*", RenewCollabWeb.LiveSimulationLogChannel
+  channel "live:simulation_breakpoints:*", RenewCollabWeb.LiveSimulationBreakpointsChannel
 
   @impl true
   def connect(%{"token" => token}, socket, _connect_info) do

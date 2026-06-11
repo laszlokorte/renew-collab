@@ -146,6 +146,23 @@ defmodule RenewCollabSim.Server.SimulationProcess do
     state
   end
 
+  defp broadcast_breakpoints_changed(
+         %{
+           simulation_id: sim_id,
+           pubsub_channels: pubsub_channels
+         } = state
+       ) do
+    for channel <- pubsub_channels do
+      Phoenix.PubSub.broadcast(
+        RenewCollab.PubSub,
+        channel,
+        {:simulation_change, {sim_id, :breakpoints}}
+      )
+    end
+
+    state
+  end
+
   defp simulation_error_payload(detail) do
     %{
       error: "simulation_process_failed",
@@ -296,7 +313,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
     }
 
     state = put_in(state.breakpoints[transition_id], breakpoint)
-    {:reply, {:ok, breakpoint_list(state)}, state}
+    {:reply, {:ok, breakpoint_list(state)}, broadcast_breakpoints_changed(state)}
   end
 
   def handle_call({:set_transition_breakpoint, _transition_id}, _from, state) do
@@ -307,7 +324,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   def handle_call({:clear_transition_breakpoint, transition_id}, _from, state)
       when is_binary(transition_id) do
     state = %{state | breakpoints: Map.delete(state.breakpoints, transition_id)}
-    {:reply, {:ok, breakpoint_list(state)}, state}
+    {:reply, {:ok, breakpoint_list(state)}, broadcast_breakpoints_changed(state)}
   end
 
   def handle_call({:clear_transition_breakpoint, _transition_id}, _from, state) do
@@ -317,7 +334,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   @impl true
   def handle_call(:clear_breakpoints, _from, state) do
     state = %{state | breakpoints: %{}}
-    {:reply, {:ok, []}, state}
+    {:reply, {:ok, []}, broadcast_breakpoints_changed(state)}
   end
 
   @impl true
