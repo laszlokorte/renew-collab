@@ -216,7 +216,7 @@ defmodule RenewCollabWeb.LiveDocument do
                                   <% else _ -> %>
                                     Loading...
                                 <% end %>
-                                 <button>Connect</button>
+                                <button>Connect</button>
                               </form>
                             <% end %>
                           </div>
@@ -427,7 +427,8 @@ defmodule RenewCollabWeb.LiveDocument do
                       aria-label="cancel"
                     >
                       &times;
-                    </button> {entry.client_name}
+                    </button>
+                    {entry.client_name}
                   </dt>
 
                   <dd>
@@ -536,7 +537,7 @@ defmodule RenewCollabWeb.LiveDocument do
               </dl>
             </form>
           </div>
-           <hr />
+          <hr />
           <button
             type="button"
             phx-click="remove_thumbnail"

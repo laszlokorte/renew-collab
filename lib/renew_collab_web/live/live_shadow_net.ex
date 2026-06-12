@@ -122,7 +122,8 @@ defmodule RenewCollabWeb.LiveShadowNet do
                           <summary>
                             <button name="shadow_net_id" phx-click="clear_net_document" value={net.id}>
                               X
-                            </button> <code>{net.name}</code>
+                            </button>
+                            <code>{net.name}</code>
                           </summary>
 
                           <div style="width: 10em; height: 5em;">
