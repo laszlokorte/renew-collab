@@ -8,7 +8,8 @@ defmodule RenewCollab.SymbolFixtures do
       m
       |> Ecto.Multi.insert(
         {:insert_shape, Map.get(shape, :name)},
-        %Shape{id: Map.get(shape, :id)} |> Shape.changeset(shape)
+        %Shape{id: Map.get(shape, :id)} |> Shape.changeset(shape),
+        on_conflict: :nothing
       )
     end)
     |> Repo.transact()
