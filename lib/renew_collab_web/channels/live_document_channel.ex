@@ -128,7 +128,7 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
   @impl true
   def handle_event(
         "delete_layer",
-        %{"layer_ids" => layer_ids},
+        %{"layer_ids" => layer_ids} = params,
         _state,
         %{:document_id => document_id, :account => account},
         _socket
@@ -139,7 +139,7 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
       %Actions.DocumentEditDeleteLayer{
         document_id: document_id,
         layer_ids: layer_ids,
-        delete_children: true
+        delete_children: Map.get(params, "delete_children", true)
       }
       |> Dispatcher.perform_as(account)
     end
@@ -187,7 +187,8 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
               %{
                 "socket_schema_id" => id
               }
-          end
+          end,
+        "outgoing_link" => outgoing_link_attrs(params)
       }
     }
     |> Dispatcher.perform_as(account)
@@ -232,7 +233,8 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
               %{
                 "socket_schema_id" => id
               }
-          end
+          end,
+        "outgoing_link" => outgoing_link_attrs(params)
       }
     }
     |> Dispatcher.perform_as(account)
@@ -288,18 +290,20 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
       when is_list(points) and length(points) > 1 do
     %{"x" => source_x, "y" => source_y} = Enum.at(points, 0)
     %{"x" => target_x, "y" => target_y} = Enum.at(points, -1)
+    cyclic = Map.get(params, "cyclic", false)
 
     %Actions.DocumentEditCreateLayer{
       base_layer_id: Map.get(params, "base_layer_id", nil),
       document_id: document_id,
       attrs: %{
         "semantic_tag" => Map.get(params, "semantic_tag", "CH.ifa.draw.figures.PolyLineFigure"),
+        "style" => polygon_layer_style(params, cyclic),
         "edge" => %{
           "source_x" => source_x,
           "source_y" => source_y,
           "target_x" => target_x,
           "target_y" => target_y,
-          "cyclic" => Map.get(params, "cyclic", false),
+          "cyclic" => cyclic,
           "style" => Map.get(params, "style", nil),
           "waypoints" =>
             points
@@ -391,9 +395,7 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
             "layer_id" => target_layer_id,
             "socket_id" => target_socket_id
           },
-          "style" => %{
-            "target_tip_symbol_shape_id" => "84DC6617-D555-4BAB-BA33-04A5FA442F00"
-          }
+          "style" => edge_style_attrs(params)
         }
       }
     }
@@ -499,18 +501,14 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
     %{document_id: document_id, layer_ids: layer_ids, original_ids: true}
     |> RenewCollab.Queries.StrippedDocument.new()
     |> RenewCollab.DocumentFetcher.fetch()
-    |> case do
-      {:ok, stripped_document} ->
-        clipboard = RenewCollab.Document.LayerClipboard.encode(stripped_document)
+    |> then(fn {:ok, stripped_document} ->
+      clipboard = RenewCollab.Document.LayerClipboard.encode(stripped_document)
 
-        case RenewCollab.Document.LayerClipboard.to_rnw(stripped_document) do
-          {:ok, rnw} -> {:reply, %{clipboard: clipboard, rnw: rnw}}
-          _ -> {:reply, %{clipboard: clipboard}}
-        end
-
-      _ ->
-        {:reply, %{error: "copy_failed"}}
-    end
+      case RenewCollab.Document.LayerClipboard.to_rnw(stripped_document) do
+        {:ok, rnw} -> {:reply, %{clipboard: clipboard, rnw: rnw}}
+        _ -> {:reply, %{clipboard: clipboard}}
+      end
+    end)
   end
 
   @impl true
@@ -575,6 +573,25 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
 
   @impl true
   def handle_event(
+        "change_text_type",
+        %{"layer_id" => layer_id, "renew_type" => renew_type},
+        %{},
+        %{document_id: document_id, account: account},
+        _socket
+      )
+      when is_binary(layer_id) and is_integer(renew_type) do
+    %Actions.DocumentEditLayerTextType{
+      document_id: document_id,
+      layer_id: layer_id,
+      renew_type: renew_type
+    }
+    |> Dispatcher.perform_as(account)
+
+    :silent
+  end
+
+  @impl true
+  def handle_event(
         "change_style",
         %{"type" => "edge", "attr" => style_attr, "layer_id" => layer_id, "val" => value},
         %{},
@@ -607,6 +624,43 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
       layer_id: layer_id,
       style_attr: style_attr,
       value: value
+    }
+    |> Dispatcher.perform_as(account)
+
+    :silent
+  end
+
+  @impl true
+  def handle_event(
+        "link_layer",
+        %{"layer_id" => layer_id, "target_layer_id" => target_layer_id},
+        %{},
+        %{:document_id => document_id, :account => account},
+        _socket
+      )
+      when is_binary(layer_id) and is_binary(target_layer_id) do
+    %Actions.DocumentEditLinkLayer{
+      document_id: document_id,
+      layer_id: layer_id,
+      target_layer_id: target_layer_id
+    }
+    |> Dispatcher.perform_as(account)
+
+    :silent
+  end
+
+  @impl true
+  def handle_event(
+        "unlink_layer",
+        %{"layer_id" => layer_id},
+        %{},
+        %{:document_id => document_id, :account => account},
+        _socket
+      )
+      when is_binary(layer_id) do
+    %Actions.DocumentEditUnlinkLayer{
+      document_id: document_id,
+      layer_id: layer_id
     }
     |> Dispatcher.perform_as(account)
 
@@ -766,6 +820,27 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
 
   @impl true
   def handle_event(
+        "update_text_size_hint",
+        %{
+          "layer_id" => layer_id,
+          "box" => box
+        },
+        %{},
+        %{:document_id => document_id, :account => account},
+        _socket
+      ) do
+    %Actions.DocumentEditLayerTextSizeHint{
+      document_id: document_id,
+      layer_id: layer_id,
+      box: box
+    }
+    |> Dispatcher.perform_as(account)
+
+    :silent
+  end
+
+  @impl true
+  def handle_event(
         "delete_waypoint",
         %{
           "layer_id" => layer_id,
@@ -834,6 +909,49 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
       layer_id: layer_id,
       prev_waypoint_id: prev_waypoint_id,
       position: {position_x, position_y}
+    }
+    |> Dispatcher.perform_as(account)
+
+    :silent
+  end
+
+  @impl true
+  def handle_event(
+        "create_bond",
+        %{
+          "edge_id" => edge_id,
+          "kind" => kind,
+          "layer_id" => layer_id,
+          "socket_id" => socket_id
+        },
+        %{},
+        %{:document_id => document_id, :account => account},
+        _socket
+      )
+      when kind in ["source", "target"] do
+    %Actions.DocumentEditCreateEdgeBond{
+      document_id: document_id,
+      edge_id: edge_id,
+      kind: String.to_existing_atom(kind),
+      layer_id: layer_id,
+      socket_id: socket_id
+    }
+    |> Dispatcher.perform_as(account)
+
+    :silent
+  end
+
+  @impl true
+  def handle_event(
+        "delete_bond",
+        %{"bond_id" => bond_id},
+        %{},
+        %{:document_id => document_id, :account => account},
+        _socket
+      ) do
+    %Actions.DocumentEditDeleteBond{
+      document_id: document_id,
+      bond_id: bond_id
     }
     |> Dispatcher.perform_as(account)
 
@@ -1237,6 +1355,38 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
   defp default_box_size(%{"semantic_tag" => "de.renew.gui.TransitionFigure"}), do: {24, 16}
   defp default_box_size(%{"semantic_tag" => "de.renew.fa.figures.FAStateFigure"}), do: {40, 40}
   defp default_box_size(_params), do: {50, 50}
+
+  defp polygon_layer_style(params, cyclic) do
+    case Map.fetch(params, "layer_style") do
+      {:ok, style} -> style
+      :error when cyclic -> %{"background_color" => "#70DB93"}
+      :error -> nil
+    end
+  end
+
+  defp outgoing_link_attrs(params) do
+    case Map.get(params, "hyperlink", nil) do
+      nil -> nil
+      target_id -> %{"target_layer_id" => target_id}
+    end
+  end
+
+  defp edge_style_attrs(params) do
+    params
+    |> Map.get("style", %{})
+    |> Kernel.||(%{})
+    |> put_optional_edge_style(params, "source_tip_symbol_shape_id")
+    |> put_optional_edge_style(params, "target_tip_symbol_shape_id")
+    |> put_optional_edge_style(params, "smoothness_amount")
+  end
+
+  defp put_optional_edge_style(style, params, key) do
+    if Map.has_key?(params, key) do
+      Map.put(style, key, Map.get(params, key))
+    else
+      style
+    end
+  end
 
   defp reply_with_selection(socket, selection) do
     selection = normalize_selection(selection)

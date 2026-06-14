@@ -581,6 +581,21 @@ defmodule RenewCollabCtrl.Action do
     :ok
   end
 
+  def do_perform(%Actions.DocumentEditLayerTextType{
+        document_id: document_id,
+        layer_id: layer_id,
+        renew_type: renew_type
+      }) do
+    RenewCollab.Commands.UpdateLayerTextType.new(%{
+      document_id: document_id,
+      layer_id: layer_id,
+      renew_type: renew_type
+    })
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
+
+    :ok
+  end
+
   def do_perform(%Actions.DocumentEditLayerZIndex{
         document_id: document_id,
         layer_id: layer_id,
@@ -1241,50 +1256,6 @@ defmodule RenewCollabCtrl.Action do
     end
   end
 
-  defp simulation_nets(project, document_ids) do
-    document_id_set = MapSet.new(document_ids)
-
-    actual_document_ids =
-      project.documents
-      |> Enum.map(fn %{document_id: id} -> id end)
-      |> Enum.filter(&MapSet.member?(document_id_set, &1))
-
-    try do
-      {:ok,
-       actual_document_ids
-       |> Enum.map(fn doc_id ->
-         {:ok, document} =
-           %{document_id: doc_id}
-           |> RenewCollab.Queries.DocumentWithElements.new()
-           |> RenewCollab.DocumentFetcher.fetch()
-
-         {:ok, document_thumbnail} =
-           %{document_id: doc_id, root_layer_id: :thumbnail}
-           |> RenewCollab.Queries.DocumentWithElements.new()
-           |> RenewCollab.DocumentFetcher.fetch()
-
-         {:ok, rnw} = RenewCollab.Export.DocumentExport.export(document, synthetic: true)
-
-         {:ok, document_json} =
-           RenewCollabWeb.DocumentJSON.show_content(document) |> Jason.encode()
-
-         {:ok, thumbnail_json} =
-           RenewCollabWeb.DocumentJSON.show_content(document_thumbnail, 0) |> Jason.encode()
-
-         %{
-           net_name: RenewCollabSim.Compiler.SnsCompiler.normalize_net_name(document.name),
-           rnw: rnw,
-           document_json: document_json,
-           thumbnail_json: thumbnail_json,
-           snapshot_id: {document.id, document.current_snaptshot.id}
-         }
-       end)}
-    rescue
-      e ->
-        {:error, {:export_error, e}}
-    end
-  end
-
   def do_perform(%Actions.ShadowNetSystemImportFromSnsFileInProject{
         main_net_name: main_name,
         project_id: project_id,
@@ -1509,6 +1480,28 @@ defmodule RenewCollabCtrl.Action do
       simulation_id,
       net_instance_label
     )
+  end
+
+  def do_perform(%Actions.SimulationConsoleCommand{
+        simulation_id: simulation_id,
+        command: command
+      })
+      when is_binary(command) do
+    trimmed = String.trim(command)
+
+    if trimmed == "" do
+      {:error, :empty_console_command}
+    else
+      {:ok, %{project_id: project_id}} =
+        %RenewCollabProj.Queries.SimulationsProject{simulation_id: simulation_id}
+        |> RenewCollabProj.ProjectFetcher.fetch()
+
+      RenewCollabSim.Server.ScopedSimulationServer.console_command(
+        project_id,
+        simulation_id,
+        trimmed
+      )
+    end
   end
 
   def do_perform(%Actions.SimulationTransitionBindings{
@@ -1830,5 +1823,49 @@ defmodule RenewCollabCtrl.Action do
     |> Kernel.++([child_layer_id])
     |> Enum.filter(&is_binary/1)
     |> Enum.uniq()
+  end
+
+  defp simulation_nets(project, document_ids) do
+    document_id_set = MapSet.new(document_ids)
+
+    actual_document_ids =
+      project.documents
+      |> Enum.map(fn %{document_id: id} -> id end)
+      |> Enum.filter(&MapSet.member?(document_id_set, &1))
+
+    try do
+      {:ok,
+       actual_document_ids
+       |> Enum.map(fn doc_id ->
+         {:ok, document} =
+           %{document_id: doc_id}
+           |> RenewCollab.Queries.DocumentWithElements.new()
+           |> RenewCollab.DocumentFetcher.fetch()
+
+         {:ok, document_thumbnail} =
+           %{document_id: doc_id, root_layer_id: :thumbnail}
+           |> RenewCollab.Queries.DocumentWithElements.new()
+           |> RenewCollab.DocumentFetcher.fetch()
+
+         {:ok, rnw} = RenewCollab.Export.DocumentExport.export(document, synthetic: true)
+
+         {:ok, document_json} =
+           RenewCollabWeb.DocumentJSON.show_content(document) |> Jason.encode()
+
+         {:ok, thumbnail_json} =
+           RenewCollabWeb.DocumentJSON.show_content(document_thumbnail, 0) |> Jason.encode()
+
+         %{
+           net_name: RenewCollabSim.Compiler.SnsCompiler.normalize_net_name(document.name),
+           rnw: rnw,
+           document_json: document_json,
+           thumbnail_json: thumbnail_json,
+           snapshot_id: {document.id, document.current_snaptshot.id}
+         }
+       end)}
+    rescue
+      e ->
+        {:error, {:export_error, e}}
+    end
   end
 end

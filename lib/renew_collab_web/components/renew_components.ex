@@ -37,13 +37,13 @@ defmodule RenewCollabWeb.RenewComponents do
       <div style="grid-area: stack;z-index: 10;pointer-events: none; align-self: center; justify-self: center;">
         <.flash_group flash={@flash || nil} />
       </div>
+      
       <header style="grid-area: stack; background: #333; color: #fff; padding: 1em; display: flex; justify-content: space-between; font-family: monospace;">
         <.link style="color: white; align-self: center; text-decoration: none" navigate={~p"/"}>
           <h1 style="margin: 0; font-size: 1.3em; display: flex; align-items: center; gap: 1ex">
             <img src="/favicon.svg" style="width: 1.5em; height: 1.5em" /> {app_titel()}
           </h1>
         </.link>
-
         <div style="display: flex; gap: 1.5em; align-items: stretch;align-self: stretch;">
           <%= if not @blank do %>
             <%= if @project_id do %>
@@ -73,13 +73,13 @@ defmodule RenewCollabWeb.RenewComponents do
               </.link>
             <% end %>
           <% end %>
-
+          
           <%= if @logout do %>
             <.link style="color: white; align-self: center;" href={~p"/logout"} method="delete">
               Log out
             </.link>
           <% end %>
-
+          
           <%= if @editor_url do %>
             <div style="display: flex; gap: 2em; align-items: stretch; margin-left: auto; margin-right: 1em">
               <.link
@@ -94,7 +94,7 @@ defmodule RenewCollabWeb.RenewComponents do
         </div>
       </header>
     </div>
-    <hr style="margin: 0 0 3em 0; height: 0; border: none; display: block; clear: both;" />
+     <hr style="margin: 0 0 3em 0; height: 0; border: none; display: block; clear: both;" />
     """
   end
 
@@ -107,9 +107,7 @@ defmodule RenewCollabWeb.RenewComponents do
     <%= for layer <- @document.layers, layer.direct_parent_hood == nil and of_type(@filter, layer) do %>
       {render_slot(@item, layer)}
       <.child_layers document={@document} parent_id={layer.id} filter={@filter}>
-        <:item :let={child_layer}>
-          {render_slot(@item, child_layer)}
-        </:item>
+        <:item :let={child_layer}>{render_slot(@item, child_layer)}</:item>
       </.child_layers>
     <% end %>
     """
@@ -125,9 +123,7 @@ defmodule RenewCollabWeb.RenewComponents do
     <%= for layer <- @document.layers, layer.direct_parent_hood, layer.direct_parent_hood.ancestor_id == @parent_id and of_type(@filter, layer) do %>
       {render_slot(@item, layer)}
       <.child_layers document={@document} parent_id={layer.id} filter={@filter}>
-        <:item :let={child_layer}>
-          {render_slot(@item, child_layer)}
-        </:item>
+        <:item :let={child_layer}>{render_slot(@item, child_layer)}</:item>
       </.child_layers>
     <% end %>
     """
@@ -172,7 +168,7 @@ defmodule RenewCollabWeb.RenewComponents do
       {@rest}
     >
       <div>{msg}</div>
-
+      
       <button
         type="button"
         class="flash-button"
@@ -211,7 +207,7 @@ defmodule RenewCollabWeb.RenewComponents do
       >
         {"Attempting to reconnect"}
       </.flash>
-
+      
       <.flash
         id="server-error"
         kind={:error}

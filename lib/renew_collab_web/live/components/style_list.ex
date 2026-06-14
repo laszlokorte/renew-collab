@@ -13,13 +13,12 @@ defmodule RenewCollabWeb.HierarchyStyleList do
             |> String.split("_")
             |> Enum.map(&String.capitalize/1)
             |> Enum.join(" ")}
-          </label>
-          <br />
+          </label> <br />
           <small style="display: block; max-width: 10em; overflow: hidden; text-overflow: ellipsis; font-family: monospace">
             {style_or_default(@element, attr)}
           </small>
         </dt>
-
+        
         <dd>
           <.live_component
             symbols={@symbols}

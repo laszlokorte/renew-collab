@@ -155,16 +155,10 @@ defmodule RenewCollabWeb.DocumentJSON do
           href: url(~p"/api/documents/#{document.id}/simulations"),
           method: "get"
         },
-        upload_svg:
-          with %{project_id: project_id} <- document.project_assignment do
-            %{
-              method: "post",
-              href: url(~p"/api/projects/#{project_id}/media/svg")
-            }
-          else
-            _ ->
-              nil
-          end
+        upload_svg: %{
+          method: "post",
+          href: url(~p"/api/projects/#{document.project_assignment.project_id}/media/svg")
+        }
       },
       content: show_content(document)
     }
@@ -237,6 +231,9 @@ defmodule RenewCollabWeb.DocumentJSON do
                       "font_family" => v.font_family,
                       "bold" => v.bold,
                       "text_color" => v.text_color,
+                      "opacity" => v.opacity,
+                      "background_color" => v.background_color,
+                      "background_opacity" => v.background_opacity,
                       "blank_lines" => v.blank_lines,
                       "rich" => v.rich
                     }
@@ -315,6 +312,7 @@ defmodule RenewCollabWeb.DocumentJSON do
                     %{
                       "stroke_width" => v.stroke_width,
                       "stroke_color" => v.stroke_color,
+                      "stroke_opacity" => v.stroke_opacity,
                       "stroke_join" => v.stroke_join,
                       "stroke_cap" => v.stroke_cap,
                       "stroke_dash_array" => v.stroke_dash_array,
@@ -322,7 +320,8 @@ defmodule RenewCollabWeb.DocumentJSON do
                       "target_tip_symbol_shape_id" => v.target_tip_symbol_shape_id,
                       "source_tip_size" => v.source_tip_size,
                       "target_tip_size" => v.target_tip_size,
-                      "smoothness" => v.smoothness
+                      "smoothness" => v.smoothness,
+                      "smoothness_amount" => v.smoothness_amount
                     }
                 end
             }
@@ -339,9 +338,11 @@ defmodule RenewCollabWeb.DocumentJSON do
             %{
               "opacity" => v.opacity,
               "background_color" => v.background_color,
+              "background_opacity" => v.background_opacity,
               "background_url" => v.background_url,
               "target_location" => v.target_location,
               "border_color" => v.border_color,
+              "border_opacity" => v.border_opacity,
               "border_width" => v.border_width,
               "border_dash_array" => v.border_dash_array
             }
@@ -358,10 +359,12 @@ defmodule RenewCollabWeb.DocumentJSON do
         nil
 
       %RenewCollab.Connection.Bond{
+        id: id,
         socket_id: socket_id,
         layer_id: layer_id
       } ->
         %{
+          id: id,
           socket_id: socket_id,
           layer_id: layer_id
         }

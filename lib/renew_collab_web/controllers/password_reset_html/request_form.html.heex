@@ -1,12 +1,7 @@
 <.simple_form :let={f} for={@changeset} action={@action}>
   <.error :if={@changeset.action}>
-    <span style=" color: #a00; ">
-      Oops, something went wrong! Please check the errors below.
-    </span>
+    <span style=" color: #a00; ">Oops, something went wrong! Please check the errors below.</span>
   </.error>
-  <.input field={f[:email]} required type="email" label="Your E-mail" autocomplete="cc-number" />
-
-  <:actions>
-    <.button>Sign up!</.button>
-  </:actions>
+   <.input field={f[:email]} required type="email" label="Your E-mail" autocomplete="cc-number" />
+  <:actions><.button>Sign up!</.button></:actions>
 </.simple_form>

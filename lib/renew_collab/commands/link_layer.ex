@@ -37,12 +37,17 @@ defmodule RenewCollab.Commands.LinkLayer do
         )
       end
     )
-    |> Ecto.Multi.insert(:insert_hyperlink, fn %{layer: layer} ->
-      %Hyperlink{}
-      |> Hyperlink.changeset(%{
-        source_layer_id: layer.id,
-        target_layer_id: target_layer_id
-      })
-    end)
+    |> Ecto.Multi.insert(
+      :insert_hyperlink,
+      fn %{layer: layer} ->
+        %Hyperlink{}
+        |> Hyperlink.changeset(%{
+          source_layer_id: layer.id,
+          target_layer_id: target_layer_id
+        })
+      end,
+      on_conflict: {:replace, [:target_layer_id, :updated_at]},
+      conflict_target: [:source_layer_id]
+    )
   end
 end

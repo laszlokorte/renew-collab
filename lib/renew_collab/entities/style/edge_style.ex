@@ -7,10 +7,12 @@ defmodule RenewCollab.Style.EdgeStyle do
   schema "element_edge_style" do
     field :stroke_width, :float, default: 1.0
     field :stroke_color, :string, default: "black"
+    field :stroke_opacity, :float, default: 1.0
     field :stroke_join, :string
     field :stroke_cap, :string
     field :stroke_dash_array, :string
     field :smoothness, Ecto.Enum, values: [:linear, :autobezier], default: :linear
+    field :smoothness_amount, :float, default: 50.0
 
     belongs_to :source_tip_symbol_shape, RenewCollab.Symbol.Shape
     belongs_to :target_tip_symbol_shape, RenewCollab.Symbol.Shape
@@ -29,10 +31,12 @@ defmodule RenewCollab.Style.EdgeStyle do
     |> cast(attrs, [
       :stroke_width,
       :stroke_color,
+      :stroke_opacity,
       :stroke_join,
       :stroke_cap,
       :stroke_dash_array,
       :smoothness,
+      :smoothness_amount,
       :source_tip_symbol_shape_id,
       :target_tip_symbol_shape_id,
       :source_tip_size,
@@ -61,10 +65,12 @@ defmodule RenewCollab.Style.EdgeStyle do
           id: s.id,
           stroke_width: s.stroke_width,
           stroke_color: s.stroke_color,
+          stroke_opacity: s.stroke_opacity,
           stroke_join: s.stroke_join,
           stroke_cap: s.stroke_cap,
           stroke_dash_array: s.stroke_dash_array,
           smoothness: s.smoothness,
+          smoothness_amount: s.smoothness_amount,
           source_tip_symbol_shape_id: s.source_tip_symbol_shape_id,
           target_tip_symbol_shape_id: s.target_tip_symbol_shape_id,
           source_tip_size: s.source_tip_size,

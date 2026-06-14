@@ -51,26 +51,22 @@ defmodule RenewCollabWeb.LiveShadowNets do
     ~H"""
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
       <RenewCollabWeb.RenewComponents.app_header flash={@flash} tab={:sns} project_id={@project.id} />
-
       <div style="padding: 1em">
-        <.link navigate={~p"/projects"}>
-          Projects
-        </.link>
+        <.link navigate={~p"/projects"}>Projects</.link>
         / Shadow Net Systems
         <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
           <img class="icon" src="/images/icon-network.svg" /> Shadow Net Systems
         </h2>
       </div>
+      
       <div style="padding: 0 1em; display: flex; align-items: start; gap: 1em">
         <fieldset>
           <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
             Import Renew (.rnw) Files to Simulate
           </legend>
-
-          <p>
-            Select up to {file_count_limit()} Renew (.rnw) files from your computer:
-          </p>
-
+          
+          <p>Select up to {file_count_limit()} Renew (.rnw) files from your computer:</p>
+          
           <.form for={@import_rnw_form} phx-submit="import_rnw" phx-change="validate_rnw">
             <.live_file_input
               upload={@uploads.import_rnw_file}
@@ -94,15 +90,14 @@ defmodule RenewCollabWeb.LiveShadowNets do
                       aria-label="cancel"
                     >
                       &times;
-                    </button>
-                    {entry.client_name}
+                    </button> {entry.client_name}
                   </dt>
-
+                  
                   <dd>
                     <%!-- entry.progress will update automatically for in-flight entries --%>
                     <progress value={entry.progress} max="100">{entry.progress}%</progress>
                   </dd>
-
+                  
                   <dd style="grid-column: 1 / span 3;">
                     <ul>
                       <%= for err <- upload_errors(@uploads.import_rnw_file, entry) do %>
@@ -113,13 +108,13 @@ defmodule RenewCollabWeb.LiveShadowNets do
                 <% end %>
               </dl>
             <% end %>
-
+            
             <ul style="margin: 0; padding: 0;">
               <%= for err <- upload_errors(@uploads.import_rnw_file) do %>
                 <li class="alert alert-danger">{error_to_string(err)}</li>
               <% end %>
             </ul>
-
+            
             <%= if @import_rnw_form[:main_net].value != nil and Enum.count(@uploads.import_rnw_file.entries) > 0 and Enum.count(@uploads.import_rnw_file.errors) == 0 do %>
               <p>
                 <select name="formalism">
@@ -128,6 +123,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
                   <% end %>
                 </select>
               </p>
+              
               <p>
                 <button
                   type="submit"
@@ -139,17 +135,15 @@ defmodule RenewCollabWeb.LiveShadowNets do
             <% end %>
           </.form>
         </fieldset>
-
+        
         <fieldset>
           <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
             Import Shadow Net (.sns) File to Simulate
           </legend>
-
+          
           <%= if @is_admin do %>
-            <p>
-              Select a single Shadow Net System (sns) file<br />from your computer to import:
-            </p>
-
+            <p>Select a single Shadow Net System (sns) file<br />from your computer to import:</p>
+            
             <.form for={@import_sns_form} phx-submit="import_sns" phx-change="validate_sns">
               <.live_file_input
                 upload={@uploads.import_sns_file}
@@ -167,15 +161,14 @@ defmodule RenewCollabWeb.LiveShadowNets do
                         aria-label="cancel"
                       >
                         &times;
-                      </button>
-                      {entry.client_name}
+                      </button> {entry.client_name}
                     </dt>
-
+                    
                     <dd>
                       <%!-- entry.progress will update automatically for in-flight entries --%>
                       <progress value={entry.progress} max="100">{entry.progress}%</progress>
                     </dd>
-
+                    
                     <dd style="grid-column: 1 / span 3;">
                       <ul>
                         <%= for err <- upload_errors(@uploads.import_sns_file, entry) do %>
@@ -186,18 +179,17 @@ defmodule RenewCollabWeb.LiveShadowNets do
                   <% end %>
                 </dl>
               <% end %>
-
+              
               <ul style="margin: 0; padding: 0;">
                 <%= for err <- upload_errors(@uploads.import_sns_file) do %>
                   <li class="alert alert-danger">{error_to_string(err)}</li>
                 <% end %>
               </ul>
-
+              
               <label>
                 Main Net Name <br /> (required for running the simulation):
                 <.input field={@import_sns_form[:main_net]} />
               </label>
-
               <%= if @import_sns_form[:main_net].value != "" and Enum.count(@uploads.import_sns_file.entries) > 0 and Enum.count(@uploads.import_sns_file.errors) == 0 do %>
                 <button
                   type="submit"
@@ -208,35 +200,33 @@ defmodule RenewCollabWeb.LiveShadowNets do
               <% end %>
             </.form>
           <% else %>
-            <p>
-              Only admins can import SNS files
-            </p>
+            <p>Only admins can import SNS files</p>
           <% end %>
         </fieldset>
       </div>
-
+      
       <div style="padding: 1em">
         <table style="width: 100%;" cellpadding="5">
           <thead>
             <tr>
               <th style="border-bottom: 1px solid #333;" align="left" width="1000">ID</th>
-
+              
               <th style="border-bottom: 1px solid #333;" align="left" width="1000">Main Net</th>
-
+              
               <th style="border-bottom: 1px solid #333;" align="left" width="1000">All Nets</th>
-
+              
               <th style="border-bottom: 1px solid #333;" align="left" width="200">Created</th>
-
+              
               <th style="border-bottom: 1px solid #333;" align="left" width="200">
                 Number of Simulations
               </th>
-
+              
               <th style="border-bottom: 1px solid #333;" align="left" width="100" colspan="3">
                 Actions
               </th>
             </tr>
           </thead>
-
+          
           <tbody>
             <%= if Enum.empty?(@shadow_net_systems) do %>
               <tr>
@@ -253,20 +243,16 @@ defmodule RenewCollabWeb.LiveShadowNets do
                     <div style="color: #078; display: flex; align-items: center; gap: 1ex; justify-content: start;">
                       <img class="icon" src="/images/icon-network.svg" />
                       <span>
-                        <.link navigate={~p"/shadow_net/#{sns.id}"}>
-                          {sns.label || sns.id}
-                        </.link>
+                        <.link navigate={~p"/shadow_net/#{sns.id}"}>{sns.label || sns.id}</.link>
                         <%= if sns.label do %>
                           <br /><code style="color: black"><small>{sns.id}</small></code>
                         <% end %>
                       </span>
                     </div>
                   </td>
-
-                  <td valign="top">
-                    <strong>{sns.main_net_name}</strong>
-                  </td>
-
+                  
+                  <td valign="top"><strong>{sns.main_net_name}</strong></td>
+                  
                   <td valign="top">
                     <ul style="list-style: none; margin: 0; padding: 0;">
                       <%= for n <- sns.nets do %>
@@ -274,18 +260,17 @@ defmodule RenewCollabWeb.LiveShadowNets do
                       <% end %>
                     </ul>
                   </td>
-
+                  
                   <td style="white-space: nowrap;">
                     <RenewCollabWeb.RenewComponents.timestamp value={sns.inserted_at} />
                   </td>
-
+                  
                   <td style="white-space: nowrap;">
                     <div style="display: flex; align-items: center; gap: 1ex; justify-content: start;">
-                      <img class="icon" src="/images/icon-simulation.svg" />
-                      {sns.simulation_count}
+                      <img class="icon" src="/images/icon-simulation.svg" /> {sns.simulation_count}
                     </div>
                   </td>
-
+                  
                   <td>
                     <button
                       type="button"
@@ -296,6 +281,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
                       Duplicate
                     </button>
                   </td>
+                  
                   <td width="50">
                     <a style="color: #078" href={~p"/shadow_net/#{sns.id}/binary"} target="_blank">
                       <button
@@ -306,7 +292,7 @@ defmodule RenewCollabWeb.LiveShadowNets do
                       </button>
                     </a>
                   </td>
-
+                  
                   <td width="50">
                     <button
                       type="button"

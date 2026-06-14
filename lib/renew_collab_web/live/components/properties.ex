@@ -15,7 +15,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
             unselect
           </button>
         </small>
-        <br />
+         <br />
         <small>
           <button
             style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
@@ -25,7 +25,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
             delete
           </button>
         </small>
-        <br />
+         <br />
       </div>
 
       <fieldset style="margin: 1em 0; padding: 1.5ex; border: 1px solid #777">
@@ -52,10 +52,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
 
           <%= if false && @layer.interface do %>
             <span style="display: inline-flex; align-items: baseline;gap: 1ex;  padding: 0.5ex 1ex; background: #333; color: #fff">
-              <span>
-                {@layer.interface.socket_schema.name}
-              </span>
-
+              <span>{@layer.interface.socket_schema.name}</span>
               <button
                 phx-click="remove_layer_socket_schema"
                 phx-value-layer_id={@layer.id}
@@ -132,9 +129,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
                 <% end %>
               </dd>
 
-              <dt>
-                Attributes
-              </dt>
+              <dt>Attributes</dt>
 
               <dd style="margin: 0">
                 <textarea name="shape_attributes"><%=
@@ -254,14 +249,8 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
             Edge Path
           </legend>
 
-          <p>
-            <label>
-              <input type="checkbox" checked={@layer.edge.cyclic} /> Cyclic
-            </label>
-          </p>
-
+          <p><label><input type="checkbox" checked={@layer.edge.cyclic} /> Cyclic</label></p>
           <button phx-click="update_edge_flip" phx-value-id={@layer.id}>Reverse Edge</button>
-
           <form
             phx-hook="RenewEdgePosition"
             id={"layer-edge-position-#{@layer.id}"}
@@ -324,7 +313,6 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
               >
                 +
               </button>
-
               <button
                 phx-hook="RenewEdgeWaypointsClear"
                 id={"layer-edge-position-#{@layer.id}-waypoints-clear"}
@@ -404,7 +392,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
                 >
                   {@layer.edge.source_bond.layer_id}/<br /> {@layer.edge.source_bond.socket_id}
                 </small>
-                <br />
+                 <br />
                 <button
                   phx-click="detach-bond"
                   phx-value-id={@layer.edge.source_bond.id}
@@ -426,7 +414,6 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
                       <option value={l.id}>{l.semantic_tag}/{l.id}</option>
                     <% end %>
                   </select>
-
                   <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: socket_schemas} <- @socket_schemas do %>
                     <select style="width: 5em" name="socket_id">
                       <option value="">Socket</option>
@@ -458,7 +445,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
                 >
                   {@layer.edge.target_bond.layer_id}/<br /> {@layer.edge.target_bond.socket_id}
                 </small>
-                <br />
+                 <br />
                 <button
                   phx-click="detach-bond"
                   phx-value-id={@layer.edge.target_bond.id}
@@ -480,7 +467,6 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
                       <option value={l.id}>{l.semantic_tag}/{l.id}</option>
                     <% end %>
                   </select>
-
                   <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: socket_schemas} <- @socket_schemas do %>
                     <select style="width: 5em" name="socket_id">
                       <option value="">Socket</option>
@@ -595,6 +581,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
               stroke_cap: :text,
               stroke_dash_array: :text,
               smoothness: :text,
+              smoothness_amount: :number,
               source_tip_symbol_shape_id: :symbol,
               target_tip_symbol_shape_id: :symbol,
               source_tip_size: :number,

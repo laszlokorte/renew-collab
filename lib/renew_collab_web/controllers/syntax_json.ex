@@ -18,6 +18,15 @@ defmodule RenewCollabWeb.SyntaxJSON do
           & &1.source_semantic_tag,
           & &1.target_semantic_tag
         ),
+      "edgeRules" =>
+        syntax.edge_whitelists
+        |> Enum.group_by(
+          & &1.source_semantic_tag,
+          &%{
+            "target_semantic_tag" => &1.target_semantic_tag,
+            "edge_semantic_tag" => &1.edge_semantic_tag
+          }
+        ),
       "autoEdgeNode" =>
         syntax.edge_auto_targets
         |> Enum.map(fn t ->

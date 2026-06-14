@@ -116,15 +116,6 @@ defmodule RenewCollabWeb.LiveSimulationNetInstanceChannel do
            bindings: bindings
          }, socket}
 
-      false ->
-        push_error(socket, %{
-          error: "transition_bindings_failed",
-          message: "Transition bindings could not be loaded",
-          detail: "The simulation is not running."
-        })
-
-        {:reply, %{transition_id: transition_id, bindings: []}, socket}
-
       {:error, reason} ->
         detail = simulation_error_detail(reason)
 
@@ -174,20 +165,8 @@ defmodule RenewCollabWeb.LiveSimulationNetInstanceChannel do
       :ok ->
         {:reply, %{fired: true}, socket}
 
-      true ->
-        {:reply, %{fired: true}, socket}
-
       {:ok, _} ->
         {:reply, %{fired: true}, socket}
-
-      false ->
-        push_error(socket, %{
-          error: "fire_transition_failed",
-          message: "Transition could not be fired",
-          detail: "The simulation is not running."
-        })
-
-        {:reply, %{fired: false}, socket}
 
       {:error, reason} ->
         detail = simulation_error_detail(reason)

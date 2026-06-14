@@ -128,6 +128,9 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(%{id: account_id}, %Actions.DocumentEditLayerTextBody{document_id: doc_id}),
     do: can_write(account_id, :document, doc_id)
 
+  def can(%{id: account_id}, %Actions.DocumentEditLayerTextType{document_id: doc_id}),
+    do: can_write(account_id, :document, doc_id)
+
   def can(%{id: account_id}, %Actions.DocumentEditLayerBoxSize{document_id: doc_id}),
     do: can_write(account_id, :document, doc_id)
 
@@ -326,6 +329,9 @@ defmodule RenewCollabCtrl.WriteAccess do
     do: can_write(account_id, :simulation, sim_id)
 
   def can(%{id: account_id}, %Actions.SimulationNetStep{simulation_id: sim_id}),
+    do: can_write(account_id, :simulation, sim_id)
+
+  def can(%{id: account_id}, %Actions.SimulationConsoleCommand{simulation_id: sim_id}),
     do: can_write(account_id, :simulation, sim_id)
 
   def can(%{id: account_id}, %Actions.SimulationTransitionBindings{simulation_id: sim_id}),

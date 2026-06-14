@@ -23,7 +23,7 @@ defmodule RenewCollabWeb.UndoRedoComponent do
               Undo
             </button>
           <% end %>
-
+          
           <%= case @undo_redo.successors do %>
             <% [] -> %>
               <button

@@ -35,6 +35,10 @@ defmodule RenewCollabSim.Server.SimulationProcess do
     GenServer.cast(pid, {:net_step, net_instance_label})
   end
 
+  def console_command(pid, command) do
+    safe_call(pid, {:console_command, command})
+  end
+
   def transition_bindings(pid, net_instance_label, transition_id) do
     safe_call(pid, {:transition_bindings, net_instance_label, transition_id})
   end
@@ -237,33 +241,13 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   end
 
   @impl true
-  def handle_cast(
-        {:log, {:exit, status}},
-        %{simulation_id: simulation_id} = state
-      ) do
-    state
-    |> State.append_command(
-      RenewCollabSim.Commands.StopSimulation.new(%{
-        simulation_id: simulation_id,
-        exit_code: status
-      })
-    )
-    |> State.commit(:strict)
-    |> maybe_broadcast_exit_error(status)
-    |> broadcast_change(:stop)
-    |> then(&{:stop, :normal, &1})
+  def handle_call({:console_command, command}, _from, state) when is_binary(command) do
+    State.console_command(state, command)
+    {:reply, :ok, state}
   end
 
-  @impl true
-  def handle_cast(:step, state) do
-    State.step(state)
-    {:noreply, state}
-  end
-
-  @impl true
-  def handle_cast({:net_step, net_instance_label}, state) do
-    State.net_step(state, net_instance_label)
-    {:noreply, state}
+  def handle_call({:console_command, _command}, _from, state) do
+    {:reply, {:error, :invalid_console_command}, state}
   end
 
   @impl true
@@ -335,6 +319,36 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   def handle_call(:clear_breakpoints, _from, state) do
     state = %{state | breakpoints: %{}}
     {:reply, {:ok, []}, broadcast_breakpoints_changed(state)}
+  end
+
+  @impl true
+  def handle_cast(
+        {:log, {:exit, status}},
+        %{simulation_id: simulation_id} = state
+      ) do
+    state
+    |> State.append_command(
+      RenewCollabSim.Commands.StopSimulation.new(%{
+        simulation_id: simulation_id,
+        exit_code: status
+      })
+    )
+    |> State.commit(:strict)
+    |> maybe_broadcast_exit_error(status)
+    |> broadcast_change(:stop)
+    |> then(&{:stop, :normal, &1})
+  end
+
+  @impl true
+  def handle_cast(:step, state) do
+    State.step(state)
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_cast({:net_step, net_instance_label}, state) do
+    State.net_step(state, net_instance_label)
+    {:noreply, state}
   end
 
   @impl true

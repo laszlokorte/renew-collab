@@ -26,7 +26,7 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
           >
           </rect>
         <% end %>
-
+        
         <rect
           data-client-adjusted
           id={"#{@layer.text.id}-outline-box"}
@@ -38,7 +38,7 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
         >
         </rect>
       </g>
-
+      
       <text
         cursor="default"
         fill={style_or_default(@layer.text, :text_color)}
@@ -92,7 +92,7 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
         <!--
         -->
       </text>
-
+      
       <%= if @selected do %>
         <g
           cursor="move"
@@ -115,7 +115,7 @@ defmodule RenewCollabWeb.HierarchyLayerTextComponent do
             >
             </rect>
           </g>
-
+          
           <text
             pointer-events="none"
             cursor="default"

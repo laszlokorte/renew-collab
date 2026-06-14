@@ -7,9 +7,11 @@ defmodule RenewCollab.Style.LayerStyle do
   schema "layer_style" do
     field :opacity, :float, default: 1.0
     field :background_color, :string
+    field :background_opacity, :float, default: 1.0
     field :background_url, :string
     field :target_location, :string
     field :border_color, :string
+    field :border_opacity, :float, default: 1.0
     field :border_width, :float
     field :border_dash_array, :string
     belongs_to :layer, RenewCollab.Hierarchy.Layer
@@ -23,9 +25,11 @@ defmodule RenewCollab.Style.LayerStyle do
     |> cast(attrs, [
       :opacity,
       :background_color,
+      :background_opacity,
       :background_url,
       :target_location,
       :border_color,
+      :border_opacity,
       :border_width,
       :border_dash_array
     ])
@@ -51,9 +55,11 @@ defmodule RenewCollab.Style.LayerStyle do
           id: s.id,
           opacity: s.opacity,
           background_color: s.background_color,
+          background_opacity: s.background_opacity,
           background_url: s.background_url,
           target_location: s.target_location,
           border_color: s.border_color,
+          border_opacity: s.border_opacity,
           border_width: s.border_width,
           border_dash_array: s.border_dash_array,
           layer_id: s.layer_id,

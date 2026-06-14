@@ -1,9 +1,8 @@
 <.simple_form :let={f} method="post" for={@changeset} action={@action}>
   <.error :if={@changeset.action}>
-    <span style=" color: #a00; ">
-      Oops, something went wrong! Please check the errors below.
-    </span>
+    <span style=" color: #a00; ">Oops, something went wrong! Please check the errors below.</span>
   </.error>
+  
   <.input
     field={f[:new_password]}
     required
@@ -18,8 +17,5 @@
     label="Confirm Password"
     autocomplete="new-password"
   />
-
-  <:actions>
-    <.button>Reset password</.button>
-  </:actions>
+  <:actions><.button>Reset password</.button></:actions>
 </.simple_form>

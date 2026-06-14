@@ -58,23 +58,23 @@ defmodule RenewCollabWeb.LiveProjectManager do
           <img class="icon" src="/images/icon-project.svg" /> Project: {@project.name}
         </h2>
       </div>
-
+      
       <div style="padding: 1em">
         <dl style="display: grid; grid-template-columns: max-content max-content">
           <dt>Created at</dt>
-          <dd>
-            <RenewCollabWeb.RenewComponents.timestamp value={@project.inserted_at} />
-          </dd>
+          
+          <dd><RenewCollabWeb.RenewComponents.timestamp value={@project.inserted_at} /></dd>
+          
           <dt>Last Update</dt>
-          <dd>
-            <RenewCollabWeb.RenewComponents.timestamp value={@project.updated_at} />
-          </dd>
+          
+          <dd><RenewCollabWeb.RenewComponents.timestamp value={@project.updated_at} /></dd>
         </dl>
       </div>
+      
       <div style="padding: 1em">
         <div style="border: 1px solid #ddd; margin: 1em 0; padding: 1em">
           <h3 style="margin-top: 0;border-bottom: 1px solid #aaa;">Rename Project</h3>
-
+          
           <form method="post" phx-submit="rename" accept-charset="utf-8">
             <input type="text" name="name" value={@project.name} />
             <button
@@ -85,9 +85,11 @@ defmodule RenewCollabWeb.LiveProjectManager do
             </button>
           </form>
         </div>
+        
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(40em, 1fr)); gap: 1em;">
           <div style="border: 1px solid #ddd; padding: 1em">
             <h3 style="margin-top: 0;border-bottom: 1px solid #aaa;">Members</h3>
+            
             <%= if  not Enum.empty?(@project.members) do %>
               <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px">
                 <%= for m <- @project.members do %>
@@ -105,19 +107,16 @@ defmodule RenewCollabWeb.LiveProjectManager do
                       <% %{id: account_id, email: account_email} -> %>
                         <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
                           [{m.role}]
-                        </span>
-                        {account_email} <small>({account_id})</small>
+                        </span> {account_email} <small>({account_id})</small>
                       <% %Ecto.Association.NotLoaded{} -> %>
                         <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
                           [{m.role}]
-                        </span>
-                        <em>Account not loaded</em>
+                        </span> <em>Account not loaded</em>
                         (ID: <code>{m.account_id}</code>)
                       <% nil -> %>
                         <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
                           [{m.role}]
-                        </span>
-                        <em>Account deleted</em>
+                        </span> <em>Account deleted</em>
                         (ID: <code>{m.account_id}</code>)
                     <% end %>
                   </li>
@@ -126,10 +125,11 @@ defmodule RenewCollabWeb.LiveProjectManager do
             <% else %>
               <p>None</p>
             <% end %>
-
+            
             <form method="post" phx-submit="add_member" accept-charset="utf-8">
               <select name="account_id">
                 <option value="">---</option>
+                
                 <%= for a <- @accounts do %>
                   <option
                     value={a.id}
@@ -141,9 +141,7 @@ defmodule RenewCollabWeb.LiveProjectManager do
               </select>
               <select name="role">
                 <%= for r <- RenewCollabProj.Projects.member_roles(@current_account, @project) do %>
-                  <option value={r}>
-                    {r}
-                  </option>
+                  <option value={r}>{r}</option>
                 <% end %>
               </select>
               <button
@@ -154,8 +152,10 @@ defmodule RenewCollabWeb.LiveProjectManager do
               </button>
             </form>
           </div>
+          
           <div style="border: 1px solid #ddd; padding: 1em">
             <h3 style="margin-top: 0;border-bottom: 1px solid #aaa;">Documents</h3>
+            
             <%= if  not Enum.empty?(@project.documents) do %>
               <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px">
                 <%= for d <- @project.documents do %>
@@ -168,7 +168,6 @@ defmodule RenewCollabWeb.LiveProjectManager do
                     >
                       Remove
                     </button>
-
                     <img class="icon" src="/images/icon-document.svg" style="vertical-align: middle" />
                     <img
                       class="icon"
@@ -189,11 +188,13 @@ defmodule RenewCollabWeb.LiveProjectManager do
             <% else %>
               <p>None</p>
             <% end %>
-
+            
             <form method="post" phx-submit="add_document" accept-charset="utf-8">
               <h4>Unassigned Documents</h4>
+              
               <select name="document_id">
                 <option value="">---</option>
+                
                 <%= for d <- @documents do %>
                   <option
                     value={d.id}
@@ -210,10 +211,13 @@ defmodule RenewCollabWeb.LiveProjectManager do
                 Assign
               </button>
             </form>
+            
             <h4>All Documents</h4>
+            
             <form method="post" phx-submit="dup_document" accept-charset="utf-8">
               <select name="document_id">
                 <option value="">---</option>
+                
                 <%= for d <- @documents do %>
                   <option value={d.id}>{d.name} &mdash; ({d.id})</option>
                 <% end %>
@@ -226,8 +230,10 @@ defmodule RenewCollabWeb.LiveProjectManager do
               </button>
             </form>
           </div>
+          
           <div style="border: 1px solid #ddd; padding: 1em">
             <h3 style="margin-top: 0;border-bottom: 1px solid #aaa;">Shadow Net Systems</h3>
+            
             <%= if  not Enum.empty?(@project.shadow_net_systems) do %>
               <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px">
                 <%= for s <- @project.shadow_net_systems do %>
@@ -256,10 +262,11 @@ defmodule RenewCollabWeb.LiveProjectManager do
             <% else %>
               <p>None</p>
             <% end %>
-
+            
             <form method="post" phx-submit="add_sns" accept-charset="utf-8">
               <select name="shadow_net_system_id">
                 <option value="">---</option>
+                
                 <%= for s <- @shadow_net_systems do %>
                   <option
                     value={s.id}
@@ -277,8 +284,10 @@ defmodule RenewCollabWeb.LiveProjectManager do
               </button>
             </form>
           </div>
+          
           <div style="border: 1px solid #ddd; padding: 1em">
             <h3 style="margin-top: 0;border-bottom: 1px solid #aaa;">Simulations</h3>
+            
             <%= if  not Enum.empty?(@project.simulations) do %>
               <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px">
                 <%= for s <- @project.simulations do %>
@@ -291,7 +300,6 @@ defmodule RenewCollabWeb.LiveProjectManager do
                     >
                       Remove
                     </button>
-
                     <img
                       class="icon"
                       src="/images/icon-simulation.svg"
@@ -311,10 +319,11 @@ defmodule RenewCollabWeb.LiveProjectManager do
             <% else %>
               <p>None</p>
             <% end %>
-
+            
             <form method="post" phx-submit="add_simulation" accept-charset="utf-8">
               <select name="simulation_id">
                 <option value="">---</option>
+                
                 <%= for s <- @simulations do %>
                   <option
                     value={s.id}
@@ -333,9 +342,10 @@ defmodule RenewCollabWeb.LiveProjectManager do
             </form>
           </div>
         </div>
+        
         <div style="border: 1px solid #ddd; margin: 1em 0; padding: 1em">
           <h3 style="margin-top: 0;border-bottom: 1px solid #aaa;">Delete Project</h3>
-
+          
           <form method="post" phx-submit="delete" phx-value-id={@project.id} accept-charset="utf-8">
             <button
               type="submit"

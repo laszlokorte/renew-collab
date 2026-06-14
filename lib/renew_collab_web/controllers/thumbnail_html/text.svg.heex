@@ -1,5 +1,3 @@
 <%= with %RenewCollab.Element.Text{position_x: x, position_y: y, body: body} <- @layer.text do %>
-  <text x={x} y={y}>
-    {body}
-  </text>
+  <text x={x} y={y}>{body}</text>
 <% end %>

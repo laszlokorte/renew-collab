@@ -359,9 +359,11 @@ defmodule RenewCollab.Document.LayerClipboard do
     %{}
     |> put_present(:opacity, value(style, :opacity))
     |> put_present(:background_color, value(style, :background_color))
+    |> put_present(:background_opacity, value(style, :background_opacity))
     |> put_present(:background_url, value(style, :background_url))
     |> put_present(:target_location, value(style, :target_location))
     |> put_present(:border_color, value(style, :border_color))
+    |> put_present(:border_opacity, value(style, :border_opacity))
     |> put_present(:border_width, value(style, :border_width))
     |> put_present(:border_dash_array, value(style, :border_dash_array))
   end
@@ -378,6 +380,9 @@ defmodule RenewCollab.Document.LayerClipboard do
     |> put_present(:underline, value(style, :underline))
     |> put_present(:rich, value(style, :rich))
     |> put_present(:text_color, value(style, :text_color))
+    |> put_present(:opacity, value(style, :opacity))
+    |> put_present(:background_color, value(style, :background_color))
+    |> put_present(:background_opacity, value(style, :background_opacity))
     |> put_present(:blank_lines, value(style, :blank_lines))
   end
 
@@ -387,10 +392,12 @@ defmodule RenewCollab.Document.LayerClipboard do
     %{}
     |> put_present(:stroke_width, value(style, :stroke_width))
     |> put_present(:stroke_color, value(style, :stroke_color))
+    |> put_present(:stroke_opacity, value(style, :stroke_opacity))
     |> put_present(:stroke_join, value(style, :stroke_join))
     |> put_present(:stroke_cap, value(style, :stroke_cap))
     |> put_present(:stroke_dash_array, value(style, :stroke_dash_array))
     |> put_present(:smoothness, value(style, :smoothness))
+    |> put_present(:smoothness_amount, value(style, :smoothness_amount))
     |> put_present(:source_tip_symbol_shape_id, value(style, :source_tip_symbol_shape_id))
     |> put_present(:target_tip_symbol_shape_id, value(style, :target_tip_symbol_shape_id))
     |> put_present(:source_tip_size, value(style, :source_tip_size))

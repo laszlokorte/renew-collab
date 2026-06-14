@@ -66,6 +66,7 @@ defmodule RenewCollabWeb.HierarchyLayerBoxComponent do
               stroke-dasharray="4 4"
             >
             </rect>
+            
             <text
               x={@layer.box.position_x + @layer.box.width / 2}
               y={@layer.box.position_y + @layer.box.height / 2}
@@ -103,6 +104,7 @@ defmodule RenewCollabWeb.HierarchyLayerBoxComponent do
               height={@layer.box.height}
             >
             </rect>
+            
             <image
               x={@layer.box.position_x}
               y={@layer.box.position_y}
@@ -113,7 +115,7 @@ defmodule RenewCollabWeb.HierarchyLayerBoxComponent do
             />
         <% end %>
       <% end %>
-
+      
       <%= if @selected do %>
         <g>
           <rect
@@ -135,7 +137,7 @@ defmodule RenewCollabWeb.HierarchyLayerBoxComponent do
             stroke-dasharray="1"
           >
           </rect>
-
+          
           <circle
             stroke="transparent"
             stroke-width="10"

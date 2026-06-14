@@ -14,6 +14,9 @@ defmodule RenewCollab.Style.TextStyle do
     field :font_family, :string, default: "sans-serif"
     field :bold, :boolean, default: false
     field :text_color, :string, default: "black"
+    field :opacity, :float, default: 1.0
+    field :background_color, :string
+    field :background_opacity, :float, default: 1.0
     belongs_to :text, RenewCollab.Element.Text
 
     timestamps(type: :utc_datetime)
@@ -31,6 +34,9 @@ defmodule RenewCollab.Style.TextStyle do
       :underline,
       :rich,
       :text_color,
+      :opacity,
+      :background_color,
+      :background_opacity,
       :blank_lines
     ])
     |> validate_required([
@@ -42,6 +48,8 @@ defmodule RenewCollab.Style.TextStyle do
       :underline,
       :rich,
       :text_color,
+      :opacity,
+      :background_opacity,
       :blank_lines
     ])
     |> unique_constraint(:element_text_id)
@@ -73,6 +81,9 @@ defmodule RenewCollab.Style.TextStyle do
           font_family: s.font_family,
           bold: s.bold,
           text_color: s.text_color,
+          opacity: s.opacity,
+          background_color: s.background_color,
+          background_opacity: s.background_opacity,
           text_id: s.text_id,
           inserted_at: s.inserted_at,
           updated_at: s.updated_at

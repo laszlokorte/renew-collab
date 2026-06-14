@@ -1,20 +1,18 @@
 <RenewCollabWeb.RenewComponents.app_header flash={@flash} blank={true} logout={true} />
 <div style="padding: 1em">
-  <.link navigate={~p"/"}>
-    Dashboard
-  </.link>
+  <.link navigate={~p"/"}>Dashboard</.link>
   / System Reset
   <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
     <img class="icon" src="/images/icon-system.svg" /> System Reset
   </h2>
 </div>
+
 <div style="display: grid; grid-template-columns: auto; justify-content: center; gap: 1ex">
   <fieldset>
     <legend>Reset</legend>
-
-    <p>
-      Clear all Documents and reset database content.
-    </p>
+    
+    <p>Clear all Documents and reset database content.</p>
+    
     <form action={~p"/system/reset"} method="post">
       <input type="hidden" name="_csrf_token" value={Phoenix.Controller.get_csrf_token()} />
       <button

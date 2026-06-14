@@ -37,6 +37,10 @@ defmodule RenewCollabSim.Server.SimulationServer do
     GenServer.cast(pid, {:net_step, simulation_id, net_instance_label})
   end
 
+  def console_command(pid, simulation_id, command) do
+    safe_call(pid, {:console_command, simulation_id, command})
+  end
+
   def transition_bindings(pid, simulation_id, net_instance_label, transition_id) do
     safe_call(pid, {:transition_bindings, simulation_id, net_instance_label, transition_id})
   end
@@ -218,6 +222,17 @@ defmodule RenewCollabSim.Server.SimulationServer do
       %{sim_process: p} ->
         RenewCollabSim.Server.SimulationProcess.stop(p)
         {:reply, true, state}
+
+      nil ->
+        {:reply, false, state}
+    end
+  end
+
+  @impl true
+  def handle_call({:console_command, simulation_id, command}, _from, %{processes: procs} = state) do
+    case Map.get(procs, simulation_id, nil) do
+      %{sim_process: p} ->
+        {:reply, RenewCollabSim.Server.SimulationProcess.console_command(p, command), state}
 
       nil ->
         {:reply, false, state}

@@ -1,5 +1,4 @@
 <RenewCollabWeb.RenewComponents.app_header flash={@flash} blank={true} logout={true} />
-
 <ul style="display: grid; justify-content: center; padding: 1em; list-style: none; gap: 1em; grid-template-columns: repeat(auto-fit, minmax(25em, 1fr));">
   <li style="background-color: #eee;">
     <.link
@@ -9,6 +8,7 @@
       <img class="icon" src="/images/icon-project.svg" /> My Projects
     </.link>
   </li>
+  
   <li style="background-color: #eee;">
     <.link
       style="gap: 1em; text-align: center; padding: 2em; display: block; color: #078; display: flex; flex-direction: column; align-items: center;"
@@ -18,8 +18,10 @@
     </.link>
   </li>
 </ul>
+
 <%= if is_admin(@conn) do %>
   <h2 style="border-bottom: 2px solid gray;text-align: center;padding: 1ex">Administration</h2>
+  
   <ul style="display: grid; justify-content: center; padding: 1em; list-style: none; gap: 1em; grid-template-columns: repeat(auto-fit, minmax(25em, 1fr));">
     <li style="background-color: #eee;">
       <.link
@@ -29,6 +31,7 @@
         <img class="icon" src="/images/icon-project.svg" /> All Projects
       </.link>
     </li>
+    
     <li style="background-color: #eee;">
       <.link
         style="gap: 1em; text-align: center; padding: 2em; display: block; color: #078; display: flex; flex-direction: column; align-items: center;"
@@ -37,6 +40,7 @@
         <img class="icon" src="/images/icon-document.svg" /> All Documents
       </.link>
     </li>
+    
     <li style="background-color: #eee;">
       <.link
         style="gap: 1em; text-align: center; padding: 2em; display: block; color: #078; display: flex; flex-direction: column; align-items: center;"
@@ -45,6 +49,7 @@
         <img class="icon" src="/images/icon-simulation.svg" /> All Simulations
       </.link>
     </li>
+    
     <li style="background-color: #eee;">
       <.link
         style="gap: 1em; text-align: center; padding: 2em; display: block; color: #078; display: flex; flex-direction: column; align-items: center;"
@@ -53,6 +58,7 @@
         <img class="icon" src="/images/icon-user.svg" /> Accounts
       </.link>
     </li>
+    
     <li style="background-color: #eee;">
       <.link
         style="gap: 1em; text-align: center; padding: 2em; display: block; color: #078; display: flex; flex-direction: column; align-items: center;"
@@ -61,6 +67,7 @@
         <img class="icon" src="/images/icon-health.svg" /> Health
       </.link>
     </li>
+    
     <li style="background-color: #eee;">
       <.link
         style="gap: 1em; text-align: center; padding: 2em; display: block; color: #078; display: flex; flex-direction: column; align-items: center;"
@@ -70,9 +77,9 @@
       </.link>
     </li>
   </ul>
-  <h3 style="gap: 1em; text-align: center;">
-    Template Configuration
-  </h3>
+  
+  <h3 style="gap: 1em; text-align: center;">Template Configuration</h3>
+  
   <ul style="display: grid; justify-content: center; padding: 1em; list-style: none; gap: 1em; grid-template-columns: repeat(auto-fit, minmax(25em, 1fr));">
     <li style="background-color: #eee;">
       <.link
@@ -82,7 +89,7 @@
         <img class="icon" src="/images/icon-socket.svg" /> Socket Schemas
       </.link>
     </li>
-
+    
     <li style="background-color: #eee;">
       <.link
         style="gap: 1em; text-align: center; padding: 2em; display: block; color: #078; display: flex; flex-direction: column; align-items: center;"
@@ -91,7 +98,7 @@
         <img class="icon" src="/images/icon-symbol.svg" /> Icons
       </.link>
     </li>
-
+    
     <li style="background-color: #eee;">
       <.link
         style="gap: 1em; text-align: center; padding: 2em; display: block; color: #078; display: flex; flex-direction: column; align-items: center;"
@@ -100,7 +107,7 @@
         <img class="icon" src="/images/icon-syntax.svg" /> Syntax
       </.link>
     </li>
-
+    
     <li style="background-color: #eee;">
       <.link
         style="gap: 1em; text-align: center; padding: 2em; display: block; color: #078; display: flex; flex-direction: column; align-items: center;"

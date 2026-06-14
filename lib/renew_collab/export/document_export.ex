@@ -205,6 +205,33 @@ defmodule RenewCollab.Export.DocumentExport do
       #     }
       #   ]
 
+      Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "de.renew.gui.VirtualTransitionFigure") ->
+        storables
+        |> Enum.concat([
+          %Renewex.Storable{
+            class_name: layer.semantic_tag,
+            fields: %{
+              # layer.direct_parent_hood == nil,
+              _root: true,
+              _gen_id: layer.id,
+              attributes: export_attributes(:box, layer),
+              x: round(-view_box.x + layer.box.position_x),
+              y: round(-view_box.y + layer.box.position_y),
+              w: round(layer.box.width),
+              h: round(layer.box.height),
+              highlight_figure: nil,
+              transition:
+                with out when not is_nil(out) <- layer.outgoing_link,
+                     target_layer_id when not is_nil(target_layer_id) <- out.target_layer_id do
+                  Enum.find_value(Enum.with_index(storables), fn
+                    {%{fields: %{_gen_id: ^target_layer_id}}, i} -> {:ref, i}
+                    _ -> nil
+                  end)
+                end
+            }
+          }
+        ])
+
       Hierarchy.is_subtype_of(grammar, layer.semantic_tag, "de.renew.gui.TransitionFigure") ->
         storables
         |> Enum.concat([

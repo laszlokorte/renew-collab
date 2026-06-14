@@ -64,6 +64,9 @@ defmodule RenewCollab.Commands.UpdateLayerTextStyle do
   def attr_key("font_family"), do: :font_family
   def attr_key("bold"), do: :bold
   def attr_key("text_color"), do: :text_color
+  def attr_key("opacity"), do: :opacity
+  def attr_key("background_color"), do: :background_color
+  def attr_key("background_opacity"), do: :background_opacity
   def attr_key("rich"), do: :rich
   def attr_key("blank_lines"), do: :blank_lines
 end

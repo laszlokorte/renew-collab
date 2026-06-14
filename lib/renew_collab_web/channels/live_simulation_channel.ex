@@ -179,6 +179,29 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
 
   @impl true
   def handle_event(
+        "console_command",
+        payload,
+        _state,
+        %{
+          simulation_id: simulation_id,
+          account: account
+        },
+        socket
+      ) do
+    %Actions.SimulationConsoleCommand{
+      simulation_id: simulation_id,
+      command: payload_value(payload, "command")
+    }
+    |> perform_simulation_action(
+      account,
+      socket,
+      "simulation_console_command_failed",
+      "Simulation command could not be sent"
+    )
+  end
+
+  @impl true
+  def handle_event(
         "transition_bindings",
         payload,
         _state,
@@ -211,15 +234,6 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
            transition_instance: transition_instance,
            bindings: bindings
          }, socket}
-
-      false ->
-        push_error(socket, %{
-          error: "transition_bindings_failed",
-          message: "Transition bindings could not be loaded",
-          detail: "The simulation is not running."
-        })
-
-        {:reply, %{transition_id: transition_id, bindings: []}, socket}
 
       {:error, reason} ->
         detail = simulation_error_detail(reason)
@@ -269,20 +283,8 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
       :ok ->
         {:reply, %{fired: true}, socket}
 
-      true ->
-        {:reply, %{fired: true}, socket}
-
       {:ok, _} ->
         {:reply, %{fired: true}, socket}
-
-      false ->
-        push_error(socket, %{
-          error: "fire_transition_failed",
-          message: "Transition could not be fired",
-          detail: "The simulation is not running."
-        })
-
-        {:reply, %{fired: false}, socket}
 
       {:error, reason} ->
         detail = simulation_error_detail(reason)

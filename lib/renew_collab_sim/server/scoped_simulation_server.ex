@@ -33,6 +33,10 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
     GenServer.cast(__MODULE__, {:net_step, simulation_scope, simulation_id, net_instance_label})
   end
 
+  def console_command(simulation_scope, simulation_id, command) do
+    safe_call({:console_command, simulation_scope, simulation_id, command})
+  end
+
   def transition_bindings(simulation_scope, simulation_id, net_instance_label, transition_id) do
     safe_call(
       {:transition_bindings, simulation_scope, simulation_id, net_instance_label, transition_id}
@@ -213,6 +217,18 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
       %{server_process: p} ->
         RenewCollabSim.Server.SimulationServer.stop(p, simulation_id)
         {:reply, true, state}
+
+      nil ->
+        {:reply, false, state}
+    end
+  end
+
+  @impl true
+  def handle_call({:console_command, simulation_scope, simulation_id, command}, _from, state) do
+    case Map.get(state, simulation_scope, nil) do
+      %{server_process: p} ->
+        {:reply,
+         RenewCollabSim.Server.SimulationServer.console_command(p, simulation_id, command), state}
 
       nil ->
         {:reply, false, state}

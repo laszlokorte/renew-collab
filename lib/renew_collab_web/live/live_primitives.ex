@@ -27,12 +27,10 @@ defmodule RenewCollabWeb.LivePrimitives do
         /
         Predefined Primitives
         <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
-          <img class="icon" src="/images/icon-lego.svg" />
-          <span>
-            Primitives
-          </span>
+          <img class="icon" src="/images/icon-lego.svg" /> <span>Primitives</span>
         </h2>
       </div>
+      
       <div style="padding: 1em">
         <.form for={@create_form} phx-change="validate" phx-submit="save">
           <div style="display: flex; gap: 1ex; align-items: stretch">
@@ -42,30 +40,30 @@ defmodule RenewCollabWeb.LivePrimitives do
             </button>
           </div>
         </.form>
-
+        
         <table style="width: 100%;" cellpadding="5">
           <thead>
             <tr>
               <th style="border-bottom: 1px solid #333;" align="left" colspan="1"></th>
-
+              
               <th style="border-bottom: 1px solid #333;" align="left" width="500" colspan="1">
                 Name
               </th>
-
+              
               <th style="border-bottom: 1px solid #333;" align="left" width="500" colspan="1">
                 Icon
               </th>
-
+              
               <th style="border-bottom: 1px solid #333;" align="left" width="500" colspan="1">
                 Data
               </th>
-
+              
               <th style="border-bottom: 1px solid #333;" align="left" width="100" colspan="4">
                 Actions
               </th>
             </tr>
           </thead>
-
+          
           <%= if Enum.empty?(@primitive_groups) do %>
             <tbody>
               <tr>
@@ -81,13 +79,11 @@ defmodule RenewCollabWeb.LivePrimitives do
               <thead>
                 <tr {[style: "background-color:#333;color: #fff"]}>
                   <th align="left">Icon</th>
-
-                  <th align="left" colspan="2">
-                    <strong>{group.name}</strong>
-                  </th>
-
+                  
+                  <th align="left" colspan="2"><strong>{group.name}</strong></th>
+                  
                   <th></th>
-
+                  
                   <th align="left" width="50">
                     <button
                       type="button"
@@ -100,7 +96,7 @@ defmodule RenewCollabWeb.LivePrimitives do
                   </th>
                 </tr>
               </thead>
-
+              
               <tbody>
                 <%= if Enum.empty?(group.primitives) do %>
                   <tr>
@@ -114,23 +110,19 @@ defmodule RenewCollabWeb.LivePrimitives do
                   <%= for {primitive, si} <- group.primitives |> Enum.with_index do %>
                     <tr {if(rem(si, 2) == 0, do: [style: "background-color:#f5f5f5;"], else: [])}>
                       <td>
-                        <svg viewBox="-8 -8 48 48" style="width: 3em">
-                          {raw(primitive.icon)}
-                        </svg>
+                        <svg viewBox="-8 -8 48 48" style="width: 3em">{raw(primitive.icon)}</svg>
                       </td>
-
-                      <td align="left" colspan="1">
-                        {primitive.name}
-                      </td>
-
+                      
+                      <td align="left" colspan="1">{primitive.name}</td>
+                      
                       <td align="left" colspan="1">
                         <textarea readonly rows="5" cols="40">{primitive.icon}</textarea>
                       </td>
-
+                      
                       <td align="left" colspan="1">
                         <textarea readonly rows="5" cols="40">{Jason.encode!(primitive.data)}</textarea>
                       </td>
-
+                      
                       <td align="left" width="50">
                         <button
                           type="button"
@@ -145,8 +137,10 @@ defmodule RenewCollabWeb.LivePrimitives do
                   <% end %>
                 <% end %>
               </tbody>
+              
               <tr>
                 <td valign="top">Add Primitive</td>
+                
                 <td valign="top">
                   <input
                     style="padding: 1ex"
@@ -155,12 +149,15 @@ defmodule RenewCollabWeb.LivePrimitives do
                     name="name"
                   />
                 </td>
+                
                 <td valign="top">
                   <textarea form={"add_primitive-#{group.id}"} name="icon" rows="5" cols="40"></textarea>
                 </td>
+                
                 <td valign="top">
                   <textarea form={"add_primitive-#{group.id}"} name="data" rows="5" cols="40"></textarea>
                 </td>
+                
                 <td valign="top">
                   <form id={"add_primitive-#{group.id}"} phx-submit="add_primitive">
                     <input type="hidden" name="group_id" value={group.id} />

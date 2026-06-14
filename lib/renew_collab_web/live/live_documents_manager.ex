@@ -21,29 +21,29 @@ defmodule RenewCollabWeb.LiveDocumentsManager do
     ~H"""
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
       <RenewCollabWeb.RenewComponents.app_header flash={@flash} />
-
       <div style="padding: 1em">
         Documents Management
         <h2 style="margin: 0; display: flex; align-items: center; gap: 1ex;">
           <img class="icon" src="/images/icon-document.svg" /> Manage Documents
         </h2>
       </div>
-
+      
       <div style="padding: 1em">
         <table style="width: 100%;" cellpadding="5">
           <thead>
             <tr>
               <th style="border-bottom: 1px solid #333;" align="left" width="1000">Name</th>
-
+              
               <th style="border-bottom: 1px solid #333;" align="left" width="200">Created</th>
-
+              
               <th style="border-bottom: 1px solid #333;" align="left" width="200">Last Updated</th>
+              
               <th style="border-bottom: 1px solid #333;" align="left" width="100" colspan="3">
                 Actions
               </th>
             </tr>
           </thead>
-
+          
           <tbody>
             <%= if Enum.empty?(@documents) do %>
               <tr>
@@ -61,18 +61,14 @@ defmodule RenewCollabWeb.LiveDocumentsManager do
                       style="color: #078; display: flex; gap: 1ex;"
                       navigate={~p"/document/#{document.id}"}
                     >
-                      <img class="icon" src="/images/icon-document.svg" />
-                      {document.name}
+                      <img class="icon" src="/images/icon-document.svg" /> {document.name}
                     </.link>
                   </td>
-
-                  <td>
-                    <RenewCollabWeb.RenewComponents.timestamp value={document.inserted_at} />
-                  </td>
-
-                  <td>
-                    <RenewCollabWeb.RenewComponents.timestamp value={document.inserted_at} />
-                  </td>
+                  
+                  <td><RenewCollabWeb.RenewComponents.timestamp value={document.inserted_at} /></td>
+                  
+                  <td><RenewCollabWeb.RenewComponents.timestamp value={document.inserted_at} /></td>
+                  
                   <td width="50">
                     <a target="_blank" href={~p"/documents/#{document.id}/export"}>
                       <button style="cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff">
@@ -80,7 +76,7 @@ defmodule RenewCollabWeb.LiveDocumentsManager do
                       </button>
                     </a>
                   </td>
-
+                  
                   <td width="50">
                     <button
                       type="button"

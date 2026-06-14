@@ -11,8 +11,12 @@ defmodule RenewCollab.Symbols do
     name: "ellipse-double-in-arrow-inward-north-west",
     paths: []
   }
-
-  @custom_shapes [@fa_start_shape, @fa_start_end_shape]
+  @rect_double_in_shape %{
+    id: "06B11F6B-53C9-4BCB-AC72-1454CE3F5352",
+    name: "rect-double-in",
+    paths: []
+  }
+  @custom_shapes [@fa_start_shape, @fa_start_end_shape, @rect_double_in_shape]
 
   def predefined_shapes do
     RenewexIconset.Predefined.all() ++ custom_shapes()

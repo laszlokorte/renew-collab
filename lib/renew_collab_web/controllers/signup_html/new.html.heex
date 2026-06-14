@@ -1,20 +1,16 @@
 <RenewCollabWeb.RenewComponents.app_header flash={@flash} blank={true} />
-
 <h2 style="text-align: center; margin-top: 3em;">Sign up</h2>
+
 <div style="margin: auto; width: max-content;">
-  <p>
-    To create a new account Enter your E-Mail address.
-  </p>
-  <p>
-    An E-mail with a confirmation code will be sent to your E-mail.
-  </p>
+  <p>To create a new account Enter your E-Mail address.</p>
+  
+  <p>An E-mail with a confirmation code will be sent to your E-mail.</p>
 </div>
+
 <div style="display: grid; justify-content: center;" class="rnw-form">
   <.signup_form changeset={@changeset} action={~p"/signup"} />
 </div>
 
 <div style="display: grid; justify-content: center; text-align: center; margin: 2em;">
-  <p>
-    Do you already have an account? Go <a style="color: #23875d" href={~p"/login"}>Log In</a>
-  </p>
+  <p>Do you already have an account? Go <a style="color: #23875d" href={~p"/login"}>Log In</a></p>
 </div>

@@ -44,10 +44,12 @@ defmodule RenewCollab.Commands.UpdateLayerEdgeStyle do
 
   defp attr_key("stroke_width"), do: :stroke_width
   defp attr_key("stroke_color"), do: :stroke_color
+  defp attr_key("stroke_opacity"), do: :stroke_opacity
   defp attr_key("stroke_join"), do: :stroke_join
   defp attr_key("stroke_cap"), do: :stroke_cap
   defp attr_key("stroke_dash_array"), do: :stroke_dash_array
   defp attr_key("smoothness"), do: :smoothness
+  defp attr_key("smoothness_amount"), do: :smoothness_amount
   defp attr_key("source_tip_symbol_shape_id"), do: :source_tip_symbol_shape_id
   defp attr_key("target_tip_symbol_shape_id"), do: :target_tip_symbol_shape_id
   defp attr_key("source_tip_size"), do: :source_tip_size

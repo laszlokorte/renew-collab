@@ -12,7 +12,6 @@ defmodule RenewCollabWeb.SnapshotListComponent do
       >
         Create Snaphot
       </button>
-
       <button
         type="button"
         phx-click="prune_snaphots"
@@ -20,11 +19,10 @@ defmodule RenewCollabWeb.SnapshotListComponent do
       >
         Prune Snaphots
       </button>
-
       <div style="width: 45vw">
         <%= for {day, snaps} <- @snapshots |> Enum.group_by(&DateTime.to_date(&1.inserted_at))|>Enum.reverse do %>
           <h5 style="margin: 0;">{day |> Calendar.strftime("%Y-%m-%d")}</h5>
-
+          
           <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.2ex">
             <%= for s <- snaps  do %>
               <li style="display: flex; align-items: center;gap: 1ex;">
@@ -32,7 +30,6 @@ defmodule RenewCollabWeb.SnapshotListComponent do
                   <span style="cursor: default; font-size: 10pt; font-family: sans-serif; width: max-content; display: inline; padding: 1ex; border: none; background: #33a; color: #fff">
                     Current
                   </span>
-
                   <RenewCollabWeb.RenewComponents.timestamp format="%H:%M" value={s.inserted_at} />
                   <%= if not is_nil(s.label) do %>
                     <button
@@ -43,8 +40,7 @@ defmodule RenewCollabWeb.SnapshotListComponent do
                       title="Remove Pin"
                     >
                       📌
-                    </button>
-                    {s.label}
+                    </button> {s.label}
                   <% else %>
                     <form
                       phx-hook="RnwSnapshotPin"
@@ -57,8 +53,7 @@ defmodule RenewCollabWeb.SnapshotListComponent do
                         type="submit"
                       >
                         📌
-                      </button>
-                      <input name="description" type="text" placeholder="Description" />
+                      </button> <input name="description" type="text" placeholder="Description" />
                     </form>
                   <% end %>
                 <% else %>
@@ -79,8 +74,7 @@ defmodule RenewCollabWeb.SnapshotListComponent do
                       title="Remove Pin"
                     >
                       📌
-                    </button>
-                    {s.label}
+                    </button> {s.label}
                   <% end %>
                 <% end %>
               </li>

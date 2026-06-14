@@ -39,17 +39,13 @@ defmodule RenewCollabWeb.LiveSocketSchema do
     <div style="display: grid; position: absolute; left: 0;right:0;bottom:0;top:0; grid-auto-rows: auto; align-content: start;">
       <RenewCollabWeb.RenewComponents.app_header flash={@flash} />
       <div style="padding: 1em">
-        /
-        <.link style="color: #078" navigate={~p"/socket_schemas"}>
-          Socket Schemas
-        </.link>
+        / <.link style="color: #078" navigate={~p"/socket_schemas"}>Socket Schemas</.link>
         <h2 style="margin: 0; display: flex; gap: 1ex; align-items: center;">
           <img class="icon" src="/images/icon-socket.svg" />
-          <span>
-            Socket Schema: {@socket_schema.name}
-          </span>
+          <span>Socket Schema: {@socket_schema.name}</span>
         </h2>
       </div>
+      
       <div style="padding: 1em">
         <div style="display: grid; grid-template-columns: 20em 1fr;">
           <div>
@@ -67,7 +63,7 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                   <% end %>
                 </g>
               <% end %>
-
+              
               <g fill="#ddd">
                 <%= case @socket_schema.stencil do %>
                   <% :ellipse -> %>
@@ -109,6 +105,7 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                     />
                 <% end %>
               </g>
+              
               <%= for s <- @socket_schema.sockets do %>
                 <g pointer-events="all" fill="transparent">
                   <circle
@@ -159,7 +156,7 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                   </circle>
                 </g>
               <% end %>
-
+              
               <%= with s when @preview.name != nil <- @preview do %>
                 <g pointer-events="all" fill="transparent">
                   <circle
@@ -215,76 +212,111 @@ defmodule RenewCollabWeb.LiveSocketSchema do
             <form phx-change="change_preview">
               <select name="icon_id">
                 <option value="">None</option>
+                
                 <%= for i <- @icons do %>
                   <option value={i.id}>{i.name}</option>
                 <% end %>
               </select>
             </form>
           </div>
+          
           <div>
             <h3>Stencil</h3>
+            
             <form id="stencil_form" phx-change="change_stencil">
               <p>
                 <select name="stencil">
                   <option selected={@socket_schema.stencil == nil} value="">None</option>
+                  
                   <option selected={@socket_schema.stencil == :ellipse} value="ellipse">
                     Ellipse
                   </option>
+                  
                   <option selected={@socket_schema.stencil == :rect} value="rect">Rect</option>
                 </select>
               </p>
             </form>
+            
             <h3>Sockets</h3>
-
+            
             <table border="1" cellpadding="5" cellspacing="0">
               <thead>
                 <tr>
                   <th rowspan="3" valign="bottom" align="left">Name</th>
+                  
                   <th colspan="2" valign="bottom">X Position</th>
+                  
                   <th colspan="4" valign="bottom">X Offset</th>
+                  
                   <th colspan="2" valign="bottom">Y Position</th>
+                  
                   <th colspan="4" valign="bottom">Y Offset</th>
+                  
                   <th colspan="1" rowspan="3" valign="bottom"></th>
                 </tr>
+                
                 <tr>
                   <th rowspan="2" valign="bottom">Value</th>
+                  
                   <th rowspan="2" valign="bottom">Unit</th>
+                  
                   <th rowspan="2" valign="bottom">Operation</th>
+                  
                   <th rowspan="2" valign="bottom">Static</th>
+                  
                   <th colspan="2" valign="bottom">Dynamic</th>
-
+                  
                   <th rowspan="2" valign="bottom">Value</th>
+                  
                   <th rowspan="2" valign="bottom">Unit</th>
+                  
                   <th rowspan="2" valign="bottom">Operation</th>
+                  
                   <th rowspan="2" valign="bottom">Static</th>
+                  
                   <th colspan="2" valign="bottom">Dynamic</th>
                 </tr>
-
+                
                 <tr>
                   <th>Value</th>
+                  
                   <th>Unit</th>
-
+                  
                   <th>Value</th>
+                  
                   <th>Unit</th>
                 </tr>
               </thead>
+              
               <tbody>
                 <%= for s <- @socket_schema.sockets do %>
                   <tr>
                     <td>{s.name}</td>
-
+                    
                     <td>{s.x_value}</td>
+                    
                     <td>{s.x_unit}</td>
+                    
                     <td>{s.x_offset_operation}</td>
+                    
                     <td>{s.x_offset_value_static}</td>
+                    
                     <td>{s.x_offset_dynamic_value}</td>
+                    
                     <td>{s.x_offset_dynamic_unit}</td>
+                    
                     <td>{s.y_value}</td>
+                    
                     <td>{s.y_unit}</td>
+                    
                     <td>{s.y_offset_operation}</td>
+                    
                     <td>{s.y_offset_value_static}</td>
+                    
                     <td>{s.y_offset_dynamic_value}</td>
+                    
                     <td>{s.y_offset_dynamic_unit}</td>
+                    
                     <td>
                       <button type="button" phx-click="delete_socket" value={s.id}>Delete</button>
                       <button type="button" phx-click="copy_socket" value={s.id}>Copy</button>
@@ -292,12 +324,13 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                   </tr>
                 <% end %>
               </tbody>
+              
               <tfoot>
                 <tr>
                   <td>
                     <input required form="create_form" type="text" name="name" value={@preview.name} />
                   </td>
-
+                  
                   <td>
                     <input
                       form="create_form"
@@ -308,6 +341,7 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                       value={@preview.x_value}
                     />
                   </td>
+                  
                   <td>
                     <select form="create_form" name="x_unit">
                       <%= for d <- dims() do %>
@@ -315,6 +349,7 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                       <% end %>
                     </select>
                   </td>
+                  
                   <td>
                     <select form="create_form" name="x_offset_operation">
                       <%= for f <- funcs() do %>
@@ -322,6 +357,7 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                       <% end %>
                     </select>
                   </td>
+                  
                   <td>
                     <input
                       form="create_form"
@@ -332,6 +368,7 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                       value={@preview.x_offset_value_static}
                     />
                   </td>
+                  
                   <td>
                     <input
                       form="create_form"
@@ -342,6 +379,7 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                       value={@preview.x_offset_dynamic_value}
                     />
                   </td>
+                  
                   <td>
                     <select form="create_form" name="x_offset_dynamic_unit">
                       <%= for d <- dims() do %>
@@ -349,6 +387,7 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                       <% end %>
                     </select>
                   </td>
+                  
                   <td>
                     <input
                       form="create_form"
@@ -359,6 +398,7 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                       value={@preview.y_value}
                     />
                   </td>
+                  
                   <td>
                     <select form="create_form" name="y_unit">
                       <%= for d <- dims() do %>
@@ -366,6 +406,7 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                       <% end %>
                     </select>
                   </td>
+                  
                   <td>
                     <select form="create_form" name="y_offset_operation">
                       <%= for f <- funcs() do %>
@@ -373,6 +414,7 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                       <% end %>
                     </select>
                   </td>
+                  
                   <td>
                     <input
                       form="create_form"
@@ -383,6 +425,7 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                       value={@preview.y_offset_value_static}
                     />
                   </td>
+                  
                   <td>
                     <input
                       form="create_form"
@@ -393,6 +436,7 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                       value={@preview.y_offset_dynamic_value}
                     />
                   </td>
+                  
                   <td>
                     <select form="create_form" name="y_offset_dynamic_unit">
                       <%= for d <- dims() do %>
@@ -400,6 +444,7 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                       <% end %>
                     </select>
                   </td>
+                  
                   <td>
                     <form id="create_form" phx-submit="create_socket" phx-change="preview_socket">
                       <input type="hidden" name="socket_schema_id" value={@socket_schema.id} />
@@ -409,10 +454,10 @@ defmodule RenewCollabWeb.LiveSocketSchema do
                 </tr>
               </tfoot>
             </table>
-
+            
             <details>
               <summary>Export</summary>
-              <textarea style="width: 50%; min-height: 12em;" readonly>{inspect(@socket_schema, pretty: true)}</textarea>
+               <textarea style="width: 50%; min-height: 12em;" readonly>{inspect(@socket_schema, pretty: true)}</textarea>
             </details>
           </div>
         </div>

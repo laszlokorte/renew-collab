@@ -140,6 +140,10 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
     )
   end
 
+  def console_command(%__MODULE__{sim_process: sim_process}, command) when is_binary(command) do
+    send(sim_process, {:command, String.trim_trailing(command) <> "\n"})
+  end
+
   def transition_bindings(
         %__MODULE__{
           sim_process: sim_process,

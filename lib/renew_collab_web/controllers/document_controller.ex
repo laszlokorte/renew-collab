@@ -87,6 +87,7 @@ defmodule RenewCollabWeb.DocumentController do
             >
               <%= with %{layer_id: lid} <- @document.thumbnail, true <- @layer_id == :thumbnail do %>
                 <tspan x={x + width / 2}>{@document.layers |> Enum.count()}</tspan>
+                
                 <tspan x={x + width / 2} dy="100">{lid}</tspan>
                 <% else _ -> %>
                   ⊗
