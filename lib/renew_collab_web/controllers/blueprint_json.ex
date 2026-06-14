@@ -32,17 +32,28 @@ defmodule RenewCollabWeb.BlueprintJSON do
   @arrow_tip_double "1BB93575-6759-4C59-8ED3-626949D1326A"
   @arrow_tip_circle "2FD06A6E-6B3E-4AD4-8728-4BE95A8A1451"
   @edge_icon """
-  <path d="M 5 27 L 27 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="butt" />
-  <path d="M 27 5 L 22.6 6.4 L 25.6 9.4 Z" fill="currentColor" stroke="currentColor" stroke-linejoin="miter" />
+  <path d="M 8 8 L 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="butt" />
+  <path d="M 24 24 L 17 20.8 L 20.8 17 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
   """
   @double_edge_icon """
-  <path d="M 5 27 L 27 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="butt" />
-  <path d="M 27 5 L 22.6 6.4 L 25.6 9.4 Z" fill="currentColor" stroke="currentColor" stroke-linejoin="miter" />
-  <path d="M 5 27 L 9.4 25.6 L 6.4 22.6 Z" fill="currentColor" stroke="currentColor" stroke-linejoin="miter" />
+  <path d="M 8 8 L 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="butt" />
+  <path d="M 24 24 L 17 20.8 L 20.8 17 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
+  <path d="M 8 8 L 15 11.2 L 11.2 15 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
+  """
+  @double_tip_edge_icon """
+  <path d="M 8 8 L 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="butt" />
+  <path d="M 24 24 L 17 20.8 L 20.8 17 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
+  <path d="M 20 20 L 14 17.2 L 17.2 14 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
   """
   @circle_edge_icon """
-  <path d="M 5 27 L 27 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="butt" />
-  <circle cx="27" cy="5" r="3.2" fill="white" stroke="currentColor" stroke-width="2" />
+  <path d="M 8 8 L 21 21" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="butt" />
+  <circle cx="24" cy="24" r="3.8" fill="white" stroke="currentColor" stroke-width="1.5" />
+  """
+  @plain_edge_icon """
+  <path d="M 8 8 L 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="butt" />
+  """
+  @angle_edge_icon """
+  <path d="M 8 8 L 8 22 L 24 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="butt" stroke-linejoin="miter" />
   """
   @edge_tools [
     %{
@@ -62,8 +73,7 @@ defmodule RenewCollabWeb.BlueprintJSON do
         source_tip_symbol_shape_id: nil,
         target_tip_symbol_shape_id: nil
       },
-      icon:
-        ~s(<path d="M 5 27 L 27 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="butt" />)
+      icon: @plain_edge_icon
     },
     %{
       kind: "edge-tool",
@@ -73,8 +83,7 @@ defmodule RenewCollabWeb.BlueprintJSON do
         source_tip_symbol_shape_id: nil,
         target_tip_symbol_shape_id: nil
       },
-      icon:
-        ~s(<path d="M 5 27 L 5 12 L 27 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="butt" />)
+      icon: @angle_edge_icon
     },
     %{
       kind: "edge-tool",
@@ -84,8 +93,7 @@ defmodule RenewCollabWeb.BlueprintJSON do
         source_tip_symbol_shape_id: nil,
         target_tip_symbol_shape_id: nil
       },
-      icon:
-        ~s(<path d="M 5 27 L 27 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="butt" />)
+      icon: @plain_edge_icon
     },
     %{
       kind: "edge-tool",
@@ -104,7 +112,7 @@ defmodule RenewCollabWeb.BlueprintJSON do
         semantic_tag: "de.renew.gui.DoubleArcConnection",
         target_tip_symbol_shape_id: @arrow_tip_double
       },
-      icon: @edge_icon
+      icon: @double_tip_edge_icon
     },
     %{
       kind: "edge-tool",
@@ -123,7 +131,7 @@ defmodule RenewCollabWeb.BlueprintJSON do
         semantic_tag: "de.renew.gui.HollowDoubleArcConnection",
         target_tip_symbol_shape_id: @arrow_tip_double
       },
-      icon: @edge_icon
+      icon: @double_tip_edge_icon
     }
   ]
 

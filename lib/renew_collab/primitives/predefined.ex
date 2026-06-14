@@ -44,7 +44,18 @@ defmodule RenewCollab.Primitives.Predefined do
               alignY: 0.5
             },
             icon:
-              ~H(<circle fill="#24d188" cx="16" cy="16" r="15" stroke="#047138" stroke-width="2" />)
+              ~H(<circle fill="#f2df60" cx="16" cy="16" r="11" stroke="#111" stroke-width="1.5" />
+<text
+  x="16"
+  y="20"
+  text-anchor="middle"
+  font-family="serif"
+  font-size="11"
+  font-weight="bold"
+  fill="#111"
+>
+  P
+</text>)
               |> html_to_string
           },
           %{
@@ -62,7 +73,18 @@ defmodule RenewCollab.Primitives.Predefined do
               alignY: 0.5
             },
             icon:
-              ~H(<rect fill="#24d188" x="1" y="5" width="30" height="22" stroke="#047138" stroke-width="2" />)
+              ~H(<rect fill="#f2df60" x="6" y="9" width="20" height="14" stroke="#111" stroke-width="1.5" />
+<text
+  x="16"
+  y="20"
+  text-anchor="middle"
+  font-family="serif"
+  font-size="11"
+  font-weight="bold"
+  fill="#111"
+>
+  T
+</text>)
               |> html_to_string
           },
           %{
@@ -80,8 +102,9 @@ defmodule RenewCollab.Primitives.Predefined do
               alignY: 0.5
             },
             icon:
-              ~H(<circle fill="none" cx="16" cy="16" r="14" stroke="#047138" stroke-width="2" />
-<circle fill="#24d188" cx="16" cy="16" r="9" stroke="#047138" stroke-width="2" />)
+              ~H(<circle fill="#f2df60" cx="16" cy="16" r="11" stroke="#111" stroke-width="1.5" />
+<circle fill="none" cx="16" cy="16" r="8" stroke="#111" stroke-width="1" />
+<path d="M8 13 H24 M8 16 H24 M8 19 H24" stroke="#b89d22" stroke-width="0.8" />)
               |> html_to_string
           },
           %{
@@ -99,7 +122,9 @@ defmodule RenewCollab.Primitives.Predefined do
               alignY: 0.5
             },
             icon:
-              ~H(<rect fill="#24d188" x="1" y="5" width="30" height="22" stroke="#047138" stroke-width="2" />)
+              ~H(<rect fill="#f2df60" x="6" y="9" width="20" height="14" stroke="#111" stroke-width="1.5" />
+<rect fill="none" x="9" y="12" width="14" height="8" stroke="#111" stroke-width="1" />
+<path d="M8 12 H24 M8 16 H24 M8 20 H24" stroke="#b89d22" stroke-width="0.8" />)
               |> html_to_string
           }
         ]
@@ -283,8 +308,14 @@ defmodule RenewCollab.Primitives.Predefined do
               alignY: 0.5
             },
             icon:
-              ~H(<circle fill="none" cx="16" cy="16" r="13" stroke="#111" stroke-width="2" />
-<path d="M16 3 L16 29 M3 16 L29 16" fill="none" stroke="#111" stroke-width="1" />)
+              ~H(<path
+  d="M9 23 L23 9 M17 9 H23 V15"
+  fill="none"
+  stroke="#111"
+  stroke-width="2"
+  stroke-linecap="butt"
+  stroke-linejoin="miter"
+/>)
               |> html_to_string
           },
           %{
@@ -330,7 +361,17 @@ defmodule RenewCollab.Primitives.Predefined do
               alignY: 0.5
             },
             icon:
-              ~H(<text text-anchor="middle" font-size="32" x="16" y="29" font-family="serif">T</text>)
+              ~H(<text
+  text-anchor="middle"
+  font-size="26"
+  font-weight="bold"
+  x="16"
+  y="26"
+  font-family="serif"
+  fill="#111"
+>
+  A
+</text>)
               |> html_to_string
           },
           %{
@@ -350,10 +391,17 @@ defmodule RenewCollab.Primitives.Predefined do
               alignY: 0.5
             },
             icon:
-              ~H(<text text-anchor="middle" font-size="28" x="19" y="29" font-family="serif">A</text>
-
-<rect x="1" y="3" width="9" height="14" fill="none" rx="5" ry="5" stroke="#555" stroke-width="2" />
-<rect x="3" y="9" width="5" height="14" fill="#555" rx="3" ry="3" stroke="none" />)
+              ~H(<text
+  text-anchor="middle"
+  font-size="24"
+  font-weight="bold"
+  x="16"
+  y="25"
+  font-family="serif"
+  fill="#111"
+>
+  i
+</text>)
               |> html_to_string
           },
           %{
@@ -373,10 +421,18 @@ defmodule RenewCollab.Primitives.Predefined do
               alignY: 0.5
             },
             icon:
-              ~H(<text text-anchor="middle" font-size="24" x="18" y="27" font-family="serif">T</text>
-
-<rect x="2" y="4" width="8" height="12" fill="none" rx="4" ry="4" stroke="#555" stroke-width="2" />
-<rect x="4" y="10" width="4" height="12" fill="#555" rx="2" ry="2" stroke="none" />)
+              ~H(<text x="5" y="11" font-size="12" font-family="serif" fill="#111">*</text>
+<text
+  text-anchor="middle"
+  font-size="25"
+  font-weight="bold"
+  x="18"
+  y="27"
+  font-family="serif"
+  fill="#111"
+>
+  A
+</text>)
               |> html_to_string
           },
           %{
@@ -396,7 +452,15 @@ defmodule RenewCollab.Primitives.Predefined do
               alignY: 0.5
             },
             icon:
-              ~H(<text text-anchor="middle" font-size="28" font-weight="bold" x="16" y="26" font-family="serif">
+              ~H(<text
+  text-anchor="middle"
+  font-size="24"
+  font-weight="bold"
+  x="16"
+  y="25"
+  font-family="serif"
+  fill="#111"
+>
   n
 </text>)
               |> html_to_string
@@ -418,7 +482,15 @@ defmodule RenewCollab.Primitives.Predefined do
               alignY: 0.5
             },
             icon:
-              ~H(<text text-anchor="middle" font-size="28" font-weight="bold" x="16" y="27" font-family="serif">
+              ~H(<text
+  text-anchor="middle"
+  font-size="24"
+  font-weight="bold"
+  x="16"
+  y="25"
+  font-family="serif"
+  fill="#111"
+>
   d
 </text>)
               |> html_to_string
@@ -440,8 +512,16 @@ defmodule RenewCollab.Primitives.Predefined do
               alignY: 0.5
             },
             icon:
-              ~H(<text text-anchor="middle" font-size="28" font-weight="bold" x="16" y="27" font-family="serif">
-  i
+              ~H(<text
+  text-anchor="middle"
+  font-size="22"
+  font-weight="bold"
+  x="16"
+  y="24"
+  font-family="serif"
+  fill="#111"
+>
+  @
 </text>)
               |> html_to_string
           }
