@@ -4,14 +4,13 @@ defmodule RenewCollab.Commands.UpdateLayerTextType do
   alias RenewCollab.Element.Text
   alias RenewCollab.Style.TextSizeHint
 
-  defstruct [:document_id, :layer_id, :layer_ids, :renew_type]
+  defstruct [:document_id, :layer_ids, :renew_type]
 
   def new(%{document_id: document_id, renew_type: renew_type} = attrs) do
     layer_ids = normalize_layer_ids(attrs)
 
     %__MODULE__{
       document_id: document_id,
-      layer_id: List.first(layer_ids),
       layer_ids: layer_ids,
       renew_type: renew_type
     }
@@ -72,6 +71,5 @@ defmodule RenewCollab.Commands.UpdateLayerTextType do
     |> Enum.uniq()
   end
 
-  defp normalize_layer_ids(%{layer_id: layer_id}) when is_binary(layer_id), do: [layer_id]
   defp normalize_layer_ids(_), do: []
 end

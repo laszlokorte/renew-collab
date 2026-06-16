@@ -6,14 +6,13 @@ defmodule RenewCollab.Commands.UpdateLayerTextStyle do
 
   @size_affecting_attrs [:font_family, :font_size, :bold, :italic, :blank_lines, :rich]
 
-  defstruct [:document_id, :layer_id, :layer_ids, :style_attr, :value]
+  defstruct [:document_id, :layer_ids, :style_attr, :value]
 
   def new(%{document_id: document_id, style_attr: style_attr, value: value} = attrs) do
     layer_ids = normalize_layer_ids(attrs)
 
     %__MODULE__{
       document_id: document_id,
-      layer_id: List.first(layer_ids),
       layer_ids: layer_ids,
       style_attr: attr_key(style_attr),
       value: value
@@ -155,7 +154,6 @@ defmodule RenewCollab.Commands.UpdateLayerTextStyle do
     |> Enum.uniq()
   end
 
-  defp normalize_layer_ids(%{layer_id: layer_id}) when is_binary(layer_id), do: [layer_id]
   defp normalize_layer_ids(_), do: []
 
   defp normalize_value(:alignment, "center"), do: :center

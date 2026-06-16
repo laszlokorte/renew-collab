@@ -386,14 +386,12 @@ defmodule RenewCollabCtrl.Action do
 
   def do_perform(%Actions.DocumentEditLayerBoxShape{
         document_id: document_id,
-        layer_id: layer_id,
         layer_ids: layer_ids,
         shape_id: shape_id,
         attributes: attributes
       }) do
     RenewCollab.Commands.UpdateLayerBoxShape.new(%{
       document_id: document_id,
-      layer_id: layer_id,
       layer_ids: layer_ids,
       shape_id: shape_id,
       attributes: attributes
@@ -420,13 +418,11 @@ defmodule RenewCollabCtrl.Action do
 
   def do_perform(%Actions.DocumentEditLayerEdgeAttributes{
         document_id: document_id,
-        layer_id: layer_id,
         layer_ids: layer_ids,
         attributes: attributes
       }) do
     RenewCollab.Commands.UpdateLayerEdgeAttributes.new(%{
       document_id: document_id,
-      layer_id: layer_id,
       layer_ids: layer_ids,
       attributes: attributes
     })
@@ -465,14 +461,12 @@ defmodule RenewCollabCtrl.Action do
 
   def do_perform(%Actions.DocumentEditLayerEdgeStyle{
         document_id: document_id,
-        layer_id: layer_id,
         layer_ids: layer_ids,
         style_attr: style_attr,
         value: value
       }) do
     RenewCollab.Commands.UpdateLayerEdgeStyle.new(%{
       document_id: document_id,
-      layer_id: layer_id,
       layer_ids: layer_ids,
       style_attr: style_attr,
       value: value
@@ -529,14 +523,12 @@ defmodule RenewCollabCtrl.Action do
 
   def do_perform(%Actions.DocumentEditLayerStyle{
         document_id: document_id,
-        layer_id: layer_id,
         layer_ids: layer_ids,
         style_attr: style_attr,
         value: value
       }) do
     RenewCollab.Commands.UpdateLayerStyle.new(%{
       document_id: document_id,
-      layer_id: layer_id,
       layer_ids: layer_ids,
       style_attr: style_attr,
       value: value
@@ -593,14 +585,12 @@ defmodule RenewCollabCtrl.Action do
 
   def do_perform(%Actions.DocumentEditLayerTextStyle{
         document_id: document_id,
-        layer_id: layer_id,
         layer_ids: layer_ids,
         style_attr: style_attr,
         value: value
       }) do
     RenewCollab.Commands.UpdateLayerTextStyle.new(%{
       document_id: document_id,
-      layer_id: layer_id,
       layer_ids: layer_ids,
       style_attr: style_attr,
       value: value
@@ -612,13 +602,11 @@ defmodule RenewCollabCtrl.Action do
 
   def do_perform(%Actions.DocumentEditLayerTextType{
         document_id: document_id,
-        layer_id: layer_id,
         layer_ids: layer_ids,
         renew_type: renew_type
       }) do
     RenewCollab.Commands.UpdateLayerTextType.new(%{
       document_id: document_id,
-      layer_id: layer_id,
       layer_ids: layer_ids,
       renew_type: renew_type
     })

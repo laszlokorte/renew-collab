@@ -3,7 +3,7 @@ defmodule RenewCollab.Commands.UpdateLayerBoxShape do
 
   alias RenewCollab.Element.Box
 
-  defstruct [:document_id, :layer_id, :layer_ids, :shape_id, :attributes]
+  defstruct [:document_id, :layer_ids, :shape_id, :attributes]
 
   def new(
         %{
@@ -16,7 +16,6 @@ defmodule RenewCollab.Commands.UpdateLayerBoxShape do
 
     %__MODULE__{
       document_id: document_id,
-      layer_id: List.first(layer_ids),
       layer_ids: layer_ids,
       shape_id: shape_id,
       attributes: attributes
@@ -61,6 +60,5 @@ defmodule RenewCollab.Commands.UpdateLayerBoxShape do
     |> Enum.uniq()
   end
 
-  defp normalize_layer_ids(%{layer_id: layer_id}) when is_binary(layer_id), do: [layer_id]
   defp normalize_layer_ids(_), do: []
 end

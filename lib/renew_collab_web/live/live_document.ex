@@ -994,7 +994,7 @@ defmodule RenewCollabWeb.LiveDocument do
       ) do
     %Actions.DocumentEditLayerStyle{
       document_id: socket.assigns.document.id,
-      layer_id: layer_id,
+      layer_ids: [layer_id],
       style_attr: style_attr,
       value: value
     }
@@ -1015,7 +1015,7 @@ defmodule RenewCollabWeb.LiveDocument do
       ) do
     %Actions.DocumentEditLayerEdgeStyle{
       document_id: socket.assigns.document.id,
-      layer_id: layer_id,
+      layer_ids: [layer_id],
       style_attr: style_attr,
       value: value
     }
@@ -1036,7 +1036,7 @@ defmodule RenewCollabWeb.LiveDocument do
       ) do
     %Actions.DocumentEditLayerTextStyle{
       document_id: socket.assigns.document.id,
-      layer_id: layer_id,
+      layer_ids: [layer_id],
       style_attr: style_attr,
       value: value
     }
@@ -1293,7 +1293,7 @@ defmodule RenewCollabWeb.LiveDocument do
       ) do
     %Actions.DocumentEditLayerBoxShape{
       document_id: socket.assigns.document.id,
-      layer_id: layer_id,
+      layer_ids: [layer_id],
       shape_id: shape_id,
       attributes: shape_attributes
     }

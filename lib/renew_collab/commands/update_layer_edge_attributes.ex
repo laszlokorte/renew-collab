@@ -3,7 +3,7 @@ defmodule RenewCollab.Commands.UpdateLayerEdgeAttributes do
 
   alias RenewCollab.Element.Edge
 
-  defstruct [:document_id, :layer_id, :layer_ids, :attributes]
+  defstruct [:document_id, :layer_ids, :attributes]
 
   def new(
         %{
@@ -15,7 +15,6 @@ defmodule RenewCollab.Commands.UpdateLayerEdgeAttributes do
 
     %__MODULE__{
       document_id: document_id,
-      layer_id: List.first(layer_ids),
       layer_ids: layer_ids,
       attributes: attributes
     }
@@ -60,6 +59,5 @@ defmodule RenewCollab.Commands.UpdateLayerEdgeAttributes do
     |> Enum.uniq()
   end
 
-  defp normalize_layer_ids(%{layer_id: layer_id}) when is_binary(layer_id), do: [layer_id]
   defp normalize_layer_ids(_), do: []
 end
