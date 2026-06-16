@@ -9,7 +9,8 @@ defmodule RenewCollab.Repo.Migrations.UseDoubleShapeForVirtualTransitions do
   alias RenewCollab.Symbol.Shape
 
   def up do
-    with rect_shape_id when is_binary(rect_shape_id) <- shape_id("rect-double-in") || shape_id("rect") do
+    with rect_shape_id when is_binary(rect_shape_id) <-
+           shape_id("rect-double-in") || shape_id("rect") do
       repo().update_all(
         from(b in Box,
           join: l in Layer,

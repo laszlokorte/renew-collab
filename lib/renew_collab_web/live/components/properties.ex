@@ -14,8 +14,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
           >
             unselect
           </button>
-        </small>
-         <br />
+        </small> <br />
         <small>
           <button
             style="cursor: pointer; padding: 1ex; border: none; background: #a33; color: #fff"
@@ -24,8 +23,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
           >
             delete
           </button>
-        </small>
-         <br />
+        </small> <br />
       </div>
 
       <fieldset style="margin: 1em 0; padding: 1.5ex; border: 1px solid #777">
@@ -250,7 +248,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
           </legend>
 
           <p><label><input type="checkbox" checked={@layer.edge.cyclic} /> Cyclic</label></p>
-          <button phx-click="update_edge_flip" phx-value-id={@layer.id}>Reverse Edge</button>
+           <button phx-click="update_edge_flip" phx-value-id={@layer.id}>Reverse Edge</button>
           <form
             phx-hook="RenewEdgePosition"
             id={"layer-edge-position-#{@layer.id}"}
@@ -391,8 +389,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
                   style="display: inline-block; cursor: pointer; background: #333; color: #fff"
                 >
                   {@layer.edge.source_bond.layer_id}/<br /> {@layer.edge.source_bond.socket_id}
-                </small>
-                 <br />
+                </small> <br />
                 <button
                   phx-click="detach-bond"
                   phx-value-id={@layer.edge.source_bond.id}
@@ -429,7 +426,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
                     <% else _ -> %>
                       Loading
                   <% end %>
-                  <button type="submit">Attach</button>
+                   <button type="submit">Attach</button>
                 </form>
               <% end %>
             </dd>
@@ -444,8 +441,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
                   style="display: inline-block; cursor: pointer; background: #333; color: #fff"
                 >
                   {@layer.edge.target_bond.layer_id}/<br /> {@layer.edge.target_bond.socket_id}
-                </small>
-                 <br />
+                </small> <br />
                 <button
                   phx-click="detach-bond"
                   phx-value-id={@layer.edge.target_bond.id}
@@ -482,7 +478,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
                     <% else _ -> %>
                       Loading
                   <% end %>
-                  <button type="submit">Attach</button>
+                   <button type="submit">Attach</button>
                 </form>
               <% end %>
             </dd>
@@ -533,7 +529,7 @@ defmodule RenewCollabWeb.LayerPropertiesComponent do
           <legend style="background: #333; color: #fff; display: inline-block; padding: 0.2ex 1ex;">
             Text
           </legend>
-          <textarea
+           <textarea
             rows="5"
             cols="30"
             phx-hook="RenewTextBody"

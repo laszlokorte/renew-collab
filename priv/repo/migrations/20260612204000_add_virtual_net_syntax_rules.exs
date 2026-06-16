@@ -28,7 +28,14 @@ defmodule RenewCollab.Repo.Migrations.AddVirtualNetSyntaxRules do
       add_whitelist(@virtual_place, @transition)
       add_whitelist(@virtual_place, @virtual_transition)
 
-      add_auto_target(@virtual_transition, @transition_socket, @place_shape, @place_socket, @place)
+      add_auto_target(
+        @virtual_transition,
+        @transition_socket,
+        @place_shape,
+        @place_socket,
+        @place
+      )
+
       add_auto_target(
         @virtual_place,
         @place_socket,
