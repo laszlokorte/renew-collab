@@ -48,17 +48,17 @@ defmodule RenewCollab.Commands.CreateDocument do
       :insert_parenthoods,
       LayerParenthood,
       fn %{insert_document: new_document} ->
-        Enum.map(
-          parenthoods,
-          fn {ancestor_id, descendant_id, depth} ->
-            %{
-              depth: depth,
-              ancestor_id: ancestor_id,
-              descendant_id: descendant_id,
-              document_id: new_document.id
-            }
-          end
-        )
+        content
+        |> Map.get(:layers, [])
+        |> RenewCollab.Document.TransientDocument.normalized_parenthoods(parenthoods)
+        |> Enum.map(fn {ancestor_id, descendant_id, depth} ->
+          %{
+            depth: depth,
+            ancestor_id: ancestor_id,
+            descendant_id: descendant_id,
+            document_id: new_document.id
+          }
+        end)
       end,
       on_conflict: {:replace, [:depth, :ancestor_id, :descendant_id]},
       conflict_target: [:descendant_id, :ancestor_id]

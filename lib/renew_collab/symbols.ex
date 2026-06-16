@@ -1,6 +1,19 @@
 defmodule RenewCollab.Symbols do
+  alias RenewCollab.Symbol.Shape
+
   def predefined_shapes do
     RenewexIconset.Predefined.all()
+  end
+
+  def ensure_custom_shapes_multi(multi \\ Ecto.Multi.new()) do
+    Enum.reduce(predefined_shapes(), multi, fn shape, multi ->
+      Ecto.Multi.insert_or_update(
+        multi,
+        {:insert_shape, Map.get(shape, :name)},
+        %Shape{id: Map.get(shape, :id)} |> Shape.changeset(shape),
+        on_conflict: :nothing
+      )
+    end)
   end
 
   def shape_name_by_id(id) do

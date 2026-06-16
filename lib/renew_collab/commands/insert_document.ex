@@ -100,17 +100,16 @@ defmodule RenewCollab.Commands.InsertDocument do
     |> RenewCollab.Compatibility.Multi.insert_all(
       :insert_parenthoods,
       LayerParenthood,
-      Enum.map(
-        parenthoods,
-        fn {ancestor_id, descendant_id, depth} ->
-          %{
-            depth: depth,
-            ancestor_id: ancestor_id,
-            descendant_id: descendant_id,
-            document_id: document_id
-          }
-        end
-      ),
+      layers
+      |> TransientDocument.normalized_parenthoods(parenthoods)
+      |> Enum.map(fn {ancestor_id, descendant_id, depth} ->
+        %{
+          depth: depth,
+          ancestor_id: ancestor_id,
+          descendant_id: descendant_id,
+          document_id: document_id
+        }
+      end),
       on_conflict: {:replace, [:depth, :ancestor_id, :descendant_id]},
       conflict_target: [:descendant_id, :ancestor_id]
     )

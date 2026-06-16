@@ -110,6 +110,15 @@ defmodule RenewCollabWeb.SimulationJSON do
         duplicate: %{
           href: url(~p"/api/shadow_net_system/#{simulation.shadow_net_system_id}/simulate"),
           method: "POST"
+        },
+        menu: %{
+          primitives: %{href: url(~p"/api/primitives"), method: "GET"},
+          icons: %{href: url(~p"/icons"), method: "GET"},
+          socket_schemas: %{href: url(~p"/api/socket_schemas"), method: "GET"},
+          syntax: %{href: url(~p"/api/syntax"), method: "GET"},
+          health: %{href: url(~p"/health"), method: "GET"},
+          system: %{href: url(~p"/system"), method: "GET"},
+          simulator_health: %{href: url(~p"/health/simulator"), method: "GET"}
         }
       },
       content: show_content(simulation, running, nil)

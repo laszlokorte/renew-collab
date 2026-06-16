@@ -224,6 +224,10 @@ defmodule RenewCollab.Primitives.Predefined do
               content: %{
                 semantic_tag: "CH.ifa.draw.figures.PieFigure",
                 shape_id: pie_shape_id,
+                shape_attributes: %{
+                  "start_angle" => 180,
+                  "end_angle" => 90
+                },
                 width: 32,
                 height: 32,
                 style: %{

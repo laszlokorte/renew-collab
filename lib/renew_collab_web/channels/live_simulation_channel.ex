@@ -188,16 +188,45 @@ defmodule RenewCollabWeb.LiveSimulationChannel do
         },
         socket
       ) do
-    %Actions.SimulationConsoleCommand{
-      simulation_id: simulation_id,
-      command: payload_value(payload, "command")
-    }
-    |> perform_simulation_action(
-      account,
-      socket,
-      "simulation_console_command_failed",
-      "Simulation command could not be sent"
-    )
+    result =
+      %Actions.SimulationConsoleCommand{
+        simulation_id: simulation_id,
+        command: payload_value(payload, "command")
+      }
+      |> perform_action(account)
+
+    case result do
+      {:ok, %{output: output}} ->
+        {:reply, %{output: output}, socket}
+
+      :ok ->
+        {:reply, %{output: ""}, socket}
+
+      {:ok, _} ->
+        {:reply, %{output: ""}, socket}
+
+      {:error, reason} ->
+        detail = simulation_error_detail(reason)
+
+        push_error(socket, %{
+          error: "simulation_console_command_failed",
+          message: "Simulation command could not be sent",
+          detail: detail
+        })
+
+        {:reply, %{output: "", error: detail}, socket}
+
+      reason ->
+        detail = simulation_error_detail(reason)
+
+        push_error(socket, %{
+          error: "simulation_console_command_failed",
+          message: "Simulation command could not be sent",
+          detail: detail
+        })
+
+        {:reply, %{output: "", error: detail}, socket}
+    end
   end
 
   @impl true

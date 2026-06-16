@@ -5,6 +5,7 @@ defmodule RenewCollab.Commands.InsertTransientDocument do
   alias RenewCollab.Connection.Hyperlink
   alias RenewCollab.Connection.Bond
   alias RenewCollab.Element.Edge
+  alias RenewCollab.Document.TransientDocument
   alias RenewCollab.Import.Converted
 
   defstruct [:converted_document, :target_document_id, :position, :target]
@@ -129,17 +130,16 @@ defmodule RenewCollab.Commands.InsertTransientDocument do
     |> RenewCollab.Compatibility.Multi.insert_all(
       :insert_parenthoods,
       LayerParenthood,
-      Enum.map(
-        hierarchy,
-        fn {ancestor_id, descendant_id, depth} ->
-          %{
-            depth: depth,
-            ancestor_id: ancestor_id,
-            descendant_id: descendant_id,
-            document_id: document_id
-          }
-        end
-      ),
+      layers
+      |> TransientDocument.normalized_parenthoods(hierarchy)
+      |> Enum.map(fn {ancestor_id, descendant_id, depth} ->
+        %{
+          depth: depth,
+          ancestor_id: ancestor_id,
+          descendant_id: descendant_id,
+          document_id: document_id
+        }
+      end),
       on_conflict: {:replace, [:depth, :ancestor_id, :descendant_id]},
       conflict_target: [:descendant_id, :ancestor_id]
     )

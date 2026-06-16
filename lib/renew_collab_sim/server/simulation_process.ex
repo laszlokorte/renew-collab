@@ -192,6 +192,18 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   end
 
   @impl true
+  def handle_info({:finish_console_request, request_id}, state) do
+    case Map.get(state.console_requests, request_id) do
+      %{from: from, output: output} ->
+        GenServer.reply(from, {:ok, %{output: output |> Enum.reverse() |> Enum.join("\n")}})
+        {:noreply, update_in(state.console_requests, &Map.delete(&1, request_id))}
+
+      _ ->
+        {:noreply, state}
+    end
+  end
+
+  @impl true
   def init(%{simulation_id: simulation_id, pubsub_channels: pubsub_channels}) do
     with {:ok, simulation} when not is_nil(simulation) <-
            RenewCollabSim.Queries.Simulation.new(%{simulation_id: simulation_id})
@@ -241,9 +253,16 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   end
 
   @impl true
-  def handle_call({:console_command, command}, _from, state) when is_binary(command) do
+  def handle_call({:console_command, command}, from, state) when is_binary(command) do
+    request_id = UUID.uuid4(:default)
     State.console_command(state, command)
-    {:reply, :ok, state}
+    Process.send_after(self(), {:finish_console_request, request_id}, 250)
+
+    {:noreply,
+     put_in(state.console_requests[request_id], %{
+       from: from,
+       output: []
+     })}
   end
 
   def handle_call({:console_command, _command}, _from, state) do
@@ -383,6 +402,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
         state
       end
       |> maybe_remember_simulation_error(content)
+      |> maybe_append_console_output(content)
 
     {:noreply, state}
   end
@@ -415,6 +435,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
         state
       end
       |> maybe_remember_simulation_error(content)
+      |> maybe_append_console_output(content)
 
     RenewCollabSim.Server.SimulationParser.parse(content)
     |> case do
@@ -565,6 +586,19 @@ defmodule RenewCollabSim.Server.SimulationProcess do
 
       nil ->
         {:noreply, state}
+    end
+  end
+
+  defp maybe_append_console_output(state, content) do
+    if is_binary(content) and map_size(state.console_requests) > 0 and
+         not simulation_protocol_line?(content) do
+      update_in(state.console_requests, fn requests ->
+        Map.new(requests, fn {request_id, request} ->
+          {request_id, update_in(request.output, &[content | &1])}
+        end)
+      end)
+    else
+      state
     end
   end
 

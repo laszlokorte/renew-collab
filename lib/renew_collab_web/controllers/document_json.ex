@@ -128,9 +128,17 @@ defmodule RenewCollabWeb.DocumentJSON do
           href: url(~p"/api/primitives"),
           method: "get"
         },
+        icons: %{
+          href: url(~p"/icons"),
+          method: "get"
+        },
         formalisms: %{
           method: "GET",
           href: url(~p"/api/formalisms")
+        },
+        check_inscriptions: %{
+          href: url(~p"/api/documents/#{document.id}/check"),
+          method: "get"
         },
         export: %{
           href: url(~p"/api/documents/#{document.id}/export"),
@@ -158,6 +166,19 @@ defmodule RenewCollabWeb.DocumentJSON do
         upload_svg: %{
           method: "post",
           href: url(~p"/api/projects/#{document.project_assignment.project_id}/media/svg")
+        },
+        menu: %{
+          primitives: %{href: url(~p"/api/primitives"), method: "get"},
+          icons: %{href: url(~p"/icons"), method: "get"},
+          socket_schemas: %{href: url(~p"/api/socket_schemas"), method: "get"},
+          syntax: %{href: url(~p"/api/syntax"), method: "get"},
+          health: %{href: url(~p"/health"), method: "get"},
+          system: %{href: url(~p"/system"), method: "get"},
+          simulator_health: %{href: url(~p"/health/simulator"), method: "get"},
+          check_inscriptions: %{
+            href: url(~p"/api/documents/#{document.id}/check"),
+            method: "get"
+          }
         }
       },
       content: show_content(document)

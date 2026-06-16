@@ -80,6 +80,7 @@ defmodule RenewCollabWeb.Router do
     get "/blueprints", BlueprintController, :index
 
     scope "/documents" do
+      get "/:id/check", DocumentController, :check
       get "/:id/export", DocumentController, :export
       get "/:id/download.iex", DocumentController, :inspect
       get "/:id/download.json", DocumentController, :show

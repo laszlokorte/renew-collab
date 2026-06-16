@@ -335,8 +335,8 @@ defmodule RenewCollab.Export.DocumentExport do
               y: round(-view_box.y + layer.box.position_y),
               w: round(layer.box.width),
               h: round(layer.box.height),
-              start_angle: Map.get(shape_attributes, "start_angle") || 0.0,
-              end_angle: Map.get(shape_attributes, "end_angle") || 180.0
+              start_angle: Map.get(shape_attributes, "start_angle") || 180.0,
+              end_angle: Map.get(shape_attributes, "end_angle") || 90.0
             }
           }
         ])

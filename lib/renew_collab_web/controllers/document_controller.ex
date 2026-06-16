@@ -87,7 +87,7 @@ defmodule RenewCollabWeb.DocumentController do
             >
               <%= with %{layer_id: lid} <- @document.thumbnail, true <- @layer_id == :thumbnail do %>
                 <tspan x={x + width / 2}>{@document.layers |> Enum.count()}</tspan>
-                
+
                 <tspan x={x + width / 2} dy="100">{lid}</tspan>
                 <% else _ -> %>
                   ⊗
@@ -128,6 +128,29 @@ defmodule RenewCollabWeb.DocumentController do
     end
   end
 
+  def check(conn, %{"id" => id}) do
+    case %Views.DocumentWithContent{
+           document_id: id
+         }
+         |> Fetcher.fetch_as(conn.assigns.current_account) do
+      nil ->
+        conn
+        |> put_status(:not_found)
+        |> Phoenix.Controller.json(%{message: "Not found"})
+        |> halt()
+
+      document ->
+        issues = inscription_issues(document)
+
+        conn
+        |> json(%{
+          ok: issues == [],
+          issue_count: length(issues),
+          issues: issues
+        })
+    end
+  end
+
   def export(conn, %{"id" => id} = params) do
     case %Views.DocumentWithContent{
            document_id: id
@@ -163,6 +186,77 @@ defmodule RenewCollabWeb.DocumentController do
         |> text(output)
     end
   end
+
+  defp inscription_issues(%{layers: layers}) when is_list(layers) do
+    by_id = Map.new(layers, &{&1.id, &1})
+
+    layers
+    |> Enum.filter(&inscription_layer?/1)
+    |> Enum.flat_map(&inscription_layer_issues(&1, by_id))
+  end
+
+  defp inscription_issues(_document), do: []
+
+  defp inscription_layer?(%{text: %{renew_type: renew_type}, semantic_tag: tag}) do
+    renew_type in [1, 3] or
+      (is_nil(renew_type) and is_binary(tag) and String.ends_with?(tag, ".CPNTextFigure"))
+  end
+
+  defp inscription_layer?(_layer), do: false
+
+  defp inscription_layer_issues(layer, by_id) do
+    target = inscription_target(layer, by_id)
+
+    cond do
+      is_nil(target) ->
+        [
+          %{
+            layer_id: layer.id,
+            title: "Syntax Error",
+            message: "Inscription is not connected to a net element.",
+            detail:
+              "Renew accepts inscriptions on places and arcs. Connect the inscription to a supported net element before simulating or exporting the drawing."
+          }
+        ]
+
+      qualified_inscription_target?(target) ->
+        []
+
+      true ->
+        [
+          %{
+            layer_id: layer.id,
+            target_layer_id: target.id,
+            title: "Syntax Error",
+            message: "The connected figure cannot carry inscriptions.",
+            detail:
+              "Renew accepts inscriptions on places and arcs. Remove the inscription from this figure, or attach it to a supported net element."
+          }
+        ]
+    end
+  end
+
+  defp inscription_target(%{outgoing_link: %{target_layer_id: target_layer_id}}, by_id)
+       when is_binary(target_layer_id),
+       do: Map.get(by_id, target_layer_id)
+
+  defp inscription_target(%{direct_parent_hood: %{ancestor_id: target_layer_id}}, by_id)
+       when is_binary(target_layer_id),
+       do: Map.get(by_id, target_layer_id)
+
+  defp inscription_target(_layer, _by_id), do: nil
+
+  defp qualified_inscription_target?(%{edge: %Ecto.Association.NotLoaded{}}), do: false
+
+  defp qualified_inscription_target?(%{edge: nil}), do: false
+
+  defp qualified_inscription_target?(%{edge: _edge}), do: true
+
+  defp qualified_inscription_target?(%{semantic_tag: tag}) when is_binary(tag) do
+    String.ends_with?(tag, ".PlaceFigure") or String.ends_with?(tag, ".VirtualPlaceFigure")
+  end
+
+  defp qualified_inscription_target?(_layer), do: false
 
   def inspect(conn, %{"id" => id}) do
     %Views.DocumentStripped{

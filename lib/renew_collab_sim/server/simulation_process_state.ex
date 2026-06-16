@@ -14,6 +14,7 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
     :last_error,
     :binding_requests,
     :fire_requests,
+    :console_requests,
     :breakpoints,
     :open_multi,
     :throttle,
@@ -54,6 +55,7 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
          last_error: nil,
          binding_requests: %{},
          fire_requests: %{},
+         console_requests: %{},
          breakpoints: %{},
          cmds: cmds,
          open_multi:

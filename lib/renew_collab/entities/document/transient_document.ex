@@ -70,6 +70,23 @@ defmodule RenewCollab.Document.TransientDocument do
     |> Enum.into([])
   end
 
+  def normalized_parenthoods(layers, parenthoods) do
+    entries =
+      parenthoods
+      |> List.wrap()
+      |> Enum.flat_map(&normalize_parenthood/1)
+
+    self_entries =
+      layers
+      |> List.wrap()
+      |> Enum.map(&value(&1, :id))
+      |> Enum.reject(&is_nil/1)
+      |> Enum.map(&{&1, &1, 0})
+
+    (self_entries ++ entries)
+    |> Enum.uniq()
+  end
+
   def shift_positions(%__MODULE__{content: content} = doc, dx, dy) do
     %__MODULE__{
       doc
@@ -247,6 +264,24 @@ defmodule RenewCollab.Document.TransientDocument do
       _ -> []
     end
   end
+
+  defp normalize_parenthood({ancestor_id, descendant_id, depth})
+       when not is_nil(ancestor_id) and not is_nil(descendant_id) and is_integer(depth),
+       do: [{ancestor_id, descendant_id, depth}]
+
+  defp normalize_parenthood(%{} = parenthood) do
+    case {value(parenthood, :ancestor_id), value(parenthood, :descendant_id),
+          value(parenthood, :depth)} do
+      {ancestor_id, descendant_id, depth}
+      when not is_nil(ancestor_id) and not is_nil(descendant_id) and is_integer(depth) ->
+        [{ancestor_id, descendant_id, depth}]
+
+      _ ->
+        []
+    end
+  end
+
+  defp normalize_parenthood(_), do: []
 
   defp ensure_layer_text_size_hint(layer) do
     Map.update(layer, :text, nil, fn
