@@ -13,7 +13,6 @@ defmodule RenewCollab.Queries.SymbolIdsByName do
 
   def multi(%__MODULE__{}) do
     Ecto.Multi.new()
-    |> RenewCollab.Symbols.ensure_custom_shapes_multi()
     |> Ecto.Multi.all(
       :shapes,
       from(p in Shape, select: {p.name, p.id})

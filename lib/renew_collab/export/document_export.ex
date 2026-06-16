@@ -844,7 +844,7 @@ defmodule RenewCollab.Export.DocumentExport do
 
   defp fa_state_decoration(%{symbol_shape_id: symbol_shape_id}) when is_binary(symbol_shape_id) do
     symbol_shape_id
-    |> RenewCollab.Symbols.custom_shape_name_by_id()
+    |> RenewCollab.Symbols.shape_name_by_id()
     |> fa_state_decoration_by_shape_name()
   end
 

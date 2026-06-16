@@ -13,7 +13,6 @@ defmodule RenewCollab.Queries.ListSymbols do
 
   def multi(%__MODULE__{}) do
     Ecto.Multi.new()
-    |> RenewCollab.Symbols.ensure_custom_shapes_multi()
     |> Ecto.Multi.all(
       :shape,
       from(s in Shape,
