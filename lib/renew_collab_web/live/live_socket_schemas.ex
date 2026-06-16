@@ -36,7 +36,7 @@ defmodule RenewCollabWeb.LiveSocketSchemas do
           <img class="icon" src="/images/icon-socket.svg" /> <span>Socket Schemas</span>
         </h2>
       </div>
-      
+
       <div style="padding: 1em">
         <form phx-submit="create">
           <div style="display: flex; gap: 1ex; align-items: stretch">
@@ -44,20 +44,20 @@ defmodule RenewCollabWeb.LiveSocketSchemas do
             <button style="background: #333; color: #fff; padding: 1ex; border: none">Create</button>
           </div>
         </form>
-        
+
         <table style="width: 100%;" cellpadding="5">
           <thead>
             <tr>
               <th style="border-bottom: 1px solid #333;" align="left" width="10">Preview</th>
-              
+
               <th style="border-bottom: 1px solid #333;" align="left" width="1000">Name</th>
-              
+
               <th style="border-bottom: 1px solid #333;" align="left" width="100" colspan="4">
                 Actions
               </th>
             </tr>
           </thead>
-          
+
           <tbody>
             <%= if Enum.empty?(@socket_schemas) do %>
               <tr>
@@ -113,7 +113,7 @@ defmodule RenewCollabWeb.LiveSocketSchemas do
                             />
                         <% end %>
                       </g>
-                      
+
                       <%= for s <- schema.sockets do %>
                         <g pointer-events="all" fill="transparent">
                           <circle
@@ -162,13 +162,13 @@ defmodule RenewCollabWeb.LiveSocketSchemas do
                       <% end %>
                     </svg>
                   </td>
-                  
+
                   <td>
                     <.link style="color: #078" navigate={~p"/socket_schema/#{schema.id}"}>
                       {schema.name}
                     </.link>
                   </td>
-                  
+
                   <td width="50">
                     <button
                       style="cursor: pointer; background: #a00; color: #fff; padding: 1ex; border: none"

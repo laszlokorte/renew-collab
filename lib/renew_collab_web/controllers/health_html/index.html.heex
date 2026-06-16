@@ -9,59 +9,59 @@
 
 <dl style="display: grid; grid-template-columns: auto auto; justify-content: center; gap: 1ex">
   <dt>Installed Icons</dt>
-  
+
   <dd>{@installed_symbols |> Enum.count()}</dd>
-  
+
   <dt>Installed Socket Schemas</dt>
-  
+
   <dd>{@installed_socket_schema |> Enum.count()}</dd>
-  
+
   <dt>Accounts</dt>
-  
+
   <dd>{@number_of_accounts}</dd>
-  
+
   <dt>Active Sessions</dt>
-  
+
   <dd>{@number_of_sessions}</dd>
-  
+
   <dt>Projects</dt>
-  
+
   <dd>{@number_of_projects}</dd>
-  
+
   <dt>Documents</dt>
-  
+
   <dd>{@number_of_documents}</dd>
-  
+
   <dt>Snapshots</dt>
-  
+
   <dd>{@number_of_snapshots}</dd>
-  
+
   <dt>Number of Shadow Net Systems</dt>
-  
+
   <dd>{@number_of_shadow_net_systems}</dd>
-  
+
   <dt>Simulations</dt>
-  
+
   <dd>{@number_of_simulations}</dd>
-  
+
   <dt>Cache Entries</dt>
-  
+
   <dd>{@cache_size}</dd>
-  
+
   <dt>Running Simulation Processes</dt>
-  
+
   <dd>
     <%= with {proj, total} <- @simulation_active_count do %>
       Projects:{proj}/ Total:{total}
     <% end %>
   </dd>
-  
+
   <dt>Media</dt>
-  
+
   <dd>{@number_of_media}</dd>
-  
+
   <dt>Java Simulator</dt>
-  
+
   <dd>
     <.form action={~p"/health/simulator"} method="post" for={%{}}>
       <.button style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff">
@@ -69,9 +69,9 @@
       </.button>
     </.form>
   </dd>
-  
+
   <dt>Formalisms</dt>
-  
+
   <dd>
     <ul style="list-style: none; margin: 0; padding: 0;">
       <%= for f <- @formalisms do %>
@@ -79,9 +79,9 @@
       <% end %>
     </ul>
   </dd>
-  
+
   <dt>Hierarchy</dt>
-  
+
   <dd>
     <dl style="display: grid; grid-template-columns: auto auto; justify-content: start; gap: 0.2ex 1em; ">
       <dt style="pading: 0; margin: 0">
@@ -89,19 +89,19 @@
           Missing Edges:
         </span>
       </dt>
-      
+
       <dd style="pading: 0; margin: 0 3em 0 0;">
         <span {[style: if(@hierarchy_missing_count == 0, do: "color: #0c0", else: "color: red")]}>
           {@hierarchy_missing_count}
         </span>
       </dd>
-      
+
       <dt style="pading: 0; margin: 0">
         <span {[style: if(@hierarchy_missing_count == 0, do: "color: #0c0", else: "color: red")]}>
           Invalid Edges:
         </span>
       </dt>
-      
+
       <dd style="pading: 0; margin: 0 3em 0 0 ">
         <span {[style: if(@hierarchy_missing_count == 0, do: "color: #0c0", else: "color: red")]}>
           {@hierarchy_invalid_count}

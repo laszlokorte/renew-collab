@@ -29,13 +29,13 @@ defmodule RenewCollabWeb.LiveProjectsManager do
           <img class="icon" src="/images/icon-project.svg" /> Manage Projects
         </h2>
       </div>
-      
+
       <div style="padding: 1em 1em 0; display: flex; align-items: start; gap: 1em">
         <fieldset style="margin-bottom: 1em; width: 30%">
           <legend style="background: #333;color:#fff;padding: 0.5ex; display: inline-block">
             New Project
           </legend>
-          
+
           <.form for={@create_form} phx-submit="create_project" phx-change="validate_project">
             <div style="display: flex; align-items: stretch; gap: 0.1em; flex-direction: column;">
               <input
@@ -55,33 +55,33 @@ defmodule RenewCollabWeb.LiveProjectsManager do
           </.form>
         </fieldset>
       </div>
-      
+
       <div style="padding: 1em">
         <table style="width: 100%;" cellpadding="5">
           <thead>
             <tr>
               <th style="border-bottom: 1px solid #333;" align="left" width="1000">Name</th>
-              
+
               <th style="border-bottom: 1px solid #333;" align="left" width="10">Documents</th>
-              
+
               <th style="border-bottom: 1px solid #333;" align="left" width="10">
                 Shadow Nets Systems
               </th>
-              
+
               <th style="border-bottom: 1px solid #333;" align="left" width="10">Simulations</th>
-              
+
               <th style="border-bottom: 1px solid #333;" align="left" width="10">Owners/Members</th>
-              
+
               <th style="border-bottom: 1px solid #333;" align="left" width="200">Created</th>
-              
+
               <th style="border-bottom: 1px solid #333;" align="left" width="200">Last Updated</th>
-              
+
               <th style="border-bottom: 1px solid #333;" align="left" width="100" colspan="3">
                 Actions
               </th>
             </tr>
           </thead>
-          
+
           <tbody>
             <%= if Enum.empty?(@projects) do %>
               <tr>
@@ -102,39 +102,39 @@ defmodule RenewCollabWeb.LiveProjectsManager do
                       <img class="icon" src="/images/icon-project.svg" /> {project.name}
                     </.link>
                   </td>
-                  
+
                   <td width="50">
                     <div style=" display: flex; gap: 1ex; align-items: center;">
                       <img class="icon" src="/images/icon-document.svg" /> {project.documents
                       |> Enum.count()}
                     </div>
                   </td>
-                  
+
                   <td width="50">
                     <div style=" display: flex; gap: 1ex; align-items: center;">
                       <img class="icon" src="/images/icon-network.svg" /> {project.shadow_net_systems
                       |> Enum.count()}
                     </div>
                   </td>
-                  
+
                   <td width="50">
                     <div style=" display: flex; gap: 1ex; align-items: center;">
                       <img class="icon" src="/images/icon-simulation.svg" /> {project.simulations
                       |> Enum.count()}
                     </div>
                   </td>
-                  
+
                   <td width="50">
                     <div style=" display: flex; gap: 1ex; align-items: center;">
                       <img class="icon" src="/images/icon-user.svg" /> {project.ownerships
                       |> Enum.count()} / {project.members |> Enum.count()}
                     </div>
                   </td>
-                  
+
                   <td><RenewCollabWeb.RenewComponents.timestamp value={project.inserted_at} /></td>
-                  
+
                   <td><RenewCollabWeb.RenewComponents.timestamp value={project.inserted_at} /></td>
-                  
+
                   <td width="50">
                     <a target="_blank" href={~p"/projects/#{project.id}/export"}>
                       <button style="cursor: pointer; padding: 1ex; border: none; background: #33a; color: #fff">
@@ -142,7 +142,7 @@ defmodule RenewCollabWeb.LiveProjectsManager do
                       </button>
                     </a>
                   </td>
-                  
+
                   <td width="50">
                     <button
                       type="button"
@@ -153,7 +153,7 @@ defmodule RenewCollabWeb.LiveProjectsManager do
                       Duplicate
                     </button>
                   </td>
-                  
+
                   <td width="50">
                     <button
                       type="button"

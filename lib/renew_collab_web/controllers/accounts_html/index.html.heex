@@ -11,22 +11,22 @@
   <thead>
     <tr>
       <th style="text-align: left;">Login</th>
-      
+
       <th style="text-align: left;">Password</th>
-      
+
       <th style="text-align: left;">Admin?</th>
-      
+
       <th style="text-align: left;">Actions</th>
     </tr>
   </thead>
-  
+
   <tbody>
     <%= for a <- @accounts do %>
       <tr>
         <td>{a.email}</td>
-        
+
         <td>****</td>
-        
+
         <td>
           <%= if a.is_admin do %>
             ✅
@@ -52,7 +52,7 @@
             <% end %>
           <% end %>
         </td>
-        
+
         <td>
           <%= if @conn.assigns[:current_account].id != a.id do %>
             <.link href={~p"/accounts/#{a}"} method="delete" data-confirm="Are you sure?">

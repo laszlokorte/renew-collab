@@ -29,7 +29,7 @@ defmodule RenewCollabWeb.HierarchyLayerComponent do
             symbols={@symbols}
           />
         <% end %>
-        
+
         <%= if @layer.text do %>
           <.live_component
             id={"text-#{@layer.id}"}
@@ -52,7 +52,7 @@ defmodule RenewCollabWeb.HierarchyLayerComponent do
             <% end %>
           <% end %>
         <% end %>
-        
+
         <%= if @layer.box do %>
           <.live_component
             id={"box-#{@layer.id}"}
@@ -75,7 +75,7 @@ defmodule RenewCollabWeb.HierarchyLayerComponent do
             <% end %>
           <% end %>
         <% end %>
-        
+
         <%= if @layer.edge do %>
           <.live_component
             id={"edge-#{@layer.id}"}

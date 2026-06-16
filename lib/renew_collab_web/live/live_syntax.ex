@@ -36,7 +36,7 @@ defmodule RenewCollabWeb.LiveSyntax do
           <img class="icon" src="/images/icon-syntax.svg" /> <span>Syntax Rules</span>
         </h2>
       </div>
-      
+
       <div style="padding: 1em">
         <.form for={@create_form} phx-change="validate" phx-submit="save">
           <div style="display: flex; gap: 1ex; align-items: stretch">
@@ -44,7 +44,7 @@ defmodule RenewCollabWeb.LiveSyntax do
             <button style="background: #333; color: #fff; padding: 1ex; border: none">Create</button>
           </div>
         </.form>
-        
+
         <table style="width: 100%;" cellpadding="5">
           <thead>
             <tr>
@@ -57,7 +57,7 @@ defmodule RenewCollabWeb.LiveSyntax do
               >
                 Name
               </th>
-              
+
               <th
                 style="border-bottom: 1px solid #333;"
                 align="left"
@@ -69,7 +69,7 @@ defmodule RenewCollabWeb.LiveSyntax do
               </th>
             </tr>
           </thead>
-          
+
           <tbody>
             <%= if Enum.empty?(@syntax_types) do %>
               <tr>
@@ -96,7 +96,7 @@ defmodule RenewCollabWeb.LiveSyntax do
                       </button>
                     <% end %>
                   </td>
-                  
+
                   <td width="50">
                     <button
                       style="cursor: pointer; background: #a00; color: #fff; padding: 1ex; border: none"
@@ -108,7 +108,7 @@ defmodule RenewCollabWeb.LiveSyntax do
                     </button>
                   </td>
                 </tr>
-                
+
                 <tr>
                   <td colspan="2">
                     <table>
@@ -116,27 +116,27 @@ defmodule RenewCollabWeb.LiveSyntax do
                         <tr>
                           <th colspan="4" align="left" valign="top">Edge Whitelist</th>
                         </tr>
-                        
+
                         <tr>
                           <th align="left" valign="top">Source Semantic Tag</th>
-                          
+
                           <th align="left" valign="top">Target Semantic Tag</th>
-                          
+
                           <th align="left" valign="top">Edge Semantic Tag</th>
-                          
+
                           <th align="right"></th>
                         </tr>
                       </thead>
-                      
+
                       <tbody style="font-family: monospace;">
                         <%= for ew <- syntax.edge_whitelists do %>
                           <tr>
                             <td>{ew.source_semantic_tag}</td>
-                            
+
                             <td>{ew.target_semantic_tag}</td>
-                            
+
                             <td>{ew.edge_semantic_tag}</td>
-                            
+
                             <td>
                               <button
                                 style="cursor: pointer; background: #a00; color: #fff; padding: 1ex; border: none"
@@ -150,18 +150,18 @@ defmodule RenewCollabWeb.LiveSyntax do
                           </tr>
                         <% end %>
                       </tbody>
-                      
+
                       <tfoot>
                         <tr>
                           <th align="left" valign="top">Source Semantic Tag</th>
-                          
+
                           <th align="left" valign="top">Target Semantic Tag</th>
-                          
+
                           <th align="left" valign="top">Edge Semantic Tag</th>
-                          
+
                           <th align="right"></th>
                         </tr>
-                        
+
                         <tr>
                           <td>
                             <input
@@ -172,7 +172,7 @@ defmodule RenewCollabWeb.LiveSyntax do
                               type="text"
                             />
                           </td>
-                          
+
                           <td>
                             <input
                               form={"add_whitelist-#{syntax.id}"}
@@ -182,7 +182,7 @@ defmodule RenewCollabWeb.LiveSyntax do
                               type="text"
                             />
                           </td>
-                          
+
                           <td>
                             <input
                               form={"add_whitelist-#{syntax.id}"}
@@ -192,7 +192,7 @@ defmodule RenewCollabWeb.LiveSyntax do
                               type="text"
                             />
                           </td>
-                          
+
                           <td>
                             <form id={"add_whitelist-#{syntax.id}"} phx-submit="add_whitelist">
                               <input type="hidden" name="syntax_id" value={syntax.id} />
@@ -207,36 +207,36 @@ defmodule RenewCollabWeb.LiveSyntax do
                         </tr>
                       </tfoot>
                     </table>
-                     <br />
+                    <br />
                     <table>
                       <thead>
                         <tr>
                           <th align="left" valign="top" colspan="8">Auto Nodes</th>
                         </tr>
-                        
+
                         <tr>
                           <th align="left" valign="top">Source Socket</th>
-                          
+
                           <th align="left" valign="top">Target Shape</th>
-                          
+
                           <th align="left" valign="top">Target Socket</th>
-                          
+
                           <th align="left" valign="top">Edge Source Tip</th>
-                          
+
                           <th align="left" valign="top">Edge Target Tip</th>
-                          
+
                           <th align="left" valign="top">Source Semantic Tag</th>
-                          
+
                           <th align="left" valign="top">Target Semantic Tag</th>
-                          
+
                           <th align="left" valign="top">Edge Semantic Tag</th>
-                          
+
                           <th align="left" valign="top" width="10">Target Style</th>
-                          
+
                           <th align="left" valign="top"></th>
                         </tr>
                       </thead>
-                      
+
                       <tbody style="font-family: monospace;">
                         <%= for at <- syntax.edge_auto_targets do %>
                           <tr>
@@ -252,7 +252,7 @@ defmodule RenewCollabWeb.LiveSyntax do
                                   <% end %>
                               <% end %>
                             </td>
-                            
+
                             <td>
                               <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: symbols} <- @symbols, symbol_id when not is_nil(symbol_id) <- at.target_shape_id do %>
                                 {symbols[symbol_id].name}
@@ -265,7 +265,7 @@ defmodule RenewCollabWeb.LiveSyntax do
                                   <% end %>
                               <% end %>
                             </td>
-                            
+
                             <td>
                               <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: sockets} <- @sockets do %>
                                 {sockets[at.target_socket_id].name}
@@ -278,7 +278,7 @@ defmodule RenewCollabWeb.LiveSyntax do
                                   <% end %>
                               <% end %>
                             </td>
-                            
+
                             <td>
                               <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: symbols} <- @symbols, symbol_id when not is_nil(symbol_id) <- at.edge_source_tip_id do %>
                                 {symbols[symbol_id].name}
@@ -291,7 +291,7 @@ defmodule RenewCollabWeb.LiveSyntax do
                                   <% end %>
                               <% end %>
                             </td>
-                            
+
                             <td>
                               <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: symbols} <- @symbols, symbol_id when not is_nil(symbol_id) <- at.edge_target_tip_id do %>
                                 {symbols[symbol_id].name}
@@ -304,19 +304,19 @@ defmodule RenewCollabWeb.LiveSyntax do
                                   <% end %>
                               <% end %>
                             </td>
-                            
+
                             <td>{at.source_semantic_tag}</td>
-                            
+
                             <td>{at.target_semantic_tag}</td>
-                            
+
                             <td>{at.edge_semantic_tag}</td>
-                            
+
                             <td>
                               <div style="padding: 1ex; background: #666; color: #fff; max-width: 10em; white-space: wrap;word-break: break-all;">
                                 {Jason.encode!(at.style)}
                               </div>
                             </td>
-                            
+
                             <td>
                               <button
                                 style="cursor: pointer; background: #a00; color: #fff; padding: 1ex; border: none"
@@ -330,30 +330,30 @@ defmodule RenewCollabWeb.LiveSyntax do
                           </tr>
                         <% end %>
                       </tbody>
-                      
+
                       <tfoot>
                         <tr>
                           <th align="left" valign="top">Source Socket</th>
-                          
+
                           <th align="left" valign="top">Target Shape</th>
-                          
+
                           <th align="left" valign="top">Target Socket</th>
-                          
+
                           <th align="left" valign="top">Edge Source Tip</th>
-                          
+
                           <th align="left" valign="top">Edge Target Tip</th>
-                          
+
                           <th align="left" valign="top">Source Semantic Tag</th>
-                          
+
                           <th align="left" valign="top">Target Semantic Tag</th>
-                          
+
                           <th align="left" valign="top">Edge Semantic Tag</th>
-                          
+
                           <th align="left" valign="top" width="10">Target Style</th>
-                          
+
                           <th align="left" valign="top"></th>
                         </tr>
-                        
+
                         <tr>
                           <td align="left" valign="top">
                             <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: sockets} <- @sockets do %>
@@ -363,7 +363,7 @@ defmodule RenewCollabWeb.LiveSyntax do
                                 style="padding: 1ex; max-width: 10em"
                               >
                                 <option value="">-</option>
-                                
+
                                 <%= for {id, s} <- sockets do %>
                                   <option value={id}>{s.name}</option>
                                 <% end %>
@@ -372,7 +372,7 @@ defmodule RenewCollabWeb.LiveSyntax do
                                 loading
                             <% end %>
                           </td>
-                          
+
                           <td align="left" valign="top">
                             <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: symbols} <- @symbols do %>
                               <select
@@ -381,7 +381,7 @@ defmodule RenewCollabWeb.LiveSyntax do
                                 style="max-width: 10em; padding: 1ex"
                               >
                                 <option value="">-</option>
-                                
+
                                 <%= for {id, s} <- symbols do %>
                                   <option value={id}>{s.name}</option>
                                 <% end %>
@@ -390,7 +390,7 @@ defmodule RenewCollabWeb.LiveSyntax do
                                 loading
                             <% end %>
                           </td>
-                          
+
                           <td align="left" valign="top">
                             <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: sockets} <- @sockets do %>
                               <select
@@ -399,7 +399,7 @@ defmodule RenewCollabWeb.LiveSyntax do
                                 style="max-width: 10em; padding: 1ex"
                               >
                                 <option value="">-</option>
-                                
+
                                 <%= for {id, s} <- sockets do %>
                                   <option value={id}>{s.name}</option>
                                 <% end %>
@@ -408,7 +408,7 @@ defmodule RenewCollabWeb.LiveSyntax do
                                 loading
                             <% end %>
                           </td>
-                          
+
                           <td align="left" valign="top">
                             <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: symbols} <- @symbols do %>
                               <select
@@ -417,7 +417,7 @@ defmodule RenewCollabWeb.LiveSyntax do
                                 style="max-width: 10em; padding: 1ex"
                               >
                                 <option value="">-</option>
-                                
+
                                 <%= for {id, s} <- symbols do %>
                                   <option value={id}>{s.name}</option>
                                 <% end %>
@@ -426,7 +426,7 @@ defmodule RenewCollabWeb.LiveSyntax do
                                 loading
                             <% end %>
                           </td>
-                          
+
                           <td align="left" valign="top">
                             <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: symbols} <- @symbols do %>
                               <select
@@ -435,7 +435,7 @@ defmodule RenewCollabWeb.LiveSyntax do
                                 style="max-width: 10em; padding: 1ex"
                               >
                                 <option value="">-</option>
-                                
+
                                 <%= for {id, s} <- symbols do %>
                                   <option value={id}>{s.name}</option>
                                 <% end %>
@@ -444,7 +444,7 @@ defmodule RenewCollabWeb.LiveSyntax do
                                 loading
                             <% end %>
                           </td>
-                          
+
                           <td align="left" valign="top">
                             <input
                               form={"add_auto-#{syntax.id}"}
@@ -453,7 +453,7 @@ defmodule RenewCollabWeb.LiveSyntax do
                               list="semantic_tags"
                             />
                           </td>
-                          
+
                           <td align="left" valign="top">
                             <input
                               form={"add_auto-#{syntax.id}"}
@@ -462,7 +462,7 @@ defmodule RenewCollabWeb.LiveSyntax do
                               list="semantic_tags"
                             />
                           </td>
-                          
+
                           <td align="left" valign="top">
                             <input
                               form={"add_auto-#{syntax.id}"}
@@ -471,11 +471,11 @@ defmodule RenewCollabWeb.LiveSyntax do
                               list="semantic_tags"
                             />
                           </td>
-                          
+
                           <td align="left" valign="top">
                             <textarea form={"add_auto-#{syntax.id}"} name="style" rows="6" cols="20" />
                           </td>
-                          
+
                           <td align="left" valign="top">
                             <form id={"add_auto-#{syntax.id}"} phx-submit="add_autonode">
                               <input type="hidden" name="syntax_id" value={syntax.id} />
@@ -491,14 +491,14 @@ defmodule RenewCollabWeb.LiveSyntax do
                       </tfoot>
                     </table>
                   </td>
-                  
+
                   <td colspan="4"></td>
                 </tr>
               <% end %>
             <% end %>
           </tbody>
         </table>
-        
+
         <datalist id="semantic_tags">
           <%= for t <- semantic_tags() do %>
             <option>{t}</option>

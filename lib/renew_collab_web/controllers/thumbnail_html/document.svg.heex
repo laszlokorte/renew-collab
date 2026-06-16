@@ -8,7 +8,7 @@
     <%= for layer <- layers, (not is_nil(@document.thumbnail) and @document.thumbnail.layer_id == layer.id) || @layer_id == layer.id do %>
       <.layer layer={layer} document={@document} />
     <% end %>
-    
+
     <%= if Enum.empty?(layers) do %>
       <rect
         x={@viewbox.x}

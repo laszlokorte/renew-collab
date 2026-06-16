@@ -36,7 +36,7 @@ defmodule RenewCollabWeb.LiveIcon do
           <img class="icon" src="/images/icon-symbol.svg" /> <span>Icon: {@icon.name}</span>
         </h2>
       </div>
-      
+
       <div style="padding: 1em">
         <div style="display: grid; grid-template-rows: 20em 1fr;">
           <svg
@@ -57,206 +57,206 @@ defmodule RenewCollabWeb.LiveIcon do
           </svg>
           <div>
             <h2>Paths</h2>
-            
+
             <%= for path <- @icon.paths do %>
               <div>
                 <h3>Path #{path.sort}</h3>
-                
+
                 <dl style="display: grid; grid-template-columns: auto auto; justify-content: start;">
                   <dt>fill_color</dt>
-                  
+
                   <dd>
                     <span style={"vertical-align: middle; border: 1px solid black; background: #{path.fill_color}; display: inline-block; width: 1em; height: 1em"}>
                     </span>{path.fill_color}
                   </dd>
-                  
+
                   <dt>stroke_color</dt>
-                  
+
                   <dd>
                     <span style={"vertical-align: middle; border: 1px solid black; background: #{path.stroke_color}; display: inline-block; width: 1em; height: 1em"}>
                     </span>{path.stroke_color}
                   </dd>
                 </dl>
-                
+
                 <%= for segment <- path.segments do %>
                   <div>
                     <table border="1" cellpadding="5" cellspacing="0">
                       <thead>
                         <tr>
                           <th>Segment</th>
-                          
+
                           <td colspan="31">
                             {if(segment.relative, do: "relative", else: "absolute")}
                           </td>
                         </tr>
-                        
+
                         <tr>
                           <th rowspan="5" valign="bottom" align="left">Steps</th>
-                          
+
                           <th colspan="6" rowspan="1" valign="bottom">Horizontal</th>
-                          
+
                           <th colspan="6" rowspan="1" valign="bottom">Vertical</th>
-                          
+
                           <th colspan="15" rowspan="1" valign="bottom">Arc</th>
                         </tr>
-                        
+
                         <tr>
                           <th colspan="2" rowspan="2" valign="bottom">Relative</th>
-                          
+
                           <th colspan="4" rowspan="2" valign="bottom">Offset</th>
-                          
+
                           <th colspan="2" rowspan="2" valign="bottom">Relative</th>
-                          
+
                           <th colspan="4" rowspan="2" valign="bottom">Offset</th>
-                          
+
                           <th colspan="6" valign="bottom">X</th>
-                          
+
                           <th colspan="6" valign="bottom">Y</th>
-                          
+
                           <th rowspan="4" valign="bottom">angle</th>
-                          
+
                           <th rowspan="4" valign="bottom">sweep</th>
-                          
+
                           <th rowspan="4" valign="bottom">large</th>
                         </tr>
-                        
+
                         <tr>
                           <th colspan="2" valign="bottom">Relative</th>
-                          
+
                           <th colspan="4" valign="bottom">Offset</th>
-                          
+
                           <th colspan="2" valign="bottom">Relative</th>
-                          
+
                           <th colspan="4" valign="bottom">Offset</th>
                         </tr>
-                        
+
                         <tr>
                           <th rowspan="2" valign="bottom">Value</th>
-                          
+
                           <th rowspan="2" valign="bottom">Unit</th>
-                          
+
                           <th rowspan="2" valign="bottom">Operation</th>
-                          
+
                           <th rowspan="2" valign="bottom">Static</th>
-                          
+
                           <th colspan="2" valign="bottom">Dynamic</th>
-                          
+
                           <th rowspan="2" valign="bottom">Value</th>
-                          
+
                           <th rowspan="2" valign="bottom">Unit</th>
-                          
+
                           <th rowspan="2" valign="bottom">Operation</th>
-                          
+
                           <th rowspan="2" valign="bottom">Static</th>
-                          
+
                           <th colspan="2" valign="bottom">Dynamic</th>
-                          
+
                           <th rowspan="2" valign="bottom">Value</th>
-                          
+
                           <th rowspan="2" valign="bottom">Unit</th>
-                          
+
                           <th rowspan="2" valign="bottom">Operation</th>
-                          
+
                           <th rowspan="2" valign="bottom">Static</th>
-                          
+
                           <th colspan="2" valign="bottom">Dynamic</th>
-                          
+
                           <th rowspan="2" valign="bottom">Value</th>
-                          
+
                           <th rowspan="2" valign="bottom">Unit</th>
-                          
+
                           <th rowspan="2" valign="bottom">Operation</th>
-                          
+
                           <th rowspan="2" valign="bottom">Static</th>
-                          
+
                           <th colspan="2" valign="bottom">Dynamic</th>
                         </tr>
-                        
+
                         <tr>
                           <th>Value</th>
-                          
+
                           <th>Unit</th>
-                          
+
                           <th>Value</th>
-                          
+
                           <th>Unit</th>
-                          
+
                           <th>Value</th>
-                          
+
                           <th>Unit</th>
-                          
+
                           <th>Value</th>
-                          
+
                           <th>Unit</th>
                         </tr>
                       </thead>
-                      
+
                       <tbody>
                         <%= for step <- segment.steps do %>
                           <tr>
                             <td>{if(step.relative, do: "relative", else: "absolute")}</td>
-                            
+
                             <%= if step.horizontal do %>
                               <td>{step.horizontal.x_value}</td>
-                              
+
                               <td>{step.horizontal.x_unit}</td>
-                              
+
                               <td>{step.horizontal.x_offset_operation}</td>
-                              
+
                               <td>{step.horizontal.x_offset_value_static}</td>
-                              
+
                               <td>{step.horizontal.x_offset_dynamic_value}</td>
-                              
+
                               <td>{step.horizontal.x_offset_dynamic_unit}</td>
                             <% else %>
                               <td colspan="6" align="center">-</td>
                             <% end %>
-                            
+
                             <%= if step.vertical do %>
                               <td>{step.vertical.y_value}</td>
-                              
+
                               <td>{step.vertical.y_unit}</td>
-                              
+
                               <td>{step.vertical.y_offset_operation}</td>
-                              
+
                               <td>{step.vertical.y_offset_value_static}</td>
-                              
+
                               <td>{step.vertical.y_offset_dynamic_value}</td>
-                              
+
                               <td>{step.vertical.y_offset_dynamic_unit}</td>
                             <% else %>
                               <td colspan="6" align="center">-</td>
                             <% end %>
-                            
+
                             <%= if step.arc do %>
                               <td>{step.arc.rx_value}</td>
-                              
+
                               <td>{step.arc.rx_unit}</td>
-                              
+
                               <td>{step.arc.rx_offset_operation}</td>
-                              
+
                               <td>{step.arc.rx_offset_value_static}</td>
-                              
+
                               <td>{step.arc.rx_offset_dynamic_value}</td>
-                              
+
                               <td>{step.arc.rx_offset_dynamic_unit}</td>
-                              
+
                               <td>{step.arc.ry_value}</td>
-                              
+
                               <td>{step.arc.ry_unit}</td>
-                              
+
                               <td>{step.arc.ry_offset_operation}</td>
-                              
+
                               <td>{step.arc.ry_offset_value_static}</td>
-                              
+
                               <td>{step.arc.ry_offset_dynamic_value}</td>
-                              
+
                               <td>{step.arc.ry_offset_dynamic_unit}</td>
-                              
+
                               <td>{step.arc.angle}</td>
-                              
+
                               <td>{step.arc.sweep}</td>
-                              
+
                               <td>{step.arc.large}</td>
                             <% else %>
                               <td colspan="15" align="center">-</td>

@@ -18,7 +18,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
           👁
         <% end %>
       </td>
-      
+
       <td
         valign="top"
         width="20"
@@ -35,7 +35,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
       >
         <img class="icon" src={"/documents/#{@document.id}/thumbnail/#{@layer.id}"} />
       </td>
-      
+
       <td valign="top" width="20">
         <%= if @layer.outgoing_link do %>
           <span
@@ -47,7 +47,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
           </span>
         <% end %>
       </td>
-      
+
       <td
         valign="top"
         width="20"
@@ -59,7 +59,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
           ☐
         <% end %>
       </td>
-      
+
       <td
         valign="top"
         width="20"
@@ -71,7 +71,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
           T
         <% end %>
       </td>
-      
+
       <td
         valign="top"
         width="20"
@@ -96,11 +96,11 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
           <% end %>
         <% end %>
       </td>
-      
+
       <td valign="top" width="20" align="center" style="white-space: nowrap; word-wrap: none">
         {@layer.z_index}
       </td>
-      
+
       <td valign="top" style={"padding-left: #{0.2+ 2*@depth}em"}>
         <div
           draggable="true"
@@ -118,7 +118,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
             style="grid-row: 1 / span 1; grid-column: 1/span 1; min-height: 1em"
           >
           </div>
-          
+
           <div
             phx-hook="RenewDropper"
             id={"dropper-#{@layer.id}-above-outside"}
@@ -128,7 +128,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
             style="grid-row: 2 / span 1; grid-column: 1/span 1; min-height: 1em"
           >
           </div>
-          
+
           <div
             phx-hook="RenewDropper"
             id={"dropper-#{@layer.id}-below-inside"}
@@ -138,7 +138,7 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
             style="grid-row: 1 / span 1; grid-column: 2/span 1; min-width: 1em"
           >
           </div>
-          
+
           <div
             phx-hook="RenewDropper"
             id={"dropper-#{@layer.id}-above-inside"}
@@ -148,13 +148,13 @@ defmodule RenewCollabWeb.HierarchyRowComponent do
             style="grid-row: 2 / span 1; grid-column: 2/span 1; min-width: 1em"
           >
           </div>
-          
+
           <div style="pointer-events: none; grid-row: 1 / span 2; grid-column: 1/span 1; grid-column: 1/span 2; text-align: center; align-self: center;">
             ☰
           </div>
         </div>
       </td>
-      
+
       <td
         valign="top"
         {[style: "cursor: pointer;padding-left: #{0.2+ 2*@depth}em", "phx-click": "select_layer"]}

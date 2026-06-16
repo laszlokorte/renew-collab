@@ -106,7 +106,8 @@ defmodule RenewCollabWeb.LiveDocuments do
                       aria-label="cancel"
                     >
                       &times;
-                    </button> {entry.client_name}
+                    </button>
+                    {entry.client_name}
                   </dt>
 
                   <dd>

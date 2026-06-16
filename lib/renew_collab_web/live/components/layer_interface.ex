@@ -40,7 +40,7 @@ defmodule RenewCollabWeb.HierarchyLayerInterfaceComponent do
               <% _ -> %>
             <% end %>
           <% end %>
-          
+
           <%= for s <- @socket_schema.sockets do %>
             <g
               phx-hook="RnwSocket"

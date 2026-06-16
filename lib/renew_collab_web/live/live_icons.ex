@@ -34,21 +34,21 @@ defmodule RenewCollabWeb.LiveIcons do
           <img class="icon" src="/images/icon-symbol.svg" /> <span>Icons</span>
         </h2>
       </div>
-      
+
       <div style="padding: 1em">
         <table style="width: 100%;" cellpadding="5">
           <thead>
             <tr>
               <th style="border-bottom: 1px solid #333;" align="left" width="10">Preview</th>
-              
+
               <th style="border-bottom: 1px solid #333;" align="left" width="1000">Name</th>
-              
+
               <th style="border-bottom: 1px solid #333;" align="left" width="100" colspan="4">
                 Actions
               </th>
             </tr>
           </thead>
-          
+
           <tbody>
             <%= if Enum.empty?(@icons) do %>
               <tr>
@@ -76,11 +76,11 @@ defmodule RenewCollabWeb.LiveIcons do
                       </g>
                     </svg>
                   </td>
-                  
+
                   <td>
                     <.link style="color: #078" navigate={~p"/icon/#{icon.id}"}>{icon.name}</.link>
                   </td>
-                  
+
                   <td width="50"></td>
                 </tr>
               <% end %>

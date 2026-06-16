@@ -18,7 +18,7 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
           fill={if(@layer.edge.cyclic, do: style_or_default(@layer, :background_color), else: "none")}
         >
         </path>
-        
+
         <%= if style_or_default(@layer.edge, :source_tip_symbol_shape_id) do %>
           <g
             fill={style_or_default(@layer, :tip_color)}
@@ -60,7 +60,7 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
             <% end %>
           </g>
         <% end %>
-        
+
         <%= if style_or_default(@layer.edge, :target_tip_symbol_shape_id) do %>
           <g
             fill={style_or_default(@layer, :tip_color)}
@@ -103,7 +103,7 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
           </g>
         <% end %>
       </g>
-      
+
       <path
         stroke="transparent"
         stroke-linejoin="round"
@@ -114,7 +114,7 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
         id={"edge-hitarea-#{@layer.edge.id}"}
       >
       </path>
-      
+
       <%= if @selected do %>
         <path
           stroke="#000"
@@ -128,7 +128,7 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
           id={"edge-support-#{@layer.edge.id}"}
         >
         </path>
-        
+
         <path
           stroke="#33aaff"
           stroke-linejoin="round"
@@ -140,7 +140,7 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
           id={"edge-select-#{@layer.edge.id}"}
         >
         </path>
-        
+
         <%= for w <- @layer.edge.waypoints do %>
           <circle
             stroke="transparent"
@@ -157,7 +157,7 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
           >
           </circle>
         <% end %>
-        
+
         <%= for [w1,w2] <- [%{id: nil, position_x: @layer.edge.source_x, position_y: @layer.edge.source_y}] |> Enum.concat(@layer.edge.waypoints) |> Enum.chunk_every(2, 1, [%{position_x: @layer.edge.target_x, position_y: @layer.edge.target_y}]) do %>
           <circle
             stroke="transparent"
@@ -174,7 +174,7 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
           >
           </circle>
         <% end %>
-        
+
         <%= if @layer.edge.target_bond do %>
           <circle
             cursor="pointer"
@@ -204,7 +204,7 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
             fill="blue"
           >
           </circle>
-          
+
           <circle
             cursor="alias"
             rnw-layer-id={"#{@layer.id}"}
@@ -219,7 +219,7 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
           >
           </circle>
         <% end %>
-        
+
         <%= if @layer.edge.source_bond do %>
           <circle
             cursor="pointer"
@@ -249,7 +249,7 @@ defmodule RenewCollabWeb.HierarchyLayerEdgeComponent do
             fill="blue"
           >
           </circle>
-          
+
           <circle
             cursor="alias"
             rnw-layer-id={"#{@layer.id}"}

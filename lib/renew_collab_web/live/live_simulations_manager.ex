@@ -27,23 +27,23 @@ defmodule RenewCollabWeb.LiveSimulationsManager do
           <img class="icon" src="/images/icon-simulation.svg" /> Manage Simulations
         </h2>
       </div>
-      
+
       <div style="padding: 1em">
         <table style="width: 100%;" cellpadding="5">
           <thead>
             <tr>
               <th style="border-bottom: 1px solid #333;" align="left" width="1000">Name</th>
-              
+
               <th style="border-bottom: 1px solid #333;" align="left" width="200">Created</th>
-              
+
               <th style="border-bottom: 1px solid #333;" align="left" width="200">Last Updated</th>
-              
+
               <th style="border-bottom: 1px solid #333;" align="left" width="100" colspan="3">
                 Actions
               </th>
             </tr>
           </thead>
-          
+
           <tbody>
             <%= if Enum.empty?(@simulations) do %>
               <tr>
@@ -65,11 +65,11 @@ defmodule RenewCollabWeb.LiveSimulationsManager do
                         simulation.id}
                     </.link>
                   </td>
-                  
+
                   <td><RenewCollabWeb.RenewComponents.timestamp value={simulation.inserted_at} /></td>
-                  
+
                   <td><RenewCollabWeb.RenewComponents.timestamp value={simulation.inserted_at} /></td>
-                  
+
                   <td width="50">
                     <button
                       type="button"

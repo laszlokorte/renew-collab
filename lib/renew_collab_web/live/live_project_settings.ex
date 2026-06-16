@@ -49,11 +49,11 @@ defmodule RenewCollabWeb.LiveProjectSettings do
           <span>Settings (Name: {@project.name}) <br /><small>{@project.id}</small></span>
         </h2>
       </div>
-      
+
       <div style="padding: 0 1em">
         <%= if WriteAccess.can(@current_account, %ProjectRename{project_id: @project.id}) do %>
           <h3>Project Name</h3>
-          
+
           <form method="post" phx-submit="rename" accept-charset="utf-8">
             <input type="text" name="name" value={@project.name} />
             <button
@@ -64,9 +64,9 @@ defmodule RenewCollabWeb.LiveProjectSettings do
             </button>
           </form>
         <% end %>
-        
+
         <h3>Project Members</h3>
-        
+
         <%= if  not Enum.empty?(@project.members) do %>
           <ul style="list-style: none; padding: 0; margin: 0">
             <%= for m <- @members do %>
@@ -81,15 +81,17 @@ defmodule RenewCollabWeb.LiveProjectSettings do
                     Remove
                   </button>
                 <% end %>
-                
+
                 <%= with acc = %{} <- m.account do %>
                   <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
                     [{m.role}]
-                  </span> {acc.email}
+                  </span>
+                  {acc.email}
                   <% else nil -> %>
                     <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
                       [{m.role}]
-                    </span> <em>Account deleted</em>
+                    </span>
+                    <em>Account deleted</em>
                     (ID: <code>{m.account_id}</code>)
                 <% end %>
               </li>
@@ -98,9 +100,9 @@ defmodule RenewCollabWeb.LiveProjectSettings do
         <% else %>
           <p>None</p>
         <% end %>
-        
+
         <h3>Open invitations</h3>
-        
+
         <%= if  not Enum.empty?(@invitations) do %>
           <ul style="list-style: none; padding: 0; margin: 0">
             <%= for i <- @invitations do %>
@@ -115,20 +117,21 @@ defmodule RenewCollabWeb.LiveProjectSettings do
                     Revoke
                   </button>
                 <% end %>
-                
+
                 <span style="background: #333; color: #fff; font-family: monospace; display: inline-block; padding: 0.5ex;border-radius: 3px">
                   [{i.role}]
-                </span> {i.email}
+                </span>
+                {i.email}
               </li>
             <% end %>
           </ul>
         <% else %>
           None
         <% end %>
-        
+
         <%= if WriteAccess.can(@current_account, %Actions.ProjectInviteMember{project_id: @project.id}) do %>
           <h3>Invite Member</h3>
-          
+
           <form method="post" phx-submit="invite_member" accept-charset="utf-8">
             <label>E-Mail: <input type="email" name="account_email" /></label>
             <select name="role">
@@ -144,10 +147,10 @@ defmodule RenewCollabWeb.LiveProjectSettings do
             </button>
           </form>
         <% end %>
-        
+
         <%= if WriteAccess.can(@current_account, %ProjectMemberWithdraw{project_id: @project.id, account_id: @current_account.id}) do %>
           <h3>Leave Project</h3>
-          
+
           <form method="post" phx-submit="withdraw" accept-charset="utf-8">
             <button
               type="submit"
@@ -157,10 +160,10 @@ defmodule RenewCollabWeb.LiveProjectSettings do
             </button>
           </form>
         <% end %>
-        
+
         <%= if WriteAccess.can(@current_account, %ProjectDelete{project_id: @project.id}) do %>
           <h3>Delete Project</h3>
-          
+
           <form method="post" phx-submit="delete" accept-charset="utf-8">
             <button
               type="submit"

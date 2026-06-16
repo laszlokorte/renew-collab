@@ -10,9 +10,9 @@
 <div style="display: grid; grid-template-columns: auto; justify-content: center; gap: 1ex">
   <fieldset>
     <legend>Reset</legend>
-    
+
     <p>Clear all Documents and reset database content.</p>
-    
+
     <form action={~p"/system/reset"} method="post">
       <input type="hidden" name="_csrf_token" value={Phoenix.Controller.get_csrf_token()} />
       <button

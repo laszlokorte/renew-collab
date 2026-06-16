@@ -9,7 +9,7 @@
 
 <div style="text-align: center; margin-top: 1em;">
   <h2>Change Password</h2>
-  
+
   <div style="display: grid; justify-content: center;" class="rnw-form">
     <.change_password_form changeset={@changeset} action={~p"/account/me/password"} />
   </div>
@@ -17,11 +17,11 @@
 
 <div style="margin: 1em; text-align: center; margin-top: 1em; border: 3px solid #a00; padding: 1em; background: #fee">
   <h2 style="margin: 0">Delete My Account</h2>
-  
+
   <p>
     Deleting your account will delete all projects you are the owner of, including all their containing documents and simulations.
   </p>
-  
+
   <.link
     href={~p"/account/me"}
     method="delete"
