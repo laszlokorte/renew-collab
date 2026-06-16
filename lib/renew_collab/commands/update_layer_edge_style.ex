@@ -28,29 +28,64 @@ defmodule RenewCollab.Commands.UpdateLayerEdgeStyle do
         style_attr: style_attr,
         value: value
       }) do
+    value = normalize_value(style_attr, value)
+    now = DateTime.utc_now() |> DateTime.truncate(:second)
+
     Ecto.Multi.new()
     |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.update_all(
+      :update_styles,
+      from(s in EdgeStyle,
+        join: e in assoc(s, :edge),
+        join: l in assoc(e, :layer),
+        where: l.document_id == ^document_id and l.id in ^layer_ids,
+        update: [set: [{^style_attr, ^value}, {:updated_at, ^now}]]
+      ),
+      []
+    )
     |> Ecto.Multi.all(
-      :edges,
+      :missing_edge_style_ids,
       from(l in Layer,
         join: e in assoc(l, :edge),
-        where: l.document_id == ^document_id and l.id in ^layer_ids,
-        select: {l.id, e}
+        left_join: s in assoc(e, :style),
+        where: l.document_id == ^document_id and l.id in ^layer_ids and is_nil(s.id),
+        select: e.id
       )
     )
-    |> Ecto.Multi.merge(fn %{edges: edges} ->
-      Enum.reduce(edges, Ecto.Multi.new(), fn {layer_id, edge}, multi ->
-        RenewCollab.Compatibility.Multi.insert(
-          multi,
-          {:style, layer_id},
-          Ecto.build_assoc(edge, :style)
-          |> EdgeStyle.changeset(%{style_attr => value}),
-          on_conflict: {:replace, [style_attr]},
-          conflict_target: [:edge_id]
-        )
-      end)
-    end)
+    |> RenewCollab.Compatibility.Multi.insert_all(
+      :insert_styles,
+      EdgeStyle,
+      fn %{missing_edge_style_ids: missing_edge_style_ids} ->
+        Enum.map(missing_edge_style_ids, fn edge_id ->
+          edge_style_row(edge_id, style_attr, value, now)
+        end)
+      end,
+      on_conflict: {:replace, [style_attr, :updated_at]},
+      conflict_target: [:edge_id]
+    )
   end
+
+  defp edge_style_row(edge_id, style_attr, value, now) do
+    %{
+      id: Ecto.UUID.generate(),
+      stroke_width: 1.0,
+      stroke_color: "black",
+      stroke_opacity: 1.0,
+      smoothness: :linear,
+      smoothness_amount: 50.0,
+      source_tip_size: 1.0,
+      target_tip_size: 1.0,
+      edge_id: edge_id,
+      inserted_at: now,
+      updated_at: now
+    }
+    |> Map.put(style_attr, value)
+  end
+
+  defp normalize_value(:smoothness, "autobezier"), do: :autobezier
+  defp normalize_value(:smoothness, "linear"), do: :linear
+  defp normalize_value(:smoothness, value), do: value
+  defp normalize_value(_style_attr, value), do: value
 
   defp normalize_layer_ids(%{layer_ids: layer_ids}) when is_list(layer_ids) do
     layer_ids

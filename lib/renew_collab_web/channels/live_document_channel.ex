@@ -579,18 +579,22 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
   @impl true
   def handle_event(
         "change_text_type",
-        %{"layer_id" => layer_id, "renew_type" => renew_type},
+        %{"renew_type" => renew_type} = params,
         %{},
         %{document_id: document_id, account: account},
         _socket
       )
-      when is_binary(layer_id) and is_integer(renew_type) do
-    %Actions.DocumentEditLayerTextType{
-      document_id: document_id,
-      layer_id: layer_id,
-      renew_type: renew_type
-    }
-    |> Dispatcher.perform_as(account)
+      when is_integer(renew_type) do
+    layer_ids = style_layer_ids(params)
+
+    if layer_ids != [] do
+      %Actions.DocumentEditLayerTextType{
+        document_id: document_id,
+        layer_ids: layer_ids,
+        renew_type: renew_type
+      }
+      |> Dispatcher.perform_as(account)
+    end
 
     :silent
   end
@@ -683,18 +687,22 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
   @impl true
   def handle_event(
         "change_edge_attributes",
-        %{"layer_id" => layer_id, "attrs" => attributes},
+        %{"attrs" => attributes} = params,
         %{},
         %{:document_id => document_id, :account => account},
         _socket
       )
-      when is_map(attributes) and is_binary(layer_id) do
-    %Actions.DocumentEditLayerEdgeAttributes{
-      document_id: document_id,
-      layer_id: layer_id,
-      attributes: attributes
-    }
-    |> Dispatcher.perform_as(account)
+      when is_map(attributes) do
+    layer_ids = style_layer_ids(params)
+
+    if layer_ids != [] do
+      %Actions.DocumentEditLayerEdgeAttributes{
+        document_id: document_id,
+        layer_ids: layer_ids,
+        attributes: attributes
+      }
+      |> Dispatcher.perform_as(account)
+    end
 
     :silent
   end
@@ -739,19 +747,23 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
   @impl true
   def handle_event(
         "change_layer_shape",
-        %{"layer_id" => layer_id, "shape_id" => shape_id} = params,
+        %{"shape_id" => shape_id} = params,
         %{},
         %{:document_id => document_id, :account => account},
         _socket
       )
-      when is_binary(shape_id) and is_binary(layer_id) do
-    %Actions.DocumentEditLayerBoxShape{
-      document_id: document_id,
-      layer_id: layer_id,
-      shape_id: shape_id,
-      attributes: Map.get(params, "attributes", %{})
-    }
-    |> Dispatcher.perform_as(account)
+      when is_binary(shape_id) do
+    layer_ids = style_layer_ids(params)
+
+    if layer_ids != [] do
+      %Actions.DocumentEditLayerBoxShape{
+        document_id: document_id,
+        layer_ids: layer_ids,
+        shape_id: shape_id,
+        attributes: Map.get(params, "attributes", %{})
+      }
+      |> Dispatcher.perform_as(account)
+    end
 
     :silent
   end

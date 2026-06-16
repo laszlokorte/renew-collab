@@ -4,6 +4,8 @@ defmodule RenewCollab.Commands.UpdateLayerTextStyle do
   alias RenewCollab.Style.TextStyle
   alias RenewCollab.Style.TextSizeHint
 
+  @size_affecting_attrs [:font_family, :font_size, :bold, :italic, :blank_lines, :rich]
+
   defstruct [:document_id, :layer_id, :layer_ids, :style_attr, :value]
 
   def new(%{document_id: document_id, style_attr: style_attr, value: value} = attrs) do
@@ -29,28 +31,68 @@ defmodule RenewCollab.Commands.UpdateLayerTextStyle do
         style_attr: style_attr,
         value: value
       }) do
+    value = normalize_value(style_attr, value)
+    now = DateTime.utc_now() |> DateTime.truncate(:second)
+
     Ecto.Multi.new()
     |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.update_all(
+      :update_styles,
+      from(s in TextStyle,
+        join: t in assoc(s, :text),
+        join: l in assoc(t, :layer),
+        where: l.document_id == ^document_id and l.id in ^layer_ids,
+        update: [set: [{^style_attr, ^value}, {:updated_at, ^now}]]
+      ),
+      []
+    )
     |> Ecto.Multi.all(
-      :texts_for_style,
+      :missing_text_style_ids,
       from(l in Layer,
         join: t in assoc(l, :text),
-        where: l.document_id == ^document_id and l.id in ^layer_ids,
-        select: {l.id, t}
+        left_join: s in assoc(t, :style),
+        where: l.document_id == ^document_id and l.id in ^layer_ids and is_nil(s.id),
+        select: t.id
       )
     )
-    |> Ecto.Multi.merge(fn %{texts_for_style: texts} ->
-      Enum.reduce(texts, Ecto.Multi.new(), fn {layer_id, text}, multi ->
-        RenewCollab.Compatibility.Multi.insert(
-          multi,
-          {:style, layer_id},
-          Ecto.build_assoc(text, :style)
-          |> TextStyle.changeset(%{style_attr => value}),
-          on_conflict: {:replace, [style_attr]},
-          conflict_target: [:text_id]
-        )
-      end)
-    end)
+    |> RenewCollab.Compatibility.Multi.insert_all(
+      :insert_styles,
+      TextStyle,
+      fn %{missing_text_style_ids: missing_text_style_ids} ->
+        Enum.map(missing_text_style_ids, fn text_id ->
+          text_style_row(text_id, style_attr, value, now)
+        end)
+      end,
+      on_conflict: {:replace, [style_attr, :updated_at]},
+      conflict_target: [:text_id]
+    )
+    |> maybe_update_size_hints(document_id, layer_ids, style_attr)
+  end
+
+  defp text_style_row(text_id, style_attr, value, now) do
+    %{
+      id: Ecto.UUID.generate(),
+      italic: false,
+      underline: false,
+      rich: false,
+      blank_lines: false,
+      alignment: :left,
+      font_size: 12.0,
+      font_family: "sans-serif",
+      bold: false,
+      text_color: "black",
+      opacity: 1.0,
+      background_opacity: 1.0,
+      text_id: text_id,
+      inserted_at: now,
+      updated_at: now
+    }
+    |> Map.put(style_attr, value)
+  end
+
+  defp maybe_update_size_hints(multi, document_id, layer_ids, style_attr)
+       when style_attr in @size_affecting_attrs do
+    multi
     |> Ecto.Multi.all(
       :texts_for_hint,
       from(l in Layer,
@@ -63,6 +105,8 @@ defmodule RenewCollab.Commands.UpdateLayerTextStyle do
     )
     |> Ecto.Multi.merge(&size_hint_multi/1)
   end
+
+  defp maybe_update_size_hints(multi, _document_id, _layer_ids, _style_attr), do: multi
 
   defp size_hint_multi(%{texts_for_hint: texts}) do
     text_ids = Enum.map(texts, fn {_layer_id, text} -> text.id end)
@@ -113,6 +157,12 @@ defmodule RenewCollab.Commands.UpdateLayerTextStyle do
 
   defp normalize_layer_ids(%{layer_id: layer_id}) when is_binary(layer_id), do: [layer_id]
   defp normalize_layer_ids(_), do: []
+
+  defp normalize_value(:alignment, "center"), do: :center
+  defp normalize_value(:alignment, "right"), do: :right
+  defp normalize_value(:alignment, "left"), do: :left
+  defp normalize_value(:alignment, value), do: value
+  defp normalize_value(_style_attr, value), do: value
 
   defp include_blank(text) do
     case text.style do

@@ -28,25 +28,56 @@ defmodule RenewCollab.Commands.UpdateLayerStyle do
         style_attr: style_attr,
         value: value
       }) do
+    value = normalize_value(style_attr, value)
+    now = DateTime.utc_now() |> DateTime.truncate(:second)
+
     Ecto.Multi.new()
     |> Ecto.Multi.put(:document_id, document_id)
-    |> Ecto.Multi.all(
-      :layers,
-      from(l in Layer, where: l.document_id == ^document_id and l.id in ^layer_ids)
+    |> Ecto.Multi.update_all(
+      :update_styles,
+      from(s in LayerStyle,
+        join: l in Layer,
+        on: s.layer_id == l.id,
+        where: l.document_id == ^document_id and l.id in ^layer_ids,
+        update: [set: [{^style_attr, ^value}, {:updated_at, ^now}]]
+      ),
+      []
     )
-    |> Ecto.Multi.merge(fn %{layers: layers} ->
-      Enum.reduce(layers, Ecto.Multi.new(), fn layer, multi ->
-        RenewCollab.Compatibility.Multi.insert(
-          multi,
-          {:style, layer.id},
-          Ecto.build_assoc(layer, :style)
-          |> LayerStyle.changeset(%{style_attr => value}),
-          on_conflict: {:replace, [style_attr]},
-          conflict_target: [:layer_id]
-        )
-      end)
-    end)
+    |> Ecto.Multi.all(
+      :missing_layer_style_ids,
+      from(l in Layer,
+        left_join: s in assoc(l, :style),
+        where: l.document_id == ^document_id and l.id in ^layer_ids and is_nil(s.id),
+        select: l.id
+      )
+    )
+    |> RenewCollab.Compatibility.Multi.insert_all(
+      :insert_styles,
+      LayerStyle,
+      fn %{missing_layer_style_ids: missing_layer_style_ids} ->
+        Enum.map(missing_layer_style_ids, fn layer_id ->
+          layer_style_row(layer_id, style_attr, value, now)
+        end)
+      end,
+      on_conflict: {:replace, [style_attr, :updated_at]},
+      conflict_target: [:layer_id]
+    )
   end
+
+  defp layer_style_row(layer_id, style_attr, value, now) do
+    %{
+      id: Ecto.UUID.generate(),
+      opacity: 1.0,
+      background_opacity: 1.0,
+      border_opacity: 1.0,
+      layer_id: layer_id,
+      inserted_at: now,
+      updated_at: now
+    }
+    |> Map.put(style_attr, value)
+  end
+
+  defp normalize_value(_style_attr, value), do: value
 
   defp normalize_layer_ids(%{layer_ids: layer_ids}) when is_list(layer_ids) do
     layer_ids

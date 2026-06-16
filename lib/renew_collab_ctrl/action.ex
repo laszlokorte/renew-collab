@@ -381,12 +381,14 @@ defmodule RenewCollabCtrl.Action do
   def do_perform(%Actions.DocumentEditLayerBoxShape{
         document_id: document_id,
         layer_id: layer_id,
+        layer_ids: layer_ids,
         shape_id: shape_id,
         attributes: attributes
       }) do
     RenewCollab.Commands.UpdateLayerBoxShape.new(%{
       document_id: document_id,
       layer_id: layer_id,
+      layer_ids: layer_ids,
       shape_id: shape_id,
       attributes: attributes
     })
@@ -413,11 +415,13 @@ defmodule RenewCollabCtrl.Action do
   def do_perform(%Actions.DocumentEditLayerEdgeAttributes{
         document_id: document_id,
         layer_id: layer_id,
+        layer_ids: layer_ids,
         attributes: attributes
       }) do
     RenewCollab.Commands.UpdateLayerEdgeAttributes.new(%{
       document_id: document_id,
       layer_id: layer_id,
+      layer_ids: layer_ids,
       attributes: attributes
     })
     |> RenewCollab.DocumentCommander.run_document_command_sync()
@@ -603,11 +607,13 @@ defmodule RenewCollabCtrl.Action do
   def do_perform(%Actions.DocumentEditLayerTextType{
         document_id: document_id,
         layer_id: layer_id,
+        layer_ids: layer_ids,
         renew_type: renew_type
       }) do
     RenewCollab.Commands.UpdateLayerTextType.new(%{
       document_id: document_id,
       layer_id: layer_id,
+      layer_ids: layer_ids,
       renew_type: renew_type
     })
     |> RenewCollab.DocumentCommander.run_document_command_sync()

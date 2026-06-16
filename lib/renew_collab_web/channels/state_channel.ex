@@ -232,10 +232,48 @@ defmodule RenewCollabWeb.StateChannel do
         end
       end
 
+      def handle_info({:flush_state_message, message}, %{assigns: assigns} = socket) do
+        pending_state_messages = Map.get(assigns, :pending_state_messages, %{})
+        key = state_message_key(message)
+
+        socket =
+          socket
+          |> assign(:pending_state_messages, Map.delete(pending_state_messages, key))
+
+        handle_state_message(message, socket)
+      end
+
       def handle_info(message, %{assigns: assigns} = socket) do
+        if debounce_state_message?(message) do
+          pending_state_messages = Map.get(assigns, :pending_state_messages, %{})
+          key = state_message_key(message)
+
+          if Map.has_key?(pending_state_messages, key) do
+            {:noreply, socket}
+          else
+            Process.send_after(self(), {:flush_state_message, message}, 25)
+
+            {:noreply,
+             socket
+             |> assign(:pending_state_messages, Map.put(pending_state_messages, key, true))}
+          end
+        else
+          handle_state_message(message, socket)
+        end
+      end
+
+      defp handle_state_message(message, %{assigns: assigns} = socket) do
         handle_message(message, Map.get(assigns, state_key()), Map.get(assigns, scope_key()))
         |> maybe_handle_reply(socket)
       end
+
+      defp debounce_state_message?({:document_modified, _document_id}), do: true
+      defp debounce_state_message?(_message), do: false
+
+      defp state_message_key({:document_modified, document_id}),
+        do: {:document_modified, document_id}
+
+      defp state_message_key(message), do: message
 
       def authorize(_channel, _payload, socket), do: {:ok, socket}
 
@@ -251,14 +289,22 @@ defmodule RenewCollabWeb.StateChannel do
 
       defp update_state(%{assigns: assigns} = socket, new_state) do
         current_state = Map.get(assigns, state_key())
-        new_state_version = increment_version(assigns)
-        {event_name, message} = build_update_message(current_state, new_state, new_state_version)
-        push(socket, event_name, message)
 
-        {:noreply,
-         socket
-         |> assign(state_key(), new_state)
-         |> assign(state_version_key(), new_state_version)}
+        if current_state == new_state do
+          {:noreply, socket}
+        else
+          new_state_version = increment_version(assigns)
+
+          {event_name, message} =
+            build_update_message(current_state, new_state, new_state_version)
+
+          push(socket, event_name, message)
+
+          {:noreply,
+           socket
+           |> assign(state_key(), new_state)
+           |> assign(state_version_key(), new_state_version)}
+        end
       end
 
       defp build_update_message(current_state, new_state, version) do

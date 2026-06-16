@@ -2,18 +2,21 @@ defmodule RenewCollab.Commands.UpdateLayerEdgeAttributes do
   import Ecto.Query, warn: false
 
   alias RenewCollab.Element.Edge
-  alias RenewCollab.Hierarchy.Layer
 
-  defstruct [:document_id, :layer_id, :attributes]
+  defstruct [:document_id, :layer_id, :layer_ids, :attributes]
 
-  def new(%{
-        document_id: document_id,
-        layer_id: layer_id,
-        attributes: attributes
-      }) do
+  def new(
+        %{
+          document_id: document_id,
+          attributes: attributes
+        } = attrs
+      ) do
+    layer_ids = normalize_layer_ids(attrs)
+
     %__MODULE__{
       document_id: document_id,
-      layer_id: layer_id,
+      layer_id: List.first(layer_ids),
+      layer_ids: layer_ids,
       attributes: attributes
     }
   end
@@ -25,20 +28,38 @@ defmodule RenewCollab.Commands.UpdateLayerEdgeAttributes do
 
   def multi(%__MODULE__{
         document_id: document_id,
-        layer_id: layer_id,
+        layer_ids: layer_ids,
         attributes: attributes
       }) do
+    now = DateTime.utc_now() |> DateTime.truncate(:second)
+    cyclic = Map.get(attributes, "cyclic", Map.get(attributes, :cyclic))
+
     Ecto.Multi.new()
     |> Ecto.Multi.put(:document_id, document_id)
-    |> Ecto.Multi.one(
-      :edge,
-      from(l in Layer, join: b in assoc(l, :edge), where: l.id == ^layer_id, select: b)
-    )
-    |> Ecto.Multi.update(
-      :position,
-      fn %{edge: edge} ->
-        Edge.attribute_changeset(edge, attributes)
+    |> then(fn multi ->
+      if is_boolean(cyclic) do
+        Ecto.Multi.update_all(
+          multi,
+          :update_edges,
+          from(e in Edge,
+            join: l in assoc(e, :layer),
+            where: l.document_id == ^document_id and l.id in ^layer_ids,
+            update: [set: [cyclic: ^cyclic, updated_at: ^now]]
+          ),
+          []
+        )
+      else
+        multi
       end
-    )
+    end)
   end
+
+  defp normalize_layer_ids(%{layer_ids: layer_ids}) when is_list(layer_ids) do
+    layer_ids
+    |> Enum.filter(&is_binary/1)
+    |> Enum.uniq()
+  end
+
+  defp normalize_layer_ids(%{layer_id: layer_id}) when is_binary(layer_id), do: [layer_id]
+  defp normalize_layer_ids(_), do: []
 end
