@@ -111,7 +111,13 @@ defmodule RenewCollabCtrl.Action do
     Commands.CreateDocument.new(%{
       doc: %TransientDocument{
         content: document_data,
-        parenthoods: [],
+        # assuming layers to not be nested
+        parenthoods:
+          document_data
+          |> Map.get("layers")
+          |> Enum.map(fn %{"id" => layer_id} ->
+            %{depth: 0, ancestor_id: layer_id, descendant_id: layer_id}
+          end),
         hyperlinks: [],
         bonds: []
       }
