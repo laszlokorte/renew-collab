@@ -110,6 +110,7 @@ defmodule RenewCollabCtrl.CacheConfig do
   def tags_for_action(%Actions.DocumentEditLayerBoxShape{}, _result), do: []
   def tags_for_action(%Actions.DocumentEditLayerBoxSize{}, _result), do: []
   def tags_for_action(%Actions.DocumentEditLayerEdgeAttributes{}, _result), do: []
+  def tags_for_action(%Actions.DocumentEditLayerEdgePoints{}, _result), do: []
   def tags_for_action(%Actions.DocumentEditLayerEdgePosition{}, _result), do: []
   def tags_for_action(%Actions.DocumentEditLayerEdgeStyle{}, _result), do: []
   def tags_for_action(%Actions.DocumentEditLayerEdgeSwapDirection{}, _result), do: []

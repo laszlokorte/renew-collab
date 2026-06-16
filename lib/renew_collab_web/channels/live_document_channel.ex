@@ -395,7 +395,8 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
             "layer_id" => target_layer_id,
             "socket_id" => target_socket_id
           },
-          "style" => edge_style_attrs(params)
+          "style" => edge_style_attrs(params),
+          "waypoints" => edge_waypoint_attrs(params)
         }
       }
     }
@@ -937,8 +938,18 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
       socket_id: socket_id
     }
     |> Dispatcher.perform_as(account)
+    |> case do
+      {:ok, %{update_edge_points: updated_edges}} ->
+        updated_edges
+        |> Enum.find(&(&1.id == edge_id or &1.layer_id == edge_id))
+        |> edge_position_reply()
 
-    :silent
+      {:error, reason} ->
+        {:reply, %{error: inspect(reason)}}
+
+      _ ->
+        :silent
+    end
   end
 
   @impl true
@@ -973,6 +984,48 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
       document_id: document_id,
       layer_id: layer_id,
       new_position: new_position
+    }
+    |> Dispatcher.perform_as(account)
+    |> case do
+      {:ok,
+       %{
+         result_edge: %{
+           source_x: source_x,
+           source_y: source_y,
+           target_x: target_x,
+           target_y: target_y
+         }
+       }} ->
+        {:reply,
+         %{
+           source_x: source_x,
+           source_y: source_y,
+           target_x: target_x,
+           target_y: target_y
+         }}
+
+      _ ->
+        :silent
+    end
+  end
+
+  @impl true
+  def handle_event(
+        "update_edge_points",
+        %{
+          "layer_id" => layer_id,
+          "value" => new_position,
+          "waypoints" => waypoints
+        },
+        %{},
+        %{:document_id => document_id, :account => account},
+        _socket
+      ) do
+    %Actions.DocumentEditLayerEdgePoints{
+      document_id: document_id,
+      layer_id: layer_id,
+      new_position: new_position,
+      waypoints: waypoints
     }
     |> Dispatcher.perform_as(account)
     |> case do
@@ -1386,6 +1439,35 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
     else
       style
     end
+  end
+
+  defp edge_waypoint_attrs(params) do
+    params
+    |> Map.get("waypoints", [])
+    |> List.wrap()
+    |> Enum.with_index()
+    |> Enum.flat_map(fn
+      {%{"x" => x, "y" => y}, sort} ->
+        [%{position_x: x, position_y: y, sort: sort}]
+
+      {%{"position_x" => x, "position_y" => y}, sort} ->
+        [%{position_x: x, position_y: y, sort: sort}]
+
+      _ ->
+        []
+    end)
+  end
+
+  defp edge_position_reply(nil), do: :silent
+
+  defp edge_position_reply(edge) do
+    {:reply,
+     %{
+       source_x: edge.source_x,
+       source_y: edge.source_y,
+       target_x: edge.target_x,
+       target_y: edge.target_y
+     }}
   end
 
   defp reply_with_selection(socket, selection) do

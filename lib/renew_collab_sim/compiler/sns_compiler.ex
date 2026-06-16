@@ -75,7 +75,16 @@ defmodule RenewCollabSim.Compiler.SnsCompiler do
 
   def formalisms(), do: Application.fetch_env!(:renew_collab, :formalisms)
 
-  def default_formalism(), do: formalisms() |> List.first()
+  def default_formalism() do
+    configured = Application.get_env(:renew_collab, :default_formalism)
+    available = formalisms()
+
+    if is_binary(configured) and configured in available do
+      configured
+    else
+      List.first(available)
+    end
+  end
 
   def normalize_net_names(nets) do
     normalized =

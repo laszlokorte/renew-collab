@@ -140,6 +140,9 @@ defmodule RenewCollabCtrl.WriteAccess do
   def can(%{id: account_id}, %Actions.DocumentEditLayerEdgePosition{document_id: doc_id}),
     do: can_write(account_id, :document, doc_id)
 
+  def can(%{id: account_id}, %Actions.DocumentEditLayerEdgePoints{document_id: doc_id}),
+    do: can_write(account_id, :document, doc_id)
+
   def can(%{id: account_id}, %Actions.DocumentEditLayerEdgeSwapDirection{
         document_id: doc_id
       }),

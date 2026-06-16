@@ -3,62 +3,83 @@ defmodule RenewCollabWeb.BlueprintJSON do
 
   @group_order ["Nodes", "Edges", "Shapes", "Text", "FA"]
   @item_order %{
-    "Nodes" => ["Transition", "Virtual Transition", "Place", "Virtual Place"],
+    "Nodes" => ["Transition Tool", "Virtual Transition Tool", "Place Tool", "Virtual Place Tool"],
     "Edges" => [
-      "Edge",
-      "Connection",
-      "Angle Connection",
-      "Test Arc",
-      "Reservation Arc",
-      "Flexible Arc",
-      "Inhibitor Arc",
-      "Clear Arc"
+      "Arc Tool",
+      "Connection Tool",
+      "Elbow Connection Tool",
+      "Test Arc Tool",
+      "Reserve Arc Tool",
+      "Flexible Arc Tool",
+      "Inhibitor Arc Tool",
+      "Clear Arc Tool"
     ],
     "Shapes" => [
-      "Rectangle",
-      "Round Rectangle",
-      "Ellipse",
-      "Pie Segment",
-      "Diamond",
-      "Triangle",
-      "Line",
-      "Target",
-      "Image"
+      "Rectangle Tool",
+      "Round Rectangle Tool",
+      "Ellipse Tool",
+      "Elliptical Arc/Pie Tool",
+      "Diamond Tool",
+      "Triangle Tool",
+      "Line Tool",
+      "Target Tool",
+      "Image Tool"
     ],
-    "Text" => ["Free Text", "Connected Text", "Inscription", "Name", "Declaration", "Comment"],
-    "FA" => ["State"]
+    "Text" => [
+      "Text Tool",
+      "Connected Text Tool",
+      "Inscription Tool",
+      "Name Tool",
+      "Declaration Tool",
+      "Comment Tool"
+    ],
+    "FA" => [
+      "FA Start State Tool",
+      "FA State Tool",
+      "FA End State Tool",
+      "FA Start End State Tool",
+      "FA Name Tool",
+      "FA Inscription Tool",
+      "FA Word Placement Tool",
+      "FA ArcConnection Tool",
+      "FA Loop ArcConnection Tool"
+    ]
   }
   @arrow_tip_normal "84DC6617-D555-4BAB-BA33-04A5FA442F00"
   @arrow_tip_double "1BB93575-6759-4C59-8ED3-626949D1326A"
   @arrow_tip_circle "2FD06A6E-6B3E-4AD4-8728-4BE95A8A1451"
   @edge_icon """
-  <path d="M 8 8 L 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="butt" />
-  <path d="M 24 24 L 17 20.8 L 20.8 17 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
+  <path d="M 5 25 L 25 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="butt" />
+  <path d="M 25 5 L 20.5 7.2 L 22.8 9.5 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
   """
   @double_edge_icon """
-  <path d="M 8 8 L 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="butt" />
-  <path d="M 24 24 L 17 20.8 L 20.8 17 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
-  <path d="M 8 8 L 15 11.2 L 11.2 15 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
+  <path d="M 5 25 L 25 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="butt" />
+  <path d="M 25 5 L 20.5 7.2 L 22.8 9.5 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
+  <path d="M 5 25 L 9.5 22.8 L 7.2 20.5 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
   """
   @double_tip_edge_icon """
-  <path d="M 8 8 L 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="butt" />
-  <path d="M 24 24 L 17 20.8 L 20.8 17 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
-  <path d="M 20 20 L 14 17.2 L 17.2 14 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
+  <path d="M 5 25 L 25 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="butt" />
+  <path d="M 25 5 L 20.5 7.2 L 22.8 9.5 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
+  <path d="M 21 9 L 16.5 11.2 L 18.8 13.5 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
   """
   @circle_edge_icon """
-  <path d="M 8 8 L 21 21" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="butt" />
-  <circle cx="24" cy="24" r="3.8" fill="white" stroke="currentColor" stroke-width="1.5" />
+  <path d="M 6 24 L 21 9" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="butt" />
+  <circle cx="24" cy="6" r="3.7" fill="white" stroke="currentColor" stroke-width="1.5" />
   """
   @plain_edge_icon """
-  <path d="M 8 8 L 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="butt" />
+  <path d="M 5 25 L 25 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="butt" />
+  """
+  @loop_edge_icon """
+  <path d="M 9 20 C 3 12 7 5 15 5 C 23 5 27 12 22 19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="butt" />
+  <path d="M 22 19 L 18 16.5 L 18.8 21 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
   """
   @angle_edge_icon """
-  <path d="M 8 8 L 8 22 L 24 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="butt" stroke-linejoin="miter" />
+  <path d="M 7 8 L 7 23 L 23 23" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="butt" stroke-linejoin="miter" />
   """
   @edge_tools [
     %{
       kind: "edge-tool",
-      name: "Edge",
+      name: "Arc Tool",
       data: %{
         semantic_tag: "de.renew.gui.ArcConnection",
         target_tip_symbol_shape_id: @arrow_tip_normal
@@ -67,7 +88,7 @@ defmodule RenewCollabWeb.BlueprintJSON do
     },
     %{
       kind: "edge-tool",
-      name: "Connection",
+      name: "Connection Tool",
       data: %{
         semantic_tag: "CH.ifa.draw.figures.LineConnection",
         source_tip_symbol_shape_id: nil,
@@ -77,7 +98,7 @@ defmodule RenewCollabWeb.BlueprintJSON do
     },
     %{
       kind: "edge-tool",
-      name: "Angle Connection",
+      name: "Elbow Connection Tool",
       data: %{
         semantic_tag: "CH.ifa.draw.figures.ElbowConnection",
         source_tip_symbol_shape_id: nil,
@@ -87,7 +108,7 @@ defmodule RenewCollabWeb.BlueprintJSON do
     },
     %{
       kind: "edge-tool",
-      name: "Test Arc",
+      name: "Test Arc Tool",
       data: %{
         semantic_tag: "de.renew.gui.ArcConnection",
         source_tip_symbol_shape_id: nil,
@@ -97,7 +118,7 @@ defmodule RenewCollabWeb.BlueprintJSON do
     },
     %{
       kind: "edge-tool",
-      name: "Reservation Arc",
+      name: "Reserve Arc Tool",
       data: %{
         semantic_tag: "de.renew.gui.ArcConnection",
         source_tip_symbol_shape_id: @arrow_tip_normal,
@@ -107,7 +128,7 @@ defmodule RenewCollabWeb.BlueprintJSON do
     },
     %{
       kind: "edge-tool",
-      name: "Flexible Arc",
+      name: "Flexible Arc Tool",
       data: %{
         semantic_tag: "de.renew.gui.DoubleArcConnection",
         target_tip_symbol_shape_id: @arrow_tip_double
@@ -116,7 +137,7 @@ defmodule RenewCollabWeb.BlueprintJSON do
     },
     %{
       kind: "edge-tool",
-      name: "Inhibitor Arc",
+      name: "Inhibitor Arc Tool",
       data: %{
         semantic_tag: "de.renew.gui.InhibitorConnection",
         source_tip_symbol_shape_id: @arrow_tip_circle,
@@ -126,12 +147,35 @@ defmodule RenewCollabWeb.BlueprintJSON do
     },
     %{
       kind: "edge-tool",
-      name: "Clear Arc",
+      name: "Clear Arc Tool",
       data: %{
         semantic_tag: "de.renew.gui.HollowDoubleArcConnection",
         target_tip_symbol_shape_id: @arrow_tip_double
       },
       icon: @double_tip_edge_icon
+    }
+  ]
+  @fa_edge_tools [
+    %{
+      kind: "edge-tool",
+      name: "FA ArcConnection Tool",
+      data: %{
+        semantic_tag: "de.renew.fa.figures.FAArcConnection",
+        target_tip_symbol_shape_id: @arrow_tip_normal,
+        smoothness: "bspline"
+      },
+      icon: @edge_icon
+    },
+    %{
+      kind: "edge-tool",
+      name: "FA Loop ArcConnection Tool",
+      data: %{
+        semantic_tag: "de.renew.fa.figures.FAArcConnection",
+        target_tip_symbol_shape_id: @arrow_tip_normal,
+        smoothness: "bspline",
+        loop: true
+      },
+      icon: @loop_edge_icon
     }
   ]
 
@@ -181,6 +225,7 @@ defmodule RenewCollabWeb.BlueprintJSON do
   end
 
   defp maybe_add_edge_tool("Edges", items), do: items ++ @edge_tools
+  defp maybe_add_edge_tool("FA", items), do: items ++ @fa_edge_tools
   defp maybe_add_edge_tool(_name, items), do: items
 
   defp ensure_edge_tool_group(groups) do

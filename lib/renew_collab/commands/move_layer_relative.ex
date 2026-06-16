@@ -6,6 +6,7 @@ defmodule RenewCollab.Commands.MoveLayerRelative do
   alias RenewCollab.Element.Box
   alias RenewCollab.Element.Text
   alias RenewCollab.Element.Edge
+  alias RenewCollab.Connection.Bond
   alias RenewCollab.Connection.Hyperlink
   alias RenewCollab.Connection.Waypoint
   alias RenewCollab.Style.TextSizeHint
@@ -112,12 +113,29 @@ defmodule RenewCollab.Commands.MoveLayerRelative do
       []
     )
     |> Ecto.Multi.update_all(
-      :update_edges,
+      :update_edge_sources,
       fn
         %{combined_layer_ids: combined_layer_ids} ->
           from(e in Edge,
+            left_join: b in Bond,
+            on: b.element_edge_id == e.id and b.kind == :source,
             where: e.layer_id in ^combined_layer_ids,
-            update: [inc: [source_x: ^dx, source_y: ^dy, target_x: ^dx, target_y: ^dy]]
+            where: is_nil(b.id),
+            update: [inc: [source_x: ^dx, source_y: ^dy]]
+          )
+      end,
+      []
+    )
+    |> Ecto.Multi.update_all(
+      :update_edge_targets,
+      fn
+        %{combined_layer_ids: combined_layer_ids} ->
+          from(e in Edge,
+            left_join: b in Bond,
+            on: b.element_edge_id == e.id and b.kind == :target,
+            where: e.layer_id in ^combined_layer_ids,
+            where: is_nil(b.id),
+            update: [inc: [target_x: ^dx, target_y: ^dy]]
           )
       end,
       []
@@ -139,15 +157,22 @@ defmodule RenewCollab.Commands.MoveLayerRelative do
     |> Ecto.Multi.all(
       :affected_bond_ids,
       fn %{combined_layer_ids: combined_layer_ids} ->
-        from(own_layer in Layer,
-          join: edge in assoc(own_layer, :attached_edges),
-          join: bond in assoc(edge, :bonds),
-          where:
-            own_layer.id in ^combined_layer_ids or
-              edge.layer_id in ^combined_layer_ids,
-          group_by: bond.id,
-          select: bond.id
-        )
+        attached_edge_bonds =
+          from(layer in Layer,
+            join: bond in assoc(layer, :attached_bonds),
+            where: layer.id in ^combined_layer_ids,
+            select: bond.id
+          )
+
+        moved_edge_bonds =
+          from(edge in Edge,
+            join: bond in assoc(edge, :bonds),
+            where: edge.layer_id in ^combined_layer_ids,
+            select: bond.id
+          )
+
+        attached_edge_bonds
+        |> union(^moved_edge_bonds)
       end
     )
     |> Ecto.Multi.append(RenewCollab.Bonding.reposition_multi())

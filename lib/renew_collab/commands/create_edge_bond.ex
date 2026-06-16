@@ -1,6 +1,8 @@
 defmodule RenewCollab.Commands.CreateEdgeBond do
   import Ecto.Query, warn: false
   alias RenewCollab.Connection.Bond
+  alias RenewCollab.Element.Edge
+  alias RenewCollab.Hierarchy.Layer
 
   defstruct [:document_id, :edge_id, :kind, :layer_id, :socket_id]
 
@@ -32,15 +34,35 @@ defmodule RenewCollab.Commands.CreateEdgeBond do
       }) do
     Ecto.Multi.new()
     |> Ecto.Multi.put(:document_id, document_id)
+    |> Ecto.Multi.one(
+      :edge,
+      from(edge in Edge,
+        join: layer in Layer,
+        on: layer.id == edge.layer_id,
+        where:
+          layer.document_id == ^document_id and (edge.id == ^edge_id or layer.id == ^edge_id),
+        select: edge
+      )
+    )
+    |> Ecto.Multi.delete_all(
+      :old_endpoint_bond,
+      fn %{edge: edge} ->
+        from(bond in Bond,
+          where: bond.element_edge_id == ^edge.id and bond.kind == ^kind
+        )
+      end
+    )
     |> Ecto.Multi.insert(
       :new_bond,
-      %Bond{}
-      |> Bond.changeset(%{
-        element_edge_id: edge_id,
-        kind: kind,
-        layer_id: layer_id,
-        socket_id: socket_id
-      })
+      fn %{edge: edge} ->
+        %Bond{}
+        |> Bond.changeset(%{
+          element_edge_id: edge.id,
+          kind: kind,
+          layer_id: layer_id,
+          socket_id: socket_id
+        })
+      end
     )
     |> Ecto.Multi.all(
       :affected_bond_ids,

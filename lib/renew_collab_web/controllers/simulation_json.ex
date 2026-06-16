@@ -18,8 +18,31 @@ defmodule RenewCollabWeb.SimulationJSON do
   end
 
   def formalisms(%{formalisms: formalisms}) do
-    %{formalisms: formalisms |> Enum.map(&%{id: &1, label: &1})}
+    default_formalism = RenewCollabSim.Compiler.SnsCompiler.default_formalism()
+
+    %{
+      default_formalism: default_formalism,
+      formalisms:
+        formalisms
+        |> Enum.map(fn formalism ->
+          %{
+            id: formalism,
+            label: formalism,
+            default: formalism == default_formalism,
+            syntax_name: formalism_syntax_name(formalism),
+            tool_groups: formalism_tool_groups(formalism)
+          }
+        end)
+    }
   end
+
+  defp formalism_tool_groups("FA Automaton Compiler"), do: ["FA Tools"]
+  defp formalism_tool_groups("FA Net Compiler"), do: ["FA Tools"]
+  defp formalism_tool_groups(_formalism), do: []
+
+  defp formalism_syntax_name("FA Automaton Compiler"), do: "FSM"
+  defp formalism_syntax_name("FA Net Compiler"), do: "FSM"
+  defp formalism_syntax_name(_formalism), do: "Reference Net"
 
   def created(%{simulation: simulation}) do
     %{id: simulation.id}

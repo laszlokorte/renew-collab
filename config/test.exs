@@ -43,13 +43,19 @@ config :renew_collab, RenewCollab.TextMeasure.MeasureServer,
   script: "priv/text_metrics/TextMeasure.java"
 
 config :renew_collab, :formalisms, [
-  "P/T Net Compiler",
   "P/T Net in Net Compiler",
-  "Java Net Compiler",
-  "Bool Net Compiler",
   "Timed Java Compiler",
-  "Single P/T Net with Channel Compiler"
+  "FA Automaton Compiler",
+  "Bool Net Compiler",
+  "FA Net Compiler",
+  "Java Net Compiler",
+  "P/T Net Compiler",
+  "Single P/T Net with Channel Compiler",
+  "Exception Catching Java Compiler",
+  "CN Compiler"
 ]
+
+config :renew_collab, :default_formalism, "P/T Net Compiler"
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.

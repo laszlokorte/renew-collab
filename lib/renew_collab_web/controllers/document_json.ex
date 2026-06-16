@@ -272,6 +272,8 @@ defmodule RenewCollabWeb.DocumentJSON do
 
           v ->
             %{
+              "id" => v.id,
+              "layer_id" => v.layer_id,
               "source_x" => v.source_x,
               "source_y" => v.source_y,
               "target_x" => v.target_x,

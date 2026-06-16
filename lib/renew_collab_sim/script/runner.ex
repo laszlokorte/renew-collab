@@ -7,12 +7,17 @@ defmodule RenewCollabSim.Script.Runner do
     "Renew Formalism",
     "Renew Misc",
     "Renew PTChannel",
+    "Renew FAFormalism",
+    "Renew Catch",
+    "Renew CNFormalism",
     "Renew Remote",
     "Renew Window Management",
     "Renew JHotDraw",
     "Renew Gui",
     "Renew PropertyManagement",
     # This Renew Formalism Gui Plugin forces the AWT/Swing Gui to open, stopping Renew from closing
+    # and is therefore not part of the default headless simulation plugin set. Formalisms that
+    # depend on it can still be enabled explicitly with SIM_RENEW_PLUGINS for manual experiments.
     # "Renew Formalism Gui",
     "Renew Logging",
     "Renew NetComponents",

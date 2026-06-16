@@ -99,6 +99,13 @@ defmodule RenewCollabCtrl.Notification do
 
   def notifications_for(
         _proj,
+        %Actions.DocumentEditLayerEdgePoints{document_id: doc_id},
+        _result
+      ),
+      do: [document_modified(doc_id)]
+
+  def notifications_for(
+        _proj,
         %Actions.DocumentEditLayerEdgeSwapDirection{document_id: doc_id},
         _result
       ),

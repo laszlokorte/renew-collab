@@ -5,7 +5,13 @@ defmodule RenewCollab.Repo.Migrations.UpdateRenewLikeToolbarIcons do
 
   alias RenewCollab.Primitives.PredefinedPrimitive
 
-  @updated_icons ["Place", "Transition", "Virtual Place", "Virtual Transition", "Target"]
+  @updated_icons [
+    "Place Tool",
+    "Transition Tool",
+    "Virtual Place Tool",
+    "Virtual Transition Tool",
+    "Target Tool"
+  ]
 
   def up do
     icons_by_name =

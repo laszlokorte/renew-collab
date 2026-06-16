@@ -20,6 +20,12 @@ defmodule RenewCollab.Primitives.Predefined do
     round_rect_shape_id = shape_id.("rect-round", rect_shape_id)
     circle_shape_id = shape_id.("ellipse", "3B66E69A-057A-40B9-A1A0-9DB44EF5CE42")
     virtual_place_shape_id = shape_id.("ellipse-double-in", circle_shape_id)
+    fa_start_shape_id = shape_id.("ellipse-arrow-inward-north-west", circle_shape_id)
+    fa_end_shape_id = shape_id.("ellipse-double-in", circle_shape_id)
+
+    fa_start_end_shape_id =
+      shape_id.("ellipse-double-in-arrow-inward-north-west", fa_end_shape_id)
+
     triangle_shape_id = shape_id.("triangle-up", rect_shape_id)
     diamond_shape_id = shape_id.("diamond", rect_shape_id)
     pie_shape_id = shape_id.("pie", circle_shape_id)
@@ -30,7 +36,7 @@ defmodule RenewCollab.Primitives.Predefined do
         name: "Nodes",
         primitives: [
           %{
-            name: "Place",
+            name: "Place Tool",
             data: %{
               content: %{
                 semantic_tag: "de.renew.gui.PlaceFigure",
@@ -59,7 +65,7 @@ defmodule RenewCollab.Primitives.Predefined do
               |> html_to_string
           },
           %{
-            name: "Transition",
+            name: "Transition Tool",
             data: %{
               content: %{
                 semantic_tag: "de.renew.gui.TransitionFigure",
@@ -88,7 +94,7 @@ defmodule RenewCollab.Primitives.Predefined do
               |> html_to_string
           },
           %{
-            name: "Virtual Place",
+            name: "Virtual Place Tool",
             data: %{
               content: %{
                 semantic_tag: "de.renew.gui.VirtualPlaceFigure",
@@ -108,7 +114,7 @@ defmodule RenewCollab.Primitives.Predefined do
               |> html_to_string
           },
           %{
-            name: "Virtual Transition",
+            name: "Virtual Transition Tool",
             data: %{
               content: %{
                 semantic_tag: "de.renew.gui.VirtualTransitionFigure",
@@ -139,7 +145,7 @@ defmodule RenewCollab.Primitives.Predefined do
         name: "Shapes",
         primitives: [
           %{
-            name: "Rectangle",
+            name: "Rectangle Tool",
             data: %{
               content: %{
                 semantic_tag: "CH.ifa.draw.figures.RectangleFigure",
@@ -160,7 +166,7 @@ defmodule RenewCollab.Primitives.Predefined do
               |> html_to_string
           },
           %{
-            name: "Round Rectangle",
+            name: "Round Rectangle Tool",
             data: %{
               content: %{
                 semantic_tag: "CH.ifa.draw.figures.RoundRectangleFigure",
@@ -192,7 +198,7 @@ defmodule RenewCollab.Primitives.Predefined do
               |> html_to_string
           },
           %{
-            name: "Ellipse",
+            name: "Ellipse Tool",
             data: %{
               content: %{
                 semantic_tag: "CH.ifa.draw.figures.EllipseFigure",
@@ -213,7 +219,7 @@ defmodule RenewCollab.Primitives.Predefined do
               |> html_to_string
           },
           %{
-            name: "Pie Segment",
+            name: "Elliptical Arc/Pie Tool",
             data: %{
               content: %{
                 semantic_tag: "CH.ifa.draw.figures.PieFigure",
@@ -234,7 +240,7 @@ defmodule RenewCollab.Primitives.Predefined do
               |> html_to_string
           },
           %{
-            name: "Diamond",
+            name: "Diamond Tool",
             data: %{
               content: %{
                 semantic_tag: "CH.ifa.draw.figures.DiamondFigure",
@@ -255,7 +261,7 @@ defmodule RenewCollab.Primitives.Predefined do
               |> html_to_string
           },
           %{
-            name: "Triangle",
+            name: "Triangle Tool",
             data: %{
               content: %{
                 semantic_tag: "CH.ifa.draw.contrib.TriangleFigure",
@@ -276,7 +282,7 @@ defmodule RenewCollab.Primitives.Predefined do
               |> html_to_string
           },
           %{
-            name: "Line",
+            name: "Line Tool",
             data: %{
               content: %{
                 semantic_tag: "CH.ifa.draw.figures.PolyLineFigure",
@@ -291,7 +297,7 @@ defmodule RenewCollab.Primitives.Predefined do
               |> html_to_string
           },
           %{
-            name: "Target",
+            name: "Target Tool",
             data: %{
               content: %{
                 semantic_tag: "CH.ifa.draw.figures.TargetFigure",
@@ -308,18 +314,18 @@ defmodule RenewCollab.Primitives.Predefined do
               alignY: 0.5
             },
             icon:
-              ~H(<path
-  d="M9 23 L23 9 M17 9 H23 V15"
+              ~H(<circle cx="16" cy="16" r="10" fill="none" stroke="#111" stroke-width="1.8" />
+<path
+  d="M16 5 V27 M5 16 H27"
   fill="none"
   stroke="#111"
-  stroke-width="2"
+  stroke-width="1.2"
   stroke-linecap="butt"
-  stroke-linejoin="miter"
 />)
               |> html_to_string
           },
           %{
-            name: "Image",
+            name: "Image Tool",
             data: %{
               content: %{
                 semantic_tag: "CH.ifa.draw.figures.ImageFigure",
@@ -347,7 +353,7 @@ defmodule RenewCollab.Primitives.Predefined do
         name: "Text",
         primitives: [
           %{
-            name: "Free Text",
+            name: "Text Tool",
             data: %{
               content: %{
                 body: "Text",
@@ -375,7 +381,7 @@ defmodule RenewCollab.Primitives.Predefined do
               |> html_to_string
           },
           %{
-            name: "Inscription",
+            name: "Inscription Tool",
             data: %{
               content: %{
                 body: "[]",
@@ -405,7 +411,7 @@ defmodule RenewCollab.Primitives.Predefined do
               |> html_to_string
           },
           %{
-            name: "Connected Text",
+            name: "Connected Text Tool",
             data: %{
               content: %{
                 body: "Text",
@@ -436,7 +442,7 @@ defmodule RenewCollab.Primitives.Predefined do
               |> html_to_string
           },
           %{
-            name: "Name",
+            name: "Name Tool",
             data: %{
               content: %{
                 body: "name",
@@ -466,7 +472,7 @@ defmodule RenewCollab.Primitives.Predefined do
               |> html_to_string
           },
           %{
-            name: "Declaration",
+            name: "Declaration Tool",
             data: %{
               content: %{
                 body: "declaration",
@@ -496,7 +502,7 @@ defmodule RenewCollab.Primitives.Predefined do
               |> html_to_string
           },
           %{
-            name: "Comment",
+            name: "Comment Tool",
             data: %{
               content: %{
                 body: "comment",
@@ -532,7 +538,44 @@ defmodule RenewCollab.Primitives.Predefined do
         name: "FA",
         primitives: [
           %{
-            name: "State",
+            name: "FA Start State Tool",
+            data: %{
+              content: %{
+                semantic_tag: "de.renew.fa.figures.FAStateFigure",
+                shape_id: fa_start_shape_id,
+                socket_schema_id: place_socket_schema_id,
+                width: 40,
+                height: 40,
+                style: %{
+                  background_color: "white",
+                  border_color: "black",
+                  border_width: "2"
+                }
+              },
+              mimeType: "application/json+renewex-layer",
+              alignX: 0.5,
+              alignY: 0.5
+            },
+            icon:
+              ~H(<circle fill="#fff" cx="16" cy="16" r="14" stroke="#111" stroke-width="2" />
+<path
+  d="M3 3 L9 9"
+  fill="none"
+  stroke="#111"
+  stroke-width="1.5"
+  stroke-linecap="round"
+/>
+<path
+  d="M9 9 L4.5 8.2 M9 9 L8.2 4.5"
+  fill="none"
+  stroke="#111"
+  stroke-width="1.5"
+  stroke-linecap="round"
+/>)
+              |> html_to_string
+          },
+          %{
+            name: "FA State Tool",
             data: %{
               content: %{
                 semantic_tag: "de.renew.fa.figures.FAStateFigure",
@@ -551,7 +594,165 @@ defmodule RenewCollab.Primitives.Predefined do
               alignY: 0.5
             },
             icon:
-              ~H(<circle fill="#fff" cx="16" cy="16" r="15" stroke="#111" stroke-width="2" />)
+              ~H(<circle fill="#fff" cx="16" cy="16" r="14" stroke="#111" stroke-width="2" />)
+              |> html_to_string
+          },
+          %{
+            name: "FA End State Tool",
+            data: %{
+              content: %{
+                semantic_tag: "de.renew.fa.figures.FAStateFigure",
+                shape_id: fa_end_shape_id,
+                socket_schema_id: place_socket_schema_id,
+                width: 40,
+                height: 40,
+                style: %{
+                  background_color: "white",
+                  border_color: "black",
+                  border_width: "2"
+                }
+              },
+              mimeType: "application/json+renewex-layer",
+              alignX: 0.5,
+              alignY: 0.5
+            },
+            icon:
+              ~H(<circle fill="#fff" cx="16" cy="16" r="14" stroke="#111" stroke-width="2" />
+<circle fill="none" cx="16" cy="16" r="10.5" stroke="#111" stroke-width="1.4" />)
+              |> html_to_string
+          },
+          %{
+            name: "FA Start End State Tool",
+            data: %{
+              content: %{
+                semantic_tag: "de.renew.fa.figures.FAStateFigure",
+                shape_id: fa_start_end_shape_id,
+                socket_schema_id: place_socket_schema_id,
+                width: 40,
+                height: 40,
+                style: %{
+                  background_color: "white",
+                  border_color: "black",
+                  border_width: "2"
+                }
+              },
+              mimeType: "application/json+renewex-layer",
+              alignX: 0.5,
+              alignY: 0.5
+            },
+            icon:
+              ~H(<circle fill="#fff" cx="16" cy="16" r="14" stroke="#111" stroke-width="2" />
+<circle fill="none" cx="16" cy="16" r="10.5" stroke="#111" stroke-width="1.4" />
+<path
+  d="M3 3 L9 9"
+  fill="none"
+  stroke="#111"
+  stroke-width="1.5"
+  stroke-linecap="round"
+/>
+<path
+  d="M9 9 L4.5 8.2 M9 9 L8.2 4.5"
+  fill="none"
+  stroke="#111"
+  stroke-width="1.5"
+  stroke-linecap="round"
+/>)
+              |> html_to_string
+          },
+          %{
+            name: "FA Name Tool",
+            data: %{
+              content: %{
+                body: "",
+                hyperlink: true,
+                renew_type: 2,
+                semantic_tag: "de.renew.fa.figures.FATextFigure",
+                style: %{
+                  :alignment => "center",
+                  :font_size => 12
+                }
+              },
+              mimeType: "application/json+renewex-layer",
+              alignX: 0.5,
+              alignY: 0.5
+            },
+            icon:
+              ~H(<text
+  text-anchor="middle"
+  font-size="24"
+  font-weight="bold"
+  x="16"
+  y="25"
+  font-family="serif"
+  fill="#111"
+>
+  n
+</text>)
+              |> html_to_string
+          },
+          %{
+            name: "FA Inscription Tool",
+            data: %{
+              content: %{
+                body: "a",
+                hyperlink: true,
+                renew_type: 1,
+                semantic_tag: "de.renew.fa.figures.FATextFigure",
+                style: %{
+                  :alignment => "center",
+                  :font_size => 12
+                }
+              },
+              mimeType: "application/json+renewex-layer",
+              alignX: 0.5,
+              alignY: 0.5
+            },
+            icon:
+              ~H(<text
+  text-anchor="middle"
+  font-size="24"
+  font-weight="bold"
+  x="16"
+  y="25"
+  font-family="serif"
+  fill="#111"
+>
+  i
+</text>)
+              |> html_to_string
+          },
+          %{
+            name: "FA Word Placement Tool",
+            data: %{
+              content: %{
+                body: "a*+b^+",
+                hyperlink: true,
+                semantic_tag: "de.renew.fa.figures.FAWordTextFigure",
+                style: %{
+                  :alignment => "center",
+                  :bold => true,
+                  :italic => true,
+                  :font_size => 12,
+                  :text_color => "#025bff"
+                }
+              },
+              mimeType: "application/json+renewex-layer",
+              alignX: 0.5,
+              alignY: 0.5
+            },
+            icon:
+              ~H(<text
+  text-anchor="middle"
+  font-size="20"
+  font-weight="bold"
+  font-style="italic"
+  x="16"
+  y="23"
+  font-family="serif"
+  fill="#025bff"
+>
+  w
+</text>)
               |> html_to_string
           }
         ]

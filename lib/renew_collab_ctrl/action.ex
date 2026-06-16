@@ -192,8 +192,6 @@ defmodule RenewCollabCtrl.Action do
       socket_id: socket_id
     })
     |> RenewCollab.DocumentCommander.run_document_command_sync()
-
-    :ok
   end
 
   def do_perform(%Actions.DocumentEditCreateEdgeWaypoint{
@@ -436,6 +434,21 @@ defmodule RenewCollabCtrl.Action do
       document_id: document_id,
       layer_id: layer_id,
       new_position: new_position
+    })
+    |> RenewCollab.DocumentCommander.run_document_command_sync()
+  end
+
+  def do_perform(%Actions.DocumentEditLayerEdgePoints{
+        document_id: document_id,
+        layer_id: layer_id,
+        new_position: new_position,
+        waypoints: waypoints
+      }) do
+    RenewCollab.Commands.UpdateLayerEdgePoints.new(%{
+      document_id: document_id,
+      layer_id: layer_id,
+      new_position: new_position,
+      waypoints: waypoints
     })
     |> RenewCollab.DocumentCommander.run_document_command_sync()
   end

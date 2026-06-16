@@ -233,12 +233,33 @@ if config_env() == :prod do
     config :renew_collab, :editor_url, editor_url
   end
 
+  default_formalisms =
+    [
+      "P/T Net in Net Compiler",
+      "Timed Java Compiler",
+      "FA Automaton Compiler",
+      "Bool Net Compiler",
+      "FA Net Compiler",
+      "Java Net Compiler",
+      "P/T Net Compiler",
+      "Single P/T Net with Channel Compiler",
+      "Exception Catching Java Compiler",
+      "CN Compiler"
+    ]
+
+  configured_formalisms =
+    (System.get_env("RENEW_FORMALISMS") || "")
+    |> String.split(";")
+    |> Enum.map(&String.trim/1)
+    |> Enum.filter(&(&1 != ""))
+
   config :renew_collab,
          :formalisms,
-         (System.get_env("RENEW_FORMALISMS") || "")
-         |> String.split(";")
-         |> Enum.map(&String.trim/1)
-         |> Enum.filter(&(&1 != ""))
+         if(configured_formalisms == [], do: default_formalisms, else: configured_formalisms)
+
+  config :renew_collab,
+         :default_formalism,
+         System.get_env("RENEW_DEFAULT_FORMALISM") || "P/T Net Compiler"
 
   Regex.compile(System.get_env("RENEW_EMAIL_WHITELIST") || ".")
   |> case do

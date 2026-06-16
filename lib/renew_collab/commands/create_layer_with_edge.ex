@@ -93,7 +93,8 @@ defmodule RenewCollab.Commands.CreateLayerWithEdge do
               "style" => %{
                 "target_tip_symbol_shape_id" => Map.get(edge, "target_tip_symbol_shape_id", nil),
                 "source_tip_symbol_shape_id" => Map.get(edge, "source_tip_symbol_shape_id", nil)
-              }
+              },
+              "waypoints" => edge_waypoint_attrs(edge)
             }
           },
           base_layer_id: target_layer_id
@@ -105,6 +106,23 @@ defmodule RenewCollab.Commands.CreateLayerWithEdge do
       else
         error -> error
       end
+    end)
+  end
+
+  defp edge_waypoint_attrs(edge) do
+    edge
+    |> Map.get("waypoints", [])
+    |> List.wrap()
+    |> Enum.with_index()
+    |> Enum.flat_map(fn
+      {%{"x" => x, "y" => y}, sort} ->
+        [%{position_x: x, position_y: y, sort: sort}]
+
+      {%{"position_x" => x, "position_y" => y}, sort} ->
+        [%{position_x: x, position_y: y, sort: sort}]
+
+      _ ->
+        []
     end)
   end
 end

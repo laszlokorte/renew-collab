@@ -5,7 +5,14 @@ defmodule RenewCollab.Repo.Migrations.UpdateRenewLikeTextToolIcons do
 
   alias RenewCollab.Primitives.PredefinedPrimitive
 
-  @updated_icons ["Free Text", "Connected Text", "Inscription", "Name", "Declaration", "Comment"]
+  @updated_icons [
+    "Text Tool",
+    "Connected Text Tool",
+    "Inscription Tool",
+    "Name Tool",
+    "Declaration Tool",
+    "Comment Tool"
+  ]
 
   def up do
     icons_by_name =

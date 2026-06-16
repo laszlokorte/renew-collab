@@ -11,7 +11,7 @@ defmodule RenewCollab.Repo.Migrations.UpdateDefaultToolbarIcons do
       |> Enum.flat_map(&Map.get(&1, :primitives, []))
       |> Map.new(fn primitive -> {Map.fetch!(primitive, :name), Map.fetch!(primitive, :icon)} end)
 
-    for name <- ["Virtual Transition", "Target"] do
+    for name <- ["Virtual Transition Tool", "Target Tool"] do
       case Map.fetch(icons_by_name, name) do
         {:ok, icon} ->
           repo().update_all(

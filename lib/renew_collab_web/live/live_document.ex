@@ -69,7 +69,7 @@ defmodule RenewCollabWeb.LiveDocument do
           tab={:documents}
         />
       </div>
-
+      
       <div style="grid-area: top; padding: 1em; background: #555; color: #fff; display: flex; justify-content: space-between; align-items: stretch;">
         <div>
           <.link navigate={~p"/projects"} style="color: inherit">Projects</.link>
@@ -82,7 +82,7 @@ defmodule RenewCollabWeb.LiveDocument do
               / Document
             <% _ -> %>
           <% end %>
-
+          
           <div style="display: flex; gap: 1ex; align-items: center;">
             <img
               class="icon"
@@ -91,7 +91,7 @@ defmodule RenewCollabWeb.LiveDocument do
             <h2 style="margin: 0;">{@document.name}</h2>
           </div>
         </div>
-
+        
         <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: undo_redo} <- @undo_redo do %>
           <.live_component
             id="undo_redo"
@@ -101,7 +101,7 @@ defmodule RenewCollabWeb.LiveDocument do
           <% else _ -> %>
         <% end %>
       </div>
-
+      
       <div style="grid-area: left; width: 100%; height: 100%; overflow: auto; box-sizing: border-box; padding: 0; display: grid;">
         <datalist id="all-semantic-tags">
           <%= for {class_name, _} <- renew_grammar().hierarchy do %>
@@ -113,7 +113,7 @@ defmodule RenewCollabWeb.LiveDocument do
             <table width="100%" border="1" cellspacing="0">
               <tr>
                 <th>Source/Target</th>
-
+                
                 <.layers filter={:box} document={@document}>
                   <:item :let={layer}>
                     <th
@@ -129,7 +129,7 @@ defmodule RenewCollabWeb.LiveDocument do
                   </:item>
                 </.layers>
               </tr>
-
+              
               <.layers filter={:box} document={@document}>
                 <:item :let={layer_a = %{id: layer_a_id}}>
                   <tr>
@@ -156,7 +156,7 @@ defmodule RenewCollabWeb.LiveDocument do
                             >
                               ---
                             </option>
-
+                            
                             <%= for {_sid, s} <- socket_schemas do %>
                               <option
                                 value={s.id}
@@ -171,7 +171,7 @@ defmodule RenewCollabWeb.LiveDocument do
                         <% end %>
                       </div>
                     </th>
-
+                    
                     <.layers filter={:box} document={@document}>
                       <:item :let={layer_b = %{id: layer_b_id}}>
                         <td align="center">
@@ -182,7 +182,7 @@ defmodule RenewCollabWeb.LiveDocument do
                               |> Enum.at(-1)}
                             </div>
                           <% end %>
-
+                          
                           <div>
                             <%= if layer_a.id != layer_b.id and (not (is_nil(layer_a.box) or is_nil(layer_b.box) or is_nil(layer_a.interface) or is_nil(layer_b.interface))) do %>
                               Connect:
@@ -202,7 +202,7 @@ defmodule RenewCollabWeb.LiveDocument do
                                   <% else _ -> %>
                                     Loading...
                                 <% end %>
-
+                                
                                 <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: socket_schemas} <- @socket_schemas do %>
                                   <select style="width: 5em" name="target_socket_id">
                                     <%= with schema <- socket_schemas |> Map.get(layer_b.interface.socket_schema_id, []) do %>
@@ -216,7 +216,7 @@ defmodule RenewCollabWeb.LiveDocument do
                                   <% else _ -> %>
                                     Loading...
                                 <% end %>
-                                <button>Connect</button>
+                                 <button>Connect</button>
                               </form>
                             <% end %>
                           </div>
@@ -226,7 +226,7 @@ defmodule RenewCollabWeb.LiveDocument do
                   </tr>
                 </:item>
               </.layers>
-
+              
               <tr>
                 <th>
                   <button
@@ -242,7 +242,7 @@ defmodule RenewCollabWeb.LiveDocument do
             </table>
           </div>
         <% end %>
-
+        
         <svg
           phx-click="select_layer"
           phx-value-id=""
@@ -277,7 +277,7 @@ defmodule RenewCollabWeb.LiveDocument do
           <% end %>
         </svg>
       </div>
-
+      
       <div style="grid-area: right;width: 100%; height: 100%; overflow: auto; box-sizing: border-box; padding: 0 2em; background: #eee">
         <p>
           <button
@@ -293,7 +293,7 @@ defmodule RenewCollabWeb.LiveDocument do
             Grid
           </button>
         </p>
-
+        
         <button
           phx-click="make-space"
           style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff"
@@ -305,7 +305,7 @@ defmodule RenewCollabWeb.LiveDocument do
             <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: other_documents} <- @other_documents do %>
               <select name="document_id" onchange="this.value=''">
                 <option value="" selected>Insert Other Document</option>
-
+                
                 <%= for doc <- other_documents, doc.id != @document.id do %>
                   <option value={doc.id}>{doc.name}</option>
                 <% end %>
@@ -317,7 +317,7 @@ defmodule RenewCollabWeb.LiveDocument do
             <% end %>
           </form>
         </div>
-
+        
         <div style="display: flex; gap: 1ex; padding: 1ex 0">
           <button
             type="button"
@@ -361,7 +361,7 @@ defmodule RenewCollabWeb.LiveDocument do
             Create Line
           </button>
         </div>
-
+        
         <div style="display: flex; gap: 1ex; padding: 1ex 0">
           <button
             type="button"
@@ -403,7 +403,7 @@ defmodule RenewCollabWeb.LiveDocument do
                 style="cursor: pointer; grid-area: 1/1/-1/-1;opacity: 0; stretch; align-self: stretch;"
               >
                 <option selected>---cancel---</option>
-
+                
                 <%= for f <- RenewCollabSim.Compiler.SnsCompiler.formalisms() do %>
                   <option>{f}</option>
                 <% end %>
@@ -411,7 +411,7 @@ defmodule RenewCollabWeb.LiveDocument do
             </label>
           </form>
         </div>
-
+        
         <div>
           <.form for={@import_form} phx-submit="import_document" phx-change="validate-import">
             <label>Import Rnw:<br /> <.live_file_input upload={@uploads.import_file} /></label>
@@ -427,15 +427,14 @@ defmodule RenewCollabWeb.LiveDocument do
                       aria-label="cancel"
                     >
                       &times;
-                    </button>
-                    {entry.client_name}
+                    </button> {entry.client_name}
                   </dt>
-
+                  
                   <dd>
                     <%!-- entry.progress will update automatically for in-flight entries --%>
                     <progress value={entry.progress} max="100">{entry.progress}%</progress>
                   </dd>
-
+                  
                   <dd style="grid-column: 1 / span 3;">
                     <ul>
                       <%= for err <- upload_errors(@uploads.import_file, entry) do %>
@@ -446,7 +445,7 @@ defmodule RenewCollabWeb.LiveDocument do
                 <% end %>
               </dl>
             <% end %>
-
+            
             <%= if Enum.count(@uploads.import_file.entries) > 0 and Enum.count(@uploads.import_file.errors) == 0 do %>
               <button
                 type="submit"
@@ -457,17 +456,17 @@ defmodule RenewCollabWeb.LiveDocument do
             <% end %>
           </.form>
         </div>
-
+        
         <h2 style="cursor: pointer;" phx-click="toggle-meta">
           <span>{if(@show_meta, do: "▼", else: "►")}</span> Document
         </h2>
-
+        
         <%= if @show_meta do %>
           <div style="width: 45vw;">
             <form id={"document-rename-#{@document.id}"} phx-hook="RnwDocumentRename">
               <dl style="display: grid; grid-template-columns: auto 1fr;gap:1ex; align-items: baseline">
                 <dt style="margin: 0; text-align: right;">Document Id</dt>
-
+                
                 <dd style="margin: 0;">
                   <input
                     readonly
@@ -484,9 +483,9 @@ defmodule RenewCollabWeb.LiveDocument do
                     Inspect
                   </.link>
                 </dd>
-
+                
                 <dt style="margin: 0; text-align: right;">Document Name</dt>
-
+                
                 <dd style="margin: 0;">
                   <input
                     type="text"
@@ -495,9 +494,9 @@ defmodule RenewCollabWeb.LiveDocument do
                     style="padding: 1ex; box-sizing:border-box; width: 100%;"
                   />
                 </dd>
-
+                
                 <dt style="margin: 0; text-align: right;">Kind</dt>
-
+                
                 <dd style="margin: 0;">
                   <input
                     type="text"
@@ -507,9 +506,9 @@ defmodule RenewCollabWeb.LiveDocument do
                     list="all-semantic-tags"
                   />
                 </dd>
-
+                
                 <dt style="margin: 0; text-align: right;">Syntax</dt>
-
+                
                 <dd style="margin: 0;">
                   <select
                     type="text"
@@ -517,15 +516,15 @@ defmodule RenewCollabWeb.LiveDocument do
                     style="padding: 1ex; box-sizing:border-box; width: 100%;"
                   >
                     <option value="none">None</option>
-
+                    
                     <%= for s <-  @syntax_types do %>
                       <option selected={@document.syntax_id == s.id} value={s.id}>{s.name}</option>
                     <% end %>
                   </select>
                 </dd>
-
+                
                 <dt style="margin: 0; text-align: right;"></dt>
-
+                
                 <dd style="margin: 0;">
                   <button
                     style="cursor: pointer; padding: 1ex; border: none; background: #333; color: #fff"
@@ -537,7 +536,7 @@ defmodule RenewCollabWeb.LiveDocument do
               </dl>
             </form>
           </div>
-          <hr />
+           <hr />
           <button
             type="button"
             phx-click="remove_thumbnail"
@@ -546,14 +545,14 @@ defmodule RenewCollabWeb.LiveDocument do
             Remove Thumbnail
           </button>
         <% end %>
-
+        
         <h2
           {if(@selection, do: [style: "cursor: pointer;"], else: [style: "cursor: pointer; color: #aaa"])}
           phx-click="toggle-selected"
         >
           <span>{if(@show_selected, do: "▼", else: "►")}</span> Selected
         </h2>
-
+        
         <%= if @show_selected do %>
           <div style="width: 45vw;">
             <%= with selected_layer when selected_layer != nil <- Enum.find(@document.layers, &(&1.id == @selection)) do %>
@@ -568,11 +567,11 @@ defmodule RenewCollabWeb.LiveDocument do
             <% end %>
           </div>
         <% end %>
-
+        
         <h2 style="cursor: pointer;" phx-click="toggle-hierarchy">
           <span>{if(@show_hierarchy, do: "▼", else: "►")}</span> Hierarchy
         </h2>
-
+        
         <%= if @show_hierarchy do %>
           <%= if not is_nil(@selection) do %>
             <div style="padding: 1ex 0; display: flex; gap: 1ex">
@@ -626,7 +625,7 @@ defmodule RenewCollabWeb.LiveDocument do
                 Last Sibling
               </button>
             </div>
-
+            
             <div style="padding: 1ex 0; display: flex; gap: 1ex">
               <button
                 phx-click="move-relative"
@@ -679,7 +678,7 @@ defmodule RenewCollabWeb.LiveDocument do
               </button>
             </div>
           <% end %>
-
+          
           <div style="width: 45vw;">
             <.live_component
               id="hierarchy-list"
@@ -691,11 +690,11 @@ defmodule RenewCollabWeb.LiveDocument do
             />
           </div>
         <% end %>
-
+        
         <h2 style="cursor: pointer;" phx-click="toggle-snapshots">
           <span>{if(@show_snapshots, do: "▼", else: "►")}</span> Snapshots
         </h2>
-
+        
         <%= if @show_snapshots do %>
           <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: snapshots} <- @snapshots do %>
             <.live_component
@@ -707,21 +706,21 @@ defmodule RenewCollabWeb.LiveDocument do
               <p>Loading</p>
           <% end %>
         <% end %>
-
+        
         <h2 style="cursor: pointer;" phx-click="toggle-health">
           <span>{if(@show_health, do: "▼", else: "►")}</span> Health
         </h2>
-
+        
         <%= if @show_health do %>
           <div style="width: 45vw;">
             <dl style="display: grid; grid-template-columns: auto auto; justify-content: start; gap: 1ex 1em">
               <dt style="margin: 0">Missing Parenthoods</dt>
-
+              
               <dd style="margin: 0">
                 <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: hierachy_missing} <- @hierachy_missing do %>
                   <details>
                     <summary style="cursor: pointer">{Enum.count(hierachy_missing)}</summary>
-
+                    
                     <ul>
                       <%= for i <- hierachy_missing do %>
                         <li>{i.ancestor_id}/{i.descendant_id}/{i.depth}</li>
@@ -732,14 +731,14 @@ defmodule RenewCollabWeb.LiveDocument do
                     Loading
                 <% end %>
               </dd>
-
+              
               <dt style="margin: 0">Invalid Parenthoods</dt>
-
+              
               <dd style="margin: 0">
                 <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: hierachy_invalid} <- @hierachy_invalid do %>
                   <details>
                     <summary style="cursor: pointer">{Enum.count(hierachy_invalid)}</summary>
-
+                    
                     <ul>
                       <%= for id <- hierachy_invalid do %>
                         <li>{id}</li>
@@ -750,9 +749,9 @@ defmodule RenewCollabWeb.LiveDocument do
                     Loading
                 <% end %>
               </dd>
-
+              
               <dt></dt>
-
+              
               <dd style="margin: 0">
                 <button
                   type="button"
@@ -765,11 +764,11 @@ defmodule RenewCollabWeb.LiveDocument do
             </dl>
           </div>
         <% end %>
-
+        
         <h2 style="cursor: pointer;" phx-click="toggle-simulations">
           <span>{if(@show_simulations, do: "▼", else: "►")}</span> Simulations
         </h2>
-
+        
         <%= if @show_simulations do %>
           <%= with %Phoenix.LiveView.AsyncResult{ok?: true, result: simulation_links} <- @simulation_links do %>
             <%= if Enum.count(simulation_links)> 0 do %>
@@ -790,7 +789,7 @@ defmodule RenewCollabWeb.LiveDocument do
               </ul>
             <% end %>
           <% end %>
-
+          
           <form phx-submit="simulate">
             <input type="hidden" name="redirect" value="no" />
             <label style="display: grid; grid-template-columns: 6em;">
@@ -807,7 +806,7 @@ defmodule RenewCollabWeb.LiveDocument do
                 style="cursor: pointer; grid-area: 1/1/-1/-1;opacity: 0; justify-self: stretch; align-self: stretch; "
               >
                 <option selected>---cancel---</option>
-
+                
                 <%= for f <- RenewCollabSim.Compiler.SnsCompiler.formalisms() do %>
                   <option>{f}</option>
                 <% end %>
@@ -1126,6 +1125,26 @@ defmodule RenewCollabWeb.LiveDocument do
       document_id: socket.assigns.document.id,
       layer_id: layer_id,
       new_position: new_position
+    }
+    |> Dispatcher.perform_as(socket.assigns.current_account)
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "update_edge_points",
+        %{
+          "layer_id" => layer_id,
+          "value" => new_position,
+          "waypoints" => waypoints
+        },
+        socket
+      ) do
+    %Actions.DocumentEditLayerEdgePoints{
+      document_id: socket.assigns.document.id,
+      layer_id: layer_id,
+      new_position: new_position,
+      waypoints: waypoints
     }
     |> Dispatcher.perform_as(socket.assigns.current_account)
 
