@@ -3,12 +3,15 @@ defmodule RenewCollab.Commands.UpdateLayerStyle do
   alias RenewCollab.Hierarchy.Layer
   alias RenewCollab.Style.LayerStyle
 
-  defstruct [:document_id, :layer_id, :style_attr, :value]
+  defstruct [:document_id, :layer_id, :layer_ids, :style_attr, :value]
 
-  def new(%{document_id: document_id, layer_id: layer_id, style_attr: style_attr, value: value}) do
+  def new(%{document_id: document_id, style_attr: style_attr, value: value} = attrs) do
+    layer_ids = normalize_layer_ids(attrs)
+
     %__MODULE__{
       document_id: document_id,
-      layer_id: layer_id,
+      layer_id: List.first(layer_ids),
+      layer_ids: layer_ids,
       style_attr: attr_key(style_attr),
       value: value
     }
@@ -21,23 +24,38 @@ defmodule RenewCollab.Commands.UpdateLayerStyle do
 
   def multi(%__MODULE__{
         document_id: document_id,
-        layer_id: layer_id,
+        layer_ids: layer_ids,
         style_attr: style_attr,
         value: value
       }) do
     Ecto.Multi.new()
     |> Ecto.Multi.put(:document_id, document_id)
-    |> Ecto.Multi.one(:layer, from(l in Layer, where: l.id == ^layer_id))
-    |> RenewCollab.Compatibility.Multi.insert(
-      :style,
-      fn %{layer: layer} ->
-        Ecto.build_assoc(layer, :style)
-        |> LayerStyle.changeset(%{style_attr => value})
-      end,
-      on_conflict: {:replace, [style_attr]},
-      conflict_target: [:layer_id]
+    |> Ecto.Multi.all(
+      :layers,
+      from(l in Layer, where: l.document_id == ^document_id and l.id in ^layer_ids)
     )
+    |> Ecto.Multi.merge(fn %{layers: layers} ->
+      Enum.reduce(layers, Ecto.Multi.new(), fn layer, multi ->
+        RenewCollab.Compatibility.Multi.insert(
+          multi,
+          {:style, layer.id},
+          Ecto.build_assoc(layer, :style)
+          |> LayerStyle.changeset(%{style_attr => value}),
+          on_conflict: {:replace, [style_attr]},
+          conflict_target: [:layer_id]
+        )
+      end)
+    end)
   end
+
+  defp normalize_layer_ids(%{layer_ids: layer_ids}) when is_list(layer_ids) do
+    layer_ids
+    |> Enum.filter(&is_binary/1)
+    |> Enum.uniq()
+  end
+
+  defp normalize_layer_ids(%{layer_id: layer_id}) when is_binary(layer_id), do: [layer_id]
+  defp normalize_layer_ids(_), do: []
 
   defp attr_key("opacity"), do: :opacity
   defp attr_key("background_color"), do: :background_color

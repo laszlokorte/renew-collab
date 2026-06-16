@@ -3,12 +3,15 @@ defmodule RenewCollab.Commands.UpdateLayerEdgeStyle do
   alias RenewCollab.Hierarchy.Layer
   alias RenewCollab.Style.EdgeStyle
 
-  defstruct [:document_id, :layer_id, :style_attr, :value]
+  defstruct [:document_id, :layer_id, :layer_ids, :style_attr, :value]
 
-  def new(%{document_id: document_id, layer_id: layer_id, style_attr: style_attr, value: value}) do
+  def new(%{document_id: document_id, style_attr: style_attr, value: value} = attrs) do
+    layer_ids = normalize_layer_ids(attrs)
+
     %__MODULE__{
       document_id: document_id,
-      layer_id: layer_id,
+      layer_id: List.first(layer_ids),
+      layer_ids: layer_ids,
       style_attr: attr_key(style_attr),
       value: value
     }
@@ -21,26 +24,42 @@ defmodule RenewCollab.Commands.UpdateLayerEdgeStyle do
 
   def multi(%__MODULE__{
         document_id: document_id,
-        layer_id: layer_id,
+        layer_ids: layer_ids,
         style_attr: style_attr,
         value: value
       }) do
     Ecto.Multi.new()
     |> Ecto.Multi.put(:document_id, document_id)
-    |> Ecto.Multi.one(
-      :edge,
-      from(l in Layer, join: e in assoc(l, :edge), where: l.id == ^layer_id, select: e)
+    |> Ecto.Multi.all(
+      :edges,
+      from(l in Layer,
+        join: e in assoc(l, :edge),
+        where: l.document_id == ^document_id and l.id in ^layer_ids,
+        select: {l.id, e}
+      )
     )
-    |> RenewCollab.Compatibility.Multi.insert(
-      :style,
-      fn %{edge: edge} ->
-        Ecto.build_assoc(edge, :style)
-        |> EdgeStyle.changeset(%{style_attr => value})
-      end,
-      on_conflict: {:replace, [style_attr]},
-      conflict_target: [:edge_id]
-    )
+    |> Ecto.Multi.merge(fn %{edges: edges} ->
+      Enum.reduce(edges, Ecto.Multi.new(), fn {layer_id, edge}, multi ->
+        RenewCollab.Compatibility.Multi.insert(
+          multi,
+          {:style, layer_id},
+          Ecto.build_assoc(edge, :style)
+          |> EdgeStyle.changeset(%{style_attr => value}),
+          on_conflict: {:replace, [style_attr]},
+          conflict_target: [:edge_id]
+        )
+      end)
+    end)
   end
+
+  defp normalize_layer_ids(%{layer_ids: layer_ids}) when is_list(layer_ids) do
+    layer_ids
+    |> Enum.filter(&is_binary/1)
+    |> Enum.uniq()
+  end
+
+  defp normalize_layer_ids(%{layer_id: layer_id}) when is_binary(layer_id), do: [layer_id]
+  defp normalize_layer_ids(_), do: []
 
   defp attr_key("stroke_width"), do: :stroke_width
   defp attr_key("stroke_color"), do: :stroke_color

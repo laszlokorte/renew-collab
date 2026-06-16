@@ -456,12 +456,14 @@ defmodule RenewCollabCtrl.Action do
   def do_perform(%Actions.DocumentEditLayerEdgeStyle{
         document_id: document_id,
         layer_id: layer_id,
+        layer_ids: layer_ids,
         style_attr: style_attr,
         value: value
       }) do
     RenewCollab.Commands.UpdateLayerEdgeStyle.new(%{
       document_id: document_id,
       layer_id: layer_id,
+      layer_ids: layer_ids,
       style_attr: style_attr,
       value: value
     })
@@ -518,12 +520,14 @@ defmodule RenewCollabCtrl.Action do
   def do_perform(%Actions.DocumentEditLayerStyle{
         document_id: document_id,
         layer_id: layer_id,
+        layer_ids: layer_ids,
         style_attr: style_attr,
         value: value
       }) do
     RenewCollab.Commands.UpdateLayerStyle.new(%{
       document_id: document_id,
       layer_id: layer_id,
+      layer_ids: layer_ids,
       style_attr: style_attr,
       value: value
     })
@@ -580,12 +584,14 @@ defmodule RenewCollabCtrl.Action do
   def do_perform(%Actions.DocumentEditLayerTextStyle{
         document_id: document_id,
         layer_id: layer_id,
+        layer_ids: layer_ids,
         style_attr: style_attr,
         value: value
       }) do
     RenewCollab.Commands.UpdateLayerTextStyle.new(%{
       document_id: document_id,
       layer_id: layer_id,
+      layer_ids: layer_ids,
       style_attr: style_attr,
       value: value
     })

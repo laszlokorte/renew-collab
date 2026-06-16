@@ -555,19 +555,23 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
   @impl true
   def handle_event(
         "change_style",
-        %{"type" => "text", "attr" => style_attr, "layer_id" => layer_id, "val" => value},
+        %{"type" => "text", "attr" => style_attr, "val" => value} = params,
         %{},
         %{:document_id => document_id, :account => account},
         _socket
       )
-      when is_binary(style_attr) and is_binary(layer_id) do
-    %Actions.DocumentEditLayerTextStyle{
-      document_id: document_id,
-      layer_id: layer_id,
-      style_attr: style_attr,
-      value: value
-    }
-    |> Dispatcher.perform_as(account)
+      when is_binary(style_attr) do
+    layer_ids = style_layer_ids(params)
+
+    if layer_ids != [] do
+      %Actions.DocumentEditLayerTextStyle{
+        document_id: document_id,
+        layer_ids: layer_ids,
+        style_attr: style_attr,
+        value: value
+      }
+      |> Dispatcher.perform_as(account)
+    end
 
     :silent
   end
@@ -594,19 +598,23 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
   @impl true
   def handle_event(
         "change_style",
-        %{"type" => "edge", "attr" => style_attr, "layer_id" => layer_id, "val" => value},
+        %{"type" => "edge", "attr" => style_attr, "val" => value} = params,
         %{},
         %{:document_id => document_id, :account => account},
         _socket
       )
-      when is_binary(style_attr) and is_binary(layer_id) do
-    %Actions.DocumentEditLayerEdgeStyle{
-      document_id: document_id,
-      layer_id: layer_id,
-      style_attr: style_attr,
-      value: value
-    }
-    |> Dispatcher.perform_as(account)
+      when is_binary(style_attr) do
+    layer_ids = style_layer_ids(params)
+
+    if layer_ids != [] do
+      %Actions.DocumentEditLayerEdgeStyle{
+        document_id: document_id,
+        layer_ids: layer_ids,
+        style_attr: style_attr,
+        value: value
+      }
+      |> Dispatcher.perform_as(account)
+    end
 
     :silent
   end
@@ -614,19 +622,23 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
   @impl true
   def handle_event(
         "change_style",
-        %{"type" => "layer", "attr" => style_attr, "layer_id" => layer_id, "val" => value},
+        %{"type" => "layer", "attr" => style_attr, "val" => value} = params,
         %{},
         %{:document_id => document_id, :account => account},
         _socket
       )
-      when is_binary(style_attr) and is_binary(layer_id) do
-    %Actions.DocumentEditLayerStyle{
-      document_id: document_id,
-      layer_id: layer_id,
-      style_attr: style_attr,
-      value: value
-    }
-    |> Dispatcher.perform_as(account)
+      when is_binary(style_attr) do
+    layer_ids = style_layer_ids(params)
+
+    if layer_ids != [] do
+      %Actions.DocumentEditLayerStyle{
+        document_id: document_id,
+        layer_ids: layer_ids,
+        style_attr: style_attr,
+        value: value
+      }
+      |> Dispatcher.perform_as(account)
+    end
 
     :silent
   end
@@ -1483,6 +1495,12 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
     )
 
     {:reply, %{layer_ids: selection}}
+  end
+
+  defp style_layer_ids(params) do
+    params
+    |> Map.get("layer_ids", Map.get(params, "layer_id"))
+    |> normalize_selection()
   end
 
   defp normalize_selection(selection) when is_list(selection) do
