@@ -24,7 +24,7 @@ defmodule RenewCollabWeb.ProjectDocumentController do
 
   def create(conn, %{"project_id" => project_id, "document" => document_data}) do
     %Actions.DocumentCreateInProject{project_id: project_id, document_data: document_data}
-    |> Dispatcher.perform_as(conn.assigns.current_user)
+    |> Dispatcher.perform_as(conn.assigns.current_account)
     |> case do
       {:ok, %Document{} = document} ->
         conn
