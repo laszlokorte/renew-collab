@@ -157,7 +157,8 @@ defmodule RenewCollabWeb.LiveSimulationNetInstanceChannel do
         simulation_id: simulation_id,
         net_instance_label: net_instance_label,
         transition_id: payload_value(payload, "transition_id"),
-        binding_index: payload_value(payload, "binding_index")
+        binding_index: payload_value(payload, "binding_index"),
+        sync: true
       }
       |> perform_action(account)
 

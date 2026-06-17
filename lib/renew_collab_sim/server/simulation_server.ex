@@ -52,6 +52,13 @@ defmodule RenewCollabSim.Server.SimulationServer do
     )
   end
 
+  def fire_transition_async(pid, simulation_id, net_instance_label, transition_id, binding_index) do
+    GenServer.cast(
+      pid,
+      {:fire_transition, simulation_id, net_instance_label, transition_id, binding_index}
+    )
+  end
+
   def list_breakpoints(pid, simulation_id) do
     safe_call(pid, {:list_breakpoints, simulation_id})
   end
@@ -274,6 +281,27 @@ defmodule RenewCollabSim.Server.SimulationServer do
            transition_id,
            binding_index
          ), state}
+
+      nil ->
+        {:reply, false, state}
+    end
+  end
+
+  @impl true
+  def handle_cast(
+        {:fire_transition, simulation_id, net_instance_label, transition_id, binding_index},
+        %{processes: procs} = state
+      ) do
+    case Map.get(procs, simulation_id, nil) do
+      %{sim_process: p} ->
+        RenewCollabSim.Server.SimulationProcess.fire_transition_async(
+          p,
+          net_instance_label,
+          transition_id,
+          binding_index
+        )
+
+        {:noreply, state}
 
       nil ->
         {:reply, false, state}

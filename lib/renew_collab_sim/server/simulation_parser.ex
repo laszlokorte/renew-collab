@@ -13,6 +13,7 @@ defmodule RenewCollabSim.Server.SimulationParser do
   @bindings_end ~r/SIMULATION_BINDINGS_END (?<be_request_id>\S+)/
   @bindings_error ~r/SIMULATION_BINDINGS_ERROR (?<ber_request_id>\S+) (?<ber_detail>\S+)/
   @fire_result ~r/SIMULATION_FIRE (?<fire_request_id>\S+) (?<fire_status>\S+)(?: (?<fire_detail>\S+))?/
+  @error_no_sim ~r/Error: (?<no_sim>There is no current simulation environment)/
 
   @combined [
               @bindings_start,
@@ -26,7 +27,8 @@ defmodule RenewCollabSim.Server.SimulationParser do
               @removing,
               @firing,
               @sync,
-              @setup
+              @setup,
+              @error_no_sim
             ]
             |> Enum.map_join("|", & &1.source)
             |> then(&"(:?#{@prompt})?(?:#{&1})")
@@ -152,6 +154,9 @@ defmodule RenewCollabSim.Server.SimulationParser do
       }
       when "" != setup ->
         :setup
+
+      %{"no_sim" => _no_sim} ->
+        :no_sim
 
       nil ->
         nil

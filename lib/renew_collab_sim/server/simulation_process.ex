@@ -47,6 +47,10 @@ defmodule RenewCollabSim.Server.SimulationProcess do
     safe_call(pid, {:fire_transition, net_instance_label, transition_id, binding_index})
   end
 
+  def fire_transition_async(pid, net_instance_label, transition_id, binding_index) do
+    GenServer.cast(pid, {:fire_transition, net_instance_label, transition_id, binding_index})
+  end
+
   def list_breakpoints(pid) do
     safe_call(pid, :list_breakpoints)
   end
@@ -296,6 +300,21 @@ defmodule RenewCollabSim.Server.SimulationProcess do
     {:noreply,
      put_in(state.fire_requests[request_id], %{
        from: from,
+       transition_id: transition_id
+     })}
+  end
+
+  @impl true
+  def handle_cast(
+        {:fire_transition, net_instance_label, transition_id, binding_index},
+        state
+      ) do
+    request_id = UUID.uuid4(:default)
+    State.fire_transition(state, request_id, net_instance_label, transition_id, binding_index)
+
+    {:noreply,
+     put_in(state.fire_requests[request_id], %{
+       from: nil,
        transition_id: transition_id
      })}
   end
@@ -584,6 +603,9 @@ defmodule RenewCollabSim.Server.SimulationProcess do
       {:fire_result, request_id, _status, detail} ->
         {:noreply, finish_fire_request(state, request_id, {:error, detail})}
 
+      :no_sim ->
+        {:noreply, cancel_all_requests(state, "Simulation not Running")}
+
       nil ->
         {:noreply, state}
     end
@@ -707,6 +729,23 @@ defmodule RenewCollabSim.Server.SimulationProcess do
     |> Enum.sort_by(& &1.transition_id)
   end
 
+  defp cancel_all_requests(
+         %{binding_requests: open_binding_reqs, fire_requests: open_fire_reqs} = state,
+         error_detail
+       ) do
+    for {req_id, %{from: from}} when not is_nil(from) <- open_binding_reqs do
+      GenServer.reply(from, {:error, error_detail})
+    end
+
+    dbg(open_fire_reqs)
+
+    for {req_id, %{from: from}} when not is_nil(from) <- open_fire_reqs do
+      GenServer.reply(from, {:error, error_detail})
+    end
+
+    %{state | fire_requests: Map.new(), binding_requests: Map.new()}
+  end
+
   @impl true
   # handle termination
   def terminate(
@@ -781,5 +820,9 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   catch
     :exit, {:timeout, _} -> {:error, :simulation_command_timed_out}
     :exit, reason -> {:error, reason}
+  end
+
+  defp safe_cast(pid, message) do
+    GenServer.cast(pid, message)
   end
 end

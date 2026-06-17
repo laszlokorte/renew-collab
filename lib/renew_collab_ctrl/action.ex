@@ -1544,13 +1544,34 @@ defmodule RenewCollabCtrl.Action do
         simulation_id: simulation_id,
         net_instance_label: net_instance_label,
         transition_id: transition_id,
-        binding_index: binding_index
+        binding_index: binding_index,
+        sync: true
       }) do
     {:ok, %{project_id: project_id}} =
       %RenewCollabProj.Queries.SimulationsProject{simulation_id: simulation_id}
       |> RenewCollabProj.ProjectFetcher.fetch()
 
     RenewCollabSim.Server.ScopedSimulationServer.fire_transition(
+      project_id,
+      simulation_id,
+      net_instance_label,
+      transition_id,
+      binding_index
+    )
+  end
+
+  def do_perform(%Actions.SimulationFireTransition{
+        simulation_id: simulation_id,
+        net_instance_label: net_instance_label,
+        transition_id: transition_id,
+        binding_index: binding_index,
+        sync: false
+      }) do
+    {:ok, %{project_id: project_id}} =
+      %RenewCollabProj.Queries.SimulationsProject{simulation_id: simulation_id}
+      |> RenewCollabProj.ProjectFetcher.fetch()
+
+    RenewCollabSim.Server.ScopedSimulationServer.fire_transition_async(
       project_id,
       simulation_id,
       net_instance_label,
