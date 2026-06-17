@@ -4,7 +4,6 @@ defmodule RenewCollabWeb.LiveSimulationNetInstanceTransitionBindingsChannel do
   alias RenewCollabCtrl.Fetcher
   alias RenewCollabCtrl.Views
   alias RenewCollabSim.Entities
-  alias RenewCollabWeb.SimulationError
   use RenewCollabWeb.StateChannel, web_module: RenewCollabWeb
 
   @impl true
@@ -23,7 +22,7 @@ defmodule RenewCollabWeb.LiveSimulationNetInstanceTransitionBindingsChannel do
       nil ->
         {:error, %{reason: "not found"}}
 
-      %Entities.SimulationNetInstance{label: net_instance_label, simulation_id: simulation_id} =
+      %Entities.SimulationNetInstance{simulation_id: simulation_id} =
           net_instance ->
         Phoenix.PubSub.subscribe(RenewCollab.PubSub, "simulation:#{simulation_id}")
 

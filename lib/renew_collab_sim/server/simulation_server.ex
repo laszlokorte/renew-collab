@@ -108,6 +108,13 @@ defmodule RenewCollabSim.Server.SimulationServer do
   end
 
   @impl true
+  def handle_continue({:broadcast, simulation_id}, state) do
+    broadcast_state_change(state, simulation_id)
+
+    {:noreply, state}
+  end
+
+  @impl true
   def handle_cast(
         {:setup, simulation_id},
         %{processes: procs, pubsub_channels: pubsub_channels} = state
@@ -120,8 +127,6 @@ defmodule RenewCollabSim.Server.SimulationServer do
                simulation_id,
                simulation_pubsub_channels(simulation_id, pubsub_channels)
              ) do
-        broadcast_state_change(state, simulation_id)
-
         {:noreply,
          %{
            state
@@ -129,7 +134,7 @@ defmodule RenewCollabSim.Server.SimulationServer do
                Map.put(procs, simulation_id, %{
                  sim_process: pid
                })
-         }}
+         }, {:continue, {:broadcast, simulation_id}}}
       else
         _ ->
           {:noreply, state}
@@ -199,8 +204,6 @@ defmodule RenewCollabSim.Server.SimulationServer do
                simulation_id,
                simulation_pubsub_channels(simulation_id, pubsub_channels)
              ) do
-        broadcast_state_change(state, simulation_id)
-
         {:reply, :ok,
          %{
            state
@@ -208,7 +211,7 @@ defmodule RenewCollabSim.Server.SimulationServer do
                Map.put(procs, simulation_id, %{
                  sim_process: pid
                })
-         }}
+         }, {:continue, {:broadcast, simulation_id}}}
       else
         error ->
           {:reply, error, state}
@@ -414,20 +417,13 @@ defmodule RenewCollabSim.Server.SimulationServer do
   end
 
   @impl true
-  def handle_info(
-        {:broadcast_shutdown, simulation_id},
-        %{processes: procs} = state
-      ) do
-    broadcast_state_change(state, simulation_id)
-
-    if Enum.empty?(procs), do: {:stop, :normal, state}, else: {:noreply, state}
-  end
-
-  @impl true
   def handle_info({:DOWN, _ref, :process, pid, _}, %{processes: procs} = state) do
-    for {simulation_id, %{sim_process: ^pid}} <- procs do
-      Process.send_after(self(), {:broadcast_shutdown, simulation_id}, 0)
-    end
+    simulation_id =
+      procs
+      |> Enum.find_value(fn
+        {simulation_id, %{sim_process: ^pid}} -> simulation_id
+        _ -> nil
+      end)
 
     remaining =
       Map.filter(procs, fn
@@ -435,7 +431,11 @@ defmodule RenewCollabSim.Server.SimulationServer do
         _ -> true
       end)
 
-    {:noreply, %{state | processes: remaining}}
+    if simulation_id do
+      {:noreply, %{state | processes: remaining}, {:continue, {:broadcast, simulation_id}}}
+    else
+      {:noreply, %{state | processes: remaining}}
+    end
   end
 
   @impl true
@@ -448,17 +448,12 @@ defmodule RenewCollabSim.Server.SimulationServer do
 
   @impl true
   # handle termination
-  def terminate(reason, state) do
-    cleanup(reason, state)
-    state
-  end
-
-  defp cleanup(_reason, %{processes: procs} = state) do
-    for {simulation_id, %{sim_process: pid}} <- procs do
-      RenewCollabSim.Server.SimulationProcess.stop(pid)
-
+  def terminate(_reason, %{processes: procs} = state) do
+    Enum.each(procs, fn {simulation_id, _} ->
       broadcast_state_change(state, simulation_id)
-    end
+    end)
+
+    :ok
   end
 
   defp broadcast_state_change(%{pubsub_channels: channels}, simulation_id) do

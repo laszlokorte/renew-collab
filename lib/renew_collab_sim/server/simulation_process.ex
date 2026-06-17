@@ -4,6 +4,9 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   alias RenewCollabSim.Server.SimulationProcess.State
 
   @simulation_command_timeout 30_000
+  @auto_play_delay_ms 100
+  @broadcast_retry_ms 200
+  @console_capture_ms 250
 
   def start_monitor(simulation_id, pubsub_channels) do
     with {:ok, pid} <-
@@ -100,7 +103,10 @@ defmodule RenewCollabSim.Server.SimulationProcess do
 
       %{state | latest_update: now, retry: nil}
     else
-      %{state | retry: Process.send_after(self(), {:retry_broadcast, event}, 100)}
+      %{
+        state
+        | retry: Process.send_after(self(), {:retry_broadcast, event}, @broadcast_retry_ms)
+      }
     end
   end
 
@@ -181,8 +187,13 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   defp explain_simulation_error(detail), do: inspect(detail)
 
   @impl true
-  def handle_info({:retry_broadcast, event}, state) do
+  def handle_continue({:broadcast, event}, state) do
     {:noreply, state |> broadcast_change(event)}
+  end
+
+  @impl true
+  def handle_info({:retry_broadcast, event}, state) do
+    {:noreply, state, {:continue, {:broadcast, event}}}
   end
 
   @impl true
@@ -257,7 +268,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   def handle_call({:console_command, command}, from, state) when is_binary(command) do
     request_id = UUID.uuid4(:default)
     State.console_command(state, command)
-    Process.send_after(self(), {:finish_console_request, request_id}, 250)
+    Process.send_after(self(), {:finish_console_request, request_id}, @console_capture_ms)
 
     {:noreply,
      put_in(state.console_requests[request_id], %{
@@ -297,21 +308,6 @@ defmodule RenewCollabSim.Server.SimulationProcess do
     {:noreply,
      put_in(state.fire_requests[request_id], %{
        from: from,
-       transition_id: transition_id
-     })}
-  end
-
-  @impl true
-  def handle_cast(
-        {:fire_transition, net_instance_label, transition_id, binding_index},
-        state
-      ) do
-    request_id = UUID.uuid4(:default)
-    State.fire_transition(state, request_id, net_instance_label, transition_id, binding_index)
-
-    {:noreply,
-     put_in(state.fire_requests[request_id], %{
-       from: nil,
        transition_id: transition_id
      })}
   end
@@ -390,13 +386,13 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   def handle_cast(:play, state) do
     state = %{state | playing: true}
     State.step(state)
-    {:noreply, state |> broadcast_change(:play)}
+    {:noreply, state, {:continue, {:broadcast, :play}}}
   end
 
   @impl true
   def handle_cast(:pause, %{sim_process: _sim_process} = state) do
     # send(sim_process, {:command, "simulation stop\n"})
-    {:noreply, %{state | playing: false, scheduled: false} |> broadcast_change(:pause)}
+    {:noreply, %{state | playing: false, scheduled: false}, {:continue, {:broadcast, :pause}}}
   end
 
   @impl true
@@ -553,11 +549,11 @@ defmodule RenewCollabSim.Server.SimulationProcess do
           |> State.commit(:strict)
 
         if playing and not scheduled do
-          Process.send_after(self(), :auto_step, 100)
+          Process.send_after(self(), :auto_step, @auto_play_delay_ms)
 
-          {:noreply, %{state | scheduled: true} |> broadcast_change(:step)}
+          {:noreply, %{state | scheduled: true}, {:continue, {:broadcast, :step}}}
         else
-          {:noreply, state |> broadcast_change(:step)}
+          {:noreply, state, {:continue, {:broadcast, :step}}}
         end
 
       :setup ->
@@ -568,8 +564,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
           })
         )
         |> State.commit(:strict)
-        |> broadcast_change(:init)
-        |> then(&{:noreply, &1})
+        |> then(&{:noreply, &1, {:continue, {:broadcast, :init}}})
 
       {:bindings_start, request_id, transition_id, transition_instance, count} ->
         {:noreply,
@@ -730,11 +725,11 @@ defmodule RenewCollabSim.Server.SimulationProcess do
          %{binding_requests: open_binding_reqs, fire_requests: open_fire_reqs} = state,
          error_detail
        ) do
-    for {req_id, %{from: from}} when not is_nil(from) <- open_binding_reqs do
+    for {_req_id, %{from: from}} when not is_nil(from) <- open_binding_reqs do
       GenServer.reply(from, {:error, error_detail})
     end
 
-    for {req_id, %{from: from}} when not is_nil(from) <- open_fire_reqs do
+    for {_req_id, %{from: from}} when not is_nil(from) <- open_fire_reqs do
       GenServer.reply(from, {:error, error_detail})
     end
 
@@ -815,9 +810,5 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   catch
     :exit, {:timeout, _} -> {:error, :simulation_command_timed_out}
     :exit, reason -> {:error, reason}
-  end
-
-  defp safe_cast(pid, message) do
-    GenServer.cast(pid, message)
   end
 end
