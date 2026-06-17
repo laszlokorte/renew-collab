@@ -22,7 +22,7 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
     :cmds
   ]
 
-  def init(parent, simulation, pubsub_channels) do
+  def init(parent, simulation, pubsub_channels, opts \\ []) do
     try do
       import Ecto.Query
 
@@ -38,6 +38,35 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
       }
 
       {sim_process, directory} = init_process(parent, simulation, Map.get(cmds, :sim_start))
+
+      reset_multi =
+        Ecto.Multi.new()
+        |> Ecto.Multi.delete_all(
+          :reset_net_instances_initial,
+          from(n in RenewCollabSim.Entities.SimulationNetInstance,
+            where: n.simulation_id == ^simulation.id
+          )
+        )
+        |> Ecto.Multi.delete_all(
+          :reset_logs_initial,
+          from(l in RenewCollabSim.Entities.SimulationLogEntry,
+            where: l.simulation_id == ^simulation.id
+          )
+        )
+        |> Ecto.Multi.update_all(
+          :reset_timestep_initial,
+          from(sim in RenewCollabSim.Entities.Simulation,
+            where: sim.id == ^simulation.id,
+            update: [set: [timestep: 0]]
+          ),
+          []
+        )
+
+      # by default delete all net instances, log entries of older simulation runs from DB
+      # and reset timer
+      if Keyword.get(opts, :initial_reset, true) do
+        Repo.transact(reset_multi)
+      end
 
       {:ok,
        %__MODULE__{
@@ -58,29 +87,8 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
          console_requests: %{},
          breakpoints: %{},
          cmds: cmds,
-         open_multi:
-           {0,
-            Ecto.Multi.new()
-            |> Ecto.Multi.delete_all(
-              :reset_net_instances_initial,
-              from(n in RenewCollabSim.Entities.SimulationNetInstance,
-                where: n.simulation_id == ^simulation.id
-              )
-            )
-            |> Ecto.Multi.delete_all(
-              :reset_logs_initial,
-              from(l in RenewCollabSim.Entities.SimulationLogEntry,
-                where: l.simulation_id == ^simulation.id
-              )
-            )
-            |> Ecto.Multi.update_all(
-              :reset_timestep_initial,
-              from(sim in RenewCollabSim.Entities.Simulation,
-                where: sim.id == ^simulation.id,
-                update: [set: [timestep: 0]]
-              ),
-              []
-            )}
+         # rerun reset on first received event again
+         open_multi: {0, reset_multi}
        }}
     rescue
       e ->

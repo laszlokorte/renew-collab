@@ -27,8 +27,7 @@ defmodule RenewCollabSim.Server.SimulationParser do
               @removing,
               @firing,
               @sync,
-              @setup,
-              @error_no_sim
+              @setup
             ]
             |> Enum.map_join("|", & &1.source)
             |> then(&"(:?#{@prompt})?(?:#{&1})")

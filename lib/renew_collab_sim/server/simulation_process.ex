@@ -47,10 +47,6 @@ defmodule RenewCollabSim.Server.SimulationProcess do
     safe_call(pid, {:fire_transition, net_instance_label, transition_id, binding_index})
   end
 
-  def fire_transition_async(pid, net_instance_label, transition_id, binding_index) do
-    GenServer.cast(pid, {:fire_transition, net_instance_label, transition_id, binding_index})
-  end
-
   def list_breakpoints(pid) do
     safe_call(pid, :list_breakpoints)
   end
@@ -216,7 +212,8 @@ defmodule RenewCollabSim.Server.SimulationProcess do
            State.init(
              self(),
              simulation,
-             pubsub_channels
+             pubsub_channels,
+             initial_reset: true
            ) do
       {:ok, state}
     else
@@ -736,8 +733,6 @@ defmodule RenewCollabSim.Server.SimulationProcess do
     for {req_id, %{from: from}} when not is_nil(from) <- open_binding_reqs do
       GenServer.reply(from, {:error, error_detail})
     end
-
-    dbg(open_fire_reqs)
 
     for {req_id, %{from: from}} when not is_nil(from) <- open_fire_reqs do
       GenServer.reply(from, {:error, error_detail})

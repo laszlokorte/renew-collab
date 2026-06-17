@@ -56,20 +56,6 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
     )
   end
 
-  def fire_transition_async(
-        simulation_scope,
-        simulation_id,
-        net_instance_label,
-        transition_id,
-        binding_index
-      ) do
-    GenServer.cast(
-      __MODULE__,
-      {:fire_transition, simulation_scope, simulation_id, net_instance_label, transition_id,
-       binding_index}
-    )
-  end
-
   def list_breakpoints(simulation_scope, simulation_id) do
     safe_call({:list_breakpoints, simulation_scope, simulation_id})
   end
@@ -238,11 +224,17 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
   end
 
   @impl true
-  def handle_call({:console_command, simulation_scope, simulation_id, command}, _from, state) do
+  def handle_call({:console_command, simulation_scope, simulation_id, command}, from, state) do
     case Map.get(state, simulation_scope, nil) do
       %{server_process: p} ->
-        {:reply,
-         RenewCollabSim.Server.SimulationServer.console_command(p, simulation_id, command), state}
+        Task.start(fn ->
+          result =
+            RenewCollabSim.Server.SimulationServer.console_command(p, simulation_id, command)
+
+          GenServer.reply(from, result)
+        end)
+
+        {:noreply, state}
 
       nil ->
         {:reply, false, state}
@@ -253,18 +245,24 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
   def handle_call(
         {:transition_bindings, simulation_scope, simulation_id, net_instance_label,
          transition_id},
-        _from,
+        from,
         state
       ) do
     case Map.get(state, simulation_scope, nil) do
       %{server_process: p} ->
-        {:reply,
-         RenewCollabSim.Server.SimulationServer.transition_bindings(
-           p,
-           simulation_id,
-           net_instance_label,
-           transition_id
-         ), state}
+        Task.start(fn ->
+          result =
+            RenewCollabSim.Server.SimulationServer.transition_bindings(
+              p,
+              simulation_id,
+              net_instance_label,
+              transition_id
+            )
+
+          GenServer.reply(from, result)
+        end)
+
+        {:noreply, state}
 
       nil ->
         {:reply, false, state}
@@ -275,19 +273,25 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
   def handle_call(
         {:fire_transition, simulation_scope, simulation_id, net_instance_label, transition_id,
          binding_index},
-        _from,
+        from,
         state
       ) do
     case Map.get(state, simulation_scope, nil) do
       %{server_process: p} ->
-        {:reply,
-         RenewCollabSim.Server.SimulationServer.fire_transition(
-           p,
-           simulation_id,
-           net_instance_label,
-           transition_id,
-           binding_index
-         ), state}
+        Task.start(fn ->
+          result =
+            RenewCollabSim.Server.SimulationServer.fire_transition(
+              p,
+              simulation_id,
+              net_instance_label,
+              transition_id,
+              binding_index
+            )
+
+          GenServer.reply(from, result)
+        end)
+
+        {:noreply, state}
 
       nil ->
         {:reply, false, state}
@@ -295,33 +299,17 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
   end
 
   @impl true
-  def handle_cast(
-        {:fire_transition, simulation_scope, simulation_id, net_instance_label, transition_id,
-         binding_index},
-        state
-      ) do
+  def handle_call({:list_breakpoints, simulation_scope, simulation_id}, from, state) do
     case Map.get(state, simulation_scope, nil) do
       %{server_process: p} ->
-        RenewCollabSim.Server.SimulationServer.fire_transition_async(
-          p,
-          simulation_id,
-          net_instance_label,
-          transition_id,
-          binding_index
-        )
+        Task.start(fn ->
+          result =
+            RenewCollabSim.Server.SimulationServer.list_breakpoints(p, simulation_id)
+
+          GenServer.reply(from, result)
+        end)
 
         {:noreply, state}
-
-      nil ->
-        {:noreply, state}
-    end
-  end
-
-  @impl true
-  def handle_call({:list_breakpoints, simulation_scope, simulation_id}, _from, state) do
-    case Map.get(state, simulation_scope, nil) do
-      %{server_process: p} ->
-        {:reply, RenewCollabSim.Server.SimulationServer.list_breakpoints(p, simulation_id), state}
 
       nil ->
         {:reply, false, state}
@@ -331,17 +319,23 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
   @impl true
   def handle_call(
         {:set_transition_breakpoint, simulation_scope, simulation_id, transition_id},
-        _from,
+        from,
         state
       ) do
     case Map.get(state, simulation_scope, nil) do
       %{server_process: p} ->
-        {:reply,
-         RenewCollabSim.Server.SimulationServer.set_transition_breakpoint(
-           p,
-           simulation_id,
-           transition_id
-         ), state}
+        Task.start(fn ->
+          result =
+            RenewCollabSim.Server.SimulationServer.set_transition_breakpoint(
+              p,
+              simulation_id,
+              transition_id
+            )
+
+          GenServer.reply(from, result)
+        end)
+
+        {:noreply, state}
 
       nil ->
         {:reply, false, state}
@@ -351,17 +345,23 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
   @impl true
   def handle_call(
         {:clear_transition_breakpoint, simulation_scope, simulation_id, transition_id},
-        _from,
+        from,
         state
       ) do
     case Map.get(state, simulation_scope, nil) do
       %{server_process: p} ->
-        {:reply,
-         RenewCollabSim.Server.SimulationServer.clear_transition_breakpoint(
-           p,
-           simulation_id,
-           transition_id
-         ), state}
+        Task.start(fn ->
+          result =
+            RenewCollabSim.Server.SimulationServer.clear_transition_breakpoint(
+              p,
+              simulation_id,
+              transition_id
+            )
+
+          GenServer.reply(from, result)
+        end)
+
+        {:noreply, state}
 
       nil ->
         {:reply, false, state}
@@ -369,11 +369,17 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
   end
 
   @impl true
-  def handle_call({:clear_breakpoints, simulation_scope, simulation_id}, _from, state) do
+  def handle_call({:clear_breakpoints, simulation_scope, simulation_id}, from, state) do
     case Map.get(state, simulation_scope, nil) do
       %{server_process: p} ->
-        {:reply, RenewCollabSim.Server.SimulationServer.clear_breakpoints(p, simulation_id),
-         state}
+        Task.start(fn ->
+          result =
+            RenewCollabSim.Server.SimulationServer.clear_breakpoints(p, simulation_id)
+
+          GenServer.reply(from, result)
+        end)
+
+        {:noreply, state}
 
       nil ->
         {:reply, false, state}
@@ -381,10 +387,17 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
   end
 
   @impl true
-  def handle_call({:exists, simulation_scope, simulation_id}, _from, state) do
+  def handle_call({:exists, simulation_scope, simulation_id}, from, state) do
     case Map.get(state, simulation_scope, nil) do
       %{server_process: p} ->
-        {:reply, RenewCollabSim.Server.SimulationServer.exists(p, simulation_id), state}
+        Task.start(fn ->
+          result =
+            RenewCollabSim.Server.SimulationServer.exists(p, simulation_id)
+
+          GenServer.reply(from, result)
+        end)
+
+        {:noreply, state}
 
       nil ->
         {:reply, false, state}
@@ -392,23 +405,36 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
   end
 
   @impl true
-  def handle_call({:is_playing, simulation_scope, simulation_id}, _from, state) do
+  def handle_call({:is_playing, simulation_scope, simulation_id}, from, state) do
     Map.get(state, simulation_scope, nil)
     |> case do
       %{server_process: pid} ->
-        RenewCollabSim.Server.SimulationServer.is_playing(pid, simulation_id)
+        Task.start(fn ->
+          result =
+            RenewCollabSim.Server.SimulationServer.is_playing(pid, simulation_id)
+
+          GenServer.reply(from, result)
+        end)
+
+        {:noreply, state}
 
       _ ->
-        false
+        {:reply, false, state}
     end
-    |> then(&{:reply, &1, state})
   end
 
   @impl true
-  def handle_call({:running_ids, simulation_scope}, _from, state) do
+  def handle_call({:running_ids, simulation_scope}, from, state) do
     case Map.get(state, simulation_scope, nil) do
       %{server_process: p} ->
-        {:reply, RenewCollabSim.Server.SimulationServer.running_ids(p), state}
+        Task.start(fn ->
+          result =
+            RenewCollabSim.Server.SimulationServer.running_ids(p)
+
+          GenServer.reply(from, result)
+        end)
+
+        {:noreply, state}
 
       nil ->
         {:reply, MapSet.new(), state}
@@ -416,10 +442,17 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
   end
 
   @impl true
-  def handle_call({:count, simulation_scope}, _from, state) do
+  def handle_call({:count, simulation_scope}, from, state) do
     case Map.get(state, simulation_scope, nil) do
       %{server_process: p} ->
-        {:reply, RenewCollabSim.Server.SimulationServer.count(p), state}
+        Task.start(fn ->
+          result =
+            RenewCollabSim.Server.SimulationServer.count(p)
+
+          GenServer.reply(from, result)
+        end)
+
+        {:noreply, state}
 
       nil ->
         {:reply, 0, state}
