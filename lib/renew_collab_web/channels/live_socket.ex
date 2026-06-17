@@ -11,6 +11,7 @@ defmodule RenewCollabWeb.LiveSocket do
   channel "project:*", RenewCollabWeb.LiveProjectChannel
 
   channel "live:net_instance:*", RenewCollabWeb.LiveSimulationNetInstanceChannel
+  channel "live:net_instance_bindings:*", RenewCollabWeb.LiveSimulationNetInstanceBindingsChannel
   channel "live:simulation_links:*", RenewCollabWeb.LiveSimulationLinksChannel
   channel "live:simulation_log:*", RenewCollabWeb.LiveSimulationLogChannel
   channel "live:simulation_breakpoints:*", RenewCollabWeb.LiveSimulationBreakpointsChannel

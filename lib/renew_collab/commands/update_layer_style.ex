@@ -94,4 +94,5 @@ defmodule RenewCollab.Commands.UpdateLayerStyle do
   defp attr_key("border_opacity"), do: :border_opacity
   defp attr_key("border_width"), do: :border_width
   defp attr_key("border_dash_array"), do: :border_dash_array
+  defp attr_key("target_location"), do: :target_location
 end

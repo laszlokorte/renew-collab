@@ -49,32 +49,35 @@ defmodule RenewCollabWeb.BlueprintJSON do
   @arrow_tip_double "1BB93575-6759-4C59-8ED3-626949D1326A"
   @arrow_tip_circle "2FD06A6E-6B3E-4AD4-8728-4BE95A8A1451"
   @edge_icon """
-  <path d="M 5 25 L 25 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="butt" />
-  <path d="M 25 5 L 20.5 7.2 L 22.8 9.5 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
+  <path d="M 8 8 L 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="butt" />
+  <path d="M 24 24 L 18.4 21.5 L 21.5 18.4 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
   """
   @double_edge_icon """
-  <path d="M 5 25 L 25 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="butt" />
-  <path d="M 25 5 L 20.5 7.2 L 22.8 9.5 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
-  <path d="M 5 25 L 9.5 22.8 L 7.2 20.5 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
+  <path d="M 8 24 L 24 8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="butt" />
+  <path d="M 24 8 L 18.4 10.5 L 21.5 13.6 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
+  <path d="M 8 24 L 13.6 21.5 L 10.5 18.4 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
   """
   @double_tip_edge_icon """
-  <path d="M 5 25 L 25 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="butt" />
-  <path d="M 25 5 L 20.5 7.2 L 22.8 9.5 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
-  <path d="M 21 9 L 16.5 11.2 L 18.8 13.5 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
+  <path d="M 8 8 L 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="butt" />
+  <path d="M 24 24 L 18.4 21.5 L 21.5 18.4 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
+  <path d="M 20 20 L 14.4 17.5 L 17.5 14.4 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
   """
   @circle_edge_icon """
-  <path d="M 6 24 L 21 9" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="butt" />
-  <circle cx="24" cy="6" r="3.7" fill="white" stroke="currentColor" stroke-width="1.5" />
+  <path d="M 8 24 L 24 8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="butt" />
+  <circle cx="8" cy="24" r="2.4" fill="currentColor" />
+  <circle cx="24" cy="8" r="2.4" fill="currentColor" />
   """
   @plain_edge_icon """
-  <path d="M 5 25 L 25 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="butt" />
+  <path d="M 8 24 L 24 8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="butt" />
   """
   @loop_edge_icon """
-  <path d="M 9 20 C 3 12 7 5 15 5 C 23 5 27 12 22 19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="butt" />
-  <path d="M 22 19 L 18 16.5 L 18.8 21 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
+  <path d="M 9 20 C 3 12 7 5 15 5 C 23 5 27 12 22 19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="butt" />
+  <path d="M 22 19 L 17.7 16.3 L 18.8 21.4 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
   """
   @angle_edge_icon """
-  <path d="M 7 8 L 7 23 L 23 23" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="butt" stroke-linejoin="miter" />
+  <path d="M 7 8 L 7 23 L 23 23" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="butt" stroke-linejoin="miter" />
+  <path d="M 7 8 L 4.5 13.6 L 9.5 13.6 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
+  <path d="M 23 23 L 17.4 20.5 L 20.5 17.4 Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" stroke-linejoin="miter" />
   """
   @edge_tools [
     %{
@@ -91,18 +94,23 @@ defmodule RenewCollabWeb.BlueprintJSON do
       name: "Connection Tool",
       data: %{
         semantic_tag: "CH.ifa.draw.figures.LineConnection",
-        source_tip_symbol_shape_id: nil,
-        target_tip_symbol_shape_id: nil
+        source_tip_symbol_shape_id: @arrow_tip_normal,
+        target_tip_symbol_shape_id: @arrow_tip_normal,
+        connection_layout: "line",
+        create_node_on_empty: false
       },
-      icon: @plain_edge_icon
+      icon: @double_edge_icon
     },
     %{
       kind: "edge-tool",
       name: "Elbow Connection Tool",
       data: %{
         semantic_tag: "CH.ifa.draw.figures.ElbowConnection",
-        source_tip_symbol_shape_id: nil,
-        target_tip_symbol_shape_id: nil
+        source_tip_symbol_shape_id: @arrow_tip_normal,
+        target_tip_symbol_shape_id: @arrow_tip_normal,
+        connection_layout: "elbow",
+        smoothness: "elbow",
+        create_node_on_empty: false
       },
       icon: @angle_edge_icon
     },

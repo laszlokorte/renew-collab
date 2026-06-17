@@ -15,8 +15,14 @@ defmodule RenewCollab.Primitives.Predefined do
     transition_socket_schema_id =
       socket_schema_id.("simple-rect", "4FDF577B-DB81-462E-971E-FA842F0ABA1E")
 
+    # Plain shapes get the same simple socket schemas as nodes so that connection edges
+    # (LineConnection/ElbowConnection) can attach to any figure, like in Renew. Edges
+    # require a real socket+schema server-side (bonding repositioning joins on them).
+    rect_socket_schema_id = transition_socket_schema_id
+    ellipse_socket_schema_id = place_socket_schema_id
+
     rect_shape_id = shape_id.("rect", "2DD432FE-CC8A-4259-8A84-63F75AF0ECE0")
-    virtual_transition_shape_id = rect_shape_id
+    virtual_transition_shape_id = shape_id.("rect-double-in", rect_shape_id)
     round_rect_shape_id = shape_id.("rect-round", rect_shape_id)
     circle_shape_id = shape_id.("ellipse", "3B66E69A-057A-40B9-A1A0-9DB44EF5CE42")
     virtual_place_shape_id = shape_id.("ellipse-double-in", circle_shape_id)
@@ -150,6 +156,7 @@ defmodule RenewCollab.Primitives.Predefined do
               content: %{
                 semantic_tag: "CH.ifa.draw.figures.RectangleFigure",
                 shape_id: rect_shape_id,
+                socket_schema_id: rect_socket_schema_id,
                 width: 40,
                 height: 28,
                 style: %{
@@ -171,6 +178,7 @@ defmodule RenewCollab.Primitives.Predefined do
               content: %{
                 semantic_tag: "CH.ifa.draw.figures.RoundRectangleFigure",
                 shape_id: round_rect_shape_id,
+                socket_schema_id: rect_socket_schema_id,
                 shape_attributes: %{"rx" => 8, "ry" => 8},
                 width: 40,
                 height: 28,
@@ -203,6 +211,7 @@ defmodule RenewCollab.Primitives.Predefined do
               content: %{
                 semantic_tag: "CH.ifa.draw.figures.EllipseFigure",
                 shape_id: circle_shape_id,
+                socket_schema_id: ellipse_socket_schema_id,
                 width: 32,
                 height: 32,
                 style: %{
@@ -224,6 +233,7 @@ defmodule RenewCollab.Primitives.Predefined do
               content: %{
                 semantic_tag: "CH.ifa.draw.figures.PieFigure",
                 shape_id: pie_shape_id,
+                socket_schema_id: ellipse_socket_schema_id,
                 shape_attributes: %{
                   "start_angle" => 180,
                   "end_angle" => 90
@@ -249,6 +259,7 @@ defmodule RenewCollab.Primitives.Predefined do
               content: %{
                 semantic_tag: "CH.ifa.draw.figures.DiamondFigure",
                 shape_id: diamond_shape_id,
+                socket_schema_id: rect_socket_schema_id,
                 width: 32,
                 height: 32,
                 style: %{
@@ -270,6 +281,7 @@ defmodule RenewCollab.Primitives.Predefined do
               content: %{
                 semantic_tag: "CH.ifa.draw.contrib.TriangleFigure",
                 shape_id: triangle_shape_id,
+                socket_schema_id: rect_socket_schema_id,
                 width: 32,
                 height: 28,
                 style: %{
@@ -289,7 +301,7 @@ defmodule RenewCollab.Primitives.Predefined do
             name: "Line Tool",
             data: %{
               content: %{
-                semantic_tag: "CH.ifa.draw.figures.PolyLineFigure",
+                semantic_tag: "CH.ifa.draw.figures.LineFigure",
                 points: [%{x: -20, y: 0}, %{x: 20, y: 0}]
               },
               mimeType: "application/json+renewex-layer",
@@ -297,7 +309,7 @@ defmodule RenewCollab.Primitives.Predefined do
               alignY: 0.5
             },
             icon:
-              ~H(<path d="M4 26 L28 6" fill="none" stroke="#111" stroke-width="2" stroke-linecap="butt" />)
+              ~H(<path d="M8 8 L24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="butt" />)
               |> html_to_string
           },
           %{
@@ -318,13 +330,20 @@ defmodule RenewCollab.Primitives.Predefined do
               alignY: 0.5
             },
             icon:
-              ~H(<circle cx="16" cy="16" r="10" fill="none" stroke="#111" stroke-width="1.8" />
+              ~H(<rect x="7" y="17" width="10" height="8" fill="none" stroke="#111" stroke-width="1.8" />
 <path
-  d="M16 5 V27 M5 16 H27"
+  d="M13 19 L24 8"
   fill="none"
   stroke="#111"
-  stroke-width="1.2"
+  stroke-width="1.8"
   stroke-linecap="butt"
+/>
+<path
+  d="M24 8 L18.5 9.8 L22.2 13.5 Z"
+  fill="#111"
+  stroke="#111"
+  stroke-width="0.6"
+  stroke-linejoin="miter"
 />)
               |> html_to_string
           },
@@ -334,6 +353,7 @@ defmodule RenewCollab.Primitives.Predefined do
               content: %{
                 semantic_tag: "CH.ifa.draw.figures.ImageFigure",
                 shape_id: rect_shape_id,
+                socket_schema_id: rect_socket_schema_id,
                 width: 40,
                 height: 32,
                 style: %{

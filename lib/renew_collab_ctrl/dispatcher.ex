@@ -29,6 +29,9 @@ defmodule RenewCollabCtrl.Dispatcher do
 
         :error ->
           :error
+
+        false ->
+          false
       end
       |> case do
         res = :ok ->
@@ -38,6 +41,9 @@ defmodule RenewCollabCtrl.Dispatcher do
         res = {:ok, result} ->
           notify(project_before, action, result)
           res
+
+        false ->
+          false
 
         res ->
           res

@@ -11,7 +11,7 @@ defmodule RenewCollab.Style.EdgeStyle do
     field :stroke_join, :string
     field :stroke_cap, :string
     field :stroke_dash_array, :string
-    field :smoothness, Ecto.Enum, values: [:linear, :autobezier], default: :linear
+    field :smoothness, Ecto.Enum, values: [:linear, :autobezier, :elbow], default: :linear
     field :smoothness_amount, :float, default: 50.0
 
     belongs_to :source_tip_symbol_shape, RenewCollab.Symbol.Shape
