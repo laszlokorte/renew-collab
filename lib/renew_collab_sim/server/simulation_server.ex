@@ -232,6 +232,15 @@ defmodule RenewCollabSim.Server.SimulationServer do
   end
 
   @impl true
+  def handle_call(:stop_all, _from, %{processes: procs} = state) do
+    for {_sim_id, %{sim_process: p}} <- procs do
+      RenewCollabSim.Server.SimulationProcess.stop(p)
+    end
+
+    {:stop, :normal, :ok, state}
+  end
+
+  @impl true
   def handle_call({:console_command, simulation_id, command}, from, %{processes: procs} = state) do
     case Map.get(procs, simulation_id, nil) do
       %{sim_process: p} ->

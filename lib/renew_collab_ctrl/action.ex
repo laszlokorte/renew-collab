@@ -1009,6 +1009,8 @@ defmodule RenewCollabCtrl.Action do
   end
 
   def do_perform(%Actions.ProjectDelete{project_id: project_id}) do
+    RenewCollabSim.Server.ScopedSimulationServer.stop_scope(project_id)
+
     %RenewCollabProj.Commands.DeleteProject{project_id: project_id}
     |> RenewCollabProj.ProjectCommander.run_project_command_sync()
 

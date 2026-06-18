@@ -84,6 +84,10 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
     GenServer.call(__MODULE__, {:stop, simulation_scope, simulation_id})
   end
 
+  def stop_scope(simulation_scope) do
+    GenServer.call(__MODULE__, {:stop_scope, simulation_scope})
+  end
+
   def exists(simulation_scope, simulation_id) do
     GenServer.call(__MODULE__, {:exists, simulation_scope, simulation_id})
   end
@@ -216,6 +220,18 @@ defmodule RenewCollabSim.Server.ScopedSimulationServer do
     case Map.get(state, simulation_scope, nil) do
       %{server_process: p} ->
         RenewCollabSim.Server.SimulationServer.stop(p, simulation_id)
+        {:reply, true, state}
+
+      nil ->
+        {:reply, false, state}
+    end
+  end
+
+  @impl true
+  def handle_call({:stop_scope, simulation_scope}, _from, state) do
+    case Map.get(state, simulation_scope, nil) do
+      %{server_process: p} ->
+        RenewCollabSim.Server.SimulationServer.stop_all(p)
         {:reply, true, state}
 
       nil ->

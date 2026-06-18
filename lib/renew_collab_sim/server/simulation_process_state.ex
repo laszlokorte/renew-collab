@@ -228,6 +228,7 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
       open_multi |> Repo.transact()
     rescue
       Ecto.ConstraintError -> {}
+      FunctionClauseError -> {}
     end
 
     %{state | open_multi: {0, Ecto.Multi.new()}}
