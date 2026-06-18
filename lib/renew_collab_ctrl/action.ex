@@ -108,16 +108,20 @@ defmodule RenewCollabCtrl.Action do
         project_id: project_id,
         document_data: document_data
       }) do
+    layers = document_layers(document_data)
+
     Commands.CreateDocument.new(%{
       doc: %TransientDocument{
-        content: document_data,
+        content: put_document_layers(document_data, layers),
         # assuming layers to not be nested
         parenthoods:
-          document_data
-          |> Map.get("layers")
-          |> Enum.map(fn %{"id" => layer_id} ->
+          layers
+          |> Enum.map(fn layer ->
+            layer_id = document_layer_id(layer)
+
             %{depth: 0, ancestor_id: layer_id, descendant_id: layer_id}
-          end),
+          end)
+          |> Enum.reject(&is_nil(&1.ancestor_id)),
         hyperlinks: [],
         bonds: []
       }
@@ -1835,6 +1839,21 @@ defmodule RenewCollabCtrl.Action do
         :error
     end
   end
+
+  defp document_layers(%{} = document_data) do
+    Map.get(document_data, :layers) || Map.get(document_data, "layers") || []
+  end
+
+  defp put_document_layers(%{} = document_data, layers) do
+    if Map.has_key?(document_data, :layers) do
+      document_data
+    else
+      Map.put(document_data, :layers, layers)
+    end
+  end
+
+  defp document_layer_id(%{} = layer), do: Map.get(layer, :id) || Map.get(layer, "id")
+  defp document_layer_id(_), do: nil
 
   defp create_parent_layer_ids(layer_ids, child_layer_id) do
     layer_ids
