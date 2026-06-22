@@ -15,6 +15,11 @@ defmodule RenewCollab.Primitives.Predefined do
     transition_socket_schema_id =
       socket_schema_id.("simple-rect", "4FDF577B-DB81-462E-971E-FA842F0ABA1E")
 
+    # The rhombus stencil chops connections against the real diamond outline instead of
+    # its axis-aligned bounding box, so edges meet the visible diamond edge (like Renew).
+    rhombus_socket_schema_id =
+      socket_schema_id.("simple-rhombus", "9F3C1A52-7E64-4D2B-9C18-2A7B5E0C4D11")
+
     # Plain shapes get the same simple socket schemas as nodes so that connection edges
     # (LineConnection/ElbowConnection) can attach to any figure, like in Renew. Edges
     # require a real socket+schema server-side (bonding repositioning joins on them).
@@ -259,7 +264,7 @@ defmodule RenewCollab.Primitives.Predefined do
               content: %{
                 semantic_tag: "CH.ifa.draw.figures.DiamondFigure",
                 shape_id: diamond_shape_id,
-                socket_schema_id: rect_socket_schema_id,
+                socket_schema_id: rhombus_socket_schema_id,
                 width: 32,
                 height: 32,
                 style: %{
@@ -452,6 +457,7 @@ defmodule RenewCollab.Primitives.Predefined do
             },
             icon:
               ~H(<text x="5" y="11" font-size="12" font-family="serif" fill="#111">*</text>
+
 <text
   text-anchor="middle"
   font-size="25"

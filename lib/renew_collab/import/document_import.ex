@@ -120,7 +120,7 @@ defmodule RenewCollab.Import.DocumentImport do
                   "symbol_shape_attributes" => shape_attributes,
                   "symbol_shape_id" => Map.get(symbol_ids, shape_name)
                 },
-                "interface" => convert_interface(socket_schema_ids, class_name),
+                "interface" => convert_interface(socket_schema_ids, parser.grammar, class_name),
                 "style" => style
               }
 
@@ -201,7 +201,7 @@ defmodule RenewCollab.Import.DocumentImport do
                   "style" => text_style,
                   "size_hint" => import_text_size_hint(fields, body, x, y)
                 },
-                "interface" => convert_interface(socket_schema_ids, class_name)
+                "interface" => convert_interface(socket_schema_ids, parser.grammar, class_name)
               }
 
             {{%Renewex.Storable{
@@ -443,22 +443,20 @@ defmodule RenewCollab.Import.DocumentImport do
                   "CH.ifa.draw.figures.ChopEllipseConnector" ->
                     {"simple-ellipse", "center-socket"}
 
-                  # TODO: these connectors are not working yet
                   "CH.ifa.draw.contrib.ChopPolygonConnector" ->
-                    {"simple", "center-socket"}
+                    {"simple-rect", "center-socket"}
 
                   "CH.ifa.draw.figures.ChopPieConnector" ->
-                    {"simple", "center-socket"}
+                    {"simple-ellipse", "center-socket"}
 
                   "de.renew.diagram.VerticalConnector" ->
-                    {"simple", "center-socket"}
+                    {"simple-rect", "center-socket"}
 
                   "de.renew.diagram.VSplitCenterConnector" ->
-                    {"simple", "center-socket"}
+                    {"simple-rect", "center-socket"}
 
                   _other ->
-                    # dbg(other)
-                    {"simple", "center-socket"}
+                    {"simple-rect", "center-socket"}
                 end
               ),
             kind: kind
@@ -605,41 +603,69 @@ defmodule RenewCollab.Import.DocumentImport do
   defp is_rich_text(grammar, class_name),
     do: Renewex.Hierarchy.is_subtype_of(grammar, class_name, "de.renew.gui.fs.ConceptFigure")
 
-  defp convert_interface(socket_schema_ids, class_name) do
-    case class_name do
-      "de.renew.gui.PlaceFigure" ->
-        "simple-ellipse"
+  defp convert_interface(socket_schema_ids, grammar, class_name) do
+    schema_name =
+      cond do
+        class_name in [
+          "de.renew.gui.PlaceFigure",
+          "de.renew.gui.VirtualPlaceFigure"
+        ] ->
+          "simple-ellipse"
 
-      "de.renew.gui.TransitionFigure" ->
-        "simple-rect"
+        class_name in [
+          "de.renew.gui.TransitionFigure",
+          "de.renew.gui.VirtualTransitionFigure"
+        ] ->
+          "simple-rect"
 
-      "de.renew.gui.VirtualPlaceFigure" ->
-        "simple-ellipse"
+        class_name in [
+          "de.renew.gui.fs.ConceptFigure",
+          "fs.ConceptFigure"
+        ] ->
+          "sides"
 
-      "de.renew.gui.VirtualTransitionFigure" ->
-        "simple-rect"
+        Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.contrib.TriangleFigure") ->
+          "simple-rect"
 
-      "de.renew.gui.fs.ConceptFigure" ->
-        "sides"
+        Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.contrib.DiamondFigure") ->
+          "simple-rhombus"
 
-      "fs.ConceptFigure" ->
-        "sides"
+        Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.figures.EllipseFigure") ->
+          "simple-ellipse"
 
-      _ ->
-        nil
-    end
-    |> case do
+        Renewex.Hierarchy.is_subtype_of(grammar, class_name, "CH.ifa.draw.figures.PieFigure") ->
+          "simple-ellipse"
+
+        Renewex.Hierarchy.is_subtype_of(
+          grammar,
+          class_name,
+          "CH.ifa.draw.figures.RoundRectangleFigure"
+        ) ->
+          "simple-rect"
+
+        Renewex.Hierarchy.is_subtype_of(
+          grammar,
+          class_name,
+          "CH.ifa.draw.figures.RectangleFigure"
+        ) ->
+          "simple-rect"
+
+        true ->
+          nil
+      end
+
+    interface_attrs(socket_schema_ids, schema_name)
+  end
+
+  defp interface_attrs(_socket_schema_ids, nil), do: nil
+
+  defp interface_attrs(socket_schema_ids, name) do
+    case Map.get(socket_schema_ids, name) do
       nil ->
         nil
 
-      name ->
-        %{
-          "socket_schema_id" =>
-            Map.get(
-              socket_schema_ids,
-              name
-            )
-        }
+      socket_schema_id ->
+        %{"socket_schema_id" => socket_schema_id}
     end
   end
 

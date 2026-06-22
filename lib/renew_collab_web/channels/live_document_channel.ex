@@ -178,16 +178,7 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
           "symbol_shape_attributes" => Map.get(params, "shape_attributes", nil)
         },
         "style" => Map.get(params, "style", nil),
-        "interface" =>
-          case Map.get(params, "socket_schema_id", nil) do
-            nil ->
-              nil
-
-            id ->
-              %{
-                "socket_schema_id" => id
-              }
-          end,
+        "interface" => box_interface_attrs(params),
         "outgoing_link" => outgoing_link_attrs(params)
       }
     }
@@ -224,16 +215,7 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
           "symbol_shape_attributes" => Map.get(params, "shape_attributes", nil)
         },
         "style" => Map.get(params, "style", nil),
-        "interface" =>
-          case Map.get(params, "socket_schema_id", nil) do
-            nil ->
-              nil
-
-            id ->
-              %{
-                "socket_schema_id" => id
-              }
-          end,
+        "interface" => box_interface_attrs(params),
         "outgoing_link" => outgoing_link_attrs(params)
       }
     }
@@ -296,8 +278,9 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
       base_layer_id: Map.get(params, "base_layer_id", nil),
       document_id: document_id,
       attrs: %{
-        "semantic_tag" => Map.get(params, "semantic_tag", "CH.ifa.draw.figures.PolyLineFigure"),
+        "semantic_tag" => point_layer_semantic_tag(params, cyclic),
         "style" => polygon_layer_style(params, cyclic),
+        "interface" => point_layer_interface_attrs(params, cyclic),
         "edge" => %{
           "source_x" => source_x,
           "source_y" => source_y,
@@ -1433,6 +1416,58 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
   defp default_box_size(%{"semantic_tag" => "de.renew.fa.figures.FAStateFigure"}), do: {40, 40}
   defp default_box_size(_params), do: {50, 50}
 
+  defp box_interface_attrs(%{"socket_schema_id" => socket_schema_id})
+       when is_binary(socket_schema_id),
+       do: %{"socket_schema_id" => socket_schema_id}
+
+  defp box_interface_attrs(%{"semantic_tag" => semantic_tag}) do
+    case default_socket_schema_name(semantic_tag) do
+      nil -> nil
+      name -> %{"socket_schema_id" => socket_schema_id_by_name(name)}
+    end
+  end
+
+  defp box_interface_attrs(_params), do: nil
+
+  defp default_socket_schema_name(semantic_tag)
+       when semantic_tag in [
+              "de.renew.gui.PlaceFigure",
+              "de.renew.gui.VirtualPlaceFigure",
+              "CH.ifa.draw.figures.EllipseFigure",
+              "CH.ifa.draw.figures.PieFigure",
+              "de.renew.fa.figures.FAStateFigure"
+            ],
+       do: "simple-ellipse"
+
+  defp default_socket_schema_name(semantic_tag)
+       when semantic_tag in [
+              "de.renew.gui.TransitionFigure",
+              "de.renew.gui.VirtualTransitionFigure",
+              "CH.ifa.draw.figures.RectangleFigure",
+              "CH.ifa.draw.figures.RoundRectangleFigure",
+              "CH.ifa.draw.contrib.TriangleFigure",
+              "CH.ifa.draw.figures.TargetFigure"
+            ],
+       do: "simple-rect"
+
+  defp default_socket_schema_name("CH.ifa.draw.contrib.DiamondFigure"), do: "simple-rhombus"
+  defp default_socket_schema_name(_semantic_tag), do: nil
+
+  defp socket_schema_id_by_name("simple-ellipse") do
+    RenewCollab.Sockets.schemas_by_name()
+    |> Map.get("simple-ellipse", "2C5DE751-2FB8-48DE-99B6-D99648EBDFFC")
+  end
+
+  defp socket_schema_id_by_name("simple-rhombus") do
+    RenewCollab.Sockets.schemas_by_name()
+    |> Map.get("simple-rhombus", "9F3C1A52-7E64-4D2B-9C18-2A7B5E0C4D11")
+  end
+
+  defp socket_schema_id_by_name(_name) do
+    RenewCollab.Sockets.schemas_by_name()
+    |> Map.get("simple-rect", "4FDF577B-DB81-462E-971E-FA842F0ABA1E")
+  end
+
   defp polygon_layer_style(params, cyclic) do
     case Map.fetch(params, "layer_style") do
       {:ok, style} -> style
@@ -1440,6 +1475,25 @@ defmodule RenewCollabWeb.LiveDocumentChannel do
       :error -> nil
     end
   end
+
+  defp point_layer_semantic_tag(params, true) do
+    Map.get(params, "semantic_tag", "CH.ifa.draw.figures.PolygonFigure")
+  end
+
+  defp point_layer_semantic_tag(params, false) do
+    Map.get(params, "semantic_tag", "CH.ifa.draw.figures.PolyLineFigure")
+  end
+
+  defp point_layer_interface_attrs(params, true) do
+    socket_schema_id =
+      Map.get(params, "socket_schema_id") ||
+        RenewCollab.Sockets.schemas_by_name()
+        |> Map.get("simple-rect", "4FDF577B-DB81-462E-971E-FA842F0ABA1E")
+
+    %{"socket_schema_id" => socket_schema_id}
+  end
+
+  defp point_layer_interface_attrs(_params, false), do: nil
 
   defp outgoing_link_attrs(params) do
     case Map.get(params, "hyperlink", nil) do

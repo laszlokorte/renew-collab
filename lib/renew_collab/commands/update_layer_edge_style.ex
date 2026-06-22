@@ -83,6 +83,7 @@ defmodule RenewCollab.Commands.UpdateLayerEdgeStyle do
 
   defp normalize_value(:smoothness, "autobezier"), do: :autobezier
   defp normalize_value(:smoothness, "linear"), do: :linear
+  defp normalize_value(:smoothness, "elbow"), do: :elbow
   defp normalize_value(:smoothness, value), do: value
   defp normalize_value(_style_attr, value), do: value
 

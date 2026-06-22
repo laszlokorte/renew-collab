@@ -134,10 +134,17 @@ defmodule RenewCollabWeb.SimulationJSON do
   end
 
   def show_content(%Simulation{} = simulation, running, is_playing) do
+    linked_document_ids =
+      [simulation.id]
+      |> RenewCollab.Renew.list_simulation_document_ids()
+      |> Map.get(simulation.id, [])
+
     %{
       timestep: simulation.timestep,
+      document_ids: document_ids(simulation, linked_document_ids),
       running: running,
-      name: simulation.id,
+      name: simulation_label(simulation),
+      label: simulation_label(simulation),
       is_playing: is_playing,
       net_instances: Enum.map(simulation.net_instances, &list_instance/1),
       shadow_net_system: show_sns_item(simulation.shadow_net_system)
@@ -250,17 +257,27 @@ defmodule RenewCollabWeb.SimulationJSON do
   end
 
   def index_content(%{project_id: project_id, simulations: simulations, runnings: runnings}) do
+    document_ids_by_simulation =
+      simulations
+      |> Enum.map(& &1.id)
+      |> RenewCollab.Renew.list_simulation_document_ids()
+
     %{
       project_id: project_id,
-      items: for(simulation <- simulations, do: list_data(simulation, runnings))
+      items:
+        for simulation <- simulations do
+          list_data(simulation, runnings, Map.get(document_ids_by_simulation, simulation.id, []))
+        end
     }
   end
 
-  defp list_data(%Simulation{} = simulation, runnings) do
+  defp list_data(%Simulation{} = simulation, runnings, linked_document_ids) do
     %{
       href: url(~p"/api/simulations/#{simulation}"),
       id: simulation.id,
-      label: simulation.shadow_net_system.main_net_name,
+      label: simulation_label(simulation),
+      inserted_at: simulation.inserted_at,
+      updated_at: simulation.updated_at,
       links: %{
         step: %{
           href: url(~p"/api/simulations/#{simulation}/step"),
@@ -285,6 +302,7 @@ defmodule RenewCollabWeb.SimulationJSON do
       },
       content: %{
         timestep: simulation.timestep,
+        document_ids: document_ids(simulation, linked_document_ids),
         running:
           case runnings do
             nil -> nil
@@ -293,6 +311,28 @@ defmodule RenewCollabWeb.SimulationJSON do
       }
     }
   end
+
+  defp simulation_label(%Simulation{} = simulation) do
+    main_net_name =
+      case simulation.shadow_net_system do
+        %{main_net_name: name} when is_binary(name) and name != "" -> name
+        _ -> "Untitled"
+      end
+
+    "#{main_net_name}[0]"
+  end
+
+  defp document_ids(%Simulation{document_links: %Ecto.Association.NotLoaded{}}, fallback),
+    do: fallback
+
+  defp document_ids(%Simulation{document_links: links}, _fallback) when is_list(links) do
+    links
+    |> Enum.map(& &1.document_id)
+    |> Enum.filter(&is_binary/1)
+    |> Enum.uniq()
+  end
+
+  defp document_ids(_simulation, fallback), do: fallback
 
   def log(%{simulation_id: simulation_id, log_entries: log_entries}) do
     %{

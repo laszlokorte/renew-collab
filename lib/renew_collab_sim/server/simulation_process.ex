@@ -6,7 +6,9 @@ defmodule RenewCollabSim.Server.SimulationProcess do
   @simulation_command_timeout 30_000
   @auto_play_delay_ms 100
   @broadcast_retry_ms 200
-  @console_capture_ms 250
+  # Fallback timeout in case the end marker never comes back (e.g. Renew died
+  # mid-command). The reply normally happens as soon as the end marker is seen.
+  @console_fallback_ms 10_000
 
   def start_monitor(simulation_id, pubsub_channels) do
     with {:ok, pid} <-
@@ -204,14 +206,7 @@ defmodule RenewCollabSim.Server.SimulationProcess do
 
   @impl true
   def handle_info({:finish_console_request, request_id}, state) do
-    case Map.get(state.console_requests, request_id) do
-      %{from: from, output: output} ->
-        GenServer.reply(from, {:ok, %{output: output |> Enum.reverse() |> Enum.join("\n")}})
-        {:noreply, update_in(state.console_requests, &Map.delete(&1, request_id))}
-
-      _ ->
-        {:noreply, state}
-    end
+    {:noreply, reply_console_request(state, request_id)}
   end
 
   @impl true
@@ -266,14 +261,20 @@ defmodule RenewCollabSim.Server.SimulationProcess do
 
   @impl true
   def handle_call({:console_command, command}, from, state) when is_binary(command) do
-    request_id = UUID.uuid4(:default)
-    State.console_command(state, command)
-    Process.send_after(self(), {:finish_console_request, request_id}, @console_capture_ms)
+    request_id = UUID.uuid4(:hex)
+    begin_marker = console_marker("BEGIN", request_id)
+    end_marker = console_marker("END", request_id)
+
+    State.console_command(state, begin_marker, command, end_marker)
+    Process.send_after(self(), {:finish_console_request, request_id}, @console_fallback_ms)
 
     {:noreply,
      put_in(state.console_requests[request_id], %{
        from: from,
-       output: []
+       output: [],
+       begin_marker: begin_marker,
+       end_marker: end_marker,
+       capturing: false
      })}
   end
 
@@ -404,19 +405,31 @@ defmodule RenewCollabSim.Server.SimulationProcess do
           playing: playing
         } = state
       ) do
-    state =
-      if logging and not playing and not simulation_protocol_line?(content) do
-        state
-        |> State.append_command(
-          RenewCollabSim.Commands.LogEvent.new(%{simulation_id: simulation_id, content: content})
-        )
-      else
-        state
-      end
-      |> maybe_remember_simulation_error(content)
-      |> maybe_append_console_output(content)
+    case consume_console_marker(state, content) do
+      {:consumed, state} ->
+        {:noreply, state}
 
-    {:noreply, state}
+      {:passthrough, state} ->
+        state =
+          if logging and not playing and not simulation_protocol_line?(content) do
+            state
+            |> State.append_command(
+              RenewCollabSim.Commands.LogEvent.new(%{
+                simulation_id: simulation_id,
+                content: content
+              })
+            )
+          else
+            state
+          end
+          |> maybe_remember_simulation_error(content)
+          |> maybe_append_console_output(
+            content,
+            RenewCollabSim.Server.SimulationParser.parse(content)
+          )
+
+        {:noreply, state}
+    end
   end
 
   @impl true
@@ -424,7 +437,10 @@ defmodule RenewCollabSim.Server.SimulationProcess do
         {:log, {:eol, content}},
         state
       ) do
-    process_simulator_output(state, content)
+    case consume_console_marker(state, content) do
+      {:consumed, state} -> {:noreply, state}
+      {:passthrough, state} -> process_simulator_output(state, content)
+    end
   end
 
   defp process_simulator_output(
@@ -437,6 +453,8 @@ defmodule RenewCollabSim.Server.SimulationProcess do
          } = state,
          content
        ) do
+    parsed = RenewCollabSim.Server.SimulationParser.parse(content)
+
     state =
       if logging and not playing and not simulation_protocol_line?(content) do
         state
@@ -447,9 +465,9 @@ defmodule RenewCollabSim.Server.SimulationProcess do
         state
       end
       |> maybe_remember_simulation_error(content)
-      |> maybe_append_console_output(content)
+      |> maybe_append_console_output(content, parsed)
 
-    RenewCollabSim.Server.SimulationParser.parse(content)
+    parsed
     |> case do
       {:new_instance, _time_number, instance_name, instance_number} ->
         {:noreply,
@@ -603,17 +621,80 @@ defmodule RenewCollabSim.Server.SimulationProcess do
     end
   end
 
-  defp maybe_append_console_output(state, content) do
+  # Only genuine command responses belong in the console buffer. Lines the
+  # SimulationParser recognises (firing/putting/removing/sync/… trace as well as
+  # SIMULATION_ protocol lines) are simulation output that interleaves while the
+  # net is playing — they are still parsed as simulation changes below, but must
+  # not leak into the response of a manually entered console command.
+  defp maybe_append_console_output(state, content, parsed) do
     if is_binary(content) and map_size(state.console_requests) > 0 and
-         not simulation_protocol_line?(content) do
+         is_nil(parsed) and not simulation_protocol_line?(content) do
       update_in(state.console_requests, fn requests ->
         Map.new(requests, fn {request_id, request} ->
-          {request_id, update_in(request.output, &[content | &1])}
+          if request.capturing do
+            {request_id, update_in(request.output, &[content | &1])}
+          else
+            {request_id, request}
+          end
         end)
       end)
     else
       state
     end
+  end
+
+  defp console_marker(kind, request_id), do: "RENEW_CONSOLE_#{kind}_#{request_id}"
+
+  # Detects the begin/end markers emitted by the `get <marker>` commands wrapping
+  # a console command. The begin marker opens the capture window for its request,
+  # the end marker closes it and replies. Marker lines are consumed (never logged
+  # nor surfaced as command output).
+  defp consume_console_marker(state, content) when is_binary(content) do
+    cond do
+      request_id = find_console_marker(state.console_requests, content, :begin_marker) ->
+        {:consumed, put_in(state.console_requests[request_id].capturing, true)}
+
+      request_id = find_console_marker(state.console_requests, content, :end_marker) ->
+        {:consumed, reply_console_request(state, request_id)}
+
+      true ->
+        {:passthrough, state}
+    end
+  end
+
+  defp consume_console_marker(state, _content), do: {:passthrough, state}
+
+  defp find_console_marker(requests, content, key) do
+    Enum.find_value(requests, fn {request_id, request} ->
+      if String.contains?(content, Map.fetch!(request, key)), do: request_id
+    end)
+  end
+
+  defp reply_console_request(state, request_id) do
+    case Map.get(state.console_requests, request_id) do
+      %{from: from, output: output} ->
+        GenServer.reply(from, {:ok, %{output: render_console_output(output)}})
+        update_in(state.console_requests, &Map.delete(&1, request_id))
+
+      _ ->
+        state
+    end
+  end
+
+  defp render_console_output(output) do
+    output
+    |> Enum.reverse()
+    |> Enum.map(&clean_console_line/1)
+    |> Enum.reject(&(&1 == ""))
+    |> Enum.join("\n")
+  end
+
+  # Strip the leading "Renew > " prompt(s) the console prints between commands so
+  # they do not clutter the captured response.
+  defp clean_console_line(line) do
+    line
+    |> String.replace(~r/^(?:Renew > )+/, "")
+    |> String.trim_trailing()
   end
 
   defp binding_request_started(nil, transition_id, transition_instance, count) do

@@ -6,7 +6,7 @@ defmodule RenewCollab.Connection.SocketSchema do
   @foreign_key_type :binary_id
   schema "socket_schema" do
     field :name, :string
-    field :stencil, Ecto.Enum, values: [:rect, :ellipse], null: false
+    field :stencil, Ecto.Enum, values: [:rect, :ellipse, :rhombus], null: false
     has_many :sockets, RenewCollab.Connection.Socket
 
     timestamps(type: :utc_datetime)

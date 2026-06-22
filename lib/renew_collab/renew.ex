@@ -37,4 +37,23 @@ defmodule RenewCollab.Renew do
     )
     |> RenewCollabSim.Repo.preload([:simulation])
   end
+
+  def list_simulation_document_ids(simulation_ids) do
+    ids =
+      simulation_ids
+      |> List.wrap()
+      |> Enum.filter(&is_binary/1)
+      |> Enum.uniq()
+
+    Repo.all(
+      from(l in SimulationLink,
+        where: l.simulation_id in ^ids,
+        select: {l.simulation_id, l.document_id}
+      )
+    )
+    |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
+    |> Map.new(fn {simulation_id, document_ids} ->
+      {simulation_id, Enum.uniq(document_ids)}
+    end)
+  end
 end

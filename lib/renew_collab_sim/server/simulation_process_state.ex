@@ -150,8 +150,17 @@ defmodule RenewCollabSim.Server.SimulationProcess.State do
     )
   end
 
-  def console_command(%__MODULE__{sim_process: sim_process}, command) when is_binary(command) do
+  # The user command is wrapped between two `get <marker>` commands. The console
+  # processes stdin commands sequentially on its prompt thread, so the begin/end
+  # markers are echoed in order around the genuine command response. `get` for an
+  # unset property echoes the marker token ("Property <marker> is not set."),
+  # which lets the server delimit the response deterministically instead of
+  # guessing via a fixed time window — even while simulation output interleaves.
+  def console_command(%__MODULE__{sim_process: sim_process}, begin_marker, command, end_marker)
+      when is_binary(command) do
+    send(sim_process, {:command, "get #{begin_marker}\n"})
     send(sim_process, {:command, String.trim_trailing(command) <> "\n"})
+    send(sim_process, {:command, "get #{end_marker}\n"})
   end
 
   def transition_bindings(

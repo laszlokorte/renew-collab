@@ -63,7 +63,7 @@ defmodule RenewCollab.MixProject do
         {:pbkdf2_elixir, "~> 2.2"},
         {:renewex, "~> 0.15.0"},
         {:renewex_iconset, "~> 0.5.0"},
-        {:renewex_routing, "~> 0.3.0"},
+        {:renewex_routing, path: "../edge-router-main"},
         {:renewex_converter, "~> 0.5.0"},
         {:swoosh, "~> 1.19"},
         {:gen_smtp, "~> 1.0"},

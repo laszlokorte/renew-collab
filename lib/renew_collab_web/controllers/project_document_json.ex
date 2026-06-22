@@ -37,6 +37,8 @@ defmodule RenewCollabWeb.ProjectDocumentJSON do
       name: document.name,
       kind: document.kind,
       id: document.id,
+      inserted_at: document.inserted_at,
+      updated_at: document.updated_at,
       links: %{
         export: %{
           href: url(~p"/api/documents/#{document.id}/export")

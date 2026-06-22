@@ -90,10 +90,7 @@ defmodule RenewCollab.Commands.CreateLayerWithEdge do
               "target_y" => 0,
               "source_bond" => source_bond,
               "target_bond" => target_bond,
-              "style" => %{
-                "target_tip_symbol_shape_id" => Map.get(edge, "target_tip_symbol_shape_id", nil),
-                "source_tip_symbol_shape_id" => Map.get(edge, "source_tip_symbol_shape_id", nil)
-              },
+              "style" => edge_style_attrs(edge),
               "waypoints" => edge_waypoint_attrs(edge)
             }
           },
@@ -124,5 +121,14 @@ defmodule RenewCollab.Commands.CreateLayerWithEdge do
       _ ->
         []
     end)
+  end
+
+  defp edge_style_attrs(edge) do
+    style = Map.get(edge, "style") || %{}
+
+    Map.merge(style, %{
+      "target_tip_symbol_shape_id" => Map.get(edge, "target_tip_symbol_shape_id", nil),
+      "source_tip_symbol_shape_id" => Map.get(edge, "source_tip_symbol_shape_id", nil)
+    })
   end
 end
